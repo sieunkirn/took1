@@ -1,0 +1,8 @@
+node_modules/
+public/vendor/
+certs/
+dist/
+
+# 로컬 전용
+.claude/
+*.log

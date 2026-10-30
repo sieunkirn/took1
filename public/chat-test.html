@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 챗봇(테스트)</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<main class="fit">
+  <div class="chat-layout">
+    <div class="chat-col conv">
+      <p class="msg" style="margin:0">AI 뷰티 챗봇 · 외부 AI API 는 연결되어 있지 않습니다. 등록 제품 데이터베이스 기준 <strong>규칙 기반 추천</strong>으로 동작합니다.</p>
+      <section class="area grow">
+        <div class="label">[대화 내용 영역]</div>
+        <div id="chat-log" class="chat-log" aria-live="polite"></div>
+        <form id="chat-form" class="row" style="margin-top:8px" autocomplete="off">
+          <label for="chat-input" class="hidden">메시지</label>
+          <input type="text" id="chat-input" placeholder="예: 2만원 이하 글로시한 코랄 추천해 줘" style="flex:1; min-width:200px">
+          <button type="submit" id="chat-send">전송</button>
+          <button type="button" id="voice" aria-pressed="false">음성으로 질문</button>
+          <button type="button" id="chat-reset">대화 초기화</button>
+        </form>
+        <div class="row">
+          <label><input type="checkbox" id="tts"> 답변 소리로 읽어주기</label>
+          <button type="button" id="tts-stop" class="hidden">읽기 중지</button>
+        </div>
+        <p id="voice-status" class="muted small" aria-live="polite"></p>
+        <p class="muted small">음성 질문은 브라우저(Chrome/Edge)의 음성 인식 서비스로 전송되어 글자로 바뀐 뒤 챗봇에 입력됩니다.</p>
+      </section>
+      <section class="area">
+        <div class="label">[빠른 질문]</div>
+        <div class="row" id="quick">
+          <button type="button" data-q="더 글로시한 제품 추천해 줘">더 글로시한 제품 추천</button>
+          <button type="button" data-q="더 저렴한 제품 추천해 줘">더 저렴한 제품 추천</button>
+          <button type="button" data-q="비슷한 색상 찾아 줘">비슷한 색상 찾기</button>
+          <button type="button" data-q="매트한 제품 찾아 줘">매트한 제품 찾기</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="chat-col info">
+      <section class="area">
+        <div class="label">[답할 수 있는 질문]</div>
+        <p class="muted small">아래 질문을 누르거나, 입력창·음성으로 비슷하게 말하면 됩니다. 조건을 섞어도 됩니다.</p>
+        <div id="question-guide"></div>
+      </section>
+      <section class="area">
+        <div class="label">[기준 제품 정보]</div>
+        <div id="base-info" class="muted">기준 제품이 없습니다. 바코드 검색 또는 추천 결과에서 기준 제품을 정할 수 있습니다.</div>
+        <div class="row" style="margin-top:6px"><button type="button" id="base-clear" disabled>기준 제품 해제</button></div>
+      </section>
+      <section class="area">
+        <div class="label">[기준 색상 정보]</div>
+        <div id="color-info" class="muted">립 컬러 매핑에서 선택한 색상이 없습니다.</div>
+        <div class="row" style="margin-top:6px"><button type="button" id="color-clear" disabled>기준 색상 해제</button></div>
+      </section>
+      <section class="area">
+        <div class="label">[제품 추천 결과 영역]</div>
+        <div id="chat-status" class="muted">질문을 입력하면 조건에 맞는 등록 제품이 표시됩니다.</div>
+        <div id="chat-results" class="cards"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<script type="module" src="js/chat-test.js"></script>
+</body>
+</html>

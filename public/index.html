@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭)</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<main class="home">
+  <section class="hero">
+    <p class="eyebrow">LIP COLOR · BEAUTY ASSISTANT</p>
+    <h1>took(툭)</h1>
+    <p class="hero-lead">카메라에 비춰 보기만 하면<br>나에게 어울리는 립을 툭, 찾아 드려요.</p>
+    <div class="hero-actions">
+      <a class="btn-primary fresh" href="lip-together.html">립 발라 보기</a>
+      <a class="btn-line fresh" href="chat.html">챗봇에게 물어보기</a>
+    </div>
+  </section>
+
+  <section aria-labelledby="menu-title">
+    <h2 id="menu-title" class="section-title">무엇을 해 볼까요?</h2>
+    <nav class="home-menu">
+      <a href="lip-together.html" id="go-lip" class="feature fresh">
+        <svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M4 24c5-8 10-12 14-12 3 0 4 2 6 2s3-2 6-2c4 0 9 4 14 12-6 8-13 12-20 12S10 32 4 24z"/><path d="M4 24h40"/></svg>
+        <strong>립 컬러 매핑</strong>
+        <span>카메라로 입술에 바로 발라 보고, 나에게 어울리는 컬러와 비슷한 제품을 추천받아요.</span>
+        <span class="go">시작하기 →</span>
+      </a>
+      <a href="chat.html" id="go-chat" class="feature fresh">
+        <svg viewBox="0 0 48 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 10h36v22H20l-9 7v-7H6z"/><path d="M14 19h20M14 25h12"/></svg>
+        <strong>AI 뷰티 챗봇</strong>
+        <span>"데이트 립 추천해 줘"처럼 편하게 물어보세요. 말로 물어보거나, 가지고 있는 립의 바코드를 찍어 어떤 제품인지 알아볼 수도 있어요.</span>
+        <span class="go">대화하기 →</span>
+      </a>
+    </nav>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <h2 id="how-title" class="section-title">이렇게 써 보세요</h2>
+    <ol class="steps">
+      <li><span class="num">01</span><strong>발라 보기</strong><span class="muted">카메라를 켜고 마음에 드는 컬러와 텍스처를 골라요.</span></li>
+      <li><span class="num">02</span><strong>내 톤 찾기</strong><span class="muted">"나에게 가장 잘 어울리는 컬러 추천받기"로 톤을 확인해요.</span></li>
+      <li><span class="num">03</span><strong>제품 고르기</strong><span class="muted">비슷한 색의 제품을 추천받고, 챗봇에게 더 물어봐요.</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="recent-title">
+    <h2 id="recent-title" class="section-title">최근 기록</h2>
+    <div id="session-state" class="recent"></div>
+  </section>
+
+  <p class="home-note muted small">가상 제품 데이터로 동작하는 시연 버전이에요. 챗봇은 외부 AI 없이 규칙 기반으로 답해요.</p>
+</main>
+<script type="module">
+  import { renderNav, store, api, go, el, won, shortName } from './js/common.js';
+  renderNav();
+  // 홈에서 들어가는 기능 페이지는 이전 전달값 없이 새로 연다
+  document.querySelectorAll('a.fresh').forEach((a) => a.addEventListener('click', () => store.remove('navCurrent.' + a.getAttribute('href'))));
+
+  // 최근 기록: 이번 방문(세션)에서 고른 색·측정한 톤·챗봇 기준 제품
+  const SEASON_LABELS = { spring: '봄 웜', summer: '여름 쿨', autumn: '가을 웜', winter: '겨울 쿨' };
+  const color = store.get('lipColor');
+  const tone = store.get('lipMatch')?.season;
+  const baseId = store.get('chatBaseId');
+  const rows = [];
+  const row = (label, value, action) => el('div', { class: 'recent-row' },
+    el('span', { class: 'muted', text: label }), el('strong', { text: value }), action || el('span'));
+  if (color?.hex) {
+    rows.push(row('최근에 고른 립 색', color.hex, el('a', {
+      href: 'recommend.html', text: '비슷한 제품 보기 →',
+      onclick: (e) => { e.preventDefault(); go('recommend.html', { hex: color.hex, source: 'lip' }); },
+    })));
+  }
+  if (SEASON_LABELS[tone]) rows.push(row('측정한 내 톤', SEASON_LABELS[tone], el('a', { href: 'lip-together.html', text: '다시 측정하기 →' })));
+  if (baseId) {
+    const { ok, body } = await api('api/products/' + encodeURIComponent(baseId));
+    if (ok) {
+      const p = body.product;
+      rows.push(row('챗봇 기준 제품', `${shortName(p)} (${won(p.price)})`, el('a', {
+        href: 'chat.html', text: '이어서 물어보기 →',
+      })));
+    }
+  }
+  document.getElementById('session-state').replaceChildren(...(rows.length ? rows : [
+    el('p', { class: 'muted', text: '아직 기록이 없어요. 립 컬러 매핑에서 첫 컬러를 골라 보세요.' }),
+  ]));
+</script>
+</body>
+</html>

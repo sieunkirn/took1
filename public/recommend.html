@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 제품 추천</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<main>
+  <h1>색상 기반 제품 추천</h1>
+  <section class="area">
+    <div class="label">[기준 색상 정보]</div>
+    <p id="ref-color">기준 색상: -</p>
+    <p class="muted">추천 방식: 기준 색상과 각 제품 색상의 CIEDE2000 색차(ΔE)를 계산해 작은 순서로 정렬합니다. 유사도 = 100 − 2 × ΔE (최소 0%).</p>
+    <div class="row">
+      <label for="finish-filter">제형 필터</label>
+      <select id="finish-filter"><option value="">전체</option></select>
+      <label for="limit">개수</label>
+      <select id="limit"><option>5</option><option selected>10</option><option>20</option></select>
+    </div>
+  </section>
+  <section class="area">
+    <div class="label">[추천 결과 목록]</div>
+    <div id="rec-status" class="muted"></div>
+    <div id="rec-list" class="cards"></div>
+  </section>
+  <section class="area">
+    <div class="row">
+      <button type="button" id="recolor">다시 조색하기</button>
+      <button type="button" id="to-chat">이 색상으로 챗봇에 질문하기</button>
+      <a href="index.html">홈으로 돌아가기</a>
+    </div>
+  </section>
+</main>
+<script type="module">
+  import { renderNav, api, qs, go, store, el, productCard, FINISH_LABELS } from './js/common.js';
+  import { normalizeHex } from './lib/color.js';
+  renderNav();
+
+  // 색상값 출처: 이동 시 전달값 > 마지막으로 본 추천 > 립 컬러 매핑 세션
+  const saved = store.get('recommendQuery') || {};
+  const passed = normalizeHex(qs('hex') || '');
+  const hex = passed || saved.hex || store.get('lipColor')?.hex || null;
+  const exclude = passed ? (qs('exclude') || '') : (saved.exclude || '');
+  const source = passed ? (qs('source') || 'lip') : (saved.source || 'lip');
+  const sourceLabel = { lip: '립 컬러 매핑에서 선택한 색상', barcode: '바코드 검색 제품의 색상', product: '제품 상세의 색상' }[source] || source;
+  const finishSel = document.getElementById('finish-filter');
+  const limitSel = document.getElementById('limit');
+  for (const [k, v] of Object.entries(FINISH_LABELS)) finishSel.append(el('option', { value: k, text: v }));
+  finishSel.value = saved.hex === hex ? (saved.finish || '') : '';
+
+  async function load() {
+    const status = document.getElementById('rec-status');
+    const list = document.getElementById('rec-list');
+    if (!hex) {
+      status.replaceChildren(el('p', { class: 'msg', text: '전달된 색상값이 없습니다. 립 컬러 매핑에서 색상을 선택하세요.' }));
+      list.replaceChildren();
+      return;
+    }
+    store.set('recommendQuery', { hex, exclude, source, finish: finishSel.value });
+    const p = new URLSearchParams({ hex, limit: limitSel.value });
+    if (finishSel.value) p.set('finish', finishSel.value);
+    if (exclude) p.set('exclude', exclude);
+    const { ok, body } = await api('api/recommend?' + p);
+    if (!ok) { status.textContent = body.error; return; }
+    status.textContent = `${body.products.length}개 제품 (유사도 높은 순)`;
+    list.replaceChildren(...body.products.map((prod) => productCard(prod, { from: 'recommend' })));
+  }
+  document.getElementById('ref-color').textContent = hex ? `기준 색상: ${hex} (${sourceLabel})` : '기준 색상: 없음';
+  finishSel.addEventListener('change', load);
+  limitSel.addEventListener('change', load);
+  document.getElementById('recolor').addEventListener('click', () => { location.href = store.get('lipReturn') || 'lip.html'; }); // 들어온 립 화면(사용자용/테스트)으로 복귀
+  document.getElementById('to-chat').addEventListener('click', () => go('chat.html', { hex }));
+  load();
+</script>
+</body>
+</html>

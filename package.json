@@ -1,0 +1,27 @@
+{
+  "name": "took",
+  "version": "0.1.0",
+  "private": true,
+  "description": "took(툭) - 립 컬러 매핑 / 색상 기반 추천 / 바코드 검색 / 규칙형 뷰티 챗봇 (로우파이 와이어프레임 단계)",
+  "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/vendor.js",
+    "setup": "node scripts/vendor.js",
+    "seed": "node scripts/seed.js",
+    "import:oliveyoung": "node scripts/import-oliveyoung.js",
+    "start": "node server.js",
+    "test": "node --test test/unit.test.js",
+    "e2e": "node test/e2e.mjs",
+    "cert": "node scripts/cert.js",
+    "samples": "node scripts/make-samples.js",
+    "build:static": "node scripts/build-static.js",
+    "e2e:static": "node scripts/build-static.js && MODE=static node test/e2e.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.14",
+    "@zxing/library": "0.21.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

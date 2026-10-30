@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 바코드 검색</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<main class="fit">
+  <div class="barcode-layout">
+  <div>
+  <section class="area">
+    <div class="label">[바코드 입력 영역]</div>
+    <form id="barcode-form" class="row" autocomplete="off">
+      <label for="barcode-input">바코드</label>
+      <input type="text" id="barcode-input" inputmode="numeric" placeholder="예: 8809100000017" size="20" autofocus>
+      <button type="submit" id="barcode-search">검색</button>
+      <button type="button" id="barcode-clear">지우기</button>
+    </form>
+    <p class="muted">USB/블루투스 바코드 스캐너(키보드 입력 방식)는 이 입력창에 숫자를 입력한 뒤 Enter 를 보내므로 자동으로 검색됩니다.
+      입력창에 커서가 있어야 하며, 웹페이지는 스캐너의 실제 연결 여부를 감지하지 않습니다.</p>
+  </section>
+
+  <section class="area">
+    <div class="label">[검색 결과 영역]</div>
+    <div id="barcode-result" class="muted">바코드를 입력하거나 스캔하세요.</div>
+  </section>
+
+  <section class="area" id="detail-area">
+    <div class="label">[제품 상세 정보 영역]</div>
+    <div id="barcode-detail" class="muted">검색된 제품이 없습니다.</div>
+    <div class="row" style="margin-top:8px">
+      <button type="button" id="go-chat" disabled>이 제품으로 챗봇에 질문하기</button>
+      <button type="button" id="go-similar" disabled>비슷한 색상 제품 보기</button>
+    </div>
+  </section>
+
+  </div>
+  <div>
+  <section class="area">
+    <details open>
+      <summary>시연용 등록 바코드 목록 (클릭하면 입력 후 검색)</summary>
+      <table id="demo-barcodes"><thead><tr><th>바코드</th><th>브랜드</th><th>제품명</th><th>색상명</th></tr></thead><tbody></tbody></table>
+    </details>
+  </section>
+  <p><a href="index.html">홈으로 돌아가기</a></p>
+  </div>
+  </div>
+</main>
+<script type="module" src="js/barcode.js"></script>
+</body>
+</html>

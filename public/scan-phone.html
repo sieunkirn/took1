@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 휴대폰으로 바코드 찍기</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<!-- PC 챗봇의 QR 로 여는 휴대폰 화면. 휴대폰 기본 카메라로 사진을 찍어(HTTPS 없이도 동작) 바코드를 읽고, 번호만 PC 로 보낸다 -->
+<main class="phone-scan">
+  <p class="eyebrow">TOOK · 바코드 찍기</p>
+  <h1>휴대폰으로<br>바코드 찍기</h1>
+  <p id="link-status" class="msg" aria-live="polite">PC와 연결하는 중이에요…</p>
+
+  <label class="btn-primary big-btn" for="photo">
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/></svg>
+    바코드 사진 찍기
+  </label>
+  <input type="file" id="photo" accept="image/*" capture="environment" class="hidden">
+  <p class="muted small">바코드가 사진 가운데에 크게, 흔들리지 않게 찍어 주세요. 가까이 대면 휴대폰이 알아서 초점을 맞춰요.</p>
+
+  <div id="result" class="phone-result hidden" aria-live="polite">
+    <img id="preview" alt="찍은 사진">
+    <p id="result-text"></p>
+  </div>
+
+  <form id="manual" class="scan-form" autocomplete="off">
+    <label for="manual-input" class="small">사진이 잘 안 되면 번호로 보내기</label>
+    <div class="row">
+      <input type="text" id="manual-input" inputmode="numeric" placeholder="예: 8809100000017">
+      <button type="submit">보내기</button>
+    </div>
+  </form>
+</main>
+<script type="module">
+  import { api } from './js/common.js';
+  import { decodeImageFile } from './js/barcode-scan.js';
+
+  const $ = (id) => document.getElementById(id);
+  const id = new URLSearchParams(location.search).get('s') || '';
+  const linkStatus = $('link-status');
+  const ended = () => {
+    linkStatus.textContent = 'PC와의 연결이 끝났어요. PC 챗봇 화면에서 QR을 다시 띄운 뒤 다시 찍어 주세요.';
+    $('photo').disabled = true;
+  };
+
+  // PC 화면에 '휴대폰이 연결됐어요'를 알린다
+  if (!/^[0-9a-f]{16}$/.test(id)) ended();
+  else {
+    const { ok } = await api(`api/pair/${id}/hello`, { method: 'POST', body: '{}' });
+    if (ok) linkStatus.textContent = 'PC와 연결됐어요. 바코드를 찍으면 PC 화면에 제품 설명이 떠요.';
+    else ended();
+  }
+
+  async function sendCode(code) {
+    const { ok, status, body } = await api(`api/pair/${id}/code`, { method: 'POST', body: JSON.stringify({ code }) });
+    if (status === 404) return ended();
+    if (!ok) return show(body.error || '보내지 못했어요. 다시 시도해 주세요.');
+    show(body.found
+      ? `${body.name} (${body.code}) — PC 화면에 설명이 떴어요! 다른 제품도 바로 찍을 수 있어요.`
+      : `바코드 ${body.code}를 PC로 보냈어요. 아직 등록되지 않은 제품이라 PC 화면에서 안내해 드려요.`);
+  }
+
+  function show(text) {
+    $('result').classList.remove('hidden');
+    $('result-text').textContent = text;
+  }
+
+  $('photo').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = ''; // 같은 사진을 다시 골라도 동작하게
+    if (!file) return;
+    $('preview').src = URL.createObjectURL(file);
+    show('사진에서 바코드를 찾는 중이에요…');
+    let code = null;
+    try {
+      code = await decodeImageFile(file);
+    } catch (err) {
+      return show('사진을 읽지 못했어요: ' + err.message);
+    }
+    if (!code) return show('사진에서 바코드를 찾지 못했어요. 바코드가 가운데에 크게, 선명하게 나오도록 다시 찍어 주세요.');
+    show(`인식했어요: ${code} — PC로 보내는 중…`);
+    sendCode(code);
+  });
+
+  $('manual').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const code = $('manual-input').value.replace(/\D/g, '');
+    if (!code) return;
+    $('manual-input').value = '';
+    $('preview').removeAttribute('src');
+    sendCode(code);
+  });
+</script>
+</body>
+</html>

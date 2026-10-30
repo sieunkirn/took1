@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 시연용 바코드</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<main>
+  <h1>시연용 바코드</h1>
+  <p class="muted">등록된 가상 제품의 바코드(EAN-13)예요. 이 화면을 휴대폰에 띄우거나 인쇄해서 챗봇의 "카메라로 바코드 찍기"에 비춰 보세요.
+    실제 판매 상품의 바코드가 아닌 시연용 데이터입니다.</p>
+  <div class="row"><button type="button" id="print">인쇄하기</button></div>
+  <div id="sheet" class="barcode-sheet"></div>
+</main>
+<script type="module">
+  import { renderNav, api, el, won, fullName } from './js/common.js';
+  import { ean13Svg } from './js/ean13.js';
+  renderNav();
+  document.getElementById('print').addEventListener('click', () => window.print());
+  const { ok, body } = await api('api/products');
+  const sheet = document.getElementById('sheet');
+  const withCode = ok ? body.products.filter((p) => p.barcode) : [];
+  if (!ok) sheet.textContent = '제품 목록을 불러오지 못했어요.';
+  else if (!withCode.length) {
+    // 지금 쓰는 올리브영 수집 데이터에는 바코드가 없다 (지어내지 않는다)
+    sheet.replaceChildren(el('p', { class: 'msg', text: '지금 쓰는 올리브영 데이터에는 바코드 정보가 수집되지 않아 시연용 바코드가 없어요. 바코드 기능은 가상 데이터(TOOK_DATA=virtual)로 서버를 켜면 시연할 수 있어요.' }));
+  } else {
+    sheet.replaceChildren(...withCode.map((p) => {
+      const box = el('figure', { class: 'barcode-card' });
+      box.innerHTML = ean13Svg(p.barcode); // 내부에서 만든 SVG (숫자만 들어간다)
+      box.append(el('figcaption', { class: 'small', text: `${fullName(p)} · ${won(p.price)}` }));
+      return box;
+    }));
+  }
+</script>
+</body>
+</html>

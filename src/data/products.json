@@ -1,0 +1,515 @@
+[
+  {
+    "id": "P001",
+    "barcode": "8809100000017",
+    "brand": "모노랩",
+    "name": "벨벳 립 무스",
+    "type": "립스틱",
+    "shade_name": "01 시그니처 레드",
+    "color_hex": "#B3122E",
+    "color_lab": {
+      "L": 38.23,
+      "a": 60.15,
+      "b": 29.67
+    },
+    "color_family": "red",
+    "finish": "velvet",
+    "price": 18000,
+    "image_url": "",
+    "description": "선명한 정통 레드. 부드럽게 블러 처리되는 벨벳 마무리."
+  },
+  {
+    "id": "P002",
+    "barcode": "8809100000024",
+    "brand": "모노랩",
+    "name": "벨벳 립 무스",
+    "type": "립스틱",
+    "shade_name": "02 로지 브릭",
+    "color_hex": "#A0413A",
+    "color_lab": {
+      "L": 40.51,
+      "a": 38.97,
+      "b": 24.27
+    },
+    "color_family": "brown",
+    "finish": "velvet",
+    "price": 18000,
+    "image_url": "",
+    "description": "붉은 벽돌빛 브라운 레드."
+  },
+  {
+    "id": "P003",
+    "barcode": "8809100000031",
+    "brand": "모노랩",
+    "name": "벨벳 립 무스",
+    "type": "립스틱",
+    "shade_name": "03 모브 로즈",
+    "color_hex": "#A8606A",
+    "color_lab": {
+      "L": 49.17,
+      "a": 30.37,
+      "b": 7.16
+    },
+    "color_family": "rose",
+    "finish": "velvet",
+    "price": 18000,
+    "image_url": "",
+    "description": "차분한 모브 톤 로즈."
+  },
+  {
+    "id": "P004",
+    "barcode": "8809100000048",
+    "brand": "모노랩",
+    "name": "글로우 립 오일",
+    "type": "립오일",
+    "shade_name": "01 클리어 핑크",
+    "color_hex": "#E89AAE",
+    "color_lab": {
+      "L": 71.78,
+      "a": 31.84,
+      "b": 1.66
+    },
+    "color_family": "pink",
+    "finish": "glossy",
+    "price": 15000,
+    "image_url": "",
+    "description": "투명하게 비치는 연한 핑크 오일."
+  },
+  {
+    "id": "P005",
+    "barcode": "8809100000055",
+    "brand": "모노랩",
+    "name": "글로우 립 오일",
+    "type": "립오일",
+    "shade_name": "02 체리 쥬스",
+    "color_hex": "#C2203F",
+    "color_lab": {
+      "L": 42.56,
+      "a": 62.14,
+      "b": 25.12
+    },
+    "color_family": "red",
+    "finish": "glossy",
+    "price": 15000,
+    "image_url": "",
+    "description": "촉촉한 광택의 체리 레드."
+  },
+  {
+    "id": "P006",
+    "barcode": "8809200000061",
+    "brand": "리플",
+    "name": "워터 틴트",
+    "type": "틴트",
+    "shade_name": "01 코랄 비치",
+    "color_hex": "#F06A5A",
+    "color_lab": {
+      "L": 61.29,
+      "a": 50.52,
+      "b": 34.47
+    },
+    "color_family": "coral",
+    "finish": "glossy",
+    "price": 9900,
+    "image_url": "",
+    "description": "물처럼 가볍게 발리는 코랄 틴트."
+  },
+  {
+    "id": "P007",
+    "barcode": "8809200000078",
+    "brand": "리플",
+    "name": "워터 틴트",
+    "type": "틴트",
+    "shade_name": "02 핑크 소다",
+    "color_hex": "#E8608C",
+    "color_lab": {
+      "L": 59.36,
+      "a": 56.6,
+      "b": 2.94
+    },
+    "color_family": "pink",
+    "finish": "glossy",
+    "price": 9900,
+    "image_url": "",
+    "description": "생기 있는 비비드 핑크."
+  },
+  {
+    "id": "P008",
+    "barcode": "8809200000085",
+    "brand": "리플",
+    "name": "워터 틴트",
+    "type": "틴트",
+    "shade_name": "03 베리 펀치",
+    "color_hex": "#9E2450",
+    "color_lab": {
+      "L": 36.2,
+      "a": 52.12,
+      "b": 4.54
+    },
+    "color_family": "berry",
+    "finish": "glossy",
+    "price": 9900,
+    "image_url": "",
+    "description": "진한 베리 계열 글로시 틴트."
+  },
+  {
+    "id": "P009",
+    "barcode": "8809200000092",
+    "brand": "리플",
+    "name": "블러 매트 틴트",
+    "type": "틴트",
+    "shade_name": "01 누드 피치",
+    "color_hex": "#D4917A",
+    "color_lab": {
+      "L": 66.26,
+      "a": 22.6,
+      "b": 22.46
+    },
+    "color_family": "nude",
+    "finish": "matte",
+    "price": 11000,
+    "image_url": "",
+    "description": "데일리용 누드 피치."
+  },
+  {
+    "id": "P010",
+    "barcode": "8809200000108",
+    "brand": "리플",
+    "name": "블러 매트 틴트",
+    "type": "틴트",
+    "shade_name": "02 칠리 오렌지",
+    "color_hex": "#D9472B",
+    "color_lab": {
+      "L": 51.19,
+      "a": 55.68,
+      "b": 47.28
+    },
+    "color_family": "orange",
+    "finish": "matte",
+    "price": 11000,
+    "image_url": "",
+    "description": "붉은 기 도는 칠리 오렌지."
+  },
+  {
+    "id": "P011",
+    "barcode": "8809200000115",
+    "brand": "리플",
+    "name": "블러 매트 틴트",
+    "type": "틴트",
+    "shade_name": "03 플럼 와인",
+    "color_hex": "#6E2340",
+    "color_lab": {
+      "L": 26.41,
+      "a": 35.91,
+      "b": -0.24
+    },
+    "color_family": "plum",
+    "finish": "matte",
+    "price": 11000,
+    "image_url": "",
+    "description": "깊은 플럼 와인 컬러."
+  },
+  {
+    "id": "P012",
+    "barcode": "8809300000121",
+    "brand": "온더립",
+    "name": "새틴 립스틱",
+    "type": "립스틱",
+    "shade_name": "101 베어 누드",
+    "color_hex": "#C08A78",
+    "color_lab": {
+      "L": 62.29,
+      "a": 18.24,
+      "b": 17.8
+    },
+    "color_family": "nude",
+    "finish": "satin",
+    "price": 32000,
+    "image_url": "",
+    "description": "입술 본연의 색에 가까운 누드."
+  },
+  {
+    "id": "P013",
+    "barcode": "8809300000138",
+    "brand": "온더립",
+    "name": "새틴 립스틱",
+    "type": "립스틱",
+    "shade_name": "102 로즈 우드",
+    "color_hex": "#A4565E",
+    "color_lab": {
+      "L": 46.12,
+      "a": 32.86,
+      "b": 10
+    },
+    "color_family": "rose",
+    "finish": "satin",
+    "price": 32000,
+    "image_url": "",
+    "description": "우디한 로즈 브라운."
+  },
+  {
+    "id": "P014",
+    "barcode": "8809300000145",
+    "brand": "온더립",
+    "name": "새틴 립스틱",
+    "type": "립스틱",
+    "shade_name": "103 클래식 레드",
+    "color_hex": "#C0172C",
+    "color_lab": {
+      "L": 41.22,
+      "a": 62.66,
+      "b": 34.98
+    },
+    "color_family": "red",
+    "finish": "satin",
+    "price": 32000,
+    "image_url": "",
+    "description": "은은한 윤기의 클래식 레드."
+  },
+  {
+    "id": "P015",
+    "barcode": "8809300000152",
+    "brand": "온더립",
+    "name": "새틴 립스틱",
+    "type": "립스틱",
+    "shade_name": "104 버건디 나잇",
+    "color_hex": "#6B1A2A",
+    "color_lab": {
+      "L": 23.78,
+      "a": 36.63,
+      "b": 10.94
+    },
+    "color_family": "burgundy",
+    "finish": "satin",
+    "price": 32000,
+    "image_url": "",
+    "description": "깊고 어두운 버건디."
+  },
+  {
+    "id": "P016",
+    "barcode": "8809300000169",
+    "brand": "온더립",
+    "name": "매트 립스틱",
+    "type": "립스틱",
+    "shade_name": "201 테라코타",
+    "color_hex": "#B5533C",
+    "color_lab": {
+      "L": 47.42,
+      "a": 38.08,
+      "b": 32.32
+    },
+    "color_family": "brown",
+    "finish": "matte",
+    "price": 34000,
+    "image_url": "",
+    "description": "따뜻한 테라코타 브라운."
+  },
+  {
+    "id": "P017",
+    "barcode": "8809300000176",
+    "brand": "온더립",
+    "name": "매트 립스틱",
+    "type": "립스틱",
+    "shade_name": "202 핑크 누드",
+    "color_hex": "#C98E8E",
+    "color_lab": {
+      "L": 64.74,
+      "a": 22.4,
+      "b": 8.98
+    },
+    "color_family": "nude",
+    "finish": "matte",
+    "price": 34000,
+    "image_url": "",
+    "description": "핑크 기가 도는 누드."
+  },
+  {
+    "id": "P018",
+    "barcode": "8809400000182",
+    "brand": "데일리톤",
+    "name": "젤리 글로스",
+    "type": "립글로스",
+    "shade_name": "01 피치 젤리",
+    "color_hex": "#F4A58A",
+    "color_lab": {
+      "L": 74.81,
+      "a": 26.11,
+      "b": 25.88
+    },
+    "color_family": "coral",
+    "finish": "glossy",
+    "price": 7000,
+    "image_url": "",
+    "description": "맑은 피치 코랄 글로스."
+  },
+  {
+    "id": "P019",
+    "barcode": "8809400000199",
+    "brand": "데일리톤",
+    "name": "젤리 글로스",
+    "type": "립글로스",
+    "shade_name": "02 라즈베리",
+    "color_hex": "#C2315E",
+    "color_lab": {
+      "L": 44.91,
+      "a": 59.38,
+      "b": 9.01
+    },
+    "color_family": "berry",
+    "finish": "glossy",
+    "price": 7000,
+    "image_url": "",
+    "description": "라즈베리 색 젤리 글로스."
+  },
+  {
+    "id": "P020",
+    "barcode": "8809400000205",
+    "brand": "데일리톤",
+    "name": "젤리 글로스",
+    "type": "립글로스",
+    "shade_name": "03 라벤더 핑크",
+    "color_hex": "#C98BB5",
+    "color_lab": {
+      "L": 65.14,
+      "a": 30.08,
+      "b": -12.45
+    },
+    "color_family": "pink",
+    "finish": "glossy",
+    "price": 7000,
+    "image_url": "",
+    "description": "쿨톤 라벤더 핑크."
+  },
+  {
+    "id": "P021",
+    "barcode": "8809400000212",
+    "brand": "데일리톤",
+    "name": "소프트 매트",
+    "type": "립스틱",
+    "shade_name": "01 말린 장미",
+    "color_hex": "#B06C6C",
+    "color_lab": {
+      "L": 52.99,
+      "a": 27.09,
+      "b": 11.52
+    },
+    "color_family": "rose",
+    "finish": "matte",
+    "price": 8500,
+    "image_url": "",
+    "description": "말린 장미 MLBB 컬러."
+  },
+  {
+    "id": "P022",
+    "barcode": "8809400000229",
+    "brand": "데일리톤",
+    "name": "소프트 매트",
+    "type": "립스틱",
+    "shade_name": "02 시나몬 브라운",
+    "color_hex": "#8A4B3A",
+    "color_lab": {
+      "L": 39.14,
+      "a": 24.87,
+      "b": 21.82
+    },
+    "color_family": "brown",
+    "finish": "matte",
+    "price": 8500,
+    "image_url": "",
+    "description": "시나몬 브라운."
+  },
+  {
+    "id": "P023",
+    "barcode": "8809500000235",
+    "brand": "노바뷰티",
+    "name": "실크 립 밤",
+    "type": "립밤",
+    "shade_name": "01 코랄 블러썸",
+    "color_hex": "#E8826E",
+    "color_lab": {
+      "L": 65.16,
+      "a": 37.19,
+      "b": 28.1
+    },
+    "color_family": "coral",
+    "finish": "satin",
+    "price": 22000,
+    "image_url": "",
+    "description": "보습감 있는 코랄 컬러 밤."
+  },
+  {
+    "id": "P024",
+    "barcode": "8809500000242",
+    "brand": "노바뷰티",
+    "name": "실크 립 밤",
+    "type": "립밤",
+    "shade_name": "02 피그 플럼",
+    "color_hex": "#7F3550",
+    "color_lab": {
+      "L": 33.22,
+      "a": 34.96,
+      "b": -0.48
+    },
+    "color_family": "plum",
+    "finish": "satin",
+    "price": 22000,
+    "image_url": "",
+    "description": "무화과빛 플럼."
+  },
+  {
+    "id": "P025",
+    "barcode": "8809500000259",
+    "brand": "노바뷰티",
+    "name": "실크 립 밤",
+    "type": "립밤",
+    "shade_name": "03 오렌지 선셋",
+    "color_hex": "#E5643A",
+    "color_lab": {
+      "L": 58.12,
+      "a": 47.7,
+      "b": 47.46
+    },
+    "color_family": "orange",
+    "finish": "satin",
+    "price": 22000,
+    "image_url": "",
+    "description": "선셋 오렌지."
+  },
+  {
+    "id": "P026",
+    "barcode": "8809500000266",
+    "brand": "노바뷰티",
+    "name": "벨벳 틴트",
+    "type": "틴트",
+    "shade_name": "01 핑크 벨벳",
+    "color_hex": "#D45A7E",
+    "color_lab": {
+      "L": 54.89,
+      "a": 51.38,
+      "b": 4.29
+    },
+    "color_family": "pink",
+    "finish": "velvet",
+    "price": 16000,
+    "image_url": "",
+    "description": "포근한 벨벳 핑크."
+  },
+  {
+    "id": "P027",
+    "barcode": "8809500000273",
+    "brand": "노바뷰티",
+    "name": "벨벳 틴트",
+    "type": "틴트",
+    "shade_name": "02 다크 체리",
+    "color_hex": "#7A1426",
+    "color_lab": {
+      "L": 26.1,
+      "a": 43.26,
+      "b": 17.28
+    },
+    "color_family": "burgundy",
+    "finish": "velvet",
+    "price": 16000,
+    "image_url": "",
+    "description": "다크 체리 버건디."
+  }
+]

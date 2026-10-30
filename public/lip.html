@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 립 컬러 매핑(추천따로)</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<body>
+<main class="fit lip-user">
+  <section class="area lip-user-view">
+    <div class="label">[가상 립 메이크업 화면]</div>
+    <div class="stage">
+      <div class="placeholder loading" id="placeholder" style="position:absolute;inset:0"><div class="spinner" aria-hidden="true"></div><p id="placeholder-text">카메라를 준비하고 있습니다<br>권한 요청이 뜨면 허용해 주세요</p></div>
+      <canvas id="view" class="hidden"></canvas>
+      <video id="video" class="hidden" playsinline muted></video>
+    </div>
+    <p id="guide" class="muted" aria-live="polite"></p>
+    <div id="error" class="msg hidden" role="alert"></div>
+    <div class="row">
+      <button type="button" id="cam-retry" class="hidden">카메라 다시 연결</button>
+    </div>
+  </section>
+
+  <div class="lip-user-side">
+    <section class="area">
+      <div class="label">[나에게 어울리는 컬러]</div>
+      <div class="row"><button type="button" id="match" disabled>나에게 가장 잘 어울리는 컬러 추천받기</button></div>
+      <p id="match-result" class="small" aria-live="polite"></p>
+      <p id="match-metrics" class="muted small"></p>
+      <div class="swatches hidden" id="match-swatches" role="group" aria-label="추천 컬러"></div>
+      <p class="muted small">볼·이마 피부색으로 톤을 추정한 참고용 결과입니다. 조명에 따라 달라질 수 있어요.</p>
+    </section>
+
+    <section class="area">
+      <div class="label">[컬러 선택]</div>
+      <div class="swatches" id="swatches" role="group" aria-label="립 컬러"></div>
+      <p id="color-name" class="small"></p>
+    </section>
+
+    <section class="area">
+      <div class="label">[텍스처 / 농도]</div>
+      <div class="row seg" id="textures" role="group" aria-label="텍스처"></div>
+      <div class="slider"><label for="intensity">농도</label><input type="range" id="intensity" min="0" max="100" step="1"><output id="intensity-out"></output></div>
+    </section>
+
+    <section class="area">
+      <div class="label">[다음 단계]</div>
+      <div class="row"><button type="button" id="recommend">이 컬러로 제품 추천 받기</button></div>
+    </section>
+  </div>
+</main>
+<script type="module" src="js/lip.js"></script>
+</body>
+</html>
