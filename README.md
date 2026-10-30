@@ -22,6 +22,14 @@ npm run e2e:static     # 정적 버전으로 같은 흐름 테스트
 - Artifact 페이지에서는 카메라 사용이 허용되지 않습니다. 카메라 버튼을 누르면 권한 거부 안내가 표시되며, 샘플 그림이나 사진 업로드로 체험할 수 있습니다.
 - Node 18 이상 필요 (런타임 의존성 없이 내장 `http` 사용)
 
+### Render 배포 (고정 https 주소)
+1. GitHub 에 저장소를 만들고 이 프로젝트를 올린다 (`git remote add origin <주소>` → `git push -u origin main`)
+2. https://render.com 에 GitHub 계정으로 가입 → **New → Blueprint** → 저장소 선택 → `render.yaml` 대로 만들어짐 → **Apply**
+3. 빌드(`npm ci`, 약 3~5분)가 끝나면 `https://took-○○○.onrender.com` 으로 접속
+- 코드를 GitHub 에 push 하면 자동으로 다시 배포된다
+- 무료 플랜은 15분 동안 접속이 없으면 잠들고, 다시 접속하면 30초쯤 걸린다. 휴대폰 QR 연결 정보는 메모리에 있어 깨어나면 새 QR 이 자동으로 만들어진다
+- 공개 저장소·공개 사이트이므로 올리브영 수집 데이터와 상품 이미지가 외부에 공개된다는 점에 유의
+
 ### 인터넷 공개 주소로 실행 (휴대폰 QR 연결용, cloudflared 빠른 터널)
 와이파이·방화벽과 상관없이 휴대폰에서 접속하려면 무료 터널로 임시 https 주소를 붙인다.
 ```bash
