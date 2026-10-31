@@ -11,7 +11,8 @@ npm install        # MediaPipe 설치 + public/vendor 로 복사 + 얼굴 랜드
 npm start          # http://localhost:3000
 npm test           # 단위 테스트 (색상 계산 / 추천 / 바코드 / 챗봇)
 npm run e2e        # Playwright 전체 흐름 테스트 (가짜 카메라 사용)
-npm run build:static   # 서버 없이 동작하는 정적 버전 → dist/static
+npm run build:static   # 서버 없이 동작하는 정적 버전 → dist/static (claude.ai Artifact 용)
+npm run build:web      # 같은 정적 버전을 Vercel 등 일반 정적 호스팅용으로 (문서 골격 유지)
 npm run e2e:static     # 정적 버전으로 같은 흐름 테스트
 ```
 
@@ -21,6 +22,14 @@ npm run e2e:static     # 정적 버전으로 같은 흐름 테스트
 - 얼굴 모델(.task)은 Artifact 가 제공하지 않는 형식이라 base64 텍스트(`face_landmarker.task.b64.txt`)로 포함합니다.
 - Artifact 페이지에서는 카메라 사용이 허용되지 않습니다. 카메라 버튼을 누르면 권한 거부 안내가 표시되며, 샘플 그림이나 사진 업로드로 체험할 수 있습니다.
 - Node 18 이상 필요 (런타임 의존성 없이 내장 `http` 사용)
+
+### Vercel 배포 (정적 버전, 서버 없음)
+```bash
+npm run build:web
+vercel deploy dist/static --temporary --yes   # 로그인 없이 임시 배포 (60분 뒤 만료, 출력되는 claim 링크로 계정에 가져가면 유지)
+```
+- 로그인했다면 `vercel deploy dist/static --prod` 로 계정의 프로젝트에 배포한다
+- 휴대폰 QR 연결은 서버가 필요해 정적 버전에서는 안내 문구만 나온다. 나머지(카메라·챗봇·추천·바코드 카메라/번호 입력·팔레트)는 동작
 
 ### Render 배포 (고정 https 주소)
 1. GitHub 에 저장소를 만들고 이 프로젝트를 올린다 (`git remote add origin <주소>` → `git push -u origin main`)
