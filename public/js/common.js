@@ -1,8 +1,9 @@
 // 공통 모듈: API 호출, 페이지 간 상태(sessionStorage), 제품 카드 렌더링, 공통 네비게이션
 import { FINISH_LABELS, FAMILY_LABELS, finishLabel } from '../lib/constants.js';
 import { fullName, shortName } from '../lib/catalog.js';
+import { toast, skeletonCards } from './motion.js'; // 화면 움직임(모든 화면 공통)
 
-export { FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName };
+export { FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName, toast, skeletonCards };
 
 // 수집하지 않은 정보는 비워 두고, 추정한 값은 추정이라고 표시한다 (올리브영 데이터)
 const shadeText = (p) => p.shade_name || (p.color_options ? `${p.color_options}가지 중 대표색` : '대표색');
@@ -60,12 +61,13 @@ async function staticApi(path, options) {
     if (!hex) return fail(400, 'hex 파라미터가 필요합니다.');
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
-    return ok({ hex, products: rec.recommendByColor(hex, { finish: q.get('finish') || null, limit, excludeIds }) });
+    const pool = q.get('image') === '1' ? catalog.allProducts().filter((p) => p.image_url) : undefined;
+    return ok({ hex, products: rec.recommendByColor(hex, { finish: q.get('finish') || null, limit, excludeIds, products: pool }) });
   }
   if (url.pathname === '/api/chat') {
     const body = JSON.parse(options.body || '{}');
     if (!body.message) return fail(400, 'message 가 필요합니다.');
-    return ok({ engine: 'rule-based', ...chat.answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone }) });
+    return ok({ engine: 'rule-based', ...chat.answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true }) });
   }
   return fail(404, '알 수 없는 API 입니다.');
 }
@@ -131,7 +133,7 @@ export function qs(name) {
 
 // 전달값 없이 페이지를 새로 여는 링크 (메뉴 등)
 function freshLink(page, text) {
-  return el('a', { href: page, text, onclick: () => store.remove('navCurrent.' + page) });
+  return el('a', { href: page, text, 'aria-current': page === HERE ? 'page' : null, onclick: () => store.remove('navCurrent.' + page) });
 }
 
 export function el(tag, attrs = {}, ...children) {
@@ -145,10 +147,6 @@ export function el(tag, attrs = {}, ...children) {
   }
   for (const c of children.flat()) if (c !== null && c !== undefined) node.append(c);
   return node;
-}
-
-export function imagePlaceholder(product) {
-  return el('div', { class: 'placeholder img', text: product?.image_url ? '이미지: ' + product.image_url : '제품 이미지' });
 }
 
 export function detailLink(product, from, text = '상세 보기') {
@@ -169,7 +167,10 @@ export function productCard(product, { extraActions = [] } = {}) {
     // 색상값 옆에 실제 색 견본 (무채색 규칙의 예외: 제품 색 표시)
     ['색상값', [el('span', { class: 'color-dot', style: `background:${product.color_hex}`, 'aria-hidden': 'true' }), product.color_hex]],
     ['제형', finishLabel(product.finish)],
-    ['가격', won(product.price)],
+    // 가격 숫자는 카드가 나타날 때 0에서 올라간다 (motion.js)
+    ['가격', Number.isFinite(Number(product.price)) && product.price !== null
+      ? [el('span', { 'data-count': String(product.price), text: won(product.price) })]
+      : won(product.price)],
   ];
   // 대표 이미지 자리: 모든 카드에 같은 크기로 두어 줄이 맞게 한다.
   // 이미지 주소가 없거나 불러오지 못하면(외부 사이트 이미지 차단 등) '이미지 준비 중' 자리로 바꾼다
@@ -205,15 +206,16 @@ export function productDetailTable(p) {
 }
 
 export function renderNav() {
+  if (document.querySelector('header.nav')) return; // 합본 화면처럼 스크립트 두 개가 함께 부르면 한 번만 그린다
   const nav = el('header', { class: 'nav' },
     // 로고: 저장된 상태를 모두 지우고 홈으로 이동 (처음 상태로 초기화)
     el('strong', {}, el('a', { href: 'index.html', text: 'took(초기화)', id: 'nav-reset', onclick: () => store.clear() })),
-    freshLink('index.html', '홈'),
-    freshLink('lip-together.html', '립 컬러 매핑'), // 추천 같이 버전(카메라 오른쪽에 제품 추천)
-    // 숨긴 탭(파일은 유지): freshLink('lip.html', '립 컬러 매핑(추천따로)'), freshLink('lip-test.html', '립 컬러 매핑(테스트)'),
-    // 숨긴 탭(파일은 유지): freshLink('barcode.html', '바코드 검색'),
+    // 상단 '홈' 버튼으로 가면 홈 인트로 애니메이션을 건너뛴다 (index.html 머리 스크립트가 읽고 지운다)
+    Object.assign(freshLink('index.html', '홈'), { onclick: () => { store.remove('navCurrent.index.html'); store.set('homeSkipIntro', true); } }),
+    freshLink('lip-together.html', '립 컬러 매핑'), // 카메라 오른쪽에 제품 추천
     freshLink('chat.html', 'AI 뷰티 챗봇'),
-    // 숨긴 탭(파일은 유지): freshLink('chat-test.html', '챗봇(테스트)'),
+    freshLink('studio.html', '합본'), // 립 매핑 + 색 조제·챗봇·추천·바코드를 한 화면에
+    freshLink('palette.html', '팔레트'), // 테스트: 물감을 섞어 립 색 조제
   );
   document.body.prepend(nav);
 }

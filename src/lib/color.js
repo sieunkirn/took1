@@ -134,12 +134,6 @@ export function similarityFromDeltaE(dE) {
   return Math.max(0, Math.round((100 - dE * 2) * 10) / 10);
 }
 
-// 색상의 밝기를 무채색 회색값(0-255)으로 변환 (와이어프레임 단계의 미리보기용)
-export function hexToGray(hex) {
-  const { L } = hexToLab(hex);
-  return clamp(Math.round((L / 100) * 255), 0, 255);
-}
-
 export function roundLab(lab) {
   const r = (v) => Math.round(v * 100) / 100;
   return { L: r(lab.L), a: r(lab.a), b: r(lab.b) };

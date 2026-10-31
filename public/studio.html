@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 합본</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<!-- 합본 화면: 왼쪽은 립 매핑 카메라(항상 켜짐, lip.js), 오른쪽은 색 조제·챗봇·추천·바코드 탭(chat.js).
+     두 스크립트는 창 이벤트(took:color / took:recommend / took:apply / took:show-tab)로 주고받는다 -->
+<body data-layout="studio">
+<main class="fit studio">
+  <!-- 왼쪽: 립 매핑 -->
+  <section class="area lip-user-view studio-left">
+    <div class="label">가상 립 메이크업 화면</div>
+    <div class="stage">
+      <div class="placeholder loading" id="placeholder" style="position:absolute;inset:0"><div class="spinner" aria-hidden="true"></div><p id="placeholder-text">카메라를 준비하고 있습니다<br>권한 요청이 뜨면 허용해 주세요</p></div>
+      <canvas id="view" class="hidden"></canvas>
+      <video id="video" class="hidden" playsinline muted></video>
+    </div>
+    <p id="color-name" class="small"></p>
+    <p id="guide" class="muted" aria-live="polite"></p>
+    <div id="error" class="msg hidden" role="alert"></div>
+    <div class="row">
+      <button type="button" id="cam-retry" class="hidden">카메라 다시 연결</button>
+    </div>
+  </section>
+
+  <!-- 오른쪽: 탭 -->
+  <aside class="area studio-side" id="rec-panel" aria-label="색 조제·챗봇·추천·바코드">
+    <div class="studio-tabs" role="tablist" aria-label="기능">
+      <button type="button" role="tab" data-tab="mix" aria-selected="true">색 조제</button>
+      <button type="button" role="tab" data-tab="chat" aria-selected="false">챗봇</button>
+      <button type="button" role="tab" data-tab="rec" aria-selected="false">추천</button>
+      <button type="button" role="tab" data-tab="scan" aria-selected="false">바코드</button>
+    </div>
+    <!-- 챗봇 패널 전환용 요소 (합본에서는 탭을 쓰므로 숨김) -->
+    <div class="hidden"><span id="panel-label"></span><button type="button" id="panel-toggle"></button><button type="button" id="scan-close"></button></div>
+
+    <!-- 색 조제 -->
+    <div class="studio-panel" id="tab-mix" role="tabpanel">
+      <section class="area">
+        <div class="label">나에게 어울리는 컬러</div>
+        <div class="row"><button type="button" id="match" disabled>나에게 가장 잘 어울리는 컬러 추천받기</button></div>
+        <p id="match-result" class="small" aria-live="polite"></p>
+        <p id="match-metrics" class="muted small"></p>
+        <div class="swatches hidden" id="match-swatches" role="group" aria-label="추천 컬러"></div>
+      </section>
+      <section class="area">
+        <div class="label">컬러 선택</div>
+        <div class="swatches" id="swatches" role="group" aria-label="립 컬러"></div>
+      </section>
+      <section class="area">
+        <div class="label">직접 조제</div>
+        <div class="slider"><label for="mix-h">색상</label><input type="range" id="mix-h" min="0" max="360" step="1"><output id="mix-h-out"></output></div>
+        <div class="slider"><label for="mix-s">채도</label><input type="range" id="mix-s" min="0" max="100" step="1"><output id="mix-s-out"></output></div>
+        <div class="slider"><label for="mix-l">밝기</label><input type="range" id="mix-l" min="0" max="100" step="1"><output id="mix-l-out"></output></div>
+      </section>
+      <section class="area">
+        <div class="label">텍스처 / 농도</div>
+        <div class="row seg" id="textures" role="group" aria-label="텍스처"></div>
+        <div class="slider"><label for="intensity">농도</label><input type="range" id="intensity" min="0" max="100" step="1"><output id="intensity-out"></output></div>
+      </section>
+      <div class="row"><button type="button" id="recommend" class="btn-dark">이 컬러로 제품 추천 받기</button><button type="button" id="recommend-img" title="테스트용: 이미지가 있는 제품만 추천">이미지ver.</button></div>
+    </div>
+
+    <!-- 챗봇 -->
+    <div class="studio-panel chat-shell hidden" id="tab-chat" role="tabpanel">
+      <div class="chat-head">
+        <span class="muted small">등록 제품 기반 추천 · 규칙 기반(외부 AI 미연결)</span>
+        <div class="row">
+          <button type="button" id="tts" class="icon-btn" aria-pressed="true" aria-label="답변 소리로 읽어주기" title="답변 소리로 읽어주기">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="tts-wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="tts-mute" d="m22 9-6 6m0-6 6 6"/></svg>
+          </button>
+          <button type="button" id="img-only" aria-pressed="false">테스트 이미지ver.</button>
+          <button type="button" id="chat-reset">새 대화</button>
+        </div>
+      </div>
+      <div id="base-chip" class="msg small hidden">
+        기준 제품: <strong id="base-name"></strong>
+        <button type="button" id="base-clear">해제</button>
+      </div>
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <div id="compare-box" class="compare-box hidden" role="region" aria-label="비교함">
+        <strong>비교함</strong>
+        <span id="compare-count" class="muted small"></span>
+        <div id="compare-items" class="compare-items"></div>
+        <button type="button" id="compare-run">비교하기</button>
+        <button type="button" id="compare-clear">비우기</button>
+      </div>
+      <form id="chat-form" class="chat-input" autocomplete="off">
+        <button type="button" id="voice" class="icon-btn" aria-pressed="false" aria-label="음성으로 질문" title="음성으로 질문">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg>
+        </button>
+        <button type="button" id="scan-open" class="hidden"></button>
+        <label for="chat-input" class="hidden">메시지</label>
+        <input type="text" id="chat-input" placeholder="예: 데이트 립 추천해 줘">
+        <button type="submit" id="chat-send" class="icon-btn" aria-label="보내기" title="보내기">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+        </button>
+      </form>
+      <p id="voice-status" class="muted small" aria-live="polite"></p>
+    </div>
+
+    <!-- 추천 -->
+    <div class="studio-panel hidden" id="tab-rec" role="tabpanel">
+      <div id="list-view">
+        <p id="rec-status" class="muted small" aria-live="polite"></p>
+        <div id="rec-list" class="mini-list"></div>
+      </div>
+    </div>
+
+    <!-- 바코드 -->
+    <div class="studio-panel hidden" id="tab-scan" role="tabpanel">
+      <div id="scan-view">
+        <p class="small">가지고 있는 립 제품의 바코드를 찍으면 어떤 제품인지 챗봇이 알려 드려요.</p>
+        <p id="scan-note" class="msg small hidden"></p>
+        <section class="pair-box" id="pair-box" aria-label="휴대폰으로 찍기">
+          <strong>휴대폰으로 찍기 (추천)</strong>
+          <div class="pair-body">
+            <div id="pair-qr" class="pair-qr" role="img" aria-label="휴대폰 연결 QR 코드"><span class="muted small">QR 준비 중</span></div>
+            <ol class="small pair-steps">
+              <li>휴대폰 기본 카메라로 QR을 비춰요.</li>
+              <li>열린 화면에서 "바코드 사진 찍기".</li>
+              <li>제품 설명이 챗봇 탭에 떠요.</li>
+            </ol>
+          </div>
+          <p id="pair-status" class="small" aria-live="polite"></p>
+          <p id="pair-url" class="muted small pair-url"></p>
+        </section>
+        <strong class="small">PC 카메라로 찍기</strong>
+        <div class="scan-stage">
+          <video id="scan-video" class="hidden" playsinline muted></video>
+          <div class="placeholder" id="scan-placeholder" style="position:absolute;inset:0">카메라가 꺼져 있어요</div>
+          <div class="scan-guide hidden" id="scan-guide" aria-hidden="true"></div>
+        </div>
+        <div class="row">
+          <button type="button" id="scan-start" class="btn-dark">카메라로 바코드 찍기</button>
+          <button type="button" id="scan-stop" class="hidden">카메라 끄기</button>
+          <label for="scan-photo" class="btn-line photo-btn">사진으로 찍기</label>
+          <input type="file" id="scan-photo" accept="image/*" capture="environment" class="hidden">
+        </div>
+        <p id="scan-status" class="muted small" aria-live="polite">밝은 곳에서 바코드가 가운데 네모를 가득 채우게 비춰 주세요.</p>
+        <div id="scan-result"></div>
+        <form id="scan-form" class="scan-form" autocomplete="off">
+          <label for="scan-input" class="small">카메라가 안 되면 번호로 입력</label>
+          <div class="row">
+            <input type="text" id="scan-input" inputmode="numeric" placeholder="예: 8809100000017">
+            <button type="submit">확인</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </aside>
+</main>
+<script type="module">
+  // 오른쪽 탭 전환. 다른 스크립트가 took:show-tab 이벤트로 탭을 바꿀 수 있다 (예: 추천 결과가 오면 '추천' 탭)
+  const tabs = [...document.querySelectorAll('.studio-tabs [data-tab]')];
+  function show(tab) {
+    for (const b of tabs) {
+      const on = b.dataset.tab === tab;
+      b.setAttribute('aria-selected', String(on));
+      document.getElementById('tab-' + b.dataset.tab).classList.toggle('hidden', !on);
+    }
+    try { sessionStorage.setItem('took.studioTab', JSON.stringify(tab)); } catch { /* 저장 불가 환경 */ }
+    if (tab === 'chat') {
+      const log = document.getElementById('chat-log');
+      log.scrollTop = log.scrollHeight;
+    }
+  }
+  tabs.forEach((b) => b.addEventListener('click', () => show(b.dataset.tab)));
+  window.addEventListener('took:show-tab', (e) => show(e.detail.tab));
+  let saved = 'mix';
+  try { saved = JSON.parse(sessionStorage.getItem('took.studioTab')) || 'mix'; } catch { /* 없음 */ }
+  show(tabs.some((b) => b.dataset.tab === saved) ? saved : 'mix');
+</script>
+<script type="module" src="js/lip.js"></script>
+<script type="module" src="js/chat.js"></script>
+</body>
+</html>

@@ -5,8 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>took(툭)</title>
 <link rel="stylesheet" href="css/wireframe.css">
+<script>
+  // 홈 인트로: 첫 화면이 그려지기 전에 숨김 상태를 켠다 (js/home.js 가 이어서 움직인다).
+  // 스크립트가 3초 안에 돌지 않으면 숨김을 풀어 내용이 항상 보이게 한다.
+  // 상단 '홈' 버튼으로 온 경우(took.homeSkipIntro)에는 인트로 없이 바로 보여 준다
+  (function () {
+    var r = document.documentElement;
+    var skip = false;
+    try { skip = !!sessionStorage.getItem('took.homeSkipIntro'); sessionStorage.removeItem('took.homeSkipIntro'); } catch (e) { /* 저장 불가 환경 */ }
+    if (!skip && !matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('motion', 'intro');
+    setTimeout(function () { if (!r.dataset.homeReady) r.classList.remove('motion', 'intro'); }, 3000);
+  })();
+</script>
 </head>
-<body>
+<body class="home-page">
 <main class="home">
   <section class="hero">
     <p class="eyebrow">LIP COLOR · BEAUTY ASSISTANT</p>
@@ -54,6 +66,7 @@
 </main>
 <script type="module">
   import { renderNav, store, api, go, el, won, shortName } from './js/common.js';
+  import './js/home.js'; // 인트로·커서 반응 배경·자석 버튼·기울어지는 카드
   renderNav();
   // 홈에서 들어가는 기능 페이지는 이전 전달값 없이 새로 연다
   document.querySelectorAll('a.fresh').forEach((a) => a.addEventListener('click', () => store.remove('navCurrent.' + a.getAttribute('href'))));

@@ -1,8 +1,8 @@
 // 가상 립 컬러 합성 엔진: 입술 윤곽 경로, 텍스처별 색 합성, 프레임 간 평활.
-// 사용자용 화면(lip.html)과 테스트 화면(lip-test.html)이 같이 사용한다.
+// 립 컬러 매핑 카메라(lip.js)가 쓰고, 팔레트는 프리셋 색(PRESETS)을 물감으로 쓴다.
 import { hexToRgb } from '../lib/color.js';
 
-export const supportsCanvasFilter = (() => {
+const supportsCanvasFilter = (() => {
   const c = document.createElement('canvas').getContext('2d');
   if (!('filter' in c)) return false;
   c.filter = 'blur(1px)';
@@ -10,7 +10,7 @@ export const supportsCanvasFilter = (() => {
 })();
 
 // 윤곽점을 모두 지나는 Catmull-Rom 곡선으로 입술선을 만든다 (입꼬리 같은 뾰족한 점도 잘리지 않음)
-export function lipsPath(lips, w, h, mirror) {
+function lipsPath(lips, w, h, mirror) {
   const path = new Path2D();
   const px = (p) => [mirror ? (1 - p.x) * w : p.x * w, p.y * h];
   for (const ring of [lips.outer, lips.inner]) {
@@ -163,15 +163,6 @@ export function smoothLips(prev, next) {
   const k = Math.min(1, 0.4 + (move / mouthW) * 20); // 입 너비의 3% 이상 움직이면 평활 없음
   const mix = (a, b) => b.map((p, i) => ({ x: a[i].x + (p.x - a[i].x) * k, y: a[i].y + (p.y - a[i].y) * k }));
   return { outer: mix(prev.outer, next.outer), inner: mix(prev.inner, next.inner), tone: next.tone };
-}
-
-// 이미지 로드 완료 대기. img.decode() 는 화면에 그려지지 않는 상태(숨김 탭 등)에서 끝나지 않는 경우가 있어 load 이벤트를 쓴다.
-export function imageLoaded(img) {
-  if (img.complete) return Promise.resolve();
-  return new Promise((resolve) => {
-    img.addEventListener('load', resolve, { once: true });
-    img.addEventListener('error', resolve, { once: true });
-  });
 }
 
 // ---------- 어울리는 컬러 추정 (규칙 기반 참고용, 진단 아님) ----------

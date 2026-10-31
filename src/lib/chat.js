@@ -427,9 +427,10 @@ const START_SUGGESTIONS = ['데일리로 바를 립 추천해 줘', '데이트 �
  * @param {object} [input.context] 직전 대화 상태(이전 응답의 context 를 그대로 돌려준다)
  * @param {string} [input.tone] 립 컬러 매핑에서 측정한 퍼스널 톤(spring/summer/autumn/winter)
  */
-export function answer({ message, baseProductId = null, selectedHex = null, limit = 5, context = null, tone = null }) {
-  const products = allProducts();
-  const brands = [...new Set(products.map((p) => p.brand))];
+// imageOnly: 대표 이미지가 있는 제품만 추천 대상으로 쓴다 (테스트용 '이미지ver.' 버튼)
+export function answer({ message, baseProductId = null, selectedHex = null, limit = 5, context = null, tone = null, imageOnly = false }) {
+  const products = imageOnly ? allProducts().filter((p) => p.image_url) : allProducts();
+  const brands = [...new Set(allProducts().map((p) => p.brand))];
   // 말·입력 보정: 한글 금액("만 오천 원")과 비슷한 발음("그로시" → "글로시")을 챗봇이 아는 말로 바꾼 뒤 해석한다
   const spoken = normalizeSpoken(message, chatVocab(brands), chatKeepWords());
   const heard = spoken.corrections.length

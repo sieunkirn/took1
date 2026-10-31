@@ -9,7 +9,7 @@
 <body data-recommend="inline">
 <main class="fit lip-user">
   <section class="area lip-user-view">
-    <div class="label">[가상 립 메이크업 화면]</div>
+    <div class="label">가상 립 메이크업 화면</div>
     <div class="stage">
       <div class="placeholder loading" id="placeholder" style="position:absolute;inset:0"><div class="spinner" aria-hidden="true"></div><p id="placeholder-text">카메라를 준비하고 있습니다<br>권한 요청이 뜨면 허용해 주세요</p></div>
       <canvas id="view" class="hidden"></canvas>
@@ -25,7 +25,7 @@
   <div class="lip-user-side">
     <div id="controls" class="lip-user-side">
     <section class="area">
-      <div class="label">[나에게 어울리는 컬러]</div>
+      <div class="label">나에게 어울리는 컬러</div>
       <div class="row"><button type="button" id="match" disabled>나에게 가장 잘 어울리는 컬러 추천받기</button></div>
       <p id="match-result" class="small" aria-live="polite"></p>
       <p id="match-metrics" class="muted small"></p>
@@ -34,25 +34,25 @@
     </section>
 
     <section class="area">
-      <div class="label">[컬러 선택]</div>
+      <div class="label">컬러 선택</div>
       <div class="swatches" id="swatches" role="group" aria-label="립 컬러"></div>
       <p id="color-name" class="small"></p>
     </section>
 
     <section class="area">
-      <div class="label">[텍스처 / 농도]</div>
+      <div class="label">텍스처 / 농도</div>
       <div class="row seg" id="textures" role="group" aria-label="텍스처"></div>
       <div class="slider"><label for="intensity">농도</label><input type="range" id="intensity" min="0" max="100" step="1"><output id="intensity-out"></output></div>
     </section>
 
     <section class="area">
-      <div class="label">[다음 단계]</div>
-      <div class="row"><button type="button" id="recommend">이 컬러로 제품 추천 받기</button></div>
+      <div class="label">다음 단계</div>
+      <div class="row"><button type="button" id="recommend">이 컬러로 제품 추천 받기</button><button type="button" id="recommend-img" title="테스트용: 이미지가 있는 제품만 추천">이미지ver.</button></div>
     </section>
     </div>
 
     <section class="area hidden" id="rec-panel">
-      <div class="label">[제품 추천]</div>
+      <div class="label">제품 추천</div>
       <p id="rec-ref" class="small"></p>
       <div class="row"><button type="button" id="rec-back">컬러 다시 고르기</button></div>
       <p id="rec-status" class="muted small" aria-live="polite"></p>

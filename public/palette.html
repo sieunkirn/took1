@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 팔레트</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<!-- 팔레트(테스트): 왼쪽은 립 매핑 카메라(lip.js), 오른쪽 위는 조제한 색·텍스처·추천, 오른쪽 아래는 팔레트(palette.js).
+     물감을 섞을 때마다 palette.js 가 took:apply 이벤트로 섞은 색을 보내 카메라 입술에 바로 입힌다 -->
+<body data-layout="palette" class="palette-page">
+<main class="fit palette">
+  <!-- 왼쪽: 립 매핑 카메라 -->
+  <section class="area lip-user-view pal-cam">
+    <div class="label">가상 립 메이크업 화면</div>
+    <div class="stage">
+      <div class="placeholder loading" id="placeholder" style="position:absolute;inset:0"><div class="spinner" aria-hidden="true"></div><p id="placeholder-text">카메라를 준비하고 있습니다<br>권한 요청이 뜨면 허용해 주세요</p></div>
+      <canvas id="view" class="hidden"></canvas>
+      <video id="video" class="hidden" playsinline muted></video>
+    </div>
+    <p id="color-name" class="small"></p>
+    <p id="guide" class="muted" aria-live="polite"></p>
+    <div id="error" class="msg hidden" role="alert"></div>
+    <div class="row">
+      <button type="button" id="cam-retry" class="hidden">카메라 다시 연결</button>
+    </div>
+  </section>
+
+  <div class="pal-right">
+    <!-- 오른쪽 위: 조제한 색 · 텍스처 · 추천 -->
+    <aside class="area pal-side" aria-label="조제한 색">
+      <div class="pal-head">
+        <div class="label" id="side-label">조제한 색</div>
+        <button type="button" id="reset" class="pal-reset">초기화</button>
+      </div>
+      <div class="result">
+        <div id="result-swatch" class="result-swatch" aria-hidden="true"></div>
+        <div>
+          <strong id="result-hex" class="result-hex">-</strong>
+          <p id="result-note" class="muted small">아직 섞은 물감이 없어요</p>
+        </div>
+      </div>
+      <div id="recipe-bar" class="recipe-bar" aria-hidden="true"></div>
+      <div id="recipe" class="recipe small"></div>
+      <div class="row seg" id="textures" role="group" aria-label="텍스처"></div>
+      <div class="slider"><label for="intensity">농도</label><input type="range" id="intensity" min="0" max="100" step="1"><output id="intensity-out"></output></div>
+      <div class="row" id="find-row"><button type="button" id="find" class="btn-dark" disabled>이 색과 비슷한 제품 추천</button></div>
+      <p id="rec-status" class="muted small" aria-live="polite"></p>
+      <div id="rec-list" class="pal-rec"></div>
+    </aside>
+
+    <!-- 오른쪽 아래: 팔레트 -->
+    <section class="area pal-board" aria-label="팔레트">
+      <div class="paint-group">
+        <div class="label">립 컬러 매핑 컬러</div>
+        <div id="lip-paints" class="paints lip-paints" role="group" aria-label="립 컬러 매핑 컬러"></div>
+      </div>
+      <div class="pal-mix">
+        <div class="mix-wrap" id="mix-wrap">
+          <canvas id="mix-canvas" aria-label="섞는 칸 (드래그하면 저어져요)" role="img"></canvas>
+          <p id="mix-empty" class="mix-empty">물감을 눌러<br>떨어뜨려요</p>
+        </div>
+        <div class="pal-tools">
+          <button type="button" id="undo" disabled>한 방울 빼기</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</main>
+<script type="module" src="js/lip.js"></script>
+<script type="module" src="js/palette.js"></script>
+</body>
+</html>

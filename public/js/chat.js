@@ -2,8 +2,8 @@
 // 넓은 화면은 추천 제품을 오른쪽 패널에 고정하고(대화엔 짧은 목록만), 좁은 화면은 대화 안에 카드로 보여 준다(CSS 로 전환).
 // 제품 카드의 '+ 비교'로 비교함에 담고(최대 3개) '비교하기'를 누르면 대화에 비교표를 보여 준다.
 // 오른쪽 패널은 추천 목록이 없을 때 '바코드로 제품 알아보기'(카메라 스캔·번호 입력)를 보여 주고, 인식한 제품을 대화로 설명한다.
-// 답변은 규칙 기반 엔진(src/lib/chat.js)이 만든다. 테스트·검증용 화면(기준 정보 패널, 빠른 질문, 질문 목록)은 chat-test.html 에 있다.
-import { renderNav, api, store, el, qs, detailLink, won, FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName, storeLink } from './common.js';
+// 답변은 규칙 기반 엔진(src/lib/chat.js)이 만든다.
+import { renderNav, api, store, el, qs, detailLink, won, FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName, storeLink, toast } from './common.js';
 import { normalizeHex } from '../lib/color.js';
 import { compareSummary, josa } from '../lib/chat.js';
 import { setupVoiceInput, setupSpeaker, spokenReply } from './voice.js';
@@ -11,6 +11,10 @@ import { createBarcodeScanner, cameraErrorMessage, decodeImageFile, loadZXing } 
 
 renderNav();
 const $ = (id) => document.getElementById(id);
+// 합본 화면(studio.html): 오른쪽 탭(색 조제·챗봇·추천·바코드)이 보이는 영역을 정하고, 립 매핑(lip.js)과 창 이벤트로 주고받는다
+//   받음: took:color { hex } / took:recommend { hex }   보냄: took:apply { hex, finish } / took:show-tab { tab }
+const STUDIO = document.body.dataset.layout === 'studio';
+const showTab = (tab) => STUDIO && window.dispatchEvent(new CustomEvent('took:show-tab', { detail: { tab } }));
 const log = $('chat-log');
 const input = $('chat-input');
 
@@ -26,6 +30,7 @@ const state = {
   focus: store.get('chatUserFocus', []), // 최근 답변이 가리킨 제품 (패널에서 강조)
   compare: store.get('chatUserCompare', []), // 비교함에 담은 제품 (최대 3개)
   panel: store.get('chatUserPanel', null), // 오른쪽 패널: 'scan'(바코드) | 'list'(추천 목록)
+  imageOnly: store.get('chatImageOnly', false), // 테스트용: 이미지가 있는 제품만 추천
   typing: false,
 };
 if (state.panel !== 'scan' && state.panel !== 'list') state.panel = state.list.length ? 'list' : 'scan';
@@ -46,6 +51,7 @@ function save() {
   store.set('chatUserFocus', state.focus);
   store.set('chatUserCompare', state.compare);
   store.set('chatUserPanel', state.panel);
+  store.set('chatImageOnly', state.imageOnly);
 }
 
 // ---------- 비교함 ----------
@@ -53,11 +59,17 @@ const COMPARE_MAX = 3;
 const inCompare = (id) => state.compare.some((p) => p.id === id);
 
 function toggleCompare(p) {
-  if (inCompare(p.id)) state.compare = state.compare.filter((x) => x.id !== p.id);
-  else if (state.compare.length >= COMPARE_MAX) {
+  if (inCompare(p.id)) {
+    state.compare = state.compare.filter((x) => x.id !== p.id);
+    toast('비교함에서 뺐어요');
+  } else if (state.compare.length >= COMPARE_MAX) {
     $('compare-count').textContent = `최대 ${COMPARE_MAX}개까지 담을 수 있어요. 하나를 빼고 다시 담아 주세요.`;
+    toast(`비교함은 ${COMPARE_MAX}개까지 담을 수 있어요`);
     return;
-  } else state.compare.push(p);
+  } else {
+    state.compare.push(p);
+    toast(`비교함에 담았어요 (${state.compare.length}/${COMPARE_MAX})`);
+  }
   save();
   renderLog();
 }
@@ -130,12 +142,18 @@ async function setBase(id) {
 // ---------- 대화 그리기 ----------
 function productMini(p, n) {
   return el('div', { class: 'card mini' + (state.focus.includes(p.id) ? ' focus' : ''), 'data-product-id': p.id },
+    // 대표 이미지가 있는 제품만 사진을 보여 준다 (불러오지 못하면 사진 자리를 뺀다)
+    p.image_url ? el('img', {
+      class: 'card-img', src: p.image_url, alt: fullName(p), loading: 'lazy', referrerpolicy: 'no-referrer',
+      onerror: (e) => e.target.remove(),
+    }) : null,
     el('div', {}, n ? el('strong', { text: `${n}번 ` }) : null, el('span', { text: fullName(p) })),
     el('div', { class: 'muted small', text: [p.finish ? FINISH_LABELS[p.finish] : null, won(p.price), p.color_options ? `${p.color_options}가지 색상 중 대표색` : null,
       p.similarity !== undefined ? `기준 색과 유사도 ${p.similarity}%` : null].filter(Boolean).join(' · ') }),
     el('div', { class: 'actions' },
       detailLink(p, 'chat'),
       storeLink(p, '올리브영'),
+      STUDIO ? el('button', { type: 'button', text: '입술에 발라보기', onclick: () => window.dispatchEvent(new CustomEvent('took:apply', { detail: { hex: p.color_hex, finish: p.finish } })) }) : null,
       el('button', { type: 'button', text: '기준 제품으로', onclick: () => setBase(p.id) }),
       el('button', {
         type: 'button', text: inCompare(p.id) ? '✓ 비교함' : '+ 비교', 'aria-pressed': String(inCompare(p.id)),
@@ -168,13 +186,16 @@ function welcome() {
 }
 
 function renderPanel() {
-  const scan = state.panel === 'scan';
-  $('scan-view').classList.toggle('hidden', !scan);
-  $('list-view').classList.toggle('hidden', scan);
-  $('panel-label').textContent = scan ? '[바코드로 제품 알아보기]' : '[추천 제품]';
-  const toggle = $('panel-toggle');
-  toggle.textContent = scan ? `추천 목록 보기 (${state.list.length})` : '바코드로 찾기';
-  toggle.classList.toggle('hidden', scan && !state.list.length);
+  if (!STUDIO) {
+    // 챗봇 화면: 오른쪽 패널 하나를 바코드 ↔ 추천 목록으로 바꿔 쓴다 (합본 화면은 탭이 따로 있다)
+    const scan = state.panel === 'scan';
+    $('scan-view').classList.toggle('hidden', !scan);
+    $('list-view').classList.toggle('hidden', scan);
+    $('panel-label').textContent = scan ? '바코드로 제품 알아보기' : '추천 제품';
+    const toggle = $('panel-toggle');
+    toggle.textContent = scan ? `추천 목록 보기 (${state.list.length})` : '바코드로 찾기';
+    toggle.classList.toggle('hidden', scan && !state.list.length);
+  }
   const status = $('rec-status');
   if (!state.list.length) {
     status.textContent = state.ctx?.query
@@ -215,6 +236,7 @@ async function send(text) {
     body: JSON.stringify({
       message, baseProductId: state.baseId, selectedHex: state.selectedHex,
       context: state.ctx, tone: store.get('lipMatch')?.season || null, // 립 컬러 매핑에서 측정한 톤
+      imageOnly: state.imageOnly,
     }),
   });
   // 답변 길이에 맞춰 잠깐 '답변 준비 중'을 보여 준다 (화면 전환이 너무 갑작스럽지 않게)
@@ -237,6 +259,7 @@ async function send(text) {
       if (products.length) {
         state.panel = 'list';
         stopScan();
+        showTab('rec'); // 합본 화면: 추천 탭으로
       }
     } else {
       state.focus = products.map((p) => p.id).filter((id) => state.list.some((x) => x.id === id));
@@ -378,6 +401,7 @@ async function handleBarcode(raw, source) {
   save();
   renderLog();
   if (narrow()) document.body.classList.remove('scan-open'); // 좁은 화면은 대화에서 바로 설명을 보도록 패널을 닫는다
+  showTab('chat'); // 합본 화면: 설명은 챗봇 탭에서 본다
 }
 
 // ---------- 휴대폰으로 찍기 (QR 연결) ----------
@@ -485,6 +509,27 @@ $('compare-clear').addEventListener('click', () => {
   save();
   renderLog();
 });
+// 테스트용 '이미지ver.': 켜면 이미지가 있는 제품만으로 바로 다시 추천하고, 끄면 전체 제품으로 돌아간다
+const imgBtn = $('img-only');
+function renderImageOnly() {
+  imgBtn.setAttribute('aria-pressed', String(state.imageOnly));
+  imgBtn.title = state.imageOnly ? '이미지가 있는 제품만 추천 중 (누르면 전체 제품)' : '이미지가 있는 제품만 추천 받기';
+}
+imgBtn.addEventListener('click', () => {
+  if (state.typing) return;
+  state.imageOnly = !state.imageOnly;
+  state.ctx = null; // 새 목록부터 다시
+  save();
+  renderImageOnly();
+  if (state.imageOnly) {
+    toast('이미지가 있는 제품만 추천할게요');
+    send(state.selectedHex ? '지금 고른 색과 비슷한 제품 추천해 줘' : '립 추천해 줘');
+  } else {
+    toast('전체 제품으로 추천할게요');
+  }
+});
+renderImageOnly();
+
 $('chat-reset').addEventListener('click', () => {
   speaker.stop();
   state.messages = [];
@@ -521,4 +566,13 @@ if (qs('base') && base && !state.messages.some((m) => m.baseNotice === base.id))
   save();
 }
 renderLog();
+// 합본 화면: 립 매핑에서 고른 색을 챗봇의 기준 색으로 쓰고, '이 컬러로 제품 추천'을 챗봇 질문으로 처리한다
+if (STUDIO) {
+  if (window.tookLipHex) state.selectedHex = window.tookLipHex; // 립 매핑이 먼저 로드된 경우
+  window.addEventListener('took:color', (e) => { state.selectedHex = e.detail.hex; });
+  window.addEventListener('took:recommend', (e) => {
+    state.selectedHex = e.detail.hex;
+    send('지금 고른 색과 비슷한 제품 추천해 줘');
+  });
+}
 if (!narrow()) startPairing(); // 넓은 화면(PC)에서는 바로 휴대폰 연결 QR 을 준비한다

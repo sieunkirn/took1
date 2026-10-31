@@ -67,7 +67,9 @@ async function handleApi(req, res, url) {
     if (!hex) return sendJson(res, 400, { error: 'hex 파라미터(예: #B3122E)가 필요합니다.' });
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
-    const products = recommendByColor(hex, { finish: q.get('finish') || null, limit, excludeIds });
+    // image=1: 대표 이미지가 있는 제품만 대상으로 추천 (테스트용 '이미지ver.' 버튼)
+    const pool = q.get('image') === '1' ? allProducts().filter((p) => p.image_url) : undefined;
+    const products = recommendByColor(hex, { finish: q.get('finish') || null, limit, excludeIds, products: pool });
     return sendJson(res, 200, { hex, products });
   }
   if (req.method === 'POST' && path === '/api/chat') {
@@ -75,7 +77,7 @@ async function handleApi(req, res, url) {
     if (!body.message || typeof body.message !== 'string') return sendJson(res, 400, { error: 'message 가 필요합니다.' });
     return sendJson(res, 200, {
       engine: 'rule-based',
-      ...answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone }),
+      ...answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true }),
     });
   }
   // ---------- 휴대폰 ↔ PC 연결 (QR) ----------

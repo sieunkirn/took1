@@ -1,4 +1,4 @@
-// 챗봇 공용 음성 기능 (Web Speech API, 한국어). 사용자 챗봇(chat.html)과 챗봇(테스트)(chat-test.html)이 같이 쓴다.
+// 챗봇 음성 기능 (Web Speech API, 한국어). AI 뷰티 챗봇(chat.html)과 합본(studio.html)의 챗봇 탭이 쓴다.
 // - 음성 질문: 브라우저 음성 인식 서비스가 말을 글자로 바꾸고, 후보 문장 중 챗봇이 가장 잘 알아듣는 것을 고른다
 // - 읽어주기: 챗봇 답변을 브라우저 음성 합성으로 읽는다
 import { parseMessage, chatVocab, chatKeepWords } from '../lib/chat.js';

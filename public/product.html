@@ -11,16 +11,16 @@
   <h1>제품 상세 정보</h1>
   <div class="grid-2">
     <section class="area">
-      <div class="label">[제품 이미지 영역]</div>
+      <div class="label">제품 이미지 영역</div>
       <div class="placeholder" style="aspect-ratio:1/1">제품 이미지 플레이스홀더</div>
     </section>
     <section class="area">
-      <div class="label">[제품 정보 영역]</div>
+      <div class="label">제품 정보 영역</div>
       <div id="product-info" class="muted">불러오는 중...</div>
     </section>
   </div>
   <section class="area">
-    <div class="label">[연결 기능]</div>
+    <div class="label">연결 기능</div>
     <div class="row">
       <button type="button" id="back">이전 화면으로</button>
       <button type="button" id="to-chat">이 제품으로 챗봇에 질문하기</button>
@@ -36,7 +36,7 @@
   const from = qs('from');
   const info = document.getElementById('product-info');
   const buttons = ['to-chat', 'to-similar'].map((x) => document.getElementById(x));
-  const backTargets = { 'lip-together': 'lip-together.html', recommend: 'recommend.html', barcode: 'barcode.html', chat: 'chat.html', 'chat-test': 'chat-test.html' };
+  const backTargets = { 'lip-together': 'lip-together.html', recommend: 'recommend.html', chat: 'chat.html' };
   document.getElementById('back').addEventListener('click', () => {
     if (backTargets[from]) location.href = backTargets[from];
     else if (history.length > 1) history.back();

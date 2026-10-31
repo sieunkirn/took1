@@ -10,7 +10,7 @@
 <main>
   <h1>색상 기반 제품 추천</h1>
   <section class="area">
-    <div class="label">[기준 색상 정보]</div>
+    <div class="label">기준 색상 정보</div>
     <p id="ref-color">기준 색상: -</p>
     <p class="muted">추천 방식: 기준 색상과 각 제품 색상의 CIEDE2000 색차(ΔE)를 계산해 작은 순서로 정렬합니다. 유사도 = 100 − 2 × ΔE (최소 0%).</p>
     <div class="row">
@@ -21,7 +21,7 @@
     </div>
   </section>
   <section class="area">
-    <div class="label">[추천 결과 목록]</div>
+    <div class="label">추천 결과 목록</div>
     <div id="rec-status" class="muted"></div>
     <div id="rec-list" class="cards"></div>
   </section>
@@ -70,7 +70,7 @@
   document.getElementById('ref-color').textContent = hex ? `기준 색상: ${hex} (${sourceLabel})` : '기준 색상: 없음';
   finishSel.addEventListener('change', load);
   limitSel.addEventListener('change', load);
-  document.getElementById('recolor').addEventListener('click', () => { location.href = store.get('lipReturn') || 'lip.html'; }); // 들어온 립 화면(사용자용/테스트)으로 복귀
+  document.getElementById('recolor').addEventListener('click', () => { location.href = 'lip-together.html'; });
   document.getElementById('to-chat').addEventListener('click', () => go('chat.html', { hex }));
   load();
 </script>
