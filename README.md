@@ -29,6 +29,7 @@ npm run build:web
 vercel deploy dist/static --temporary --yes   # 로그인 없이 임시 배포 (60분 뒤 만료, 출력되는 claim 링크로 계정에 가져가면 유지)
 ```
 - 로그인했다면 `vercel deploy dist/static --prod` 로 계정의 프로젝트에 배포한다
+- GitHub 저장소를 Vercel 프로젝트에 연결하면 `main` 에 push 할 때마다 자동 배포된다. 빌드 설정은 `vercel.json` (설치 `npm install` → 빌드 `npm run build:web` → 결과 `dist/static`)
 - 휴대폰 QR 연결은 서버가 필요해 정적 버전에서는 안내 문구만 나온다. 나머지(카메라·챗봇·추천·바코드 카메라/번호 입력·팔레트)는 동작
 
 ### Render 배포 (고정 https 주소)
