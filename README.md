@@ -49,12 +49,12 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 - 자체 서명 인증서에서 카메라가 막히는 경우 ngrok / cloudflared 같은 HTTPS 터널 주소로 접속하세요.
 - 실제 iPad 기기 테스트는 하지 않았고, Chromium 에서 iPad 가로 화면 크기로 레이아웃을 검증했습니다.
 - 제품 데이터 재생성: `npm run seed` (가상 데이터, color_lab, EAN-13 체크 디지트 자동 계산)
-- 올리브영 데이터 다시 변환: `npm run import:oliveyoung [크롤링 JSON 경로]` (기본 `../크롤링/oliveyoung_lip_tints.json`)
+- 올리브영 데이터 다시 변환: `npm run import:oliveyoung [크롤링 JSON 경로]` (기본 `../크롤링c/oliveyoung_lip_tints.json`). 크롤링 폴더에 받아 둔 이미지 파일도 `public/images/lip-tints` 로 다시 복사한다
 
 ## 제품 데이터 (실제 / 테스트 구분)
 | 출처 | 파일 | 개수 | 쓰는 곳 |
 |---|---|---|---|
-| 올리브영 수집 데이터 (기본) | `src/data/products.oliveyoung.json` | 286 (296개 중 대표 색상값이 없는 10개 제외) | 서버·정적 버전 |
+| 올리브영 수집 데이터 (기본) | `src/data/products.oliveyoung.json` | 285 (크롤링c, 전부 대표 색상값·이미지 있음) | 서버·정적 버전 |
 | 시연·테스트용 가상 데이터 | `src/data/products.json` | 27 (바코드 있음) | 단위·e2e 테스트, `TOOK_DATA=virtual` 로 서버를 켜면 화면에서도 사용 |
 
 올리브영 데이터 변환 규칙 (`scripts/import-oliveyoung.js`, 수집하지 않은 정보는 지어내지 않음)
@@ -63,7 +63,7 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 - 대표 색상값 → `color_lab` 계산, 색상 계열은 가장 가까운 기준 색으로 **추정** (`color_family_source: estimated_from_color`, 화면에 "색상값으로 추정")
 - 제형은 상품명 단어(벨벳·매트·블러·글로우 등)로 **추정** (`finish_source: product_name`), 단서가 없으면 `null` → "정보 없음"
 - 바코드·색상명·설명은 수집되지 않아 비움. 바코드 인식은 "등록되지 않은 제품"으로 안내하고, 시연은 가상 데이터로
-- 대표 이미지: 크롤링 데이터의 `src`·`image_url` 또는 같은 폴더의 `oliveyoung_image_manifest.json` 에 있는 올리브영 이미지 서버(https://image.oliveyoung.co.kr) 주소만 사용(현재 8개). 주소는 추측하지 않으며, 카드 맨 위 같은 크기의 자리에 표시하고, 주소가 없거나 불러오지 못하면 "이미지 준비 중" 자리로 표시. 전체 이미지를 쓰려면 크롤러가 상품 목록의 썸네일 주소(src)를 함께 저장해야 함
+- 대표 이미지: 크롤링 폴더에 받아 둔 이미지 파일(`image_path`)을 `public/images/lip-tints` 로 복사해 그 파일을 쓴다(현재 285개 전부, 약 16MB). 파일이 없으면 크롤링 데이터의 `src`·`image_url` 이나 `oliveyoung_image_manifest.json` 의 올리브영 이미지 서버(https://image.oliveyoung.co.kr) 주소를 쓰고, 주소는 추측하지 않는다. 카드 맨 위 같은 크기의 자리에 표시하고, 불러오지 못하면 "이미지 준비 중" 자리로 표시. 가격: 크롤링c 에는 할인가가 없어 정가를 가격으로 쓴다
 - 수집 데이터이므로 외부 공개(터널·배포) 시 이용 조건에 유의
 
 ## 기존 프로젝트 분석 결과
@@ -73,7 +73,8 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 ## 구조
 ```
 server.js               정적 파일 + REST API
-src/data/products.oliveyoung.json  올리브영 수집 립틴트 286개 (기본 제품 데이터)
+src/data/products.oliveyoung.json  올리브영 수집 립틴트 285개 (기본 제품 데이터)
+public/images/lip-tints/          올리브영 상품 대표 이미지 (import:oliveyoung 이 크롤링 폴더에서 복사)
 src/data/products.json  시연·테스트용 가상 제품 27개
 src/lib/color.js        HEX/HSL/Lab 변환, CIEDE2000 (서버·브라우저 공용, /lib/color.js)
 src/lib/repository.js   제품 저장소 (JSON → 이후 DB 교체 지점)

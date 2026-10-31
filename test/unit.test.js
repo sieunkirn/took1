@@ -304,4 +304,8 @@ test('올리브영 변환: 대표 이미지는 수집된 올리브영 주소만 
   const row = (goods, extra = {}) => ({ product_name: '브랜드 틴트', sale_price_krw: '9,000', representative_color_hex: '#C1595A', detail_url: `https://www.oliveyoung.co.kr/x?goodsNo=${goods}`, ...extra });
   const { products } = convert([row('A000000267200'), row('A000000999999', { src: img }), row('A000000888888')], allProducts(), map);
   assert.deepEqual(products.map((p) => p.image_url), [img, img, '']); // manifest 보충 / 행의 src / 없음
+  // 받아 둔 이미지 파일(public 기준 경로)이 있으면 주소보다 먼저 쓴다
+  const local = { A000000999999: 'images/lip-tints/A000000999999.jpg' };
+  const withLocal = convert([row('A000000999999', { src: img }), row('A000000888888')], allProducts(), {}, local).products;
+  assert.deepEqual(withLocal.map((p) => p.image_url), ['images/lip-tints/A000000999999.jpg', '']);
 });

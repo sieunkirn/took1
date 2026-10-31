@@ -1,15 +1,16 @@
 // 올리브영에서 수집한 립틴트 데이터(크롤링 폴더)를 took 제품 데이터 형식으로 바꿔 src/data/products.oliveyoung.json 에 저장한다.
-// 실행: npm run import:oliveyoung [크롤링 JSON 경로]   (기본: ../크롤링/oliveyoung_lip_tints.json)
+// 실행: npm run import:oliveyoung [크롤링 JSON 경로]   (기본: ../크롤링c/oliveyoung_lip_tints.json)
 //
 // 데이터 원칙(CLAUDE.md): 수집하지 않은 정보는 지어내지 않는다.
 // - 바코드·색상명·제품 설명: 수집되지 않아 비워 둔다 (null)
-// - 대표 이미지: 크롤링 데이터의 이미지 주소(src·image_url)나 같은 폴더의 oliveyoung_image_manifest.json 에 있을 때만 넣는다 (주소를 추측하지 않는다)
+// - 대표 이미지: 크롤링 폴더에 받아 둔 이미지 파일(image_path)이 있으면 public/images/lip-tints 로 복사해 그 파일을 쓰고,
+//   없으면 크롤링 데이터의 이미지 주소(src·image_url)나 같은 폴더의 oliveyoung_image_manifest.json 의 주소를 쓴다 (주소를 추측하지 않는다)
 // - 색상 계열: 대표 색상값과 가장 가까운 기준 색(가상 데이터의 계열 라벨)으로 추정 → color_family_source: 'estimated_from_color'
 // - 제형: 상품명의 단어(벨벳·매트·블러·글로우 등)로 추정, 단서가 없으면 null → finish_source: 'product_name' | null
 // - 대표 색상값이 없는 상품은 색 비교·추천에 쓸 수 없어 제외한다
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { hexToLab, roundLab, normalizeHex, deltaE2000 } from '../src/lib/color.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -45,7 +46,7 @@ export function parseName(raw) {
   return { brand, name: rest || text.slice(brand.length).trim(), colorOptions: count ? Number(count[1]) : null };
 }
 
-const goodsNoOf = (url) => String(url || '').match(/goodsNo=([A-Z0-9]+)/)?.[1] || null;
+export const goodsNoOf = (url) => String(url || '').match(/goodsNo=([A-Z0-9]+)/)?.[1] || null;
 
 // 올리브영 이미지 서버의 https 주소만 받는다
 export function cleanImageUrl(url) {
@@ -73,8 +74,9 @@ const toWon = (v) => {
  * @param {object[]} rows 크롤링 JSON
  * @param {object[]} reference 계열 라벨이 있는 기준 색 (가상 제품 데이터)
  * @param {Record<string, string>} [images] 상품번호 → 대표 이미지 주소 (크롤링 데이터에 없을 때 보충)
+ * @param {Record<string, string>} [localImages] 상품번호 → public 기준 이미지 파일 경로 (있으면 주소보다 먼저 쓴다)
  */
-export function convert(rows, reference, images = {}) {
+export function convert(rows, reference, images = {}, localImages = {}) {
   const refs = reference.map((p) => ({ lab: hexToLab(p.color_hex), family: p.color_family }));
   const familyOf = (lab) => refs.reduce((best, r) => {
     const d = deltaE2000(lab, r.lab);
@@ -113,7 +115,7 @@ export function convert(rows, reference, images = {}) {
       finish_source: finish ? 'product_name' : null,
       price: toWon(row.sale_price_krw) ?? toWon(row.list_price_krw),
       list_price: toWon(row.list_price_krw),
-      image_url: cleanImageUrl(row.image_url || row.src || row.image) || (goods && images[goods]) || '',
+      image_url: (goods && localImages[goods]) || cleanImageUrl(row.image_url || row.src || row.image) || (goods && images[goods]) || '',
       description: '',
       url: row.detail_url ? String(row.detail_url).replace(/&(trackingCd|t_page|t_click|t_number)=[^&]*/g, '') : null,
       original_name: row.product_name,
@@ -122,18 +124,39 @@ export function convert(rows, reference, images = {}) {
   return { products: products.filter((p) => p.price), skipped };
 }
 
+const IMAGE_DIR = 'images/lip-tints'; // public 아래 위치 (화면에서는 상대 경로로 불러온다)
+
+// 크롤링 폴더에 받아 둔 이미지 파일을 public/images/lip-tints 로 복사한다 (지난번 복사본은 지우고 새로)
+// image_path 는 크롤링 폴더 기준 경로 (예: /images/lip-tints/A000001001860.jpg)
+function copyLocalImages(rows, crawlDir) {
+  const dest = join(root, 'public', IMAGE_DIR);
+  rmSync(dest, { recursive: true, force: true });
+  mkdirSync(dest, { recursive: true });
+  const map = {};
+  for (const row of rows) {
+    const goods = goodsNoOf(row.detail_url);
+    if (!goods || !row.image_path) continue;
+    const file = join(crawlDir, String(row.image_path).replace(/^[/\\]+/, ''));
+    if (!existsSync(file)) continue;
+    copyFileSync(file, join(dest, basename(file)));
+    map[goods] = `${IMAGE_DIR}/${basename(file)}`;
+  }
+  return map;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const src = process.argv[2] || join(root, '..', '크롤링', 'oliveyoung_lip_tints.json');
+  const src = process.argv[2] || join(root, '..', '크롤링c', 'oliveyoung_lip_tints.json');
   const rows = JSON.parse(readFileSync(src, 'utf8'));
   const reference = JSON.parse(readFileSync(join(root, 'src/data/products.json'), 'utf8'));
   const manifestFile = join(dirname(src), 'oliveyoung_image_manifest.json');
   const images = existsSync(manifestFile) ? imageMap(JSON.parse(readFileSync(manifestFile, 'utf8'))) : {};
-  const { products, skipped } = convert(rows, reference, images);
+  const localImages = copyLocalImages(rows, dirname(src));
+  const { products, skipped } = convert(rows, reference, images, localImages);
   const out = join(root, 'src/data/products.oliveyoung.json');
   writeFileSync(out, JSON.stringify(products, null, 2) + '\n');
   const finishes = products.reduce((m, p) => ((m[p.finish || '정보 없음'] = (m[p.finish || '정보 없음'] || 0) + 1), m), {});
   console.log(`올리브영 상품 ${rows.length}개 → ${products.length}개 저장 (${out})`);
   console.log(`대표 색상값이 없어 제외: ${skipped.length}개`);
   console.log('제형(상품명 기준 추정):', finishes);
-  console.log(`대표 이미지 주소가 있는 상품: ${products.filter((p) => p.image_url).length}개`);
+  console.log(`대표 이미지가 있는 상품: ${products.filter((p) => p.image_url).length}개 (그중 public/${IMAGE_DIR} 파일: ${Object.keys(localImages).length}개)`);
 }
