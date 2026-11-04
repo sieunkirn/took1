@@ -23,7 +23,12 @@
     "image_url": "images/lip-tints/A000001001860.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001001860&dispCatNo=1000001000200060003",
-    "original_name": "시튜에아 [NEW/단독신상] 시튜에아 에어리 무스 벨벳"
+    "original_name": "시튜에아 [NEW/단독신상] 시튜에아 에어리 무스 벨벳",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000255256",
@@ -49,7 +54,12 @@
     "image_url": "images/lip-tints/A000000255256.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255256&dispCatNo=1000001000200060003",
-    "original_name": "라카 [나나PICK/이시안공동개발] 라카 퍼펙트 트윈 립 12 colors"
+    "original_name": "라카 [나나PICK/이시안공동개발] 라카 퍼펙트 트윈 립 12 colors",
+    "brand_en": "Laka",
+    "name_en": "Perfect Twin Lip",
+    "global_id": "GA260540079",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540079",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000169711",
@@ -75,7 +85,12 @@
     "image_url": "images/lip-tints/A000000169711.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000169711&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 [NEW블랙에디션/구매인증이벤트] 무지개맨션 오브제 리퀴드 틴트"
+    "original_name": "무지개맨션 [NEW블랙에디션/구매인증이벤트] 무지개맨션 오브제 리퀴드 틴트",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Objet Liquid",
+    "global_id": "GA240925853",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240925853",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000244834",
@@ -101,7 +116,12 @@
     "image_url": "images/lip-tints/A000000244834.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000244834&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 무드 글로이 틴트 32 Colors (+푸딩 말랑이 키링&스티커 증정)"
+    "original_name": "페리페라 페리페라 무드 글로이 틴트 32 Colors (+푸딩 말랑이 키링&스티커 증정)",
+    "brand_en": "peripera",
+    "name_en": "Mood Glowy Tint",
+    "global_id": "GA260136903",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136903",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000234394",
@@ -127,7 +147,12 @@
     "image_url": "images/lip-tints/A000000234394.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000234394&dispCatNo=1000001000200060003",
-    "original_name": "얼터너티브스테레오 [11월올영픽] 얼터너티브스테레오 립 포션 카라멜 글레이즈 8ml"
+    "original_name": "얼터너티브스테레오 [11월올영픽] 얼터너티브스테레오 립 포션 카라멜 글레이즈 8ml",
+    "brand_en": "Alternativestereo",
+    "name_en": "Lip Potion Caramel Glaze Tint",
+    "global_id": "GA250933464",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933464",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000230581",
@@ -153,7 +178,12 @@
     "image_url": "images/lip-tints/A000000230581.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000230581&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [10월 올영픽/복숭아 립마스크 증정] 컬러그램 누디 블러 틴트 27COLOR(단품/기획)"
+    "original_name": "컬러그램 [10월 올영픽/복숭아 립마스크 증정] 컬러그램 누디 블러 틴트 27COLOR(단품/기획)",
+    "brand_en": "colorgram",
+    "name_en": "Nude Blur Tint",
+    "global_id": "GA250732540",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732540",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000211068",
@@ -179,7 +209,12 @@
     "image_url": "images/lip-tints/A000000211068.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000211068&dispCatNo=1000001000200060003",
-    "original_name": "브레이 [누적160만/회식틴트] 브레이 씬 글로우 틴트 8종"
+    "original_name": "브레이 [누적160만/회식틴트] 브레이 씬 글로우 틴트 8종",
+    "brand_en": "BRAYE",
+    "name_en": "Thin Glow Tint",
+    "global_id": "GA240925944",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240925944",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000241210",
@@ -205,7 +240,12 @@
     "image_url": "images/lip-tints/A000000241210.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000241210&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 [11월올영픽][NEW컬러/기획][롬앤10주년] 더 쥬시 래스팅 틴트"
+    "original_name": "롬앤 [11월올영픽][NEW컬러/기획][롬앤10주년] 더 쥬시 래스팅 틴트",
+    "brand_en": "rom&nd",
+    "name_en": "The Juicy Lasting Tint",
+    "global_id": "GA251235991",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235991",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000251720",
@@ -231,7 +271,12 @@
     "image_url": "images/lip-tints/A000000251720.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000251720&dispCatNo=1000001000200060003",
-    "original_name": "누니 [1등립오일/올영단독] 누니 애플 립 오일 12종"
+    "original_name": "누니 [1등립오일/올영단독] 누니 애플 립 오일 12종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000263099",
@@ -257,7 +302,12 @@
     "image_url": "images/lip-tints/A000000263099.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000263099&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 무드 블러 틴트 10 Colors (+카라멜 미니틴트 증정)"
+    "original_name": "페리페라 페리페라 무드 블러 틴트 10 Colors (+카라멜 미니틴트 증정)",
+    "brand_en": "peripera",
+    "name_en": "Mood Blur Tint",
+    "global_id": "GA260742253",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260742253",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000185265",
@@ -283,7 +333,12 @@
     "image_url": "images/lip-tints/A000000185265.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000185265&dispCatNo=1000001000200060003",
-    "original_name": "클리오 크리스탈글램틴트 단품/기획 (+코팅 립 마스크 증정) (풍년다방 에디션)"
+    "original_name": "클리오 크리스탈글램틴트 단품/기획 (+코팅 립 마스크 증정) (풍년다방 에디션)",
+    "brand_en": "CLIO",
+    "name_en": "Crystal Glam Tint",
+    "global_id": "GA230920576",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230920576",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000225046",
@@ -309,7 +364,12 @@
     "image_url": "images/lip-tints/A000000225046.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225046&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [NEW컬러/쫀쫀탱글 시럽광] 삐아 오버글레이즈 19종 (기획/단품)"
+    "original_name": "삐아 [NEW컬러/쫀쫀탱글 시럽광] 삐아 오버글레이즈 19종 (기획/단품)",
+    "brand_en": "BBIA",
+    "name_en": "Over Glaze Lip Gloss",
+    "global_id": "GA250833009",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250833009",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000202912",
@@ -335,7 +395,12 @@
     "image_url": "images/lip-tints/A000000202912.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000202912&dispCatNo=1000001000200060003",
-    "original_name": "힌스 [홀리데이 한정 컬러/NEW] 힌스 로 글로우 젤 틴트 32 Colors 한정 기획"
+    "original_name": "힌스 [홀리데이 한정 컬러/NEW] 힌스 로 글로우 젤 틴트 32 Colors 한정 기획",
+    "brand_en": "hince",
+    "name_en": "Raw Glow Gel Tint",
+    "global_id": "GA250229000",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250229000",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000232145",
@@ -361,7 +426,12 @@
     "image_url": "images/lip-tints/A000000232145.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232145&dispCatNo=1000001000200060003",
-    "original_name": "투쿨포스쿨 [10월 올영픽/휘그허쉬 에디션] 투쿨포스쿨 스웨이 립 벨벳 단품/기획(+미니글로스 증정)"
+    "original_name": "투쿨포스쿨 [10월 올영픽/휘그허쉬 에디션] 투쿨포스쿨 스웨이 립 벨벳 단품/기획(+미니글로스 증정)",
+    "brand_en": "too cool for school",
+    "name_en": "Sway Lip Velvet",
+    "global_id": "GA250832651",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832651",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000205485",
@@ -387,7 +457,12 @@
     "image_url": "images/lip-tints/A000000205485.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000205485&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 [멀멀착색립] 토니모리 퍼펙트 립스 쇼킹 립"
+    "original_name": "토니모리 [멀멀착색립] 토니모리 퍼펙트 립스 쇼킹 립",
+    "brand_en": "TONYMOLY",
+    "name_en": "Perfect Lips Shocking Lip",
+    "global_id": "GA240523533",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240523533",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000148591",
@@ -413,7 +488,12 @@
     "image_url": "images/lip-tints/A000000148591.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000148591&dispCatNo=1000001000200060003",
-    "original_name": "3CE [NEW/쿠로미에디션] 3CE 블러 워터 틴트 4.6g 기획/단품"
+    "original_name": "3CE [NEW/쿠로미에디션] 3CE 블러 워터 틴트 4.6g 기획/단품",
+    "brand_en": "3CE",
+    "name_en": "Blur Water Tint",
+    "global_id": "GA210004861",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA210004861",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000209886",
@@ -439,7 +519,12 @@
     "image_url": "images/lip-tints/A000000209886.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000209886&dispCatNo=1000001000200060003",
-    "original_name": "하트퍼센트 [10월 올영픽/NEW 이니미니 콜라보] 하트퍼센트 도트 온 무드 원 웨이 글로이 틴트 4g 21종 (단품/기획)"
+    "original_name": "하트퍼센트 [10월 올영픽/NEW 이니미니 콜라보] 하트퍼센트 도트 온 무드 원 웨이 글로이 틴트 4g 21종 (단품/기획)",
+    "brand_en": "Heart Percent",
+    "name_en": "Dote On Mood One Way Glowy Tint",
+    "global_id": "GA240825409",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240825409",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000259060",
@@ -465,7 +550,12 @@
     "image_url": "images/lip-tints/A000000259060.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000259060&dispCatNo=1000001000200060003",
-    "original_name": "투쿨포스쿨 [10월 올영픽/잔광글로우] 투쿨포스쿨 스웨이 립 듀이 10 Colors"
+    "original_name": "투쿨포스쿨 [10월 올영픽/잔광글로우] 투쿨포스쿨 스웨이 립 듀이 10 Colors",
+    "brand_en": "too cool for school",
+    "name_en": "Sway Lip Dewy",
+    "global_id": "GA260641063",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641063",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000001001712",
@@ -491,7 +581,12 @@
     "image_url": "images/lip-tints/A000001001712.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001001712&dispCatNo=1000001000200060003",
-    "original_name": "릴리바이레드 [지냐 공동개발/NEW] 릴리바이레드 몽글 블러 틴트 12종"
+    "original_name": "릴리바이레드 [지냐 공동개발/NEW] 릴리바이레드 몽글 블러 틴트 12종",
+    "brand_en": "lilybyred",
+    "name_en": "Mongle Blur Tint",
+    "global_id": "GA261044287",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA261044287",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000197490",
@@ -517,7 +612,12 @@
     "image_url": "images/lip-tints/A000000197490.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000197490&dispCatNo=1000001000200060003",
-    "original_name": "에스쁘아 [재출시요청/대란템] 에스쁘아 꾸뛰르 립틴트 글레이즈 21 colors"
+    "original_name": "에스쁘아 [재출시요청/대란템] 에스쁘아 꾸뛰르 립틴트 글레이즈 21 colors",
+    "brand_en": "espoir",
+    "name_en": "Couture Lip Tint Glaze",
+    "global_id": "GA250128375",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250128375",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000211367",
@@ -543,7 +643,12 @@
     "image_url": "images/lip-tints/A000000211367.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000211367&dispCatNo=1000001000200060003",
-    "original_name": "투크 [OY 단독컬러] 투크 윗아웃 미러 립 틴트 18종 중 택1"
+    "original_name": "투크 [OY 단독컬러] 투크 윗아웃 미러 립 틴트 18종 중 택1",
+    "brand_en": "Tooq",
+    "name_en": "Without Mirror Lip Tint",
+    "global_id": "GA240925762",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240925762",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000262953",
@@ -569,7 +674,12 @@
     "image_url": "images/lip-tints/A000000262953.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000262953&dispCatNo=1000001000200060003",
-    "original_name": "에뛰드 [NEW] 에뛰드 듀오 픽싱 틴트"
+    "original_name": "에뛰드 [NEW] 에뛰드 듀오 픽싱 틴트",
+    "brand_en": "ETUDE",
+    "name_en": "Duo Fixing Tint",
+    "global_id": "GA260742250",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260742250",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000235351",
@@ -595,7 +705,12 @@
     "image_url": "images/lip-tints/A000000235351.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000235351&dispCatNo=1000001000200060003",
-    "original_name": "네이밍 [미지근탠드립] 네이밍 오버 듀 글로시 립 틴트 (+부오이 헤어클립) 22colors"
+    "original_name": "네이밍 [미지근탠드립] 네이밍 오버 듀 글로시 립 틴트 (+부오이 헤어클립) 22colors",
+    "brand_en": "NAMING.",
+    "name_en": "Over Dew Glossy Lip Tint",
+    "global_id": "GA250933529",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933529",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000248529",
@@ -621,7 +736,12 @@
     "image_url": "images/lip-tints/A000000248529.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000248529&dispCatNo=1000001000200060003",
-    "original_name": "투크 투크 볼륨 글레이즈 시럽틴트 9 colors"
+    "original_name": "투크 투크 볼륨 글레이즈 시럽틴트 9 colors",
+    "brand_en": "Tooq",
+    "name_en": "Volume Glaze Syrup Tint",
+    "global_id": "GA260238070",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238070",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000201123",
@@ -647,7 +767,12 @@
     "image_url": "images/lip-tints/A000000201123.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000201123&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [NEW라떼에디션/1등틴트/미니립본품증정] 딘토 블러글로이 립틴트 40종 (단품/기획)"
+    "original_name": "딘토 [NEW라떼에디션/1등틴트/미니립본품증정] 딘토 블러글로이 립틴트 40종 (단품/기획)",
+    "brand_en": "Dinto",
+    "name_en": "Blur Glowy Lip Tint",
+    "global_id": "GA240222158",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240222158",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000001002174",
@@ -673,7 +798,12 @@
     "image_url": "images/lip-tints/A000001002174.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001002174&dispCatNo=1000001000200060003",
-    "original_name": "3CE [NEW] 3CE 쿠로미 에디션 기획세트 골라담기 11종"
+    "original_name": "3CE [NEW] 3CE 쿠로미 에디션 기획세트 골라담기 11종",
+    "brand_en": "3CE",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000268587",
@@ -699,7 +829,12 @@
     "image_url": "images/lip-tints/A000000268587.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000268587&dispCatNo=1000001000200060003",
-    "original_name": "라네즈 [10월 올영픽/마뗑킴 에디션] 라네즈X마뗑킴 주스팝박스 립틴트 4.5g 기획 (+전용 스트랩키링)"
+    "original_name": "라네즈 [10월 올영픽/마뗑킴 에디션] 라네즈X마뗑킴 주스팝박스 립틴트 4.5g 기획 (+전용 스트랩키링)",
+    "brand_en": "LANEIGE",
+    "name_en": "Juicepop Box Lip Tint",
+    "global_id": "GA260237993",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237993",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000219300",
@@ -725,7 +860,12 @@
     "image_url": "images/lip-tints/A000000219300.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000219300&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [위글위글 콜라보/우윳빛광택]컬러그램 탕후루 탱글 틴트 밀크 14COLOR(기획/단품)"
+    "original_name": "컬러그램 [위글위글 콜라보/우윳빛광택]컬러그램 탕후루 탱글 틴트 밀크 14COLOR(기획/단품)",
+    "brand_en": "colorgram",
+    "name_en": "Fruity Glass Tint Milk",
+    "global_id": "GA260741567",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741567",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000001002946",
@@ -751,7 +891,12 @@
     "image_url": "images/lip-tints/A000001002946.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001002946&dispCatNo=1000001000200060003",
-    "original_name": "시튜에아 시튜에아 체크 더 미러 클라우드 클레이"
+    "original_name": "시튜에아 시튜에아 체크 더 미러 클라우드 클레이",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000158896",
@@ -777,7 +922,12 @@
     "image_url": "images/lip-tints/A000000158896.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000158896&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 롬앤 블러 퍼지 틴트"
+    "original_name": "롬앤 롬앤 블러 퍼지 틴트",
+    "brand_en": "rom&nd",
+    "name_en": "Blur Fudge Tint",
+    "global_id": "GA211012024",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA211012024",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000131154",
@@ -803,7 +953,12 @@
     "image_url": "images/lip-tints/A000000131154.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000131154&dispCatNo=1000001000200060003",
-    "original_name": "베네피트 베네피트 립 앤 치크 틴트 7종 택1"
+    "original_name": "베네피트 베네피트 립 앤 치크 틴트 7종 택1",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000248951",
@@ -829,7 +984,12 @@
     "image_url": "images/lip-tints/A000000248951.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000248951&dispCatNo=1000001000200060003",
-    "original_name": "퓌 [얼그레이에디션/10월 올영픽] 퓌 로즈 옵세션 스테이핏 틴트 (기획/단품)"
+    "original_name": "퓌 [얼그레이에디션/10월 올영픽] 퓌 로즈 옵세션 스테이핏 틴트 (기획/단품)",
+    "brand_en": "fwee",
+    "name_en": "Rose Obsession Stay-fit Lip Tint",
+    "global_id": "GA260237886",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237886",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000246345",
@@ -855,7 +1015,12 @@
     "image_url": "images/lip-tints/A000000246345.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000246345&dispCatNo=1000001000200060003",
-    "original_name": "힌스 [립펜슬 본품 증정/11월 올영픽] 힌스 누 블러 틴트 13 Colors 한정 기획"
+    "original_name": "힌스 [립펜슬 본품 증정/11월 올영픽] 힌스 누 블러 틴트 13 Colors 한정 기획",
+    "brand_en": "hince",
+    "name_en": "Nu Blur Tint",
+    "global_id": "GA260137075",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260137075",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000203735",
@@ -881,7 +1046,12 @@
     "image_url": "images/lip-tints/A000000203735.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000203735&dispCatNo=1000001000200060003",
-    "original_name": "릴리바이레드 릴리바이레드 스윗 라이어 밀키 틴트 14종"
+    "original_name": "릴리바이레드 릴리바이레드 스윗 라이어 밀키 틴트 14종",
+    "brand_en": "lilybyred",
+    "name_en": "Sweet Liar Milky Lip Tint",
+    "global_id": "GA240423159",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240423159",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000222885",
@@ -907,7 +1077,12 @@
     "image_url": "images/lip-tints/A000000222885.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000222885&dispCatNo=1000001000200060003",
-    "original_name": "에스쁘아 [세레나데/블러틴트] 에스쁘아 꾸뛰르 립틴트 피팅 블러 4g 12colors"
+    "original_name": "에스쁘아 [세레나데/블러틴트] 에스쁘아 꾸뛰르 립틴트 피팅 블러 4g 12colors",
+    "brand_en": "espoir",
+    "name_en": "Couture Lip Tint Fitting Blur",
+    "global_id": "GA250329499",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329499",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000207056",
@@ -933,7 +1108,12 @@
     "image_url": "images/lip-tints/A000000207056.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207056&dispCatNo=1000001000200060003",
-    "original_name": "3CE [멀멀착색틴트] 3CE 레이지 팝 립 스테인 4.5g"
+    "original_name": "3CE [멀멀착색틴트] 3CE 레이지 팝 립 스테인 4.5g",
+    "brand_en": "3CE",
+    "name_en": "Lazy Pop Lip Stain",
+    "global_id": "GA240624344",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240624344",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000265686",
@@ -959,7 +1139,12 @@
     "image_url": "images/lip-tints/A000000265686.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000265686&dispCatNo=1000001000200060003",
-    "original_name": "얼리언스 [3초 립타투] 얼리언스 티슈오프 글로우 립스테인 4종"
+    "original_name": "얼리언스 [3초 립타투] 얼리언스 티슈오프 글로우 립스테인 4종",
+    "brand_en": "Earlyance",
+    "name_en": "Tissue Off Glow Lip Stain",
+    "global_id": "GA260843147",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260843147",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000221670",
@@ -985,7 +1170,12 @@
     "image_url": "images/lip-tints/A000000221670.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000221670&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [원조탱글광/우유빛광택] 컬러그램 탕후루 탱글 틴트 라인 (탱글/밀크)"
+    "original_name": "컬러그램 [원조탱글광/우유빛광택] 컬러그램 탕후루 탱글 틴트 라인 (탱글/밀크)",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000164559",
@@ -1011,7 +1201,12 @@
     "image_url": "images/lip-tints/A000000164559.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000164559&dispCatNo=1000001000200060003",
-    "original_name": "라카 [나나PICK/세럼밤기획] 라카 프루티 글램 틴트 (단품/기획)"
+    "original_name": "라카 [나나PICK/세럼밤기획] 라카 프루티 글램 틴트 (단품/기획)",
+    "brand_en": "Laka",
+    "name_en": "Fruity Glam Tint",
+    "global_id": "GA250329235",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329235",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000202425",
@@ -1037,7 +1232,12 @@
     "image_url": "images/lip-tints/A000000202425.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000202425&dispCatNo=1000001000200060003",
-    "original_name": "헤라 [NEW 컬러 출시] 헤라 센슈얼 파우더 매트 리퀴드 5g 14 Colors"
+    "original_name": "헤라 [NEW 컬러 출시] 헤라 센슈얼 파우더 매트 리퀴드 5g 14 Colors",
+    "brand_en": "HERA",
+    "name_en": "Sensual Powder Matte Liquid",
+    "global_id": "GA240825121",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240825121",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000240910",
@@ -1063,7 +1263,12 @@
     "image_url": "images/lip-tints/A000000240910.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000240910&dispCatNo=1000001000200060003",
-    "original_name": "오아드 [슬기PICK/단독기획] 오아드 립티크 13종 단품/기획"
+    "original_name": "오아드 [슬기PICK/단독기획] 오아드 립티크 13종 단품/기획",
+    "brand_en": "Oiad",
+    "name_en": "Liptique (Plumping/Non-Plumping)",
+    "global_id": "GA251235584",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235584",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000001001829",
@@ -1089,7 +1294,12 @@
     "image_url": "images/lip-tints/A000001001829.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001001829&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [누가 코팅 에디션] 웨이크메이크 워터풀 글로우 틴트/워터 블러링 레이어 틴트(단품/기획)"
+    "original_name": "웨이크메이크 [누가 코팅 에디션] 웨이크메이크 워터풀 글로우 틴트/워터 블러링 레이어 틴트(단품/기획)",
+    "brand_en": "wakemake",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000231637",
@@ -1115,7 +1325,12 @@
     "image_url": "images/lip-tints/A000000231637.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000231637&dispCatNo=1000001000200060003",
-    "original_name": "바닐라코 바닐라코 글로우 베일 틴트 3.8g 13종"
+    "original_name": "바닐라코 바닐라코 글로우 베일 틴트 3.8g 13종",
+    "brand_en": "BANILA CO",
+    "name_en": "Glow Veil Tint",
+    "global_id": "GA250732533",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732533",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000226383",
@@ -1141,7 +1356,12 @@
     "image_url": "images/lip-tints/A000000226383.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000226383&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 [탱글꿀광코팅] 무지개맨션 오브제 글로시틴트 8종"
+    "original_name": "무지개맨션 [탱글꿀광코팅] 무지개맨션 오브제 글로시틴트 8종",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Objet Glossy",
+    "global_id": "GA250531194",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250531194",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000265823",
@@ -1167,7 +1387,12 @@
     "image_url": "images/lip-tints/A000000265823.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000265823&dispCatNo=1000001000200060003",
-    "original_name": "헤라 [NEW/강력지속] 헤라 센슈얼 샤인 틴트 5g 8 Colors"
+    "original_name": "헤라 [NEW/강력지속] 헤라 센슈얼 샤인 틴트 5g 8 Colors",
+    "brand_en": "HERA",
+    "name_en": "Sensual Shine Tint",
+    "global_id": "GA260843218",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260843218",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000207123",
@@ -1193,7 +1418,12 @@
     "image_url": "images/lip-tints/A000000207123.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207123&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [물먹틴트] 삐아 글로우 틴트 17종"
+    "original_name": "삐아 [물먹틴트] 삐아 글로우 틴트 17종",
+    "brand_en": "BBIA",
+    "name_en": "Glow Tint",
+    "global_id": "GA240624058",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240624058",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000249454",
@@ -1219,7 +1449,12 @@
     "image_url": "images/lip-tints/A000000249454.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000249454&dispCatNo=1000001000200060003",
-    "original_name": "투에이엔 [굿럭트롤 콜라보] 투에이엔 듀이 핏 틴트 11colors (기획/단품)"
+    "original_name": "투에이엔 [굿럭트롤 콜라보] 투에이엔 듀이 핏 틴트 11colors (기획/단품)",
+    "brand_en": "2aN",
+    "name_en": "Dewy Fit Tint",
+    "global_id": "GA260238182",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238182",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000223250",
@@ -1245,7 +1480,12 @@
     "image_url": "images/lip-tints/A000000223250.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223250&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [미니틴트 증정]웨이크메이크 워터 블러링 레이어 틴트 14COLOR(단품/기획)"
+    "original_name": "웨이크메이크 [미니틴트 증정]웨이크메이크 워터 블러링 레이어 틴트 14COLOR(단품/기획)",
+    "brand_en": "wakemake",
+    "name_en": "Water Blurring Layer Tint",
+    "global_id": "GA250329509",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329509",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000266721",
@@ -1271,7 +1511,12 @@
     "image_url": "images/lip-tints/A000000266721.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000266721&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [레오파드 헬로키티] 웨이크메이크 레오파드 헬로키티 19종 골라담기(단품/기획)"
+    "original_name": "웨이크메이크 [레오파드 헬로키티] 웨이크메이크 레오파드 헬로키티 19종 골라담기(단품/기획)",
+    "brand_en": "wakemake",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000256116",
@@ -1297,7 +1542,12 @@
     "image_url": "images/lip-tints/A000000256116.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000256116&dispCatNo=1000001000200060003",
-    "original_name": "얼터너티브스테레오 [NEW초여름 컬러] 얼터너티브스테레오 립 포션 허니 티 스테인 5ml"
+    "original_name": "얼터너티브스테레오 [NEW초여름 컬러] 얼터너티브스테레오 립 포션 허니 티 스테인 5ml",
+    "brand_en": "Alternativestereo",
+    "name_en": "Lip Potion Honey Tea Stain",
+    "global_id": "GA260540007",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540007",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000223922",
@@ -1323,7 +1573,12 @@
     "image_url": "images/lip-tints/A000000223922.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223922&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 [한정기획] 토니모리 겟잇 틴트 워터풀 시럽"
+    "original_name": "토니모리 [한정기획] 토니모리 겟잇 틴트 워터풀 시럽",
+    "brand_en": "TONYMOLY",
+    "name_en": "Get It Tint Waterful Syrup",
+    "global_id": "GA250429981",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250429981",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000258196",
@@ -1349,7 +1604,12 @@
     "image_url": "images/lip-tints/A000000258196.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000258196&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [레오파드 헬로키티/거울 키링 증정] 웨이크메이크 볼드 립 블러 틴트(단품/기획)"
+    "original_name": "웨이크메이크 [레오파드 헬로키티/거울 키링 증정] 웨이크메이크 볼드 립 블러 틴트(단품/기획)",
+    "brand_en": "wakemake",
+    "name_en": "Bold Lip Blur Tint",
+    "global_id": "GA260540562",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540562",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000233576",
@@ -1375,7 +1635,12 @@
     "image_url": "images/lip-tints/A000000233576.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000233576&dispCatNo=1000001000200060003",
-    "original_name": "퓌 [미니틴트 증정 기획] 퓌 3D 볼류밍 틴트 3.8g 12종 (단품/기획)"
+    "original_name": "퓌 [미니틴트 증정 기획] 퓌 3D 볼류밍 틴트 3.8g 12종 (단품/기획)",
+    "brand_en": "fwee",
+    "name_en": "3D Voluming Tint",
+    "global_id": "GA260136561",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136561",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000232518",
@@ -1401,7 +1666,12 @@
     "image_url": "images/lip-tints/A000000232518.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232518&dispCatNo=1000001000200060003",
-    "original_name": "3CE [NEW/쿠로미에디션] 3CE 벨벳 립 틴트 플러쉬 4g 기획/단품"
+    "original_name": "3CE [NEW/쿠로미에디션] 3CE 벨벳 립 틴트 플러쉬 4g 기획/단품",
+    "brand_en": "3CE",
+    "name_en": "Velvet Lip Tint Plush",
+    "global_id": "GA250933246",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933246",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000158893",
@@ -1427,7 +1697,12 @@
     "image_url": "images/lip-tints/A000000158893.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000158893&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 [미니글로스기획] 롬앤 듀이풀 워터 틴트 (기획/단품)"
+    "original_name": "롬앤 [미니글로스기획] 롬앤 듀이풀 워터 틴트 (기획/단품)",
+    "brand_en": "rom&nd",
+    "name_en": "Dewyful Water Tint",
+    "global_id": "GA211012028",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA211012028",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000246597",
@@ -1453,7 +1728,12 @@
     "image_url": "images/lip-tints/A000000246597.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000246597&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 [NEW미니핑크오피스] 롬앤 더 쥬시 래스팅 틴트 미니"
+    "original_name": "롬앤 [NEW미니핑크오피스] 롬앤 더 쥬시 래스팅 틴트 미니",
+    "brand_en": "rom&nd",
+    "name_en": "The Juicy Lasting Tint Mini",
+    "global_id": "GA260237616",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237616",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000219707",
@@ -1479,7 +1759,12 @@
     "image_url": "images/lip-tints/A000000219707.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000219707&dispCatNo=1000001000200060003",
-    "original_name": "라카 [파우치템/과즙광틴트] 라카 프루티 글램 틴트 미니"
+    "original_name": "라카 [파우치템/과즙광틴트] 라카 프루티 글램 틴트 미니",
+    "brand_en": "Laka",
+    "name_en": "Fruity Glam Lip Tint Mini",
+    "global_id": "GA250329239",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329239",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000181619",
@@ -1505,7 +1790,12 @@
     "image_url": "images/lip-tints/A000000181619.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000181619&dispCatNo=1000001000200060003",
-    "original_name": "에뛰드 에뛰드 픽싱 틴트 4g"
+    "original_name": "에뛰드 에뛰드 픽싱 틴트 4g",
+    "brand_en": "ETUDE",
+    "name_en": "Fixing Tint",
+    "global_id": "GA230318060",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230318060",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000148663",
@@ -1531,7 +1821,12 @@
     "image_url": "images/lip-tints/A000000148663.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000148663&dispCatNo=1000001000200060003",
-    "original_name": "포렌코즈 포렌코즈 타투 끌레르 벨벳 틴트"
+    "original_name": "포렌코즈 포렌코즈 타투 끌레르 벨벳 틴트",
+    "brand_en": "FORENCOS",
+    "name_en": "Tattoo Clair Velvet Tint",
+    "global_id": "GA260338319",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338319",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000243819",
@@ -1557,7 +1852,12 @@
     "image_url": "images/lip-tints/A000000243819.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000243819&dispCatNo=1000001000200060003",
-    "original_name": "투슬래시포 [NEW/이사배브랜드] 투슬래시포 클라우드 립 칠러"
+    "original_name": "투슬래시포 [NEW/이사배브랜드] 투슬래시포 클라우드 립 칠러",
+    "brand_en": "TWOSLASHFOUR",
+    "name_en": "Cloud Lip Chiller",
+    "global_id": "GA260136972",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136972",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000245109",
@@ -1583,7 +1883,12 @@
     "image_url": "images/lip-tints/A000000245109.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000245109&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [착색광틴트/NEW컬러]컬러그램 탕후루 탱글 틴트 딥 글레이즈 8COLOR"
+    "original_name": "컬러그램 [착색광틴트/NEW컬러]컬러그램 탕후루 탱글 틴트 딥 글레이즈 8COLOR",
+    "brand_en": "colorgram",
+    "name_en": "Fruity Glass Tint Deep Glaze",
+    "global_id": "GA260237614",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237614",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000239841",
@@ -1609,7 +1914,12 @@
     "image_url": "images/lip-tints/A000000239841.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000239841&dispCatNo=1000001000200060003",
-    "original_name": "오아드 [슬기PICK/단독기획] 오아드 슬레인 하이퍼 글로우 10종 단품/기획"
+    "original_name": "오아드 [슬기PICK/단독기획] 오아드 슬레인 하이퍼 글로우 10종 단품/기획",
+    "brand_en": "Oiad",
+    "name_en": "Slayn Hyper Glow",
+    "global_id": "GA251135502",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135502",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000265682",
@@ -1635,7 +1945,12 @@
     "image_url": "images/lip-tints/A000000265682.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000265682&dispCatNo=1000001000200060003",
-    "original_name": "얼리언스 [24시간지속/필오프] 얼리언스 수채화 립타투 5종"
+    "original_name": "얼리언스 [24시간지속/필오프] 얼리언스 수채화 립타투 5종",
+    "brand_en": "Earlyance",
+    "name_en": "Watercolor Lip Tattoo",
+    "global_id": "GA260843146",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260843146",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000257710",
@@ -1661,7 +1976,12 @@
     "image_url": "images/lip-tints/A000000257710.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000257710&dispCatNo=1000001000200060003",
-    "original_name": "릴리바이레드 [산리오캐릭터즈/클리어 투명 파우치] 릴리바이레드 쥬시 라이어 워터 틴트 10종 (단품/기획)"
+    "original_name": "릴리바이레드 [산리오캐릭터즈/클리어 투명 파우치] 릴리바이레드 쥬시 라이어 워터 틴트 10종 (단품/기획)",
+    "brand_en": "lilybyred",
+    "name_en": "Juicy Liar Water Tint",
+    "global_id": "GA260540537",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540537",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000228803",
@@ -1687,7 +2007,12 @@
     "image_url": "images/lip-tints/A000000228803.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000228803&dispCatNo=1000001000200060003",
-    "original_name": "브레이 [누적160만/회식틴트] 브레이 씬 워터 블러 틴트 10종"
+    "original_name": "브레이 [누적160만/회식틴트] 브레이 씬 워터 블러 틴트 10종",
+    "brand_en": "BRAYE",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000001001710",
@@ -1713,7 +2038,12 @@
     "image_url": "images/lip-tints/A000001001710.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001001710&dispCatNo=1000001000200060003",
-    "original_name": "오플로우 [NEW] 오플로우 놋트 글로시 립 틴트 6colors"
+    "original_name": "오플로우 [NEW] 오플로우 놋트 글로시 립 틴트 6colors",
+    "brand_en": "OFFLOW",
+    "name_en": "Knot Glossy Lip Tint",
+    "global_id": "GA261044785",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA261044785",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000227015",
@@ -1739,7 +2069,12 @@
     "image_url": "images/lip-tints/A000000227015.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000227015&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [누가 코팅 에디션]웨이크메이크 워터풀 글로우 틴트(단품/기획)"
+    "original_name": "웨이크메이크 [누가 코팅 에디션]웨이크메이크 워터풀 글로우 틴트(단품/기획)",
+    "brand_en": "wakemake",
+    "name_en": "Waterful Glow Tint",
+    "global_id": "GA260641305",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641305",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000187445",
@@ -1765,7 +2100,12 @@
     "image_url": "images/lip-tints/A000000187445.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000187445&dispCatNo=1000001000200060003",
-    "original_name": "헤라 헤라 센슈얼 피팅 글로우 틴트 5g 8 Colors"
+    "original_name": "헤라 헤라 센슈얼 피팅 글로우 틴트 5g 8 Colors",
+    "brand_en": "HERA",
+    "name_en": "Sensual Fitting Glow Tint",
+    "global_id": "GA240825127",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240825127",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000245673",
@@ -1791,7 +2131,12 @@
     "image_url": "images/lip-tints/A000000245673.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000245673&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [순삭커버/입술색 지우개]컬러그램 긱 누드 컬러 커버 틴트 5COLOR"
+    "original_name": "컬러그램 [순삭커버/입술색 지우개]컬러그램 긱 누드 컬러 커버 틴트 5COLOR",
+    "brand_en": "colorgram",
+    "name_en": "Geek Nude Color Cover Tint",
+    "global_id": "GA250631862",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250631862",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000207121",
@@ -1817,7 +2162,12 @@
     "image_url": "images/lip-tints/A000000207121.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207121&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [매끈 실키립] 삐아 라스트 벨벳 틴트 5g 29종"
+    "original_name": "삐아 [매끈 실키립] 삐아 라스트 벨벳 틴트 5g 29종",
+    "brand_en": "BBIA",
+    "name_en": "Last Velvet Tint",
+    "global_id": "GA260136627",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136627",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000250445",
@@ -1843,7 +2193,12 @@
     "image_url": "images/lip-tints/A000000250445.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000250445&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 [단독기획] 무지개맨션 오브제 스테인 틴트"
+    "original_name": "무지개맨션 [단독기획] 무지개맨션 오브제 스테인 틴트",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Objet Stain Tint",
+    "global_id": "GA260338921",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338921",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000261857",
@@ -1869,7 +2224,12 @@
     "image_url": "images/lip-tints/A000000261857.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000261857&dispCatNo=1000001000200060003",
-    "original_name": "데이지크 [NEW레오파드/한겹매트틴트] 데이지크 코튼 블러 틴트 3.2g 10colors"
+    "original_name": "데이지크 [NEW레오파드/한겹매트틴트] 데이지크 코튼 블러 틴트 3.2g 10colors",
+    "brand_en": "dasique",
+    "name_en": "Cotton Blur Tint",
+    "global_id": "GA260741996",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741996",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000224939",
@@ -1895,7 +2255,12 @@
     "image_url": "images/lip-tints/A000000224939.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000224939&dispCatNo=1000001000200060003",
-    "original_name": "클리오 클리오 볼륨메이트 블러 틴트/글로스"
+    "original_name": "클리오 클리오 볼륨메이트 블러 틴트/글로스",
+    "brand_en": "CLIO",
+    "name_en": "Volumate Blur Tint/Gloss",
+    "global_id": "GA250430340",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250430340",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000253833",
@@ -1921,7 +2286,12 @@
     "image_url": "images/lip-tints/A000000253833.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000253833&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [포켓몬 에디션] 컬러그램 메타몽 에디션 8종 골라담기"
+    "original_name": "컬러그램 [포켓몬 에디션] 컬러그램 메타몽 에디션 8종 골라담기",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000267645",
@@ -1947,7 +2317,12 @@
     "image_url": "images/lip-tints/A000000267645.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000267645&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [10월 올영픽][NEW] 컬러그램 젤리 글래싱 틴트 / 젤리 레이어링 글로스"
+    "original_name": "컬러그램 [10월 올영픽][NEW] 컬러그램 젤리 글래싱 틴트 / 젤리 레이어링 글로스",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000180567",
@@ -1973,7 +2348,12 @@
     "image_url": "images/lip-tints/A000000180567.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000180567&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 [NEW 버터쿠키 에디션] 토니모리 워터풀 버터 틴트"
+    "original_name": "토니모리 [NEW 버터쿠키 에디션] 토니모리 워터풀 버터 틴트",
+    "brand_en": "TONYMOLY",
+    "name_en": "Get It Tint Waterful Butter",
+    "global_id": "GA230418422",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230418422",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000128184",
@@ -1999,7 +2379,12 @@
     "image_url": "images/lip-tints/A000000128184.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000128184&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 잉크 더 벨벳 4g 9 Colors"
+    "original_name": "페리페라 페리페라 잉크 더 벨벳 4g 9 Colors",
+    "brand_en": "peripera",
+    "name_en": "Ink the Velvet",
+    "global_id": "GA210001821",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA210001821",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000228370",
@@ -2025,7 +2410,12 @@
     "image_url": "images/lip-tints/A000000228370.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000228370&dispCatNo=1000001000200060003",
-    "original_name": "라카 [맥시글로우/유리광택] 라카 맥시 글레이어 틴트 (단품/기획)"
+    "original_name": "라카 [맥시글로우/유리광택] 라카 맥시 글레이어 틴트 (단품/기획)",
+    "brand_en": "Laka",
+    "name_en": "Maxi Glayer Tint",
+    "global_id": "GA250631866",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250631866",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000249613",
@@ -2051,7 +2441,12 @@
     "image_url": "images/lip-tints/A000000249613.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000249613&dispCatNo=1000001000200060003",
-    "original_name": "디어달리아 [안효섭PICK/물먹글로우] 디어달리아 드레시 글로우 틴트"
+    "original_name": "디어달리아 [안효섭PICK/물먹글로우] 디어달리아 드레시 글로우 틴트",
+    "brand_en": "DEAR DAHLIA",
+    "name_en": "Dressy Glow Tint",
+    "global_id": "GA260238186",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238186",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000214282",
@@ -2077,7 +2472,12 @@
     "image_url": "images/lip-tints/A000000214282.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000214282&dispCatNo=1000001000200060003",
-    "original_name": "키스미 [매트/구름텍스처] 키스미 아이 블러 이펙트 틴트 3.5g 7종"
+    "original_name": "키스미 [매트/구름텍스처] 키스미 아이 블러 이펙트 틴트 3.5g 7종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000251137",
@@ -2103,7 +2503,12 @@
     "image_url": "images/lip-tints/A000000251137.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000251137&dispCatNo=1000001000200060003",
-    "original_name": "릴리바이레드 [산리오캐릭터즈/틴케이스 키링] 릴리바이레드 앙큼 라이어 코팅 틴트 18종 (단품/기획)"
+    "original_name": "릴리바이레드 [산리오캐릭터즈/틴케이스 키링] 릴리바이레드 앙큼 라이어 코팅 틴트 18종 (단품/기획)",
+    "brand_en": "lilybyred",
+    "name_en": "Bloody Liar Coating Tint (Renewed)",
+    "global_id": "GA260338620",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338620",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000265287",
@@ -2129,7 +2534,12 @@
     "image_url": "images/lip-tints/A000000265287.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000265287&dispCatNo=1000001000200060003",
-    "original_name": "힌스 [NEW] 힌스 누 블러 틴트 미니 10 Colors"
+    "original_name": "힌스 [NEW] 힌스 누 블러 틴트 미니 10 Colors",
+    "brand_en": "hince",
+    "name_en": "Nu Blur Tint Mini",
+    "global_id": "GA260843017",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260843017",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000257297",
@@ -2155,7 +2565,12 @@
     "image_url": "images/lip-tints/A000000257297.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000257297&dispCatNo=1000001000200060003",
-    "original_name": "밀크터치 [강력유지] 밀크터치 블랙 필 오프 립 타투 4.5g 7종 택1"
+    "original_name": "밀크터치 [강력유지] 밀크터치 블랙 필 오프 립 타투 4.5g 7종 택1",
+    "brand_en": "MilkTouch",
+    "name_en": "Black Peel Off Lip Tattoo",
+    "global_id": "GA260540460",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540460",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000208687",
@@ -2181,7 +2596,12 @@
     "image_url": "images/lip-tints/A000000208687.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000208687&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [NEW위니더푸에디션/푸굿즈증정] 딘토 블러젤리 플럼핑 립틴트 10종 (단품/기획)"
+    "original_name": "딘토 [NEW위니더푸에디션/푸굿즈증정] 딘토 블러젤리 플럼핑 립틴트 10종 (단품/기획)",
+    "brand_en": "Dinto",
+    "name_en": "Blur-Jelly Plumping Lip Tint",
+    "global_id": "GA240724817",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240724817",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000204373",
@@ -2207,7 +2627,12 @@
     "image_url": "images/lip-tints/A000000204373.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000204373&dispCatNo=1000001000200060003",
-    "original_name": "바닐라코 바닐라코 듀 글로우 틴트 3.8g 12종"
+    "original_name": "바닐라코 바닐라코 듀 글로우 틴트 3.8g 12종",
+    "brand_en": "BANILA CO",
+    "name_en": "Dew Glow Tint",
+    "global_id": "GA240423339",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240423339",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000267604",
@@ -2233,7 +2658,12 @@
     "image_url": "images/lip-tints/A000000267604.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000267604&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [10월 올영픽][NEW/연유립밤틴트 증정] 컬러그램 젤리 글래싱 틴트 9COLOR"
+    "original_name": "컬러그램 [10월 올영픽][NEW/연유립밤틴트 증정] 컬러그램 젤리 글래싱 틴트 9COLOR",
+    "brand_en": "colorgram",
+    "name_en": "Jelly Glassing Tint",
+    "global_id": "GA260943882",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260943882",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000217111",
@@ -2259,7 +2689,12 @@
     "image_url": "images/lip-tints/A000000217111.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000217111&dispCatNo=1000001000200060003",
-    "original_name": "자빈드서울 자빈드서울 윙크 립 쉐이드 프라이머 5g 10종"
+    "original_name": "자빈드서울 자빈드서울 윙크 립 쉐이드 프라이머 5g 10종",
+    "brand_en": "JAVIN DE SEOUL",
+    "name_en": "Wink Lip Shade Primer",
+    "global_id": "GA250127638",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250127638",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000232078",
@@ -2285,7 +2720,12 @@
     "image_url": "images/lip-tints/A000000232078.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232078&dispCatNo=1000001000200060003",
-    "original_name": "얼터너티브스테레오 [산리오콜라보]얼터너티브스테레오 립 포션 슈가 글레이즈 틴트 미니 4ml"
+    "original_name": "얼터너티브스테레오 [산리오콜라보]얼터너티브스테레오 립 포션 슈가 글레이즈 틴트 미니 4ml",
+    "brand_en": "Alternativestereo",
+    "name_en": "Lip Potion Sugar Glaze Tint Mini",
+    "global_id": "GA250732641",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732641",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000121562",
@@ -2311,7 +2751,12 @@
     "image_url": "images/lip-tints/A000000121562.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000121562&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 잉크 더 에어리 벨벳 4g 6 Colors"
+    "original_name": "페리페라 페리페라 잉크 더 에어리 벨벳 4g 6 Colors",
+    "brand_en": "peripera",
+    "name_en": "Ink Airy Velvet",
+    "global_id": "GA230518835",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230518835",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000229469",
@@ -2337,7 +2782,12 @@
     "image_url": "images/lip-tints/A000000229469.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229469&dispCatNo=1000001000200060003",
-    "original_name": "이글립스 [NEW 밀키넛 컬렉션 런칭/여릿누디립] 이글립스 듀 글레이즈 틴트 20종 (단품)"
+    "original_name": "이글립스 [NEW 밀키넛 컬렉션 런칭/여릿누디립] 이글립스 듀 글레이즈 틴트 20종 (단품)",
+    "brand_en": "eglips",
+    "name_en": "Dew Glaze Tint",
+    "global_id": "GA260338353",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338353",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000158147",
@@ -2363,7 +2813,12 @@
     "image_url": "images/lip-tints/A000000158147.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000158147&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 어뮤즈 듀 틴트 4g 13종 (기획/단품)"
+    "original_name": "어뮤즈 어뮤즈 듀 틴트 4g 13종 (기획/단품)",
+    "brand_en": "AMUSE",
+    "name_en": "Dew Tint",
+    "global_id": "GA210911937",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA210911937",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000184327",
@@ -2389,7 +2844,12 @@
     "image_url": "images/lip-tints/A000000184327.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000184327&dispCatNo=1000001000200060003",
-    "original_name": "데이지크 데이지크 쥬시 듀이 틴트 28 colors (단품/기획)"
+    "original_name": "데이지크 데이지크 쥬시 듀이 틴트 28 colors (단품/기획)",
+    "brand_en": "dasique",
+    "name_en": "Juicy Dewy Tint",
+    "global_id": "GA231121039",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231121039",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000179233",
@@ -2415,7 +2875,12 @@
     "image_url": "images/lip-tints/A000000179233.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000179233&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 [어뮤즈xN21콜라보/신규컬러출시] 어뮤즈 젤핏 틴트 12종"
+    "original_name": "어뮤즈 [어뮤즈xN21콜라보/신규컬러출시] 어뮤즈 젤핏 틴트 12종",
+    "brand_en": "AMUSE",
+    "name_en": "Jel-Fit Tint",
+    "global_id": "GA230117412",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230117412",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000200378",
@@ -2441,7 +2906,12 @@
     "image_url": "images/lip-tints/A000000200378.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000200378&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 오버 블러 틴트 3.5g 15 Colors (단품/기획)"
+    "original_name": "페리페라 페리페라 오버 블러 틴트 3.5g 15 Colors (단품/기획)",
+    "brand_en": "peripera",
+    "name_en": "Over Blur Tint",
+    "global_id": "GA240121963",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240121963",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000246380",
@@ -2467,7 +2937,12 @@
     "image_url": "images/lip-tints/A000000246380.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000246380&dispCatNo=1000001000200060003",
-    "original_name": "에뛰드 에뛰드 포근 픽싱 틴트 (기획 / 단품) 19 Colors"
+    "original_name": "에뛰드 에뛰드 포근 픽싱 틴트 (기획 / 단품) 19 Colors",
+    "brand_en": "ETUDE",
+    "name_en": "Soft Fixing Tint",
+    "global_id": "GA260136913",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136913",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000216751",
@@ -2493,7 +2968,12 @@
     "image_url": "images/lip-tints/A000000216751.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000216751&dispCatNo=1000001000200060003",
-    "original_name": "엔트로피 메이크업 [필름광] 엔트로피 메이크업 참 틴트(글로시 겔) 10 Colors"
+    "original_name": "엔트로피 메이크업 [필름광] 엔트로피 메이크업 참 틴트(글로시 겔) 10 Colors",
+    "brand_en": "ENTROPY makeup",
+    "name_en": "Cham Tint (Glossy Gel)",
+    "global_id": "GA241227351",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227351",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000229501",
@@ -2519,7 +2999,12 @@
     "image_url": "images/lip-tints/A000000229501.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229501&dispCatNo=1000001000200060003",
-    "original_name": "팁토우 [토슈즈 컬렉션/단독기획] 팁토우 글로윗 소르베 틴트 20 Colors"
+    "original_name": "팁토우 [토슈즈 컬렉션/단독기획] 팁토우 글로윗 소르베 틴트 20 Colors",
+    "brand_en": "tiptoe",
+    "name_en": "Glow-It Sorbet Tint",
+    "global_id": "GA260338971",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338971",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000188142",
@@ -2545,7 +3030,12 @@
     "image_url": "images/lip-tints/A000000188142.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000188142&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [원조탱글광]컬러그램 탕후루 탱글 틴트 17COLOR"
+    "original_name": "컬러그램 [원조탱글광]컬러그램 탕후루 탱글 틴트 17COLOR",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000245975",
@@ -2571,7 +3061,12 @@
     "image_url": "images/lip-tints/A000000245975.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000245975&dispCatNo=1000001000200060003",
-    "original_name": "힌스 [NEW 한정 컬러/산리오캐릭터즈] 힌스 로 글로우 젤 틴트 미니 14 Colors"
+    "original_name": "힌스 [NEW 한정 컬러/산리오캐릭터즈] 힌스 로 글로우 젤 틴트 미니 14 Colors",
+    "brand_en": "hince",
+    "name_en": "Raw Glow Gel Tint Mini",
+    "global_id": "GA260136799",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136799",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000252904",
@@ -2597,7 +3092,12 @@
     "image_url": "images/lip-tints/A000000252904.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000252904&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [포켓몬 에디션/틴케이스 증정]컬러그램 누디 블러 틴트 메타몽 세트(웜/쿨)"
+    "original_name": "컬러그램 [포켓몬 에디션/틴케이스 증정]컬러그램 누디 블러 틴트 메타몽 세트(웜/쿨)",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000244456",
@@ -2623,7 +3123,12 @@
     "image_url": "images/lip-tints/A000000244456.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000244456&dispCatNo=1000001000200060003",
-    "original_name": "맥 MAC 파우더키스 립 앤 치크 무스 12 Colors"
+    "original_name": "맥 MAC 파우더키스 립 앤 치크 무스 12 Colors",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000120880",
@@ -2649,7 +3154,12 @@
     "image_url": "images/lip-tints/A000000120880.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000120880&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 롬앤 제로 벨벳 틴트"
+    "original_name": "롬앤 롬앤 제로 벨벳 틴트",
+    "brand_en": "rom&nd",
+    "name_en": "Zero Velvet Tint",
+    "global_id": "GA210001392",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA210001392",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000247641",
@@ -2675,7 +3185,12 @@
     "image_url": "images/lip-tints/A000000247641.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000247641&dispCatNo=1000001000200060003",
-    "original_name": "오아드 [슬기PICK/단독기획] 오아드 슬레인 파우더믹싱 워터틴트 8 colors 단품/기획"
+    "original_name": "오아드 [슬기PICK/단독기획] 오아드 슬레인 파우더믹싱 워터틴트 8 colors 단품/기획",
+    "brand_en": "Oiad",
+    "name_en": "Slayn Powder Mixing Water Tint",
+    "global_id": "GA260238069",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238069",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000208254",
@@ -2701,7 +3216,12 @@
     "image_url": "images/lip-tints/A000000208254.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000208254&dispCatNo=1000001000200060003",
-    "original_name": "포렌코즈 포렌코즈 속타투 틴트"
+    "original_name": "포렌코즈 포렌코즈 속타투 틴트",
+    "brand_en": "FORENCOS",
+    "name_en": "Soak Tattoo Tint",
+    "global_id": "GA240724657",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240724657",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000259218",
@@ -2727,7 +3247,12 @@
     "image_url": "images/lip-tints/A000000259218.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000259218&dispCatNo=1000001000200060003",
-    "original_name": "라카 [골라담기] 라카 미니 틴트 베스트 골라담기 (맥시/프루티/젤링)"
+    "original_name": "라카 [골라담기] 라카 미니 틴트 베스트 골라담기 (맥시/프루티/젤링)",
+    "brand_en": "Laka",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000232166",
@@ -2753,7 +3278,12 @@
     "image_url": "images/lip-tints/A000000232166.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232166&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 [단독기획/산리오콜라보] 무지개맨션 오브제 글로시 미니(포차코 에디션)"
+    "original_name": "무지개맨션 [단독기획/산리오콜라보] 무지개맨션 오브제 글로시 미니(포차코 에디션)",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Objet Glossy Mini",
+    "global_id": "GA250832646",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832646",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000269067",
@@ -2779,7 +3309,12 @@
     "image_url": "images/lip-tints/A000000269067.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000269067&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [10월 올영픽][NEW] 컬러그램 당도 최고 굽복 컬렉션 모아보기"
+    "original_name": "컬러그램 [10월 올영픽][NEW] 컬러그램 당도 최고 굽복 컬렉션 모아보기",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000249779",
@@ -2805,7 +3340,12 @@
     "image_url": "images/lip-tints/A000000249779.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000249779&dispCatNo=1000001000200060003",
-    "original_name": "러브플레르 [올영 선런칭] 러브플레르 피오니 듀 글로우 틴트"
+    "original_name": "러브플레르 [올영 선런칭] 러브플레르 피오니 듀 글로우 틴트",
+    "brand_en": "lovefleur",
+    "name_en": "Peony Dew Glow Tint",
+    "global_id": "GA260338461",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338461",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000257016",
@@ -2831,7 +3371,12 @@
     "image_url": "images/lip-tints/A000000257016.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000257016&dispCatNo=1000001000200060003",
-    "original_name": "맥 MAC 러스터글래스 스테인글래스 립 틴트 12 Colors 기획/단품"
+    "original_name": "맥 MAC 러스터글래스 스테인글래스 립 틴트 12 Colors 기획/단품",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000267468",
@@ -2857,7 +3402,12 @@
     "image_url": "images/lip-tints/A000000267468.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000267468&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 [NEW/올영 단독] 어뮤즈 젤핏 틴트 미니 1.5g 3종"
+    "original_name": "어뮤즈 [NEW/올영 단독] 어뮤즈 젤핏 틴트 미니 1.5g 3종",
+    "brand_en": "AMUSE",
+    "name_en": "Jel-Fit Tint Mini",
+    "global_id": "GA260943415",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260943415",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000211723",
@@ -2883,7 +3433,12 @@
     "image_url": "images/lip-tints/A000000211723.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000211723&dispCatNo=1000001000200060003",
-    "original_name": "얼터너티브스테레오 얼터너티브스테레오 립 포션 슈가 글레이즈 틴트 8ml"
+    "original_name": "얼터너티브스테레오 얼터너티브스테레오 립 포션 슈가 글레이즈 틴트 8ml",
+    "brand_en": "Alternativestereo",
+    "name_en": "Lip Potion Sugar Glaze Tint",
+    "global_id": "GA241026168",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241026168",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000248980",
@@ -2909,7 +3464,12 @@
     "image_url": "images/lip-tints/A000000248980.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000248980&dispCatNo=1000001000200060003",
-    "original_name": "라네즈 [10월 올영픽/+하트키링] 라네즈 주스팝박스 립틴트 4.5g"
+    "original_name": "라네즈 [10월 올영픽/+하트키링] 라네즈 주스팝박스 립틴트 4.5g",
+    "brand_en": "LANEIGE",
+    "name_en": "Juicepop Box Lip Tint",
+    "global_id": "GA260237993",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237993",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000001001707",
@@ -2935,7 +3495,12 @@
     "image_url": "images/lip-tints/A000001001707.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001001707&dispCatNo=1000001000200060003",
-    "original_name": "베네피트 [NEW] 베네피트 베네틴트 포켓팰"
+    "original_name": "베네피트 [NEW] 베네피트 베네틴트 포켓팰",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000251569",
@@ -2961,7 +3526,12 @@
     "image_url": "images/lip-tints/A000000251569.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000251569&dispCatNo=1000001000200060003",
-    "original_name": "3CE [미니립증정기획/키링증정기획][OY단독컬러] 3CE 구미 오일 틴트 4g 11종 기획/단품"
+    "original_name": "3CE [미니립증정기획/키링증정기획][OY단독컬러] 3CE 구미 오일 틴트 4g 11종 기획/단품",
+    "brand_en": "3CE",
+    "name_en": "Gummy Oil Tint",
+    "global_id": "GA260439167",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439167",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000179969",
@@ -2987,7 +3557,12 @@
     "image_url": "images/lip-tints/A000000179969.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000179969&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 워터 베어 틴트 3.7g 9종"
+    "original_name": "페리페라 페리페라 워터 베어 틴트 3.7g 9종",
+    "brand_en": "peripera",
+    "name_en": "Water Bare Tint",
+    "global_id": "GA231020830",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231020830",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000250101",
@@ -3013,7 +3588,12 @@
     "image_url": "images/lip-tints/A000000250101.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000250101&dispCatNo=1000001000200060003",
-    "original_name": "러브플레르 러브플레르 컬러 픽서 틴트"
+    "original_name": "러브플레르 러브플레르 컬러 픽서 틴트",
+    "brand_en": "lovefleur",
+    "name_en": "Color Fixer Tint",
+    "global_id": "GA260338459",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338459",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000224155",
@@ -3039,7 +3619,12 @@
     "image_url": "images/lip-tints/A000000224155.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000224155&dispCatNo=1000001000200060003",
-    "original_name": "소울 [SNS대란템] 소울 프리사이즈 리프터 4.5g 2종"
+    "original_name": "소울 [SNS대란템] 소울 프리사이즈 리프터 4.5g 2종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000212830",
@@ -3065,7 +3650,12 @@
     "image_url": "images/lip-tints/A000000212830.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000212830&dispCatNo=1000001000200060003",
-    "original_name": "바닐라코 바닐라코 쉬어 벨벳 베일 틴트 4.2g 10종"
+    "original_name": "바닐라코 바닐라코 쉬어 벨벳 베일 틴트 4.2g 10종",
+    "brand_en": "BANILA CO",
+    "name_en": "Sheer Velvet Veil Tint",
+    "global_id": "GA241227500",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227500",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000223282",
@@ -3091,7 +3681,12 @@
     "image_url": "images/lip-tints/A000000223282.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223282&dispCatNo=1000001000200060003",
-    "original_name": "네이밍 [끈적임zero/청초윤슬광] 네이밍 글로이 하트 립 틴트 24colors"
+    "original_name": "네이밍 [끈적임zero/청초윤슬광] 네이밍 글로이 하트 립 틴트 24colors",
+    "brand_en": "NAMING.",
+    "name_en": "Glowy Heart Lip Tint",
+    "global_id": "GA250329605",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329605",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000263798",
@@ -3117,7 +3712,12 @@
     "image_url": "images/lip-tints/A000000263798.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000263798&dispCatNo=1000001000200060003",
-    "original_name": "밀크터치 [10초착색/NEW] 밀크터치 실버 베일 티슈 오프 립 타투 4.7g 6colors"
+    "original_name": "밀크터치 [10초착색/NEW] 밀크터치 실버 베일 티슈 오프 립 타투 4.7g 6colors",
+    "brand_en": "MilkTouch",
+    "name_en": "Silver Veil Tissue Off Lip Tattoo",
+    "global_id": "GA260842489",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260842489",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000257253",
@@ -3143,7 +3743,12 @@
     "image_url": "images/lip-tints/A000000257253.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000257253&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 컬러그램 탕후루 탱글 틴트 라인(딥 글레이즈/밀크)"
+    "original_name": "컬러그램 컬러그램 탕후루 탱글 틴트 라인(딥 글레이즈/밀크)",
+    "brand_en": "colorgram",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000248293",
@@ -3169,7 +3774,12 @@
     "image_url": "images/lip-tints/A000000248293.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000248293&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 롬앤 더 쥬시 래스팅 틴트 제로"
+    "original_name": "롬앤 롬앤 더 쥬시 래스팅 틴트 제로",
+    "brand_en": "rom&nd",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000255835",
@@ -3195,7 +3805,12 @@
     "image_url": "images/lip-tints/A000000255835.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000255835&dispCatNo=1000001000200060003",
-    "original_name": "이글립스 [NEW 밀키넛 컬렉션 런칭/여릿블러립] 이글립스 베어 블러 틴트 9종 (단품)"
+    "original_name": "이글립스 [NEW 밀키넛 컬렉션 런칭/여릿블러립] 이글립스 베어 블러 틴트 9종 (단품)",
+    "brand_en": "eglips",
+    "name_en": "Bare Blur Tint",
+    "global_id": "GA260540004",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540004",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000250339",
@@ -3221,7 +3836,12 @@
     "image_url": "images/lip-tints/A000000250339.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000250339&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 [몬치치콜라보] 어뮤즈 퀵 메이크업 미니 가챠 (3종 택 1)"
+    "original_name": "어뮤즈 [몬치치콜라보] 어뮤즈 퀵 메이크업 미니 가챠 (3종 택 1)",
+    "brand_en": "AMUSE",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000174069",
@@ -3247,7 +3867,12 @@
     "image_url": "images/lip-tints/A000000174069.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000174069&dispCatNo=1000001000200060003",
-    "original_name": "하트퍼센트 하트퍼센트 도트 온 무드 퓨어 글로우 틴트 6.8g 6종*"
+    "original_name": "하트퍼센트 하트퍼센트 도트 온 무드 퓨어 글로우 틴트 6.8g 6종*",
+    "brand_en": "Heart Percent",
+    "name_en": "Dote On Mood Pure Glow Tint",
+    "global_id": "GA230619251",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230619251",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000233492",
@@ -3273,7 +3898,12 @@
     "image_url": "images/lip-tints/A000000233492.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000233492&dispCatNo=1000001000200060003",
-    "original_name": "비디비치 비디비치 틴트글리트 6종"
+    "original_name": "비디비치 비디비치 틴트글리트 6종",
+    "brand_en": "VIDIVICI",
+    "name_en": "Tint Glit",
+    "global_id": "GA250933459",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933459",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000232483",
@@ -3299,7 +3929,12 @@
     "image_url": "images/lip-tints/A000000232483.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232483&dispCatNo=1000001000200060003",
-    "original_name": "라카 [올영단독컬러] 라카 젤링 누드 글로스 미니 1.9g"
+    "original_name": "라카 [올영단독컬러] 라카 젤링 누드 글로스 미니 1.9g",
+    "brand_en": "Laka",
+    "name_en": "Jelling Nude Gloss Mini",
+    "global_id": "GA250833189",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250833189",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000242018",
@@ -3325,7 +3960,12 @@
     "image_url": "images/lip-tints/A000000242018.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000242018&dispCatNo=1000001000200060003",
-    "original_name": "3CE [파우치증정기획] [워터착색/이슬틴트] 3CE 미스티 립 베어 4.6g 11종 단품/기획"
+    "original_name": "3CE [파우치증정기획] [워터착색/이슬틴트] 3CE 미스티 립 베어 4.6g 11종 단품/기획",
+    "brand_en": "3CE",
+    "name_en": "Misty Lip Bare",
+    "global_id": "GA251235582",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235582",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000216752",
@@ -3351,7 +3991,12 @@
     "image_url": "images/lip-tints/A000000216752.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000216752&dispCatNo=1000001000200060003",
-    "original_name": "엔트로피 메이크업 [버터벨벳틴트] 엔트로피 메이크업 참 틴트(베이스 블러리) 10 Colors"
+    "original_name": "엔트로피 메이크업 [버터벨벳틴트] 엔트로피 메이크업 참 틴트(베이스 블러리) 10 Colors",
+    "brand_en": "ENTROPY makeup",
+    "name_en": "Cham Tint (Base Blurry)",
+    "global_id": "GA241227352",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227352",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000214642",
@@ -3377,7 +4022,12 @@
     "image_url": "images/lip-tints/A000000214642.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000214642&dispCatNo=1000001000200060003",
-    "original_name": "모우모우 [탱글립/청담샵추천] 모우모우 듀 드롭 핑크 페어링 5g"
+    "original_name": "모우모우 [탱글립/청담샵추천] 모우모우 듀 드롭 핑크 페어링 5g",
+    "brand_en": "moumou",
+    "name_en": "Dew Drop Pink Pairing",
+    "global_id": "GA241126895",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241126895",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000243857",
@@ -3403,7 +4053,12 @@
     "image_url": "images/lip-tints/A000000243857.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000243857&dispCatNo=1000001000200060003",
-    "original_name": "하트퍼센트 [워터틴트] 하트퍼센트 도트 온 무드 퍼스트 틴트 3.4g 5종"
+    "original_name": "하트퍼센트 [워터틴트] 하트퍼센트 도트 온 무드 퍼스트 틴트 3.4g 5종",
+    "brand_en": "Heart Percent",
+    "name_en": "Dote On Mood First Tint",
+    "global_id": "GA251236113",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236113",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000225803",
@@ -3429,7 +4084,12 @@
     "image_url": "images/lip-tints/A000000225803.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225803&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [미니/탱글유리알광] 딘토 블러글로이 미니 립틴트 10종"
+    "original_name": "딘토 [미니/탱글유리알광] 딘토 블러글로이 미니 립틴트 10종",
+    "brand_en": "Dinto",
+    "name_en": "Blur-Glowy Mini Lip Tint",
+    "global_id": "GA250631314",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250631314",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000200360",
@@ -3455,7 +4115,12 @@
     "image_url": "images/lip-tints/A000000200360.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000200360&dispCatNo=1000001000200060003",
-    "original_name": "메리몽드 메리몽드 체리하트 메가 틴트 10 COLORS"
+    "original_name": "메리몽드 메리몽드 체리하트 메가 틴트 10 COLORS",
+    "brand_en": "merrymonde",
+    "name_en": "Cherry Heart Mega Tint",
+    "global_id": "GA240121960",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240121960",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000249846",
@@ -3481,7 +4146,12 @@
     "image_url": "images/lip-tints/A000000249846.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000249846&dispCatNo=1000001000200060003",
-    "original_name": "러브플레르 러브플레르 워터 드롭 틴트"
+    "original_name": "러브플레르 러브플레르 워터 드롭 틴트",
+    "brand_en": "lovefleur",
+    "name_en": "Water Drop Tint",
+    "global_id": "GA260338458",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338458",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000211095",
@@ -3507,7 +4177,12 @@
     "image_url": "images/lip-tints/A000000211095.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000211095&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 [아이돌대란템] 무지개맨션 타이 업 커버 틴트"
+    "original_name": "무지개맨션 [아이돌대란템] 무지개맨션 타이 업 커버 틴트",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Tie Up Cover Tint",
+    "global_id": "GA240925682",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240925682",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000260282",
@@ -3533,7 +4208,12 @@
     "image_url": "images/lip-tints/A000000260282.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000260282&dispCatNo=1000001000200060003",
-    "original_name": "브레이 브레이 씬 글로우 틴트 2X 3.4g 10종"
+    "original_name": "브레이 브레이 씬 글로우 틴트 2X 3.4g 10종",
+    "brand_en": "BRAYE",
+    "name_en": "Thin Glow Tint 2X",
+    "global_id": "GA260641387",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641387",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000219477",
@@ -3559,7 +4239,12 @@
     "image_url": "images/lip-tints/A000000219477.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000219477&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 롬앤 컬러 립 매트"
+    "original_name": "롬앤 롬앤 컬러 립 매트",
+    "brand_en": "rom&nd",
+    "name_en": "Color Lip Matte",
+    "global_id": "GA260540034",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540034",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000187640",
@@ -3585,7 +4270,12 @@
     "image_url": "images/lip-tints/A000000187640.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000187640&dispCatNo=1000001000200060003",
-    "original_name": "키스미 [미지근컬러] 키스미 아이 캔디 피팅 틴트 3.6g 6종"
+    "original_name": "키스미 [미지근컬러] 키스미 아이 캔디 피팅 틴트 3.6g 6종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000221612",
@@ -3611,7 +4301,12 @@
     "image_url": "images/lip-tints/A000000221612.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000221612&dispCatNo=1000001000200060003",
-    "original_name": "하트퍼센트 [이한 PICK] 하트퍼센트 도트 온 무드 올 커버 립 베이스 4.1g 9종"
+    "original_name": "하트퍼센트 [이한 PICK] 하트퍼센트 도트 온 무드 올 커버 립 베이스 4.1g 9종",
+    "brand_en": "Heart Percent",
+    "name_en": "Dote On Mood All Cover Lip Base",
+    "global_id": "GA250329629",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329629",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000225039",
@@ -3637,7 +4332,12 @@
     "image_url": "images/lip-tints/A000000225039.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225039&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [매끈 실키립] 삐아 라스트 벨벳 틴트 미니 9종"
+    "original_name": "삐아 [매끈 실키립] 삐아 라스트 벨벳 틴트 미니 9종",
+    "brand_en": "BBIA",
+    "name_en": "Last Velvet Tint Mini",
+    "global_id": "GA250832964",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832964",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000187348",
@@ -3663,7 +4363,12 @@
     "image_url": "images/lip-tints/A000000187348.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000187348&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [수분광틴트] 삐아 로 틴트 4.5g 9종"
+    "original_name": "삐아 [수분광틴트] 삐아 로 틴트 4.5g 9종",
+    "brand_en": "BBIA",
+    "name_en": "L'eau Tint",
+    "global_id": "GA230619320",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230619320",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000259203",
@@ -3689,7 +4394,12 @@
     "image_url": "images/lip-tints/A000000259203.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000259203&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [NEW/도톰광감] 삐아 럭키 샤인 틴트 4.5g 10종"
+    "original_name": "삐아 [NEW/도톰광감] 삐아 럭키 샤인 틴트 4.5g 10종",
+    "brand_en": "BBIA",
+    "name_en": "Lucky Shine Tint",
+    "global_id": "GA260641069",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641069",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000227870",
@@ -3715,7 +4425,12 @@
     "image_url": "images/lip-tints/A000000227870.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000227870&dispCatNo=1000001000200060003",
-    "original_name": "패션캣 [누디블러/벨벳틴트] 패션캣 베어블러 틴트 립앤치크 3g 5colors"
+    "original_name": "패션캣 [누디블러/벨벳틴트] 패션캣 베어블러 틴트 립앤치크 3g 5colors",
+    "brand_en": "PASSIONCAT",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000253178",
@@ -3741,7 +4456,12 @@
     "image_url": "images/lip-tints/A000000253178.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000253178",
-    "original_name": "엔트로피 메이크업 [올영단독컬러/키링틴트] 엔트로피 참 틴트 스무디 에디션 5colors"
+    "original_name": "엔트로피 메이크업 [올영단독컬러/키링틴트] 엔트로피 참 틴트 스무디 에디션 5colors",
+    "brand_en": "ENTROPY makeup",
+    "name_en": "Charm Tint Smoothie Edition",
+    "global_id": "GA260439278",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439278",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000209309",
@@ -3767,7 +4487,12 @@
     "image_url": "images/lip-tints/A000000209309.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000209309&dispCatNo=1000001000200060003",
-    "original_name": "앤디얼 앤디얼 글로우 립 컬러 틴트 6colors"
+    "original_name": "앤디얼 앤디얼 글로우 립 컬러 틴트 6colors",
+    "brand_en": "andear",
+    "name_en": "Glow Lip Color",
+    "global_id": "GA240825105",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240825105",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000232835",
@@ -3793,7 +4518,12 @@
     "image_url": "images/lip-tints/A000000232835.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232835",
-    "original_name": "삐아 삐아 오버 글레이즈 미니 6종 (기획/단품)"
+    "original_name": "삐아 삐아 오버 글레이즈 미니 6종 (기획/단품)",
+    "brand_en": "BBIA",
+    "name_en": "Over Glaze Mini",
+    "global_id": "GA250832965",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832965",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000212531",
@@ -3819,7 +4549,12 @@
     "image_url": "images/lip-tints/A000000212531.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000212531&dispCatNo=1000001000200060003",
-    "original_name": "퓌 [20가지핑크] 퓌 핑크 옵세션 스테이핏 틴트 3.8g 20종"
+    "original_name": "퓌 [20가지핑크] 퓌 핑크 옵세션 스테이핏 틴트 3.8g 20종",
+    "brand_en": "fwee",
+    "name_en": "Pink Obsession Stay-Fit Lip Tint",
+    "global_id": "GA241026155",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241026155",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000229582",
@@ -3845,7 +4580,12 @@
     "image_url": "images/lip-tints/A000000229582.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229582&dispCatNo=1000001000200060003",
-    "original_name": "바닐라코 바닐라코 쉬어 벨벳 베일 틴트 미니 1.8g 4종"
+    "original_name": "바닐라코 바닐라코 쉬어 벨벳 베일 틴트 미니 1.8g 4종",
+    "brand_en": "BANILA CO",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000136343",
@@ -3871,7 +4611,12 @@
     "image_url": "images/lip-tints/A000000136343.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000136343",
-    "original_name": "롬앤 롬앤 글래스팅 워터 틴트"
+    "original_name": "롬앤 롬앤 글래스팅 워터 틴트",
+    "brand_en": "rom&nd",
+    "name_en": "Glasting Water Tint",
+    "global_id": "GA210002482",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA210002482",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000264398",
@@ -3897,7 +4642,12 @@
     "image_url": "images/lip-tints/A000000264398.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000264398&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [포켓몬 에디션] 컬러그램 누디 블러 틴트 3 COLOR (+메타몽 립파우치/랜덤 씰스티커)"
+    "original_name": "컬러그램 [포켓몬 에디션] 컬러그램 누디 블러 틴트 3 COLOR (+메타몽 립파우치/랜덤 씰스티커)",
+    "brand_en": "colorgram",
+    "name_en": "Nude Blur Tint",
+    "global_id": "GA250732540",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732540",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000245715",
@@ -3923,7 +4673,12 @@
     "image_url": "images/lip-tints/A000000245715.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000245715&dispCatNo=1000001000200060003",
-    "original_name": "어바웃톤 [필터 블러립] 어바웃톤 블러 핏 틴트 미니 2.3g 6COLORS"
+    "original_name": "어바웃톤 [필터 블러립] 어바웃톤 블러 핏 틴트 미니 2.3g 6COLORS",
+    "brand_en": "ABOUT_TONE",
+    "name_en": "Blur Fit Tint Mini",
+    "global_id": "GA260137062",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260137062",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000207064",
@@ -3949,7 +4704,12 @@
     "image_url": "images/lip-tints/A000000207064.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207064&dispCatNo=1000001000200060003",
-    "original_name": "에뛰드 에뛰드 디어 달링 워터젤 틴트"
+    "original_name": "에뛰드 에뛰드 디어 달링 워터젤 틴트",
+    "brand_en": "ETUDE",
+    "name_en": "Dear Darling Water Gel Tint",
+    "global_id": "GA240624340",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240624340",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000225219",
@@ -3975,7 +4735,12 @@
     "image_url": "images/lip-tints/A000000225219.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225219&dispCatNo=1000001000200060003",
-    "original_name": "얼터너티브스테레오 [뉴컬러출시] 얼터너티브스테레오 블러싱 펜던트"
+    "original_name": "얼터너티브스테레오 [뉴컬러출시] 얼터너티브스테레오 블러싱 펜던트",
+    "brand_en": "Alternativestereo",
+    "name_en": "Blushing Pendant (Glow/Velvet)",
+    "global_id": "GA260540045",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540045",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000107447",
@@ -4001,7 +4766,12 @@
     "image_url": "images/lip-tints/A000000107447.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000107447",
-    "original_name": "머지 머지 더 퍼스트 벨벳 틴트 V1 - V5"
+    "original_name": "머지 머지 더 퍼스트 벨벳 틴트 V1 - V5",
+    "brand_en": "MERZY",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000119882",
@@ -4027,7 +4797,12 @@
     "image_url": "images/lip-tints/A000000119882.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000119882&dispCatNo=1000001000200060003",
-    "original_name": "머지 머지 더 퍼스트 벨벳 틴트 V8, V9"
+    "original_name": "머지 머지 더 퍼스트 벨벳 틴트 V8, V9",
+    "brand_en": "MERZY",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000152764",
@@ -4053,7 +4828,12 @@
     "image_url": "images/lip-tints/A000000152764.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000152764",
-    "original_name": "홀리카홀리카 홀리카홀리카 워터바이브틴트"
+    "original_name": "홀리카홀리카 홀리카홀리카 워터바이브틴트",
+    "brand_en": "Holika Holika",
+    "name_en": "Water Vibe Tint",
+    "global_id": "GA221116941",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA221116941",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000164124",
@@ -4079,7 +4859,12 @@
     "image_url": "images/lip-tints/A000000164124.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000164124&dispCatNo=1000001000200060003",
-    "original_name": "힌스 힌스 무드인핸서 워터 리퀴드 글로우"
+    "original_name": "힌스 힌스 무드인핸서 워터 리퀴드 글로우",
+    "brand_en": "hince",
+    "name_en": "Mood Enhancer Water Liquid Glow",
+    "global_id": "GA230719764",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230719764",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000170395",
@@ -4105,7 +4890,12 @@
     "image_url": "images/lip-tints/A000000170395.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000170395&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 무지개맨션 아이시 글로우 틴트 단품 택1"
+    "original_name": "무지개맨션 무지개맨션 아이시 글로우 틴트 단품 택1",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Icy Glow",
+    "global_id": "GA250228624",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250228624",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000178944",
@@ -4131,7 +4921,12 @@
     "image_url": "images/lip-tints/A000000178944.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000178944&dispCatNo=1000001000200060003",
-    "original_name": "정샘물 정샘물 립프레션 글로우래스팅 틴트"
+    "original_name": "정샘물 정샘물 립프레션 글로우래스팅 틴트",
+    "brand_en": "JUNGSAEMMOOL",
+    "name_en": "Lip-Pression Glow Lasting Tint",
+    "global_id": "GA230117376",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230117376",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000179692",
@@ -4157,7 +4952,12 @@
     "image_url": "images/lip-tints/A000000179692.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000179692&dispCatNo=1000001000200060003",
-    "original_name": "라카 라카 젤링 누드 글로스 4.5g 10종"
+    "original_name": "라카 라카 젤링 누드 글로스 4.5g 10종",
+    "brand_en": "Laka",
+    "name_en": "Jelling Nude Gloss",
+    "global_id": "GA250329223",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329223",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000180678",
@@ -4183,7 +4983,12 @@
     "image_url": "images/lip-tints/A000000180678.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000180678&dispCatNo=1000001000200060003",
-    "original_name": "맥 [NEW] MAC 락드 키스 잉크 24 아워 립컬러 10 Colors"
+    "original_name": "맥 [NEW] MAC 락드 키스 잉크 24 아워 립컬러 10 Colors",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000185183",
@@ -4209,7 +5014,12 @@
     "image_url": "images/lip-tints/A000000185183.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000185183&dispCatNo=1000001000200060003",
-    "original_name": "코스노리 코스노리 플로우 웨이브 틴트 6 colors"
+    "original_name": "코스노리 코스노리 플로우 웨이브 틴트 6 colors",
+    "brand_en": "COSNORI",
+    "name_en": "Wave Tint",
+    "global_id": "GA231020584",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231020584",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000185465",
@@ -4235,7 +5045,12 @@
     "image_url": "images/lip-tints/A000000185465.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000185465&dispCatNo=1000001000200060003",
-    "original_name": "레미유 레미유 듀이 플로우 틴트 5colors"
+    "original_name": "레미유 레미유 듀이 플로우 틴트 5colors",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000185529",
@@ -4261,7 +5076,12 @@
     "image_url": "images/lip-tints/A000000185529.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000185529",
-    "original_name": "얼터너티브스테레오 [아이돌pick] 얼터너티브스테레오 립 포션 아쿠아 글로우"
+    "original_name": "얼터너티브스테레오 [아이돌pick] 얼터너티브스테레오 립 포션 아쿠아 글로우",
+    "brand_en": "Alternativestereo",
+    "name_en": "Lip Potion Aqua Glow",
+    "global_id": "GA231121248",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231121248",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000187713",
@@ -4287,7 +5107,12 @@
     "image_url": "images/lip-tints/A000000187713.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000187713&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 토니모리 겟잇틴트 컬러풀워터 5종"
+    "original_name": "토니모리 토니모리 겟잇틴트 컬러풀워터 5종",
+    "brand_en": "TONYMOLY",
+    "name_en": "Get It Tint Colorful Water",
+    "global_id": "GA230619416",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230619416",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000188340",
@@ -4313,7 +5138,12 @@
     "image_url": "images/lip-tints/A000000188340.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000188340&dispCatNo=1000001000200060003",
-    "original_name": "누즈 [단독기획]누즈 케어 립추얼 13 Colors (단품/기획)"
+    "original_name": "누즈 [단독기획]누즈 케어 립추얼 13 Colors (단품/기획)",
+    "brand_en": "nuse",
+    "name_en": "Care Liptual",
+    "global_id": "GA230820144",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230820144",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000188931",
@@ -4339,7 +5169,12 @@
     "image_url": "images/lip-tints/A000000188931.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000188931&dispCatNo=1000001000200060003",
-    "original_name": "릴리바이레드 릴리바이레드 무드 라이어 벨벳틴트 4호"
+    "original_name": "릴리바이레드 릴리바이레드 무드 라이어 벨벳틴트 4호",
+    "brand_en": "lilybyred",
+    "name_en": "Mood Liar Velvet Tint",
+    "global_id": "GA230819861",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230819861",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000189914",
@@ -4365,7 +5200,12 @@
     "image_url": "images/lip-tints/A000000189914.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000189914&dispCatNo=1000001000200060003",
-    "original_name": "베네피트 베네피트 스플래시 듀이 틴트 4종 중 택1"
+    "original_name": "베네피트 베네피트 스플래시 듀이 틴트 4종 중 택1",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000189915",
@@ -4391,7 +5231,12 @@
     "image_url": "images/lip-tints/A000000189915.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000189915&dispCatNo=1000001000200060003",
-    "original_name": "베네피트 베네피트 플러시 벨벳 틴트 3종 중 택 1"
+    "original_name": "베네피트 베네피트 플러시 벨벳 틴트 3종 중 택 1",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000192644",
@@ -4417,7 +5262,12 @@
     "image_url": "images/lip-tints/A000000192644.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000192644&dispCatNo=1000001000200060003",
-    "original_name": "더샘 더샘 새미스 에이드 샷 틴트 04 바이올렛 진"
+    "original_name": "더샘 더샘 새미스 에이드 샷 틴트 04 바이올렛 진",
+    "brand_en": "THE SAEM",
+    "name_en": "Saemmy's Ade Shot Tint",
+    "global_id": "GA231120997",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231120997",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000197104",
@@ -4443,7 +5293,12 @@
     "image_url": "images/lip-tints/A000000197104.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000197104&dispCatNo=1000001000200060003",
-    "original_name": "홀리카홀리카 홀리카홀리카 하트크러쉬 베어 글레이즈 틴트"
+    "original_name": "홀리카홀리카 홀리카홀리카 하트크러쉬 베어 글레이즈 틴트",
+    "brand_en": "Holika Holika",
+    "name_en": "Heart Crush Bare Glaze Tint",
+    "global_id": "GA231221445",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231221445",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000197122",
@@ -4469,7 +5324,12 @@
     "image_url": "images/lip-tints/A000000197122.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000197122&dispCatNo=1000001000200060003",
-    "original_name": "홀리카홀리카 홀리카홀리카 포기블러 틴트"
+    "original_name": "홀리카홀리카 홀리카홀리카 포기블러 틴트",
+    "brand_en": "Holika Holika",
+    "name_en": "Foggy Blur Tint",
+    "global_id": "GA231221444",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231221444",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000198165",
@@ -4495,7 +5355,12 @@
     "image_url": "images/lip-tints/A000000198165.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000198165&dispCatNo=1000001000200060003",
-    "original_name": "얼터너티브스테레오 [NEW컬러] 얼터너티브스테레오 립 포션 바미 로즈"
+    "original_name": "얼터너티브스테레오 [NEW컬러] 얼터너티브스테레오 립 포션 바미 로즈",
+    "brand_en": "Alternativestereo",
+    "name_en": "Lip Potion Balmy Rose",
+    "global_id": "GA240121725",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240121725",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000198850",
@@ -4521,7 +5386,12 @@
     "image_url": "images/lip-tints/A000000198850.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000198850&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 어뮤즈 베베 틴트 3.8g 12종"
+    "original_name": "어뮤즈 어뮤즈 베베 틴트 3.8g 12종",
+    "brand_en": "AMUSE",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000200344",
@@ -4547,7 +5417,12 @@
     "image_url": "images/lip-tints/A000000200344.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000200344&dispCatNo=1000001000200060003",
-    "original_name": "메리몽드 메리몽드 밀크하트 글로시 틴트 립앤치크 4 COLORS"
+    "original_name": "메리몽드 메리몽드 밀크하트 글로시 틴트 립앤치크 4 COLORS",
+    "brand_en": "merrymonde",
+    "name_en": "Milk Heart Tint Lip & Cheek",
+    "global_id": "GA240121956",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240121956",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000201628",
@@ -4573,7 +5448,12 @@
     "image_url": "images/lip-tints/A000000201628.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000201628&dispCatNo=1000001000200060003",
-    "original_name": "코시에로 코시에로 젤러시 플럼퍼 7종"
+    "original_name": "코시에로 코시에로 젤러시 플럼퍼 7종",
+    "brand_en": "COSIERO",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000201779",
@@ -4599,7 +5479,12 @@
     "image_url": "images/lip-tints/A000000201779.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000201779&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 컬러그램 탕후루 탱글 틴트 미니 듀오 3 COLOR"
+    "original_name": "컬러그램 컬러그램 탕후루 탱글 틴트 미니 듀오 3 COLOR",
+    "brand_en": "colorgram",
+    "name_en": "Fruity Glass Tint Mini Duo",
+    "global_id": "GA240322617",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240322617",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000202094",
@@ -4625,7 +5510,12 @@
     "image_url": "images/lip-tints/A000000202094.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000202094&dispCatNo=1000001000200060003",
-    "original_name": "에뛰드 [꿀먹광] 에뛰드 오버 글로이 틴트"
+    "original_name": "에뛰드 [꿀먹광] 에뛰드 오버 글로이 틴트",
+    "brand_en": "ETUDE",
+    "name_en": "Over Glowy Tint",
+    "global_id": "GA240322862",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240322862",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000202409",
@@ -4651,7 +5541,12 @@
     "image_url": "images/lip-tints/A000000202409.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000202409&dispCatNo=1000001000200060003",
-    "original_name": "3CE 3CE 드롭 글로우 젤 3.8g 12종"
+    "original_name": "3CE 3CE 드롭 글로우 젤 3.8g 12종",
+    "brand_en": "3CE",
+    "name_en": "Drop Glow Gel",
+    "global_id": "GA250127977",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250127977",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000208284",
@@ -4677,7 +5572,12 @@
     "image_url": "images/lip-tints/A000000208284.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000208284&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [온라인 단독]웨이크메이크 오버 블러링 팟 7 COLOR"
+    "original_name": "웨이크메이크 [온라인 단독]웨이크메이크 오버 블러링 팟 7 COLOR",
+    "brand_en": "wakemake",
+    "name_en": "Over Blurring Pot",
+    "global_id": "GA240724714",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240724714",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000209225",
@@ -4703,7 +5603,12 @@
     "image_url": "images/lip-tints/A000000209225.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000209225&dispCatNo=1000001000200060003",
-    "original_name": "모우모우 [청담샵추천] 모우모우 프로 페어링 틴트 4g 컬러 6종 (보송광/영롱광)"
+    "original_name": "모우모우 [청담샵추천] 모우모우 프로 페어링 틴트 4g 컬러 6종 (보송광/영롱광)",
+    "brand_en": "moumou",
+    "name_en": "Pro Pairing Tint",
+    "global_id": "GA241227495",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227495",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000209460",
@@ -4729,7 +5634,12 @@
     "image_url": "images/lip-tints/A000000209460.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000209460&dispCatNo=1000001000200060003",
-    "original_name": "시에로 시에로 비비드 립마커 6종"
+    "original_name": "시에로 시에로 비비드 립마커 6종",
+    "brand_en": "Siero",
+    "name_en": "Vivid Lip Marker",
+    "global_id": "GA241227185",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227185",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000209466",
@@ -4755,7 +5665,12 @@
     "image_url": "images/lip-tints/A000000209466.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000209466&dispCatNo=1000001000200060003",
-    "original_name": "코시에로 [NEW] 코시에로 젤러시 글로우 틴트 플럼퍼 6종"
+    "original_name": "코시에로 [NEW] 코시에로 젤러시 글로우 틴트 플럼퍼 6종",
+    "brand_en": "COSIERO",
+    "name_en": "Jealousy Glow Tint Plumper",
+    "global_id": "GA241227186",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227186",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000209877",
@@ -4781,7 +5696,12 @@
     "image_url": "images/lip-tints/A000000209877.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000209877&dispCatNo=1000001000200060003",
-    "original_name": "잉가 [아이돌PICK] 잉가 워터 글로우 립 틴트 4.5g_13컬러"
+    "original_name": "잉가 [아이돌PICK] 잉가 워터 글로우 립 틴트 4.5g_13컬러",
+    "brand_en": "INGA",
+    "name_en": "Water Glow Lip Tint",
+    "global_id": "GA240825442",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240825442",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000212223",
@@ -4807,7 +5727,12 @@
     "image_url": "images/lip-tints/A000000212223.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000212223&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [포슬블러/필터틴트] 딘토 블러링 립베일 틴트 10종"
+    "original_name": "딘토 [포슬블러/필터틴트] 딘토 블러링 립베일 틴트 10종",
+    "brand_en": "Dinto",
+    "name_en": "Blurring Lip Veil Tint",
+    "global_id": "GA241126595",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241126595",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000213198",
@@ -4833,7 +5758,12 @@
     "image_url": "images/lip-tints/A000000213198.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000213198&dispCatNo=1000001000200060003",
-    "original_name": "코랄헤이즈 코랄헤이즈 글로우락젤리틴트 5종 (기획/단품) *"
+    "original_name": "코랄헤이즈 코랄헤이즈 글로우락젤리틴트 5종 (기획/단품) *",
+    "brand_en": "Coralhaze",
+    "name_en": "Glow Lock Jelly Tint",
+    "global_id": "GA241026267",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241026267",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000216259",
@@ -4859,7 +5789,12 @@
     "image_url": "images/lip-tints/A000000216259.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000216259&dispCatNo=1000001000200060003",
-    "original_name": "노노어 노노어 샤인 락 립 틴트 5colors"
+    "original_name": "노노어 노노어 샤인 락 립 틴트 5colors",
+    "brand_en": "nonoer",
+    "name_en": "Shine Lock Lip Tint",
+    "global_id": "GA241227183",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227183",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000216562",
@@ -4885,7 +5820,12 @@
     "image_url": "images/lip-tints/A000000216562.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000216562&dispCatNo=1000001000200060003",
-    "original_name": "어퓨 어퓨 과즙팡 젤리 틴트 6종"
+    "original_name": "어퓨 어퓨 과즙팡 젤리 틴트 6종",
+    "brand_en": "A'pieu",
+    "name_en": "Juicy Pang Jelly Tint",
+    "global_id": "GA241227294",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227294",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000218173",
@@ -4911,7 +5851,12 @@
     "image_url": "images/lip-tints/A000000218173.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000218173&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 어뮤즈 파우더 벨벳 틴트 3.3g 8종 (기획/단품)"
+    "original_name": "어뮤즈 어뮤즈 파우더 벨벳 틴트 3.3g 8종 (기획/단품)",
+    "brand_en": "AMUSE",
+    "name_en": "Powder Velvet Tint",
+    "global_id": "GA250128034",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250128034",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000219685",
@@ -4937,7 +5882,12 @@
     "image_url": "images/lip-tints/A000000219685.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000219685&dispCatNo=1000001000200060003",
-    "original_name": "YNM [실리콘브러쉬 내장] YNM 하트 젤링 립틴트 6종"
+    "original_name": "YNM [실리콘브러쉬 내장] YNM 하트 젤링 립틴트 6종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000220304",
@@ -4963,7 +5913,12 @@
     "image_url": "images/lip-tints/A000000220304.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000220304&dispCatNo=1000001000200060003",
-    "original_name": "모브닝 [유리알광택] 모브닝 듀이 모브 글램 립 3.2ml 7colors"
+    "original_name": "모브닝 [유리알광택] 모브닝 듀이 모브 글램 립 3.2ml 7colors",
+    "brand_en": "MAUVNING",
+    "name_en": "Dewy Glam Lip",
+    "global_id": "GA250933860",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933860",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000223309",
@@ -4989,7 +5944,12 @@
     "image_url": "images/lip-tints/A000000223309.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223309",
-    "original_name": "잉가 [매끈보송/착붙블러틴트] 잉가 벨벳 슈 틴트 4.5g_6컬러"
+    "original_name": "잉가 [매끈보송/착붙블러틴트] 잉가 벨벳 슈 틴트 4.5g_6컬러",
+    "brand_en": "INGA",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000223676",
@@ -5015,7 +5975,12 @@
     "image_url": "images/lip-tints/A000000223676.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223676&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [기존 용기]컬러그램 긱 누드 컬러 커버 틴트 1COLOR"
+    "original_name": "컬러그램 [기존 용기]컬러그램 긱 누드 컬러 커버 틴트 1COLOR",
+    "brand_en": "colorgram",
+    "name_en": "Geek Nude Color Cover Tint",
+    "global_id": "GA250631862",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250631862",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000224930",
@@ -5041,7 +6006,12 @@
     "image_url": "images/lip-tints/A000000224930.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000224930&dispCatNo=1000001000200060003",
-    "original_name": "데이지크 데이지크 쥬시 듀이 글로우 틴트 20 colors (단품/기획)"
+    "original_name": "데이지크 데이지크 쥬시 듀이 글로우 틴트 20 colors (단품/기획)",
+    "brand_en": "dasique",
+    "name_en": "Juicy Dewy Glow Tint",
+    "global_id": "GA250430459",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250430459",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000225815",
@@ -5067,7 +6037,12 @@
     "image_url": "images/lip-tints/A000000225815.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225815&dispCatNo=1000001000200060003",
-    "original_name": "케이트 [한정/크리미] 케이트 립 몬스터 립스틱 크리미 몬스터 3g 3종"
+    "original_name": "케이트 [한정/크리미] 케이트 립 몬스터 립스틱 크리미 몬스터 3g 3종",
+    "brand_en": "KATE",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000225818",
@@ -5093,7 +6068,12 @@
     "image_url": "images/lip-tints/A000000225818.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225818&dispCatNo=1000001000200060003",
-    "original_name": "씨스터앤 [NEW ] 씨스터앤 멜로우 듀이 립 블러 8종 택 1"
+    "original_name": "씨스터앤 [NEW ] 씨스터앤 멜로우 듀이 립 블러 8종 택 1",
+    "brand_en": "SISTER ANN",
+    "name_en": "Mellow Dewy Lip Blur",
+    "global_id": "GA250832653",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832653",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000226126",
@@ -5119,7 +6099,12 @@
     "image_url": "images/lip-tints/A000000226126.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000226126&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [미니/탱글젤리광] 딘토 블러젤리 플럼핑 미니 립틴트 7종"
+    "original_name": "딘토 [미니/탱글젤리광] 딘토 블러젤리 플럼핑 미니 립틴트 7종",
+    "brand_en": "Dinto",
+    "name_en": "Blur-Jelly Plumping Mini Lip Tint",
+    "global_id": "GA250631315",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250631315",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000227435",
@@ -5145,7 +6130,12 @@
     "image_url": "images/lip-tints/A000000227435.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000227435&dispCatNo=1000001000200060003",
-    "original_name": "피브 [NEW 한정기획 홀리데이에디션 출시] 피브 글램드롭 3.3g 9종"
+    "original_name": "피브 [NEW 한정기획 홀리데이에디션 출시] 피브 글램드롭 3.3g 9종",
+    "brand_en": "FEEV",
+    "name_en": "Hyper-Fit Glam Drop Tint",
+    "global_id": "GA251135092",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135092",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000227860",
@@ -5171,7 +6161,12 @@
     "image_url": "images/lip-tints/A000000227860.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000227860&dispCatNo=1000001000200060003",
-    "original_name": "패션캣 [글로우틴트/탱글젤리광] 패션캣 듀이 글램 틴트 4g 3colors"
+    "original_name": "패션캣 [글로우틴트/탱글젤리광] 패션캣 듀이 글램 틴트 4g 3colors",
+    "brand_en": "PASSIONCAT",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000229115",
@@ -5197,7 +6192,12 @@
     "image_url": "images/lip-tints/A000000229115.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229115&dispCatNo=1000001000200060003",
-    "original_name": "폰들리 [팁매트립] 폰들리 슬립 틴트 8ml 8종 단품/기획"
+    "original_name": "폰들리 [팁매트립] 폰들리 슬립 틴트 8ml 8종 단품/기획",
+    "brand_en": "fondly",
+    "name_en": "Sleep Tint",
+    "global_id": "GA260338642",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338642",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000229116",
@@ -5223,7 +6223,12 @@
     "image_url": "images/lip-tints/A000000229116.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229116&dispCatNo=1000001000200060003",
-    "original_name": "폰들리 [NEW] 폰들리 글로우 젤 틴트 3.5ml 4종"
+    "original_name": "폰들리 [NEW] 폰들리 글로우 젤 틴트 3.5ml 4종",
+    "brand_en": "fondly",
+    "name_en": "Glow Gel Tint",
+    "global_id": "GA251135420",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135420",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000229359",
@@ -5249,7 +6254,12 @@
     "image_url": "images/lip-tints/A000000229359.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229359&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [글리터증정] 딘토 타임 투 키스&블러쉬 20종 (단품/기획)"
+    "original_name": "딘토 [글리터증정] 딘토 타임 투 키스&블러쉬 20종 (단품/기획)",
+    "brand_en": "Dinto",
+    "name_en": "Glowing Time To Kiss & Blush",
+    "global_id": "GA250732268",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732268",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000229845",
@@ -5275,7 +6285,12 @@
     "image_url": "images/lip-tints/A000000229845.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000229845&dispCatNo=1000001000200060003",
-    "original_name": "포트레 포트레 틴트 글로우 주르 3.5ml 9종"
+    "original_name": "포트레 포트레 틴트 글로우 주르 3.5ml 9종",
+    "brand_en": "Portré",
+    "name_en": "Tint Glow Jour",
+    "global_id": "GA250832657",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832657",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000230874",
@@ -5301,7 +6316,12 @@
     "image_url": "images/lip-tints/A000000230874.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000230874&dispCatNo=1000001000200060003",
-    "original_name": "에크멀 [NEW/라뮤끄] 에크멀 논 섹션 글로이 틴트 14종"
+    "original_name": "에크멀 [NEW/라뮤끄] 에크멀 논 섹션 글로이 틴트 14종",
+    "brand_en": "EQUMAL",
+    "name_en": "Non-Section Glowy Tint",
+    "global_id": "GA251135119",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135119",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000231620",
@@ -5327,7 +6347,12 @@
     "image_url": "images/lip-tints/A000000231620.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000231620&dispCatNo=1000001000200060003",
-    "original_name": "코랄헤이즈 코랄헤이즈 듀 드롭 틴트 4.5g 8종 (기획/단품)"
+    "original_name": "코랄헤이즈 코랄헤이즈 듀 드롭 틴트 4.5g 8종 (기획/단품)",
+    "brand_en": "Coralhaze",
+    "name_en": "Dew Drop Tint",
+    "global_id": "GA250732529",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732529",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000231706",
@@ -5353,7 +6378,12 @@
     "image_url": "images/lip-tints/A000000231706.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000231706&dispCatNo=1000001000200060003",
-    "original_name": "타이니원더 [아이돌 틴트/다윤쌤 공동개발] 타이니원더 하이퍼 듀이 립 틴트 3.4g 6종"
+    "original_name": "타이니원더 [아이돌 틴트/다윤쌤 공동개발] 타이니원더 하이퍼 듀이 립 틴트 3.4g 6종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000231709",
@@ -5379,7 +6409,12 @@
     "image_url": "images/lip-tints/A000000231709.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000231709&dispCatNo=1000001000200060003",
-    "original_name": "타이니원더 [아이돌 틴트/다윤쌤 공동개발] 타이니원더 하이퍼 블러 립 틴트 3.6g 6종"
+    "original_name": "타이니원더 [아이돌 틴트/다윤쌤 공동개발] 타이니원더 하이퍼 블러 립 틴트 3.6g 6종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000232261",
@@ -5405,7 +6440,12 @@
     "image_url": "images/lip-tints/A000000232261.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232261&dispCatNo=1000001000200060003",
-    "original_name": "씨스터앤 [NEW 신상] 씨스터앤 멜팅 글래스 립 틴트 4종 (택1)*"
+    "original_name": "씨스터앤 [NEW 신상] 씨스터앤 멜팅 글래스 립 틴트 4종 (택1)*",
+    "brand_en": "SISTER ANN",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000232806",
@@ -5431,7 +6471,12 @@
     "image_url": "images/lip-tints/A000000232806.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000232806&dispCatNo=1000001000200060003",
-    "original_name": "리스키 [NEW] 리스키 비 볼드 립 블러쉬드 4종"
+    "original_name": "리스키 [NEW] 리스키 비 볼드 립 블러쉬드 4종",
+    "brand_en": "RISKY",
+    "name_en": "Be Bold Lip Blushed",
+    "global_id": "GA250933865",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933865",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000233035",
@@ -5457,7 +6502,12 @@
     "image_url": "images/lip-tints/A000000233035.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000233035&dispCatNo=1000001000200060003",
-    "original_name": "킬릿 킬릿 엔젤링 틴트 6ml 10종"
+    "original_name": "킬릿 킬릿 엔젤링 틴트 6ml 10종",
+    "brand_en": "KILLIT",
+    "name_en": "Angel Ring Tint",
+    "global_id": "GA250933554",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933554",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000233215",
@@ -5483,7 +6533,12 @@
     "image_url": "images/lip-tints/A000000233215.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000233215&dispCatNo=1000001000200060003",
-    "original_name": "투에이엔 [놓치면 끝/하츠투하츠PICK] 투에이엔 미니 글레이즈 바운싱 틴트 3 colors*"
+    "original_name": "투에이엔 [놓치면 끝/하츠투하츠PICK] 투에이엔 미니 글레이즈 바운싱 틴트 3 colors*",
+    "brand_en": "2aN",
+    "name_en": "Glaze Bouncing Tint Mini",
+    "global_id": "GA250833126",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250833126",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000233656",
@@ -5509,7 +6564,12 @@
     "image_url": "images/lip-tints/A000000233656.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000233656&dispCatNo=1000001000200060003",
-    "original_name": "이더앤 [미니립 증정] 이더앤 듀이 시럽 틴트 4.3g 14종 (단품/기획)"
+    "original_name": "이더앤 [미니립 증정] 이더앤 듀이 시럽 틴트 4.3g 14종 (단품/기획)",
+    "brand_en": "EITHER&",
+    "name_en": "Dewy Syrup Tint",
+    "global_id": "GA250933528",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933528",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000234350",
@@ -5535,7 +6595,12 @@
     "image_url": "images/lip-tints/A000000234350.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000234350&dispCatNo=1000001000200060003",
-    "original_name": "모렛 모렛 셔터 글래스 틴트 3.2g 8종"
+    "original_name": "모렛 모렛 셔터 글래스 틴트 3.2g 8종",
+    "brand_en": "molette",
+    "name_en": "Shutter Glass Tint",
+    "global_id": "GA251235657",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235657",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000234351",
@@ -5561,7 +6626,12 @@
     "image_url": "images/lip-tints/A000000234351.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000234351&dispCatNo=1000001000200060003",
-    "original_name": "모렛 모렛 셔터 핏 틴트 3.3g 8종"
+    "original_name": "모렛 모렛 셔터 핏 틴트 3.3g 8종",
+    "brand_en": "molette",
+    "name_en": "Shutter Fit Tint",
+    "global_id": "GA251235656",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235656",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000235512",
@@ -5587,7 +6657,12 @@
     "image_url": "images/lip-tints/A000000235512.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000235512&dispCatNo=1000001000200060003",
-    "original_name": "티르티르 티르티르 워터리즘 글로우 틴트 4g 15종"
+    "original_name": "티르티르 티르티르 워터리즘 글로우 틴트 4g 15종",
+    "brand_en": "TIRTIR",
+    "name_en": "WATERISM GLOW TINT",
+    "global_id": "GA250933628",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250933628",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000235875",
@@ -5613,7 +6688,12 @@
     "image_url": "images/lip-tints/A000000235875.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000235875&dispCatNo=1000001000200060003",
-    "original_name": "오헤이오 오헤이오 무드 인첸트 글로우 틴트 5ml 6 colors 택1"
+    "original_name": "오헤이오 오헤이오 무드 인첸트 글로우 틴트 5ml 6 colors 택1",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000236123",
@@ -5639,7 +6719,12 @@
     "image_url": "images/lip-tints/A000000236123.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000236123&dispCatNo=1000001000200060003",
-    "original_name": "티르티르 티르티르 워터리즘 글로우 미니 틴트 1.8g 30종"
+    "original_name": "티르티르 티르티르 워터리즘 글로우 미니 틴트 1.8g 30종",
+    "brand_en": "TIRTIR",
+    "name_en": "Waterism Glow MINI Tint",
+    "global_id": "GA250229014",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250229014",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000236130",
@@ -5665,7 +6750,12 @@
     "image_url": "images/lip-tints/A000000236130.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000236130",
-    "original_name": "팁토우 팁토우 블러렛 소르베 틴트 6 Colors"
+    "original_name": "팁토우 팁토우 블러렛 소르베 틴트 6 Colors",
+    "brand_en": "tiptoe",
+    "name_en": "Blurlet Sorbet Tint",
+    "global_id": "GA260338976",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338976",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000238093",
@@ -5691,7 +6781,12 @@
     "image_url": "images/lip-tints/A000000238093.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238093&dispCatNo=1000001000200060003",
-    "original_name": "태오앤더 [유리알광] 태오앤더 밀키도톰 틴트 4colors*"
+    "original_name": "태오앤더 [유리알광] 태오앤더 밀키도톰 틴트 4colors*",
+    "brand_en": "teo and the",
+    "name_en": "Milky Dotom Tint",
+    "global_id": "GA251236252",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236252",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000238151",
@@ -5717,7 +6812,12 @@
     "image_url": "images/lip-tints/A000000238151.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238151&dispCatNo=1000001000200060003",
-    "original_name": "태오앤더 [셔벗벨벳] 태오앤더 꽃잎스밈 리퀴드 5colors*"
+    "original_name": "태오앤더 [셔벗벨벳] 태오앤더 꽃잎스밈 리퀴드 5colors*",
+    "brand_en": "teo and the",
+    "name_en": "Petal Smim Liquid",
+    "global_id": "GA251236251",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236251",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000238153",
@@ -5743,7 +6843,12 @@
     "image_url": "images/lip-tints/A000000238153.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238153&dispCatNo=1000001000200060003",
-    "original_name": "태오앤더 [NEW 한정기획/과즙꿀광] 태오앤더 쥬시탱탱 글레이즈 9colors (기획/단품)"
+    "original_name": "태오앤더 [NEW 한정기획/과즙꿀광] 태오앤더 쥬시탱탱 글레이즈 9colors (기획/단품)",
+    "brand_en": "teo and the",
+    "name_en": "Juicy Taeng Taeng Glaze",
+    "global_id": "GA251236253",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236253",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000238220",
@@ -5769,7 +6874,12 @@
     "image_url": "images/lip-tints/A000000238220.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238220&dispCatNo=1000001000200060003",
-    "original_name": "라카 라카 프루티 립 글로셔너 10ml"
+    "original_name": "라카 라카 프루티 립 글로셔너 10ml",
+    "brand_en": "Laka",
+    "name_en": "Fruity Lip Glotioner",
+    "global_id": "GA251134910",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251134910",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000238611",
@@ -5795,7 +6905,12 @@
     "image_url": "images/lip-tints/A000000238611.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238611&dispCatNo=1000001000200060003",
-    "original_name": "리플라이미 [NEW] 리플라이미 잔망루피 틴트 3종 택 1[밀크 로즈/베리 멜로우/체리 펀치]"
+    "original_name": "리플라이미 [NEW] 리플라이미 잔망루피 틴트 3종 택 1[밀크 로즈/베리 멜로우/체리 펀치]",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000238825",
@@ -5821,7 +6936,12 @@
     "image_url": "images/lip-tints/A000000238825.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238825&dispCatNo=1000001000200060003",
-    "original_name": "팁토우 팁토우 무스탱 립 매터 6 Colors"
+    "original_name": "팁토우 팁토우 무스탱 립 매터 6 Colors",
+    "brand_en": "tiptoe",
+    "name_en": "Mousse Tang Lip Matter",
+    "global_id": "GA251135096",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135096",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000241170",
@@ -5847,7 +6967,12 @@
     "image_url": "images/lip-tints/A000000241170.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000241170&dispCatNo=1000001000200060003",
-    "original_name": "코시에로 [한정기획] 코시에로 플럼퍼 모음전 (13종 택 1)"
+    "original_name": "코시에로 [한정기획] 코시에로 플럼퍼 모음전 (13종 택 1)",
+    "brand_en": "COSIERO",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000241370",
@@ -5873,7 +6998,12 @@
     "image_url": "images/lip-tints/A000000241370.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000241370&dispCatNo=1000001000200060003",
-    "original_name": "포트레 포트레 틴트 매트 3.7ml 6 COLORS"
+    "original_name": "포트레 포트레 틴트 매트 3.7ml 6 COLORS",
+    "brand_en": "Portré",
+    "name_en": "Tint Matte",
+    "global_id": "GA251135271",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135271",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000242855",
@@ -5899,7 +7029,12 @@
     "image_url": "images/lip-tints/A000000242855.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000242855&dispCatNo=1000001000200060003",
-    "original_name": "에뛰드 [강력 착색/타투 틴트] NEW 에뛰드 디어 달링 필 오프 립 스테인 5g 6 Colors"
+    "original_name": "에뛰드 [강력 착색/타투 틴트] NEW 에뛰드 디어 달링 필 오프 립 스테인 5g 6 Colors",
+    "brand_en": "ETUDE",
+    "name_en": "Dear Darling Peel Off Lip Stain",
+    "global_id": "GA251235898",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235898",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000242874",
@@ -5925,7 +7060,12 @@
     "image_url": "images/lip-tints/A000000242874.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000242874&dispCatNo=1000001000200060003",
-    "original_name": "엔비피시스 [NEW] 엔비피시스 글램 글로우 립 틴트 8colors"
+    "original_name": "엔비피시스 [NEW] 엔비피시스 글램 글로우 립 틴트 8colors",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000243174",
@@ -5951,7 +7091,12 @@
     "image_url": "images/lip-tints/A000000243174.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000243174&dispCatNo=1000001000200060003",
-    "original_name": "컬러그램 [위글위글 콜라보]컬러그램 누디 블러 틴트 위글위글세트 (웜/쿨)"
+    "original_name": "컬러그램 [위글위글 콜라보]컬러그램 누디 블러 틴트 위글위글세트 (웜/쿨)",
+    "brand_en": "colorgram",
+    "name_en": "Nude Blur Tint Set (Warm/Cool)",
+    "global_id": "GA251236286",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236286",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000243610",
@@ -5977,7 +7122,12 @@
     "image_url": "images/lip-tints/A000000243610.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000243610&dispCatNo=1000001000200060003",
-    "original_name": "엔비피시스 [NEW] 엔비피시스 글램 립 10colors (플럼핑 글로스/글로우 틴트)"
+    "original_name": "엔비피시스 [NEW] 엔비피시스 글램 립 10colors (플럼핑 글로스/글로우 틴트)",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000244284",
@@ -6003,7 +7153,12 @@
     "image_url": "images/lip-tints/A000000244284.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000244284&dispCatNo=1000001000200060003",
-    "original_name": "티르티르 티르티르 워터리즘 벨벳 미니 틴트 10 colors"
+    "original_name": "티르티르 티르티르 워터리즘 벨벳 미니 틴트 10 colors",
+    "brand_en": "TIRTIR",
+    "name_en": "Waterism Velvet Mini Tint",
+    "global_id": "GA251236221",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236221",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000244300",
@@ -6029,7 +7184,12 @@
     "image_url": "images/lip-tints/A000000244300.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000244300&dispCatNo=1000001000200060003",
-    "original_name": "티르티르 티르티르 글로이 젤리 틴트 미니 8 colors"
+    "original_name": "티르티르 티르티르 글로이 젤리 틴트 미니 8 colors",
+    "brand_en": "TIRTIR",
+    "name_en": "Glowy Jelly Tint Mini",
+    "global_id": "GA251034568",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251034568",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000245004",
@@ -6055,7 +7215,12 @@
     "image_url": "images/lip-tints/A000000245004.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000245004&dispCatNo=1000001000200060003",
-    "original_name": "오아드 [올영단독컬러/슬기PICK] 오아드 슬레인 에어 블러 틴트 8종 단품/기획"
+    "original_name": "오아드 [올영단독컬러/슬기PICK] 오아드 슬레인 에어 블러 틴트 8종 단품/기획",
+    "brand_en": "Oiad",
+    "name_en": "Slayn Air Blur Tint",
+    "global_id": "GA260136570",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136570",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000245917",
@@ -6081,7 +7246,12 @@
     "image_url": "images/lip-tints/A000000245917.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000245917&dispCatNo=1000001000200060003",
-    "original_name": "데이지크 데이지크 쥬시 듀이 글로우 틴트"
+    "original_name": "데이지크 데이지크 쥬시 듀이 글로우 틴트",
+    "brand_en": "dasique",
+    "name_en": "Juicy Dewy Glow Tint",
+    "global_id": "GA250430459",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250430459",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000246318",
@@ -6107,7 +7277,12 @@
     "image_url": "images/lip-tints/A000000246318.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000246318&dispCatNo=1000001000200060003",
-    "original_name": "앤드바이롬앤 [NEW미니/올영단독] 앤드바이롬앤 글래시 밤 틴트"
+    "original_name": "앤드바이롬앤 [NEW미니/올영단독] 앤드바이롬앤 글래시 밤 틴트",
+    "brand_en": "&nd by rom&nd",
+    "name_en": "Glassy Bomb Tint",
+    "global_id": "GA260237619",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237619",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000246909",
@@ -6133,7 +7308,12 @@
     "image_url": "images/lip-tints/A000000246909.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000246909&dispCatNo=1000001000200060003",
-    "original_name": "어퓨 [글로스IN틴트/말랑젤리광] 어퓨 젤리 틴트"
+    "original_name": "어퓨 [글로스IN틴트/말랑젤리광] 어퓨 젤리 틴트",
+    "brand_en": "A'pieu",
+    "name_en": "Jelly Tint",
+    "global_id": "GA260136957",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136957",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000247051",
@@ -6159,7 +7339,12 @@
     "image_url": "images/lip-tints/A000000247051.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000247051&dispCatNo=1000001000200060003",
-    "original_name": "머지 [NEW] 머지 블러 락 틴트 7 colors"
+    "original_name": "머지 [NEW] 머지 블러 락 틴트 7 colors",
+    "brand_en": "MERZY",
+    "name_en": "Blur Lock Tint",
+    "global_id": "GA260237226",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237226",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000247268",
@@ -6185,7 +7370,12 @@
     "image_url": "images/lip-tints/A000000247268.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000247268&dispCatNo=1000001000200060003",
-    "original_name": "입큰 [데일리글로우] 입큰 퍼피 글로우 틴트 5.3ml 6종"
+    "original_name": "입큰 [데일리글로우] 입큰 퍼피 글로우 틴트 5.3ml 6종",
+    "brand_en": "IPKN",
+    "name_en": "Puffy Glow Tint",
+    "global_id": "GA260137205",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260137205",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000248274",
@@ -6211,7 +7401,12 @@
     "image_url": "images/lip-tints/A000000248274.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000248274&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 토니모리 겟잇틴트 워터풀 시럽 5.3g 14 달콤허니시럽 기획 (+쇼킹립 미니) (주토피아 에디션)"
+    "original_name": "토니모리 토니모리 겟잇틴트 워터풀 시럽 5.3g 14 달콤허니시럽 기획 (+쇼킹립 미니) (주토피아 에디션)",
+    "brand_en": "TONYMOLY",
+    "name_en": "Get It Tint Waterful Syrup",
+    "global_id": "GA250429981",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250429981",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000248605",
@@ -6237,7 +7432,12 @@
     "image_url": "images/lip-tints/A000000248605.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000248605&dispCatNo=1000001000200060003",
-    "original_name": "코시에로 코시에로 젤러시 미닛 플럼퍼 5종"
+    "original_name": "코시에로 코시에로 젤러시 미닛 플럼퍼 5종",
+    "brand_en": "COSIERO",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000249314",
@@ -6263,7 +7463,12 @@
     "image_url": "images/lip-tints/A000000249314.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000249314&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 [콜라보한정신상] 롬앤 | 미피 문방구 4종 세트 (틴트2종+아이즈+떡메모지)"
+    "original_name": "롬앤 [콜라보한정신상] 롬앤 | 미피 문방구 4종 세트 (틴트2종+아이즈+떡메모지)",
+    "brand_en": "rom&nd",
+    "name_en": "Miffy Stationery 4-Piece Set",
+    "global_id": "GA260237966",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237966",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000249436",
@@ -6289,7 +7494,12 @@
     "image_url": "images/lip-tints/A000000249436.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000249436&dispCatNo=1000001000200060003",
-    "original_name": "패션캣 [쫀쫀탱글/꿀광] 허니 글로우 틴트 3g 6colors"
+    "original_name": "패션캣 [쫀쫀탱글/꿀광] 허니 글로우 틴트 3g 6colors",
+    "brand_en": "PASSIONCAT",
+    "name_en": "Honey Glow Tint",
+    "global_id": "GA260237996",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237996",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000251759",
@@ -6315,7 +7525,12 @@
     "image_url": "images/lip-tints/A000000251759.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000251759&dispCatNo=1000001000200060003",
-    "original_name": "케이트 [NEW/리퀴드타입] 케이트 립 몬스터 크리스탈 팟 6g 3종"
+    "original_name": "케이트 [NEW/리퀴드타입] 케이트 립 몬스터 크리스탈 팟 6g 3종",
+    "brand_en": "KATE",
+    "name_en": "Lip Monster Crystal Pod",
+    "global_id": "GA260338637",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338637",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000253184",
@@ -6341,7 +7556,12 @@
     "image_url": "images/lip-tints/A000000253184.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000253184&dispCatNo=1000001000200060003",
-    "original_name": "더샘 [립발색치트키/립프라이머]더샘 커버 퍼펙션 립 컨실 베이스 3colors"
+    "original_name": "더샘 [립발색치트키/립프라이머]더샘 커버 퍼펙션 립 컨실 베이스 3colors",
+    "brand_en": "THE SAEM",
+    "name_en": "Cover Perfection Lip Conceal Base",
+    "global_id": "GA260439173",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439173",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000254394",
@@ -6367,7 +7587,12 @@
     "image_url": "images/lip-tints/A000000254394.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000254394&dispCatNo=1000001000200060003",
-    "original_name": "팁토우 팁토우 위시 글레이즈 틴트 8 colors"
+    "original_name": "팁토우 팁토우 위시 글레이즈 틴트 8 colors",
+    "brand_en": "tiptoe",
+    "name_en": "Wish Glaze Tint",
+    "global_id": "GA260439354",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439354",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000254445",
@@ -6393,7 +7618,12 @@
     "image_url": "images/lip-tints/A000000254445.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000254445&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 [올영 선런칭/NEW 컬러] 페리페라 무드 글로이 틴트 키 (+카라비너 증정)"
+    "original_name": "페리페라 [올영 선런칭/NEW 컬러] 페리페라 무드 글로이 틴트 키 (+카라비너 증정)",
+    "brand_en": "peripera",
+    "name_en": "Mood Glowy Tint Key",
+    "global_id": "GA260439504",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439504",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000256713",
@@ -6419,7 +7649,12 @@
     "image_url": "images/lip-tints/A000000256713.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000256713&dispCatNo=1000001000200060003",
-    "original_name": "정샘물 [NEW/수분볼륨광] 정샘물 립프레션 글로이 틴트 10종"
+    "original_name": "정샘물 [NEW/수분볼륨광] 정샘물 립프레션 글로이 틴트 10종",
+    "brand_en": "JUNGSAEMMOOL",
+    "name_en": "Lip-Pression Glowy Tint",
+    "global_id": "GA260540078",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540078",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000257134",
@@ -6445,7 +7680,12 @@
     "image_url": "images/lip-tints/A000000257134.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000257134&dispCatNo=1000001000200060003",
-    "original_name": "라카 [올영단독] 라카 맥시 글레이어 틴트 미니"
+    "original_name": "라카 [올영단독] 라카 맥시 글레이어 틴트 미니",
+    "brand_en": "Laka",
+    "name_en": "Maxi Glayer Tint Mini",
+    "global_id": "GA260540455",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540455",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000258051",
@@ -6471,7 +7711,12 @@
     "image_url": "images/lip-tints/A000000258051.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000258051&dispCatNo=1000001000200060003",
-    "original_name": "밀크터치 [지속력임상] 밀크터치 글로우 핏 컬러 스테인 립 틴트 4g 8종 택1"
+    "original_name": "밀크터치 [지속력임상] 밀크터치 글로우 핏 컬러 스테인 립 틴트 4g 8종 택1",
+    "brand_en": "MilkTouch",
+    "name_en": "Glow Fit Color Stain Lip Tint",
+    "global_id": "GA260640874",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260640874",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000259100",
@@ -6497,7 +7742,12 @@
     "image_url": "images/lip-tints/A000000259100.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000259100&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 [UV블러셔증정/단독기획] 무지개맨션 뮤티드 블러 틴트"
+    "original_name": "무지개맨션 [UV블러셔증정/단독기획] 무지개맨션 뮤티드 블러 틴트",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": "Muted Blur Tint",
+    "global_id": "GA260641385",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641385",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000259173",
@@ -6523,7 +7773,12 @@
     "image_url": "images/lip-tints/A000000259173.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000259173&dispCatNo=1000001000200060003",
-    "original_name": "딘토 [1등틴트/멀멀착색/갓글로스증정] 딘토 베어글로스 립틴트 3.5g 9종 (단품/기획)"
+    "original_name": "딘토 [1등틴트/멀멀착색/갓글로스증정] 딘토 베어글로스 립틴트 3.5g 9종 (단품/기획)",
+    "brand_en": "Dinto",
+    "name_en": "Bare-Gloss Lip Tint",
+    "global_id": "GA260641053",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641053",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000260922",
@@ -6549,7 +7804,12 @@
     "image_url": "images/lip-tints/A000000260922.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000260922&dispCatNo=1000001000200060003",
-    "original_name": "오플로우 오플로우 놋트 슬릭 블러 틴트 4g 10colors"
+    "original_name": "오플로우 오플로우 놋트 슬릭 블러 틴트 4g 10colors",
+    "brand_en": "OFFLOW",
+    "name_en": "Knot Sleek Blur Tint",
+    "global_id": "GA260741428",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741428",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000260935",
@@ -6575,7 +7835,12 @@
     "image_url": "images/lip-tints/A000000260935.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000260935&dispCatNo=1000001000200060003",
-    "original_name": "오플로우 오플로우 놋트 슬릭 블러 틴트 & 놋트 글레이즈드 리퀴드 14colors"
+    "original_name": "오플로우 오플로우 놋트 슬릭 블러 틴트 & 놋트 글레이즈드 리퀴드 14colors",
+    "brand_en": "OFFLOW",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000262863",
@@ -6601,7 +7866,12 @@
     "image_url": "images/lip-tints/A000000262863.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000262863&dispCatNo=1000001000200060003",
-    "original_name": "웨이크메이크 [레오파드 헬로키티/기프트 특가] 웨이크메이크 립 앤 아이 키트(웜톤/쿨톤)"
+    "original_name": "웨이크메이크 [레오파드 헬로키티/기프트 특가] 웨이크메이크 립 앤 아이 키트(웜톤/쿨톤)",
+    "brand_en": "wakemake",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000267467",
@@ -6627,7 +7897,12 @@
     "image_url": "images/lip-tints/A000000267467.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000267467&dispCatNo=1000001000200060003",
-    "original_name": "어뮤즈 [NEW/올영단독] 어뮤즈 듀 틴트 미니 1.5g 3종"
+    "original_name": "어뮤즈 [NEW/올영단독] 어뮤즈 듀 틴트 미니 1.5g 3종",
+    "brand_en": "AMUSE",
+    "name_en": "Dew Tint Mini",
+    "global_id": "GA260943414",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260943414",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000268671",
@@ -6653,7 +7928,12 @@
     "image_url": "images/lip-tints/A000000268671.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000268671&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 [NEW] 토니모리 벨벳 블러링 립 틴트 4g 3SKU"
+    "original_name": "토니모리 [NEW] 토니모리 벨벳 블러링 립 틴트 4g 3SKU",
+    "brand_en": "TONYMOLY",
+    "name_en": "Velvet Blurring Lip Tint",
+    "global_id": "GA260943775",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260943775",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000269108",
@@ -6679,7 +7959,12 @@
     "image_url": "images/lip-tints/A000000269108.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000269108&dispCatNo=1000001000200060003",
-    "original_name": "누즈 누즈 케어 립추얼 4.5g 3COLOR"
+    "original_name": "누즈 누즈 케어 립추얼 4.5g 3COLOR",
+    "brand_en": "nuse",
+    "name_en": "Care Liptual",
+    "global_id": "GA230820144",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230820144",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000001002933",
@@ -6705,7 +7990,12 @@
     "image_url": "images/lip-tints/A000001002933.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001002933&dispCatNo=1000001000200060003",
-    "original_name": "어퓨 어퓨 모찌블러틴트 6 SKU"
+    "original_name": "어퓨 어퓨 모찌블러틴트 6 SKU",
+    "brand_en": "A'pieu",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000243123",
@@ -6731,7 +8021,12 @@
     "image_url": "images/lip-tints/A000000243123.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000243123&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 잉크더젤러블틴트 3.7g 2 colors"
+    "original_name": "페리페라 페리페라 잉크더젤러블틴트 3.7g 2 colors",
+    "brand_en": "peripera",
+    "name_en": "Ink The Jellable Tint",
+    "global_id": "GA250329707",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329707",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000225032",
@@ -6757,7 +8052,12 @@
     "image_url": "images/lip-tints/A000000225032.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000225032&dispCatNo=1000001000200060003",
-    "original_name": "삐아 [MINI] 삐아 로 틴트 미니 1.2g"
+    "original_name": "삐아 [MINI] 삐아 로 틴트 미니 1.2g",
+    "brand_en": "BBIA",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000170148",
@@ -6783,7 +8083,12 @@
     "image_url": "images/lip-tints/A000000170148.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000170148&dispCatNo=1000001000200060003",
-    "original_name": "피브 피브 컬러 드롭 립틴트 4ml 7종"
+    "original_name": "피브 피브 컬러 드롭 립틴트 4ml 7종",
+    "brand_en": "FEEV",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000172372",
@@ -6809,7 +8114,12 @@
     "image_url": "images/lip-tints/A000000172372.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000172372&dispCatNo=1000001000200060003",
-    "original_name": "뮤드 [NEW 컬러] 뮤드 글라세 립 틴트 3종 택1*"
+    "original_name": "뮤드 [NEW 컬러] 뮤드 글라세 립 틴트 3종 택1*",
+    "brand_en": "mude.",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000173941",
@@ -6835,7 +8145,12 @@
     "image_url": "images/lip-tints/A000000173941.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000173941&dispCatNo=1000001000200060003",
-    "original_name": "디어달리아 디어달리아 드림 벨벳 립 클라우드"
+    "original_name": "디어달리아 디어달리아 드림 벨벳 립 클라우드",
+    "brand_en": "DEAR DAHLIA",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000185439",
@@ -6861,7 +8176,12 @@
     "image_url": "images/lip-tints/A000000185439.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000185439&dispCatNo=1000001000200060003",
-    "original_name": "무지개맨션 무지개맨션 오브제 워터 틴트"
+    "original_name": "무지개맨션 무지개맨션 오브제 워터 틴트",
+    "brand_en": "MUZIGAE MANSION",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000192940",
@@ -6887,7 +8207,12 @@
     "image_url": "images/lip-tints/A000000192940.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000192940&dispCatNo=1000001000200060003",
-    "original_name": "누즈 [매끈보송립] 누즈 무스 립추얼 6Colors"
+    "original_name": "누즈 [매끈보송립] 누즈 무스 립추얼 6Colors",
+    "brand_en": "nuse",
+    "name_en": "Mousse Liptual",
+    "global_id": "GA231121040",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA231121040",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000238077",
@@ -6913,7 +8238,12 @@
     "image_url": "images/lip-tints/A000000238077.png",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238077&dispCatNo=1000001000200060003",
-    "original_name": "코드글로컬러 코드글로컬러 픽스온 프라이머 인 틴트"
+    "original_name": "코드글로컬러 코드글로컬러 픽스온 프라이머 인 틴트",
+    "brand_en": "CODE GLOKOLOR",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000200585",
@@ -6939,7 +8269,12 @@
     "image_url": "images/lip-tints/A000000200585.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000200585&dispCatNo=1000001000200060003",
-    "original_name": "케이트 [포근착색매트] 케이트 립 몬스터 수플레 매트 틴트 7g 10종"
+    "original_name": "케이트 [포근착색매트] 케이트 립 몬스터 수플레 매트 틴트 7g 10종",
+    "brand_en": "KATE",
+    "name_en": "Lip Monster Souffle Matte",
+    "global_id": "GA240523901",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240523901",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000207240",
@@ -6965,7 +8300,12 @@
     "image_url": "images/lip-tints/A000000207240.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207240&dispCatNo=1000001000200060003",
-    "original_name": "메리쏘드 메리쏘드 듀이 젤리 립 6종"
+    "original_name": "메리쏘드 메리쏘드 듀이 젤리 립 6종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000207242",
@@ -6991,7 +8331,12 @@
     "image_url": "images/lip-tints/A000000207242.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207242&dispCatNo=1000001000200060003",
-    "original_name": "메리쏘드 메리쏘드 릴타투 벨벳 틴트5종"
+    "original_name": "메리쏘드 메리쏘드 릴타투 벨벳 틴트5종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000207244",
@@ -7017,7 +8362,12 @@
     "image_url": "images/lip-tints/A000000207244.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000207244&dispCatNo=1000001000200060003",
-    "original_name": "메리쏘드 메리쏘드 릴타투 워터 틴트 5종"
+    "original_name": "메리쏘드 메리쏘드 릴타투 워터 틴트 5종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000208305",
@@ -7043,7 +8393,12 @@
     "image_url": "images/lip-tints/A000000208305.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000208305&dispCatNo=1000001000200060003",
-    "original_name": "지베르니 [물빛글로우] 지베르니 듀이 립 글레이즈 4.9g"
+    "original_name": "지베르니 [물빛글로우] 지베르니 듀이 립 글레이즈 4.9g",
+    "brand_en": "Giverny",
+    "name_en": "Dewy Lip Glaze",
+    "global_id": "GA240724821",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240724821",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000210009",
@@ -7069,7 +8424,12 @@
     "image_url": "images/lip-tints/A000000210009.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000210009&dispCatNo=1000001000200060003",
-    "original_name": "아멜리 [NEW] 아멜리 나르시시즘 립 틴트 7종"
+    "original_name": "아멜리 [NEW] 아멜리 나르시시즘 립 틴트 7종",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000210382",
@@ -7095,7 +8455,12 @@
     "image_url": "images/lip-tints/A000000210382.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000210382&dispCatNo=1000001000200060003",
-    "original_name": "더페이스샵 더페이스샵 워터핏 틴트 5g 5colors"
+    "original_name": "더페이스샵 더페이스샵 워터핏 틴트 5g 5colors",
+    "brand_en": "THE FACE SHOP",
+    "name_en": "Water Fit Tint",
+    "global_id": "GA241227460",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227460",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000210451",
@@ -7121,7 +8486,12 @@
     "image_url": "images/lip-tints/A000000210451.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000210451&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 롬앤 베어 물 틴트"
+    "original_name": "롬앤 롬앤 베어 물 틴트",
+    "brand_en": "rom&nd",
+    "name_en": "Bare Water Tint",
+    "global_id": "GA240825336",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA240825336",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000212152",
@@ -7147,7 +8517,12 @@
     "image_url": "images/lip-tints/A000000212152.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000212152&dispCatNo=1000001000200060003",
-    "original_name": "라카 라카 팝핑 벌룬 틴트 4.5g 12종"
+    "original_name": "라카 라카 팝핑 벌룬 틴트 4.5g 12종",
+    "brand_en": "Laka",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000213067",
@@ -7173,7 +8548,12 @@
     "image_url": "images/lip-tints/A000000213067.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000213067&dispCatNo=1000001000200060003",
-    "original_name": "어퓨 어퓨 과즙팡 틴트 2종"
+    "original_name": "어퓨 어퓨 과즙팡 틴트 2종",
+    "brand_en": "A'pieu",
+    "name_en": "Juicy Pang Tint",
+    "global_id": "GA250127768",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250127768",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000219607",
@@ -7199,7 +8579,12 @@
     "image_url": "images/lip-tints/A000000219607.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000219607&dispCatNo=1000001000200060003",
-    "original_name": "페리페라 페리페라 잉크 더 젤러블 틴트 3.7g"
+    "original_name": "페리페라 페리페라 잉크 더 젤러블 틴트 3.7g",
+    "brand_en": "peripera",
+    "name_en": "Ink The Jellable Tint",
+    "global_id": "GA250329707",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329707",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000223228",
@@ -7225,7 +8610,12 @@
     "image_url": "images/lip-tints/A000000223228.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000223228&dispCatNo=1000001000200060003",
-    "original_name": "VDL [광택천재] VDL 립스테인 에센셜 글로우 틴트"
+    "original_name": "VDL [광택천재] VDL 립스테인 에센셜 글로우 틴트",
+    "brand_en": "VDL",
+    "name_en": "Lipstain Essential Glow Tint",
+    "global_id": "GA250530923",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA250530923",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000000226889",
@@ -7251,7 +8641,12 @@
     "image_url": "images/lip-tints/A000000226889.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000226889&dispCatNo=1000001000200060003",
-    "original_name": "롬앤 롬앤 이나피스퀘어 콜라보 4종 (글래스팅 멜팅 밤, 블러 퍼지 틴트, 베러 댄 치크, 베러 댄 아이즈)"
+    "original_name": "롬앤 롬앤 이나피스퀘어 콜라보 4종 (글래스팅 멜팅 밤, 블러 퍼지 틴트, 베러 댄 치크, 베러 댄 아이즈)",
+    "brand_en": "rom&nd",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000230954",
@@ -7277,7 +8672,12 @@
     "image_url": "images/lip-tints/A000000230954.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000230954&dispCatNo=1000001000200060003",
-    "original_name": "에크멀 에크멀 익스트림 립 글라시 10종"
+    "original_name": "에크멀 에크멀 익스트림 립 글라시 10종",
+    "brand_en": "EQUMAL",
+    "name_en": "Extreme Lip Glassy",
+    "global_id": "GA251135120",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135120",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000000230959",
@@ -7303,7 +8703,12 @@
     "image_url": "images/lip-tints/A000000230959.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000230959&dispCatNo=1000001000200060003",
-    "original_name": "에크멀 [NEW/라뮤끄] 에크멀 블러리 립앤치크 5종"
+    "original_name": "에크멀 [NEW/라뮤끄] 에크멀 블러리 립앤치크 5종",
+    "brand_en": "EQUMAL",
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000238336",
@@ -7329,7 +8734,12 @@
     "image_url": "images/lip-tints/A000000238336.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000238336&dispCatNo=1000001000200060003",
-    "original_name": "아멜리 아멜리 나르시시즘 립 틴트 2colors"
+    "original_name": "아멜리 아멜리 나르시시즘 립 틴트 2colors",
+    "brand_en": null,
+    "name_en": null,
+    "global_id": null,
+    "url_en": null,
+    "name_en_source": null
   },
   {
     "id": "OY-A000000269076",
@@ -7355,7 +8765,12 @@
     "image_url": "images/lip-tints/A000000269076.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000269076&dispCatNo=1000001000200060003",
-    "original_name": "토니모리 토니모리 겟잇틴트 워터풀 버터 4.3g 2COLOR"
+    "original_name": "토니모리 토니모리 겟잇틴트 워터풀 버터 4.3g 2COLOR",
+    "brand_en": "TONYMOLY",
+    "name_en": "Get It Tint Waterful Butter",
+    "global_id": "GA230418422",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230418422",
+    "name_en_source": "oliveyoung_global_manual"
   },
   {
     "id": "OY-A000001003595",
@@ -7381,7 +8796,12 @@
     "image_url": "images/lip-tints/A000001003595.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001003595&dispCatNo=1000001000200060003",
-    "original_name": "러브플레르 러브플레르 포지 블러 틴트"
+    "original_name": "러브플레르 러브플레르 포지 블러 틴트",
+    "brand_en": "lovefleur",
+    "name_en": "Posy Blur Tint",
+    "global_id": "GA260338460",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338460",
+    "name_en_source": "oliveyoung_global_auto"
   },
   {
     "id": "OY-A000001004395",
@@ -7407,6 +8827,11 @@
     "image_url": "images/lip-tints/A000001004395.jpg",
     "description": "",
     "url": "https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000001004395&dispCatNo=1000001000200060003",
-    "original_name": "힌스 [11월 블프용] 힌스 무드인핸서 워터 리퀴드 글로우"
+    "original_name": "힌스 [11월 블프용] 힌스 무드인핸서 워터 리퀴드 글로우",
+    "brand_en": "hince",
+    "name_en": "Mood Enhancer Water Liquid Glow",
+    "global_id": "GA230719764",
+    "url_en": "https://global.oliveyoung.com/product/detail?prdtNo=GA230719764",
+    "name_en_source": "oliveyoung_global_auto"
   }
 ]

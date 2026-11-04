@@ -1,5 +1,6 @@
 // 올리브영에서 수집한 립틴트 데이터(크롤링 폴더)를 took 제품 데이터 형식으로 바꿔 src/data/products.oliveyoung.json 에 저장한다.
 // 실행: npm run import:oliveyoung [크롤링 JSON 경로]   (기본: ../크롤링c/oliveyoung_lip_tints.json)
+// 다시 만든 뒤에는 npm run match:global 로 영어 이름(글로벌 올리브영 짝짓기)을 다시 넣는다
 //
 // 데이터 원칙(CLAUDE.md): 수집하지 않은 정보는 지어내지 않는다.
 // - 바코드·색상명·제품 설명: 수집되지 않아 비워 둔다 (null)

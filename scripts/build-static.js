@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'dist/static');
-const BROWSER_LIBS = ['color.js', 'constants.js', 'catalog.js', 'recommend.js', 'chat.js', 'spoken.js'];
+const BROWSER_LIBS = ['color.js', 'constants.js', 'catalog.js', 'recommend.js', 'chat.js', 'spoken.js', 'situations.js', 'aliases.js', 'chat-en.js'];
 const FOR_ARTIFACT = !process.argv.includes('--web');
 
 if (!existsSync(join(root, 'public/vendor/mediapipe/vision_bundle.js'))) {

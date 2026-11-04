@@ -1,105 +1,223 @@
-// 홈 화면 인터랙션
-//  1) 인트로: 처음에는 가운데에 제목만 크게 → 글자가 하나씩 튀어 오른 뒤 제자리로 → 나머지가 여러 방향에서 날아든다
-//  2) 배경: 커서를 피해 밀려나고 진해지는 회색 점 격자, 누르면 물결이 퍼진다
-//  3) 제목 글자는 커서가 가까우면 들썩이고, 버튼은 커서 쪽으로 끌려오고, 기능 카드는 커서 방향으로 기운다
-//  4) 아래 영역은 스크롤해서 보일 때 나타난다
+// 홈 화면 인터랙션 (옛 툭ver2 대기 화면 구성, 무채색)
+//  1) 인트로: 가운데에 큰 took. (화면을 터치할 때까지 대기) → took 의 두 o 가 각자 홈의 두 동그라미 한가운데로 톡 떨어지고,
+//     닿은 자리에서 홈 동그라미가 o 크기부터 원래 크기로 퍼진다. 남은 t·k·온점은 상단 로고 자리로 → 제목·버튼이 차례로
+//  2) 팔레트 쪽 예시 그림의 입술 색이 1초마다 톡톡 튀며 바뀌고, 챗봇 쪽 예시 대화는 질문이 타이핑된다
+//  3) 배경: 커서를 피해 밀려나고 진해지는 회색 점 격자, 누르면 물결이 퍼진다
 // 동작 줄이기 설정이면 인트로·배경 움직임 없이 바로 보여 준다. 화면 클릭·키 입력으로 인트로를 건너뛸 수 있다.
+import { t, tList, languageMenu } from './i18n.js';
+
 const root = document.documentElement;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const finePointer = matchMedia('(pointer: fine)').matches;
 root.dataset.homeReady = '1'; // index.html 의 안전장치(스크립트가 안 돌면 숨김 해제)에 알린다
 
-const hero = document.querySelector('.hero');
-const title = hero.querySelector('h1');
+const home = document.getElementById('home');
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const replay = (node) => { node.classList.remove('pop'); void node.getBoundingClientRect(); node.classList.add('pop'); };
 
-// ---------- 제목 글자 나누기 ----------
-const text = title.textContent.trim();
-title.setAttribute('aria-label', text);
-const letters = [...text].map((ch, k) => {
-  const s = document.createElement('span');
-  s.className = 'ch';
-  s.textContent = ch;
-  s.setAttribute('aria-hidden', 'true');
-  s.style.setProperty('--k', String(k));
-  return s;
-});
-title.replaceChildren(...letters);
+// ---------- 예시 입술: 실제 립 색으로 톡톡 바뀐다 (무채색 규칙의 예외, CLAUDE.md) ----------
+const DEMO = ['#E0115F', '#FF6F61', '#C0646A', '#B8457A', '#D2321E', '#FF7FA5', '#A0202C', '#E06090', '#D9734E', '#9B2D5C'];
+let demoI = 0;
+let ready = false; // 인트로가 끝났는지
+setInterval(() => {
+  if (!ready || reduce) return;
+  demoI = (demoI + 1) % DEMO.length;
+  home.style.setProperty('--lip', DEMO[demoI]);
+  replay(document.getElementById('demo-lips'));
+  replay(document.getElementById('sparks'));
+}, 1000);
 
-// ---------- 등장 대상 ----------
-const reveal = [];
-function mark(elm, from, delay = 0) {
-  if (!elm) return;
-  elm.classList.add('rv');
-  elm.dataset.from = from;
-  elm.style.setProperty('--d', delay + 'ms');
-  reveal.push(elm);
-}
-mark(hero.querySelector('.eyebrow'), 'left', 0);
-mark(hero.querySelector('.hero-lead'), 'up', 120);
-mark(hero.querySelector('.hero-actions'), 'up', 240);
-document.querySelectorAll('.section-title').forEach((h) => mark(h, 'left', 0));
-document.querySelectorAll('.home-menu .feature').forEach((f, i) => mark(f, i % 2 ? 'right' : 'left', 120 + i * 120));
-document.querySelectorAll('.steps li').forEach((li, i) => mark(li, 'up', 100 + i * 110));
-mark(document.querySelector('.recent'), 'up', 100);
-mark(document.querySelector('.home-note'), 'up', 0);
-
-let ready = false; // 인트로가 끝나야 등장을 시작한다
-const waiting = new Set();
-function show(elm) {
-  if (elm.classList.contains('in')) return;
-  elm.classList.add('in');
-  // 다 나타난 뒤에는 등장용 전환을 떼어서 마우스 반응(카드 들림 등)이 늦지 않게 한다
-  const delay = parseFloat(elm.style.getPropertyValue('--d')) || 0;
-  setTimeout(() => {
-    elm.classList.remove('rv', 'in');
-    delete elm.dataset.from;
-  }, delay + 950);
-}
-const io = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    if (!e.isIntersecting) continue;
-    io.unobserve(e.target);
-    if (ready) show(e.target); else waiting.add(e.target);
+// ---------- 예시 대화: 챗봇 첫 화면의 추천 질문이 한 글자씩 타이핑된다 ----------
+const QUESTIONS = tList('home.questions'); // 화면 언어에 맞춘 예시 질문 (i18n.js)
+const demoText = document.getElementById('chat-demo-text');
+demoText.textContent = QUESTIONS[0];
+let qi = 0;
+async function typeLoop() {
+  for (;;) {
+    await wait(2600);
+    if (!ready) continue;
+    qi = (qi + 1) % QUESTIONS.length;
+    const q = QUESTIONS[qi];
+    for (let n = 1; n <= q.length; n++) {
+      demoText.textContent = q.slice(0, n);
+      await wait(70);
+    }
   }
-}, { threshold: 0.12 });
-reveal.forEach((r) => io.observe(r));
+}
+if (!reduce) typeLoop();
 
 // ---------- 인트로 ----------
-function placeTitleCenter() {
-  const r = title.getBoundingClientRect();
-  const scale = Math.min(2.4, (innerWidth * 0.72) / r.width);
-  title.style.setProperty('--ix', innerWidth / 2 - (r.left + r.width / 2) + 'px');
-  title.style.setProperty('--iy', innerHeight / 2 - (r.top + r.height / 2) + 'px');
-  title.style.setProperty('--is', String(scale));
-}
+const anims = [];
+let introBox = null;
 function finishIntro() {
   if (ready) return;
   ready = true;
-  title.classList.add('split');
-  root.classList.add('intro-go');
-  waiting.forEach(show);
-  waiting.clear();
-  setTimeout(() => root.classList.remove('intro', 'intro-go'), 1200);
+  root.classList.add('intro-go'); // 상단 메뉴가 내려온다 (CSS)
+  cleanupIntro();
+  setTimeout(() => root.classList.remove('intro', 'intro-go', 'intro-nav'), 1200);
   removeEventListener('pointerdown', skip, true);
   removeEventListener('keydown', skip, true);
 }
+// 끝까지 봤으면 마지막 모습 그대로, 건너뛰었으면 바로 제자리로
+function cleanupIntro() {
+  for (const an of anims.splice(0)) an.cancel();
+  introBox?.remove();
+  introBox = null;
+}
 const skip = () => finishIntro();
+
+const run =(node, frames, opts) => {
+  const an = node.animate(frames, { fill: 'both', ...opts });
+  anims.push(an);
+  return an.finished;
+};
+// 대기 화면: 큰 took. 아래에 터치 표시가 깜빡이고, 화면 아무 곳이나 누르면(키보드도) 이어서 움직인다.
+// 기다리는 동안은 인트로 막이 화면을 덮어, 아직 안 보이는 두 동그라미가 눌려 다른 화면으로 넘어가지 않게 한다
+function waitForTouch() {
+  return new Promise((resolve) => {
+    const hint = document.createElement('span');
+    hint.className = 'intro-touch';
+    hint.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.2a5 5 0 0 1-4-2L4.6 15.6a1.5 1.5 0 0 1 2.3-1.9L9 16"/></svg>';
+    // 시작 전에 언어부터 고를 수 있게 오른쪽 위에 언어 메뉴 (고르면 같은 대기 화면이 그 언어로 다시 열린다)
+    const langWrap = document.createElement('div');
+    langWrap.className = 'intro-lang';
+    langWrap.append(languageMenu({ skipIntro: false }));
+    introBox.append(hint, langWrap);
+    introBox.classList.add('waiting');
+    introBox.setAttribute('aria-label', t('home.touch'));
+    introBox.removeAttribute('aria-hidden');
+    const go = (e) => {
+      // 언어 메뉴를 누르거나 메뉴 안에서 키를 누르면 시작하지 않고 메뉴가 받는다
+      if (e.target?.closest?.('.intro-lang') || langWrap.contains(document.activeElement)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      langWrap.remove();
+      introBox.removeEventListener('pointerdown', go);
+      removeEventListener('keydown', go, true);
+      introBox.classList.remove('waiting');
+      introBox.setAttribute('aria-hidden', 'true');
+      hint.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' });
+      resolve();
+    };
+    introBox.addEventListener('pointerdown', go);
+    addEventListener('keydown', go, true);
+  });
+}
+
+// 글자 o 의 고리(잉크가 칠해진 부분)의 화면 위 중심과 지름. 글자 상자는 위아래 여백이 있어 상자 가운데 ≠ 고리 가운데라 글꼴 값으로 잰다
+function glyphRing(node) {
+  const box = node.getBoundingClientRect();
+  const cs = getComputedStyle(node);
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = cs.font;
+  const m = ctx.measureText(node.textContent);
+  // 줄 높이 안에서 글꼴 내용 영역은 가운데에 놓이고, 그 안에서 기준선은 글꼴 ascent 만큼 아래에 있다
+  const lineH = parseFloat(cs.lineHeight) || box.height;
+  const baseline = box.top + (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent;
+  const left = box.left - m.actualBoundingBoxLeft;
+  const d = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+  return {
+    box,
+    cx: left + (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2 + m.actualBoundingBoxLeft,
+    cy: baseline - (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2,
+    d: Math.max(d, m.actualBoundingBoxAscent + m.actualBoundingBoxDescent),
+  };
+}
+
+async function playIntro() {
+  if (ready) return;
+  const nav = document.querySelector('header.nav');
+  const logo = document.getElementById('nav-reset');
+  const mirrors = [...home.querySelectorAll('.tap .mirror')];
+  const fades = [home.querySelector('.at-hero'), ...home.querySelectorAll('.tap-label'), ...home.querySelectorAll('.orbit')];
+  introBox = document.createElement('div');
+  introBox.className = 'intro-logo';
+  introBox.setAttribute('aria-hidden', 'true');
+  // 글자를 하나씩 나눠 둔다: 두 o 는 홈의 두 원이 되고, t·k·온점은 상단 로고 자리로 간다
+  introBox.innerHTML = '<span class="in"><span class="w"><span class="ch">t</span><span class="ch o">o</span><span class="ch o">o</span><span class="ch">k</span></span><span class="d"></span></span>';
+  document.body.append(introBox);
+  const word = introBox.querySelector('.w');
+  const dot = introBox.querySelector('.d');
+  const os = [...word.querySelectorAll('.o')];
+  const rest = [...word.querySelectorAll('.ch:not(.o)'), dot];
+
+  // 1) 가운데에 크게 등장하고, 손님이 화면을 터치할 때까지 기다린다 (키오스크 대기 화면)
+  await run(introBox.firstElementChild, [{ opacity: 0, transform: 'scale(.85)' }, { opacity: 1, transform: 'none' }], { duration: 550, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  await waitForTouch();
+  if (ready) return;
+  // 터치한 뒤부터는 다시 누르면 남은 인트로를 건너뛴다
+  addEventListener('pointerdown', skip, true);
+  addEventListener('keydown', skip, true);
+  // 2) took 의 두 o 가 각자 홈의 두 원 한가운데로 톡 떨어지고, 그 자리에서 홈 원이 o 크기부터 퍼져 나온다.
+  //    남은 t·k·온점은 상단 로고의 같은 글자 자리로 천천히 줄어들어 로고와 겹친다.
+  //    메뉴는 위로 숨어 있으므로 내려온 뒤의 자리(메뉴 높이만큼 아래)를 겨눈다
+  const SMOOTH = 'cubic-bezier(.65,0,.35,1)'; // 천천히 출발해 천천히 멈춘다
+  const range = document.createRange();
+  range.setStart(logo.firstChild, 0);
+  range.setEnd(logo.firstChild, 4);
+  const r = range.getBoundingClientRect();
+  const hiddenBy = nav.getBoundingClientRect().top < 0 ? nav.offsetHeight : 0;
+  const to = { left: r.left, top: r.top + hiddenBy, height: r.height };
+  root.classList.add('intro-nav'); // 메뉴(로고 빼고)가 함께 내려온다
+  const from = word.getBoundingClientRect();
+  const k = to.height / from.height;
+  const at = (x, y, s = 1) => `translate(${x}px, ${y}px) scale(${s})`;
+  // t·k·온점: 단어 전체가 로고 자리로 줄어드는 것과 같은 위치로 (글자마다 단어 안의 자리를 유지), 가면서 옅어진다
+  const moveRest = rest.map((node) => {
+    const c = node.getBoundingClientRect();
+    const tx = to.left + (c.left - from.left) * k - c.left;
+    const ty = to.top + (c.top - from.top) * k - c.top;
+    return run(node, [{ transform: 'none', opacity: 1 }, { transform: at(tx, ty, k), opacity: 0.85, offset: 0.8 }, { transform: at(tx, ty, k), opacity: 0 }],
+      { duration: 1100, delay: 150, easing: SMOOTH });
+  });
+  // 로고는 글자가 거의 도착할 때 같은 자리에서 스르르
+  run(logo, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 1000, easing: 'ease-out' });
+  // 두 o: 조금 들렸다가 → 중력처럼 점점 빨라지며 원 한가운데로 톡 떨어진다 (크기는 글자 그대로, 색은 원 색으로 옅어진다).
+  //       닿으면 그 자리에서 '진짜 홈 원'이 o 고리 크기에서 원래 크기로 퍼진다. 끝 모습이 홈 원 그 자체라 크기·굵기·테두리가 똑같다
+  const DROP = 950; // 떨어지는 시간
+  const SPREAD = 750; // 퍼지는 시간
+  const drops = os.map((node, i) => {
+    const ring = glyphRing(node); // 글자 o 고리의 실제 중심·지름 (글꼴 측정값)
+    const m = mirrors[i].getBoundingClientRect();
+    const x = m.left + m.width / 2 - ring.cx;
+    const y = m.top + m.height / 2 - ring.cy;
+    node.style.transformOrigin = `${ring.cx - ring.box.left}px ${ring.cy - ring.box.top}px`; // 고리 중심을 기준으로 움직인다
+    const ink = getComputedStyle(node).color;
+    const fall = run(node, [
+      { transform: at(0, 0), color: ink, easing: 'cubic-bezier(.2,.6,.4,1)' },
+      { transform: at(x * 0.1, -40), color: ink, offset: 0.24, easing: 'cubic-bezier(.55,0,.9,.45)' }, // 들림 → 떨어지기 시작
+      { transform: at(x, y), color: '#d9d9d9' },
+    ], { duration: DROP, delay: i * 120 });
+    return fall.then(() => {
+      // 닿는 순간 o 는 금방 사라지고, 같은 자리·같은 크기에서 홈 원이 퍼진다 (넘치지 않고 정확히 원래 크기에서 멈춘다)
+      run(node, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'ease-out' });
+      const s0 = ring.d / m.width;
+      return run(mirrors[i], [
+        { opacity: 0.9, transform: `scale(${s0})` },
+        { opacity: 1, transform: 'scale(1)' },
+      ], { duration: SPREAD, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() =>
+        // 원 안의 그림·예시 대화는 원이 다 퍼진 뒤에 스르르
+        Promise.all([...mirrors[i].children].map((c) => run(c, [{ opacity: 0 }, { opacity: 1 }], { duration: 450, easing: 'ease-out' }))));
+    });
+  });
+  // 원이 퍼지는 동안 원 안의 그림은 숨겨 둔다
+  for (const m of mirrors) for (const c of m.children) run(c, [{ opacity: 0 }, { opacity: 0 }], { duration: DROP + SPREAD + 300 });
+  await Promise.all([...moveRest, ...drops]);
+  if (ready) return;
+  replay(document.getElementById('sparks'));
+  // 4) 제목·버튼·둘레 점: 아주 조금만 올라오며 천천히 차례로
+  await Promise.all(fades.map((node, i) => run(node, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }],
+    { duration: 650, delay: i * 70, easing: 'ease-out' })));
+}
 
 if (reduce || !root.classList.contains('motion')) {
   root.classList.remove('intro', 'motion');
   ready = true;
-  reveal.forEach((r) => r.classList.remove('rv'));
 } else {
   scrollTo(0, 0);
-  addEventListener('pointerdown', skip, true);
-  addEventListener('keydown', skip, true);
-  // 상단 메뉴가 그려진 뒤(다음 프레임)에 제목 자리를 재야 가운데가 맞는다
-  requestAnimationFrame(() => {
-    if (ready) return;
-    placeTitleCenter();
-    title.classList.add('split'); // 이때부터 글자가 튀어 오른다 (CSS)
-    setTimeout(finishIntro, 150 + letters.length * 70 + 650);
-  });
+  // 건너뛰기는 대기 화면을 터치한 뒤부터 켠다 (playIntro)
+  // 상단 메뉴가 그려진 뒤(다음 프레임)에 자리를 재야 글자·온점이 맞게 떨어진다
+  // 건너뛰면 애니메이션이 취소되며 finished 가 거절되므로 그 오류는 무시한다
+  requestAnimationFrame(() => playIntro().catch(() => {}).finally(() => { finishIntro(); cleanupIntro(); }));
 }
 
 // ---------- 커서 위치 ----------
@@ -190,45 +308,4 @@ if (!reduce) {
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
-}
-
-// ---------- 제목 글자 들썩임 · 자석 버튼 · 기울어지는 카드 ----------
-if (finePointer && !reduce) {
-  let raf = 0;
-  addEventListener('pointermove', () => {
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      raf = 0;
-      if (!ready) return;
-      for (const s of letters) {
-        const r = s.getBoundingClientRect();
-        const dist = Math.hypot(pointer.x - (r.left + r.width / 2), pointer.y - (r.top + r.height / 2));
-        const k = Math.max(0, 1 - dist / 220);
-        s.style.setProperty('--lift', (-k * k * 16).toFixed(1) + 'px');
-      }
-    });
-  }, { passive: true });
-
-  for (const btn of document.querySelectorAll('.hero-actions a')) {
-    btn.addEventListener('pointermove', (e) => {
-      const r = btn.getBoundingClientRect();
-      const dx = e.clientX - (r.left + r.width / 2);
-      const dy = e.clientY - (r.top + r.height / 2);
-      btn.style.translate = `${(dx * 0.22).toFixed(1)}px ${(dy * 0.32).toFixed(1)}px`;
-    });
-    btn.addEventListener('pointerleave', () => { btn.style.translate = ''; });
-  }
-
-  for (const card of document.querySelectorAll('.home-menu .feature')) {
-    card.addEventListener('pointermove', (e) => {
-      if (card.classList.contains('rv')) return;
-      const r = card.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width;
-      const py = (e.clientY - r.top) / r.height;
-      card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
-      card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-      card.style.transform = `perspective(900px) rotateX(${((0.5 - py) * 8).toFixed(2)}deg) rotateY(${((px - 0.5) * 10).toFixed(2)}deg) translateY(-4px)`;
-    });
-    card.addEventListener('pointerleave', () => { card.style.transform = ''; });
-  }
 }

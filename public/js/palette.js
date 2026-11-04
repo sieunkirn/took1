@@ -8,6 +8,7 @@
 import { renderNav, store, api, el, productCard, toast, skeletonCards } from './common.js';
 import { hexToRgb, rgbToHex } from '../lib/color.js';
 import { PRESETS } from './lip-engine.js'; // 립 컬러 매핑 탭에서 고를 수 있는 색
+import { t as tr } from './i18n.js'; // 화면 문구 (한국어/영어)
 
 renderNav();
 
@@ -74,7 +75,7 @@ let shownOk = mixOk; // 화면에 보이는 바탕색 (새 혼합색으로 천�
 // ---------- 물감 ----------
 const paintButton = (p) => el('button', {
   type: 'button', class: 'paint' + (p.lip ? ' paint-lip' : ''), 'data-key': p.key, title: p.name,
-  'aria-label': `${p.lip ? '립 컬러 ' : ''}${p.name} 물감 한 방울 떨어뜨리기`,
+  'aria-label': tr('pal.dropAria', { name: p.name }),
 }, el('span', { class: 'paint-blob', style: `--c:${p.hex}` }), p.lip ? null : el('span', { class: 'paint-name', text: p.name }));
 const paintBtns = ALL_PAINTS.map(paintButton);
 $('lip-paints').replaceChildren(...paintBtns);
@@ -236,7 +237,7 @@ function draw(t) {
 // ---------- 방울 떨어뜨리기 ----------
 function dropAt(key, x, y) {
   if (drops.length >= MAX_DROPS) {
-    toast(`한 번에 ${MAX_DROPS}방울까지 섞을 수 있어요`);
+    toast(tr('pal.maxDrops', { n: MAX_DROPS }));
     return;
   }
   const before = mixOk;
@@ -358,15 +359,10 @@ function render() {
   $('mix-empty').classList.toggle('hidden', !!hex);
   $('undo').disabled = !drops.length;
   $('find').disabled = !hex;
-  $('result-swatch').style.background = hex || '';
-  $('result-swatch').classList.toggle('empty', !hex);
-  $('result-hex').textContent = hex || '-';
-  $('result-note').textContent = hex ? `${drops.length}방울을 섞었어요` : '아직 섞은 물감이 없어요';
-  const counts = ALL_PAINTS.map((p) => [p, drops.filter((k) => k === p.key).length]).filter(([, n]) => n);
-  $('recipe-bar').replaceChildren(...counts.map(([p, n]) => el('span', { style: `flex:${n};background:${p.hex}`, title: `${p.name} ${n}` })));
-  $('recipe').replaceChildren(...(counts.length
-    ? counts.map(([p, n]) => el('span', { class: 'recipe-chip' }, el('span', { class: 'color-dot', style: `background:${p.hex}` }), `${p.name} ${n}`))
-    : [el('span', { class: 'muted', text: '물감을 골라 보세요' })]));
+  $('reset').disabled = !hex;
+  // 조제한 색은 섞는 칸에 보이므로 옆에 색상값과 방울 수만 적는다
+  $('mix-hex').textContent = hex ? `${hex}
+${tr('pal.drops', { n: drops.length })}` : '';
 }
 
 $('undo').addEventListener('click', () => {
@@ -382,13 +378,13 @@ $('undo').addEventListener('click', () => {
   save();
   render();
 });
-// 초기화: 팔레트를 비우고 입술 색을 기본 컬러로
-// 추천 결과 보기: 오른쪽에는 조제한 색과 추천 제품만 남기고, 오른쪽 위 버튼은 '다시하기'(초기화)가 된다
+// 추천 결과 보기: 오른쪽에는 조제한 색과 추천 제품만 남긴다. '다시 섞기'는 섞던 팔레트로 돌아간다
 function showResult(on) {
   document.querySelector('.palette').classList.toggle('show-result', on);
-  $('reset').textContent = on ? '다시하기' : '초기화';
-  $('side-label').textContent = on ? '조제한 색 · 추천 제품' : '조제한 색';
 }
+$('back-mix').addEventListener('click', () => showResult(false));
+
+// 다시하기(팔레트 오른쪽 위 아이콘): 팔레트를 비우고 입술 색을 기본 컬러로
 
 $('reset').addEventListener('click', () => {
   showResult(false);
@@ -402,25 +398,40 @@ $('reset').addEventListener('click', () => {
   $('rec-list').replaceChildren();
   $('rec-status').textContent = '';
   toLips(DEFAULT_LOOK.hex, { finish: DEFAULT_LOOK.finish, source: '기본 컬러' });
-  toast('색을 초기화했어요');
+  toast(tr('pal.resetDone'));
 });
+
+// 나에게 어울리는 컬러 (lip.js 가 측정): 팔레트의 같은 물감에 '내 톤' 표시, 추천 컬러를 누르면 한 방울 떨어뜨린다
+function markPicks(picks = []) {
+  for (const b of paintBtns) b.classList.toggle('paint-pick', picks.includes(PAINT[b.dataset.key].hex));
+}
+window.addEventListener('took:match', (e) => markPicks(e.detail.picks));
+window.addEventListener('took:pick', (e) => {
+  const p = ALL_PAINTS.find((x) => x.hex === e.detail.hex);
+  if (!p) return;
+  if (document.querySelector('.palette.show-result')) showResult(false); // 추천 결과를 보던 중이면 섞는 칸을 다시 연다
+  requestAnimationFrame(() => fly(p.key, e.detail.from));
+});
+markPicks(store.get('lipMatch')?.picks);
 
 $('find').addEventListener('click', async () => {
   const hex = okToHex(mixOk);
   showResult(true);
-  $('rec-status').textContent = `${hex} 와 비슷한 제품을 찾는 중...`;
+  $('res-swatch').style.background = hex;
+  $('res-hex').textContent = tr('pal.mixed', { hex });
+  $('rec-status').textContent = tr('pal.searching', { hex });
   $('rec-list').replaceChildren(...skeletonCards(4));
   const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, limit: 6 }));
   if (!ok) {
-    $('rec-status').textContent = body.error || '추천 제품을 불러오지 못했습니다.';
+    $('rec-status').textContent = body.error || tr('lip.recFail');
     $('rec-list').replaceChildren();
     return;
   }
-  $('rec-status').textContent = `조제한 색 ${hex} 와 비슷한 제품 ${body.products.length}개 (색이 가까운 순)`;
+  $('rec-status').textContent = tr('pal.found', { hex, n: body.products.length });
   $('rec-list').replaceChildren(...body.products.map((p) => productCard(p, {
     extraActions: [el('button', {
       type: 'button',
-      text: '입술에 발라보기',
+      text: tr('lip.tryOn'),
       onclick: () => toLips(p.color_hex, { finish: p.finish, quiet: false, source: '추천 제품 색' }),
     })],
   })));

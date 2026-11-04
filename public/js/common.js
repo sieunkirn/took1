@@ -1,18 +1,23 @@
 // 공통 모듈: API 호출, 페이지 간 상태(sessionStorage), 제품 카드 렌더링, 공통 네비게이션
 import { FINISH_LABELS, FAMILY_LABELS, finishLabel } from '../lib/constants.js';
-import { fullName, shortName } from '../lib/catalog.js';
+import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
 import { toast, skeletonCards } from './motion.js'; // 화면 움직임(모든 화면 공통)
+import { t, isEn, languageMenu, applyI18n, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js'; // 화면 언어
 
-export { FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName, toast, skeletonCards };
+// 화면에 보이는 제품 이름: 영어 화면이면 글로벌 올리브영 영어 이름(없으면 한국어 이름), 한국어면 그대로
+export const fullName = (p) => (isEn() ? displayName(p) : koFullName(p));
+export const shortName = (p) => (isEn() ? `${brandOf(p)} ${nameOf(p)}` : koShortName(p));
+export { FINISH_LABELS, FAMILY_LABELS, finishLabel, toast, skeletonCards };
 
 // 수집하지 않은 정보는 비워 두고, 추정한 값은 추정이라고 표시한다 (올리브영 데이터)
-const shadeText = (p) => p.shade_name || (p.color_options ? `${p.color_options}가지 중 대표색` : '대표색');
-const finishText = (p) => (p.finish ? FINISH_LABELS[p.finish] + (p.finish_source === 'product_name' ? ' (상품명 기준 추정)' : '') : '정보 없음');
-const familyText = (p) => (FAMILY_LABELS[p.color_family] || p.color_family) + (p.color_family_source === 'estimated_from_color' ? ' (색상값으로 추정)' : '');
+const shadeText = (p) => p.shade_name || (p.color_options ? t('detail.shadeOf', { n: p.color_options }) : t('detail.shadeRep'));
+const finishText = (p) => (p.finish ? finishName(p.finish) + (p.finish_source === 'product_name' ? t('detail.byName') : '') : t('detail.none'));
+const familyText = (p) => t('family.' + p.color_family) + (p.color_family_source === 'estimated_from_color' ? t('detail.byColor') : '');
 
 /** 올리브영 상세 페이지 링크 (새 창) */
-export function storeLink(p, text = '올리브영에서 보기') {
-  return p.url ? el('a', { href: p.url, text, target: '_blank', rel: 'noopener noreferrer' }) : null;
+export function storeLink(p, text = t('card.store')) {
+  const url = storeUrlOf(p); // 영어면 글로벌 올리브영
+  return url ? el('a', { href: url, text, target: '_blank', rel: 'noopener noreferrer' }) : null;
 }
 
 // 정적 모드: 서버 없이(예: claude.ai Artifact 링크) 같은 추천/검색/챗봇 로직을 브라우저에서 실행한다.
@@ -67,7 +72,7 @@ async function staticApi(path, options) {
   if (url.pathname === '/api/chat') {
     const body = JSON.parse(options.body || '{}');
     if (!body.message) return fail(400, 'message 가 필요합니다.');
-    return ok({ engine: 'rule-based', ...chat.answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true }) });
+    return ok({ engine: 'rule-based', ...chat.answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true, lang: body.lang === 'en' ? 'en' : 'ko' }) });
   }
   return fail(404, '알 수 없는 API 입니다.');
 }
@@ -104,7 +109,7 @@ export const store = {
   },
 };
 
-export const won = (n) => Number(n).toLocaleString('ko-KR') + '원';
+export const won = priceText; // 한국어 '13,000원', 영어 '₩13,000'
 // 페이지 이동: 전달값을 sessionStorage 에도 저장한다 (정적 모드에서는 URL 쿼리 없이 이동)
 export function go(page, params = {}) {
   const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v !== null && v !== undefined && v !== ''));
@@ -149,7 +154,7 @@ export function el(tag, attrs = {}, ...children) {
   return node;
 }
 
-export function detailLink(product, from, text = '상세 보기') {
+export function detailLink(product, from, text = t('card.detail')) {
   return el('a', { href: 'product.html', text, onclick: (e) => { e.preventDefault(); go('product.html', { id: product.id, from }); } });
 }
 
@@ -162,22 +167,22 @@ export function detailLink(product, from, text = '상세 보기') {
 // extraActions: 화면마다 필요한 버튼 (예: 립 컬러 매핑의 '입술에 발라보기')
 export function productCard(product, { extraActions = [] } = {}) {
   const rows = [
-    ['브랜드', product.brand],
-    ['제품명', product.name],
+    [t('card.brand'), brandOf(product)],
+    [t('card.name'), nameOf(product)],
     // 색상값 옆에 실제 색 견본 (무채색 규칙의 예외: 제품 색 표시)
-    ['색상값', [el('span', { class: 'color-dot', style: `background:${product.color_hex}`, 'aria-hidden': 'true' }), product.color_hex]],
-    ['제형', finishLabel(product.finish)],
+    [t('card.color'), [el('span', { class: 'color-dot', style: `background:${product.color_hex}`, 'aria-hidden': 'true' }), product.color_hex]],
+    [t('card.finish'), finishName(product.finish)],
     // 가격 숫자는 카드가 나타날 때 0에서 올라간다 (motion.js)
-    ['가격', Number.isFinite(Number(product.price)) && product.price !== null
+    [t('card.price'), Number.isFinite(Number(product.price)) && product.price !== null
       ? [el('span', { 'data-count': String(product.price), text: won(product.price) })]
       : won(product.price)],
   ];
   // 대표 이미지 자리: 모든 카드에 같은 크기로 두어 줄이 맞게 한다.
   // 이미지 주소가 없거나 불러오지 못하면(외부 사이트 이미지 차단 등) '이미지 준비 중' 자리로 바꾼다
-  const noImage = () => el('div', { class: 'card-img card-img-empty', text: '이미지 준비 중' });
+  const noImage = () => el('div', { class: 'card-img card-img-empty', text: t('card.noImage') });
   const image = product.image_url
     ? el('img', {
-      class: 'card-img', src: product.image_url, alt: fullName(product), loading: 'lazy', referrerpolicy: 'no-referrer',
+      class: 'card-img', src: product.image_url, alt: displayName(product), loading: 'lazy', referrerpolicy: 'no-referrer',
       onerror: (e) => e.target.replaceWith(noImage()),
     })
     : noImage();
@@ -192,30 +197,147 @@ export function productCard(product, { extraActions = [] } = {}) {
 
 export function productDetailTable(p) {
   const rows = [
-    ['ID', p.id], ['출처', p.source === 'oliveyoung' ? '올리브영 (수집 시점의 판매가)' : '시연용 가상 데이터'],
-    ['바코드', p.barcode || '정보 없음'], ['브랜드', p.brand], ['제품명', p.name], ['종류', p.type],
-    ['색상명', shadeText(p)], ['색상값(HEX)', p.color_hex],
-    ['색상값(Lab)', `L* ${p.color_lab.L} / a* ${p.color_lab.a} / b* ${p.color_lab.b}`],
-    ['색상 계열', familyText(p)],
-    ['제형', finishText(p)], ['가격', won(p.price) + (p.list_price && p.list_price !== p.price ? ` (정가 ${won(p.list_price)})` : '')],
-    ['설명', p.description || '정보 없음'],
+    ['ID', p.id], [t('detail.source'), p.source === 'oliveyoung' ? t('detail.sourceOy') : t('detail.sourceVirtual')],
+    [t('detail.barcode'), p.barcode || t('detail.none')], [t('card.brand'), brandOf(p)], [t('card.name'), nameOf(p)], [t('detail.type'), t('type.' + p.type)],
+    [t('detail.shade'), shadeText(p)], [t('detail.hex'), p.color_hex],
+    [t('detail.lab'), `L* ${p.color_lab.L} / a* ${p.color_lab.a} / b* ${p.color_lab.b}`],
+    [t('detail.family'), familyText(p)],
+    [t('card.finish'), finishText(p)], [t('card.price'), won(p.price) + (p.list_price && p.list_price !== p.price ? ` (${t('detail.listPrice', { price: won(p.list_price) })})` : '')],
+    [t('detail.desc'), p.description || t('detail.none')],
   ];
-  if (p.original_name) rows.push(['올리브영 상품명', p.original_name]);
+  if (p.original_name) rows.push([t('detail.originalName'), p.original_name]); // 한국 올리브영 원래 상품명 (영어 화면에서도 그대로)
   return el('table', {}, el('tbody', {}, rows.map(([k, v]) => el('tr', {}, el('th', { text: k }), el('td', { text: v }))),
-    p.url ? el('tr', {}, el('th', { text: '올리브영' }), el('td', {}, storeLink(p, '상세 페이지 열기 (새 창)'))) : null));
+    storeUrlOf(p) ? el('tr', {}, el('th', { text: t('detail.store') }), el('td', {}, storeLink(p, t('detail.storeOpen')))) : null));
 }
 
 export function renderNav() {
   if (document.querySelector('header.nav')) return; // 합본 화면처럼 스크립트 두 개가 함께 부르면 한 번만 그린다
   const nav = el('header', { class: 'nav' },
     // 로고: 저장된 상태를 모두 지우고 홈으로 이동 (처음 상태로 초기화)
-    el('strong', {}, el('a', { href: 'index.html', text: 'took(초기화)', id: 'nav-reset', onclick: () => store.clear() })),
+    el('strong', {}, el('a', { href: 'index.html', text: t('nav.reset'), id: 'nav-reset', onclick: () => store.clear() })),
     // 상단 '홈' 버튼으로 가면 홈 인트로 애니메이션을 건너뛴다 (index.html 머리 스크립트가 읽고 지운다)
-    Object.assign(freshLink('index.html', '홈'), { onclick: () => { store.remove('navCurrent.index.html'); store.set('homeSkipIntro', true); } }),
-    freshLink('lip-together.html', '립 컬러 매핑'), // 카메라 오른쪽에 제품 추천
-    freshLink('chat.html', 'AI 뷰티 챗봇'),
-    freshLink('studio.html', '합본'), // 립 매핑 + 색 조제·챗봇·추천·바코드를 한 화면에
-    freshLink('palette.html', '팔레트'), // 테스트: 물감을 섞어 립 색 조제
+    Object.assign(freshLink('index.html', t('nav.home')), { onclick: () => { store.remove('navCurrent.index.html'); store.set('homeSkipIntro', true); } }),
+    // 홈의 두 갈래와 같은 순서. 립 컬러 매핑·합본 화면은 파일만 남기고 메뉴에서 뺐다
+    freshLink('palette.html', t('nav.palette')), // 물감을 섞어 립 색 조제 + 카메라로 발라 보기
+    freshLink('chat.html', t('nav.chat')),
+    // 언어 전환 (오른쪽 끝): 한국어 화면에선 'English', 영어 화면에선 '한국어'
+    el('div', { class: 'nav-lang' }, languageMenu()),
   );
   document.body.prepend(nav);
+  applyI18n();
+  const idle = setupIdleReset();
+  // 테스트 단계: 90초를 기다리지 않고 자동 초기화 안내를 바로 띄워 본다 (오른쪽 끝). 배포 때는 IDLE_TEST_BUTTON 을 false 로
+  if (IDLE_TEST_BUTTON && idle) {
+    nav.append(el('button', { type: 'button', class: 'nav-idle-test', text: t('nav.idleTest'), title: t('nav.idleTestTitle'), onclick: idle.warnNow }));
+  }
+}
+
+const IDLE_TEST_BUTTON = true;
+
+// ---------- 키오스크 자동 초기화 ----------
+// 손님이 떠난 뒤 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않게, 한동안 조작이 없으면 안내 후 지우고 홈으로 간다.
+// - 대기 시간 기본 90초. 기기마다 바꾸려면 그 기기 브라우저에서 localStorage['took.idleSeconds'] = '120' (10초 이상)
+// - 안내가 뜬 뒤 15초 안에 '계속하기'나 화면 아무 곳을 누르면 그대로 이어서 쓴다
+// - 읽어주기·음성 듣기 중에는 기다린다. 홈에 지울 것이 없으면 아무것도 하지 않는다
+// - 직원용 화면(음성 정확도 측정·시연용 바코드)은 <body data-idle-reset="off"> 로 끈다
+const IDLE_DEFAULT_S = 90;
+const IDLE_WARN_S = 15;
+
+function idleSeconds() {
+  try {
+    const v = Number(localStorage.getItem('took.idleSeconds'));
+    if (v >= 10) return v;
+  } catch { /* 저장소를 못 쓰는 환경: 기본값 */ }
+  return IDLE_DEFAULT_S;
+}
+
+/** 저장한 상태를 모두 지우고 홈으로 (자동 초기화·'처음으로' 버튼) */
+export function resetToHome() {
+  store.clear();
+  location.href = 'index.html';
+}
+
+function hasSessionState() {
+  try {
+    return Object.keys(sessionStorage).some((k) => k.startsWith('took.') && k !== 'took.homeSkipIntro');
+  } catch { return false; }
+}
+
+function setupIdleReset() {
+  if (document.body.dataset.idleReset === 'off') return;
+  const onHome = /(^|\/)(index\.html)?$/.test(location.pathname);
+  let timer = null;
+  let dialog = null;
+  let countdown = null;
+  let busySince = 0;
+  // 읽어주는 중이거나 듣는 중(마이크 버튼에 listening 표시)이면 손님이 아직 있다.
+  // 다만 speechSynthesis.speaking 이 끝나지 않고 남는 브라우저가 있어, 이 이유로는 최대 60초만 미룬다
+  const busy = () => {
+    const now = !!window.speechSynthesis?.speaking || !!document.querySelector('.listening');
+    if (!now) { busySince = 0; return false; }
+    busySince ||= Date.now();
+    return Date.now() - busySince < 60000;
+  };
+
+  const schedule = () => {
+    clearTimeout(timer);
+    timer = setTimeout(onIdle, idleSeconds() * 1000);
+  };
+  const onIdle = () => {
+    if (document.hidden || busy() || (onHome && !hasSessionState())) return schedule();
+    showWarning();
+  };
+  const dismiss = () => {
+    clearInterval(countdown);
+    dialog?.remove();
+    dialog = null;
+    schedule();
+  };
+  // 안내: 글 대신 줄어드는 원 + 남은 초, 그리고 아이콘 버튼 두 개(손가락 = 계속, 집 = 처음으로).
+  // 자세한 설명은 화면 읽기 프로그램용으로만 둔다
+  function showWarning() {
+    let left = IDLE_WARN_S;
+    const num = el('span', { class: 'idle-num', 'aria-hidden': 'true', text: String(left) });
+    const desc = el('p', { id: 'idle-desc', class: 'sr-only' });
+    const update = () => {
+      num.textContent = String(left);
+      desc.textContent = t('idle.desc', { n: left });
+    };
+    update();
+    const ring = el('div', { class: 'idle-ring', style: `--idle-s: ${IDLE_WARN_S}s` });
+    ring.innerHTML = '<svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/><circle class="bar" cx="60" cy="60" r="52" pathLength="100"/></svg>';
+    ring.append(num);
+    const icon = (path) => {
+      const s = el('span', { class: 'idle-icon', 'aria-hidden': 'true' });
+      s.innerHTML = `<svg viewBox="0 0 24 24">${path}</svg>`;
+      return s;
+    };
+    const HAND = '<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V11m0-.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.2a5 5 0 0 1-4-2L4.6 15.6a1.5 1.5 0 0 1 2.3-1.9L9 16"/>';
+    const HOME = '<path d="M3 11 12 4l9 7M5.5 9.5V20h13V9.5M10 20v-5.5h4V20"/>';
+    const keep = el('button', { type: 'button', class: 'primary', 'aria-label': t('idle.keepAria'), onclick: dismiss }, icon(HAND), el('span', { text: t('idle.keep') }));
+    dialog = el('div', { class: 'idle-overlay', role: 'alertdialog', 'aria-modal': 'true', 'aria-label': t('idle.title'), 'aria-describedby': 'idle-desc',
+      // 안내 바깥을 눌러도 계속 쓰는 것으로 본다
+      onpointerdown: (e) => { if (e.target === dialog) dismiss(); } },
+    el('div', { class: 'idle-box' },
+      ring,
+      desc,
+      el('div', { class: 'idle-actions' }, keep,
+        el('button', { type: 'button', 'aria-label': t('idle.homeAria'), onclick: resetToHome }, icon(HOME), el('span', { text: t('idle.home') })))));
+    document.body.append(dialog);
+    keep.focus();
+    countdown = setInterval(() => {
+      left -= 1;
+      if (left <= 0) {
+        clearInterval(countdown);
+        resetToHome();
+      } else update();
+    }, 1000);
+  }
+
+  for (const type of ['pointerdown', 'keydown', 'touchstart', 'wheel', 'input']) {
+    window.addEventListener(type, () => { if (!dialog) schedule(); }, { capture: true, passive: true });
+  }
+  schedule();
+  // 테스트 버튼: 기다리지 않고 안내를 바로 띄운다 (지울 것이 없어도 띄운다)
+  return { warnNow: () => { if (!dialog) { clearTimeout(timer); showWarning(); } } };
 }

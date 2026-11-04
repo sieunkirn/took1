@@ -4,5 +4,6 @@ certs/
 dist/
 
 # 로컬 전용
+.env
 .claude/
 *.log

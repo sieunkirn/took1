@@ -8,14 +8,17 @@ import { join, extname, normalize, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { allProducts, findById, findByBarcode, normalizeBarcode } from './src/lib/repository.js';
 import { recommendByColor } from './src/lib/recommend.js';
-import { answer } from './src/lib/chat.js';
+import { hybridAnswer } from './src/lib/llm/agent.js';
+import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
 import { createSession, getSession, notify, poll, lanAddress } from './src/lib/pairing.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
+// .env (LLM 주소·키 등 서버 전용 설정). 없으면 규칙 챗봇만 쓴다
+if (existsSync(join(root, '.env'))) process.loadEnvFile(join(root, '.env'));
 const PUBLIC = join(root, 'public');
 const SHARED_LIB = join(root, 'src/lib'); // 브라우저에서 /lib/color.js 등으로 재사용
-const BROWSER_LIBS = new Set(['color.js', 'constants.js', 'catalog.js', 'recommend.js', 'chat.js', 'spoken.js']);
+const BROWSER_LIBS = new Set(['color.js', 'constants.js', 'catalog.js', 'recommend.js', 'chat.js', 'spoken.js', 'situations.js', 'aliases.js', 'chat-en.js']);
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -25,6 +28,8 @@ const MIME = {
   '.json': 'application/json; charset=utf-8',
   '.wasm': 'application/wasm',
   '.task': 'application/octet-stream',
+  '.svg': 'image/svg+xml', // 아바타 테스트 그림 (samples/)
+  '.png': 'image/png',
 };
 
 function sendJson(res, status, body) {
@@ -75,10 +80,8 @@ async function handleApi(req, res, url) {
   if (req.method === 'POST' && path === '/api/chat') {
     const body = await readBody(req);
     if (!body.message || typeof body.message !== 'string') return sendJson(res, 400, { error: 'message 가 필요합니다.' });
-    return sendJson(res, 200, {
-      engine: 'rule-based',
-      ...answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true }),
-    });
+    // 규칙 챗봇 먼저, 규칙이 뜻을 못 잡은 말만 LLM (설정했을 때). engine 으로 어느 쪽이 답했는지 알려 준다
+    return sendJson(res, 200, await hybridAnswer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true, lang: body.lang === 'en' ? 'en' : 'ko' }));
   }
   // ---------- 휴대폰 ↔ PC 연결 (QR) ----------
   if (req.method === 'POST' && path === '/api/pair') {
@@ -167,6 +170,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const scheme = useHttps ? 'https' : 'http';
   server.listen(port, '0.0.0.0', () => {
     console.log(`took(툭) 서버 실행: ${scheme}://localhost:${port}`);
+    console.log(llmEnabled() ? `  챗봇: 규칙 + LLM 보조 (${llmConfig().model})` : '  챗봇: 규칙만 (.env 에 LLM_BASE_URL·LLM_MODEL 을 넣으면 LLM 보조가 켜집니다)');
     for (const list of Object.values(networkInterfaces())) {
       for (const a of list || []) {
         if (a.family === 'IPv4' && !a.internal) console.log(`  같은 Wi-Fi 의 iPad 에서 접속: ${scheme}://${a.address}:${port}`);

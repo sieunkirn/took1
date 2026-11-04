@@ -5,6 +5,8 @@
 //  - 가격 숫자가 0에서 올라간다
 //  - toast(): 화면 아래에 잠깐 뜨는 알림, skeletonCards(): 불러오는 동안 보여 줄 회색 뼈대 카드
 // 동작 줄이기(prefers-reduced-motion) 설정이면 움직임 없이 결과만 보여 준다.
+import { priceText } from './i18n.js';
+
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- 카드·말풍선 차례로 떠오르기 ----------
@@ -60,7 +62,7 @@ function countUp(root) {
     const tick = (now) => {
       const t = Math.min(1, (now - start) / dur);
       const eased = 1 - (1 - t) ** 3;
-      span.textContent = Math.round(to * eased).toLocaleString('ko-KR') + '원';
+      span.textContent = priceText(Math.round(to * eased)); // 한국어 '13,000원', 영어 '₩13,000'
       if (t < 1 && span.isConnected) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);

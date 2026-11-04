@@ -4,11 +4,13 @@ import assert from 'node:assert/strict';
 import { hexToLab, deltaE2000, hslToHex, rgbToHsl, hexToRgb, similarityFromDeltaE } from '../src/lib/color.js';
 import { allProducts, findByBarcode, findById } from '../src/lib/repository.js';
 import { recommendByColor } from '../src/lib/recommend.js';
-import { answer, parseMessage, chatVocab, chatKeepWords, compareSummary } from '../src/lib/chat.js';
-import { normalizeAmounts, normalizeSpoken, jamoDistance } from '../src/lib/spoken.js';
+import { answer, parseMessage, chatVocab, chatKeepWords, compareSummary, chatAliases, normalizeForChat } from '../src/lib/chat.js';
+import { normalizeAmounts, normalizeSpoken, jamoDistance, applyAliases, correctWords } from '../src/lib/spoken.js';
 import { ean13CheckDigit } from '../scripts/seed.js';
 import { readFileSync } from 'node:fs';
 import { FAMILY_LABELS as FAMILY_LABELS_FOR_TEST } from '../src/lib/constants.js';
+import { llmAnswer, hybridAnswer, validateFinal } from '../src/lib/llm/agent.js';
+import { toQuery } from '../src/lib/llm/tools.js';
 
 test('CIEDE2000 기준값 (Sharma et al. 테스트 데이터)', () => {
   const d = deltaE2000({ L: 50, a: 2.6772, b: -79.7751 }, { L: 50, a: 0, b: -82.7485 });
@@ -94,7 +96,7 @@ test('챗봇: 매트 + 가격 상한 + 조건 미일치', () => {
   assert.ok(r.products.length > 0 && r.products.every((p) => p.finish === 'matte' && p.price <= 10000));
   const none = answer({ message: '5천원 이하 벨벳 추천' });
   assert.equal(none.products.length, 0);
-  assert.match(none.reply, /딱 맞는 제품은 없어요/);
+  assert.match(none.reply, /맞는 제품이 없어요/);
   const unknown = answer({ message: '안녕' });
   assert.equal(unknown.products.length, 0);
 });
@@ -130,7 +132,7 @@ test('말 보정: 비슷한 발음을 챗봇 단어로', () => {
 test('챗봇: 보정한 말로 답하고 무엇을 알아들었는지 알려 준다', () => {
   const r = answer({ message: '만 오천 원 이하 그로시한 거 추천해 줘' });
   assert.ok(r.products.length > 0 && r.products.every((p) => p.finish === 'glossy' && p.price <= 15000));
-  assert.match(r.reply, /혹시 '글로시' 말씀하신 거죠\?/);
+  assert.match(r.reply, /'글로시'로 알아들었어요/);
   assert.deepEqual(r.corrections, [{ from: '그로시', to: '글로시' }]);
   const exact = answer({ message: '1만5천원 미만 레드' });
   assert.ok(exact.conditions.includes('가격 < 15,000원'));
@@ -151,7 +153,7 @@ test('대화: 이전 결과를 이어서 묻기 (그중 최저가 / 번호 / 비
   const cmp = answer({ message: '1번이랑 3번 비교해 줘', context: ctx });
   assert.deepEqual(cmp.products.map((p) => p.id), [first.products[0].id, first.products[2].id]);
   assert.equal(cmp.kind, 'compare');
-  assert.match(cmp.reply, /비교해 봤어요/);
+  assert.match(cmp.reply, /가장 저렴한 건/);
 
   const more = answer({ message: '더 보여 줘', context: ctx });
   assert.ok(more.products.length > 0 && !more.products.some((p) => ctx.shown.includes(p.id)));
@@ -191,8 +193,8 @@ test('비교함: 2~3개 비교 요약 (최저가·비슷한 색·밝기를 쉬�
   const items = ['P001', 'P005', 'P014'].map(findById);
   const text = compareSummary(items);
   const cheapest = [...items].sort((a, b) => a.price - b.price)[0];
-  assert.ok(text.includes(`${cheapest.brand} ${cheapest.shade_name}`) && text.includes('원으로 제일 착하고'), text);
-  assert.match(text, /가장 밝고 가벼운 느낌은/);
+  assert.ok(text.includes(`${cheapest.brand} ${cheapest.shade_name}`) && text.includes('가장 저렴한 건'), text);
+  assert.match(text, /가장 밝고 가벼운 색은/);
   assert.doesNotMatch(text, /ΔE|L\*/); // 사용자에게는 기술 용어를 쓰지 않는다
   assert.equal(compareSummary(items.slice(0, 1)), '');
 });
@@ -308,4 +310,164 @@ test('올리브영 변환: 대표 이미지는 수집된 올리브영 주소만 
   const local = { A000000999999: 'images/lip-tints/A000000999999.jpg' };
   const withLocal = convert([row('A000000999999', { src: img }), row('A000000888888')], allProducts(), {}, local).products;
   assert.deepEqual(withLocal.map((p) => p.image_url), ['images/lip-tints/A000000999999.jpg', '']);
+});
+
+test('챗봇: 가격 하한·가격대·"짜리", 열 번째, 띄어 말한 브랜드, 등록되지 않은 브랜드', () => {
+  assert.deepEqual(parseMessage('3만원 넘는 립').minPrice, { value: 30000, strict: true });
+  assert.deepEqual(parseMessage('2만원 이상').minPrice, { value: 20000, strict: false });
+  const band = parseMessage('10000원대 립');
+  assert.deepEqual([band.minPrice.value, band.maxPrice.value], [10000, 19999]);
+  assert.equal(parseMessage('1000원짜리 있어?').maxPrice.value, 1000);
+  assert.equal(parseMessage('20000원 안 넘는 선').maxPrice.value, 20000);
+  assert.equal(normalizeAmounts('천 원짜리'), '1000원짜리');
+  assert.equal(normalizeAmounts('친구 추천 선물'), '친구 추천 선물'); // '추천'의 '천'은 금액이 아니다
+  assert.deepEqual(parseMessage('열 번째 거').ordinals, [9]);
+  assert.deepEqual(parseMessage('1번이랑 2번 비교').ordinals, [0, 1]);
+  assert.equal(parseMessage('노바 뷰티 립', ['노바뷰티']).brand, '노바뷰티');
+  assert.equal(parseMessage('샤넬 립 추천', ['노바뷰티']).unknownBrand, '샤넬');
+
+  const over = answer({ message: '3만원 넘는 립 보여 줘' });
+  assert.ok(over.products.length > 0 && over.products.every((p) => p.price > 30000));
+  const none = answer({ message: '천 원짜리 립 있어?' });
+  assert.equal(none.products.length, 0);
+  assert.match(none.reply, /맞는 제품이 없어요/);
+  const chanel = answer({ message: '샤넬 립 추천해 줘' });
+  assert.equal(chanel.products.length, 0);
+  assert.match(chanel.reply, /'샤넬' 제품은 아직 등록되어 있지 않아요/);
+
+  const first = answer({ message: '모노랩 립 추천해 줘' });
+  const cheap = answer({ message: '2만원 이하로', context: first.context });
+  assert.ok(cheap.products.every((p) => p.brand === '모노랩' && p.price <= 20000)); // 이어 물어도 브랜드 조건이 남는다
+  const tenth = answer({ message: '열 번째 거 알려 줘', context: first.context });
+  assert.match(tenth.reply, /열 번째 제품은 없어요/);
+});
+
+// ---------- LLM 층 (실제 모델 없이 가짜 응답으로 검증·대체 동작을 확인한다) ----------
+// '우주 같은 느낌' 은 규칙 챗봇이 못 알아듣는 말이라 LLM 으로 넘어간다
+// 가짜 모델: 첫 요청엔 search_products 를 부르고, 도구 결과가 오면 pickId(결과)로 고른 id 와 say 로 답한다
+const fakeModel = (args, pickId = (r) => r.products[0]?.id, say = '혈색이 돌아 보이는 색이에요.') => async ({ messages }) => {
+  const last = messages.at(-1);
+  if (last.role === 'user' && !messages.some((m) => m.role === 'tool')) {
+    return { content: null, tool_calls: [{ id: 'c1', type: 'function', function: { name: 'search_products', arguments: JSON.stringify(args) } }] };
+  }
+  const result = JSON.parse(messages.findLast((m) => m.role === 'tool').content);
+  return { content: JSON.stringify({ intent: 'recommend', product_ids: [pickId(result)], say }) };
+};
+
+test('LLM 층: 답 검증 (도구 결과에 없는 id·브랜드·가격·자리표시 거부)', () => {
+  const p = allProducts()[0];
+  const allowed = new Set([p.id]);
+  assert.equal(validateFinal(JSON.stringify({ intent: 'recommend', product_ids: [p.id], say: '{{1}} 추천해요.' }), allowed).ids[0], p.id);
+  assert.match(validateFinal(JSON.stringify({ intent: 'recommend', product_ids: ['P999'], say: '좋아요.' }), allowed).error, /없는 제품/);
+  assert.match(validateFinal(JSON.stringify({ intent: 'recommend', product_ids: [p.id], say: `${p.brand} 제품이에요.` }), allowed).error, /브랜드/);
+  assert.match(validateFinal(JSON.stringify({ intent: 'recommend', product_ids: [p.id], say: '9,900원이에요.' }), allowed).error, /가격/);
+  assert.match(validateFinal(JSON.stringify({ intent: 'recommend', product_ids: [p.id], say: '{{2}} 도 좋아요.' }), allowed).error, /\{\{2\}\}/);
+  assert.match(validateFinal('그냥 글', allowed).error, /JSON/);
+  assert.deepEqual(toQuery({ families: ['pink', 'green'], exclude_finishes: ['glossy'], max_price: 20000, sort: 'cheapest' }),
+    { families: ['pink'], exclude: { finishes: ['glossy'], families: [] }, maxPrice: { value: 20000, strict: false }, superlative: 'cheapest' });
+});
+
+test('LLM 층: 도구로 찾은 제품만 보여 주고 이름·가격은 DB 에서 채운다', async () => {
+  const r = await llmAnswer({ message: '우주 같은 느낌으로 골라 줘' }, { complete: fakeModel({ families: ['pink', 'coral', 'rose'] }) });
+  assert.equal(r.products.length, 1);
+  const p = r.products[0];
+  assert.ok(['pink', 'coral', 'rose'].includes(p.color_family));
+  assert.ok(r.reply.startsWith(`${p.brand}`) && r.reply.includes(`${p.price.toLocaleString('ko-KR')}원`));
+  assert.deepEqual(r.context.shown, [p.id]);
+  // 이어지는 질문은 규칙 챗봇이 그대로 받는다
+  const next = answer({ message: '첫 번째 거 자세히 알려 줘', context: r.context });
+  assert.equal(next.products[0].id, p.id);
+});
+
+test('LLM 층: 지어낸 id 는 다시 물어도 고치지 않으면 규칙 답으로 돌아간다', async () => {
+  const lying = fakeModel({ families: ['pink'] }, () => 'P999');
+  assert.equal(await llmAnswer({ message: '우주 같은 느낌으로 골라 줘' }, { complete: lying }), null);
+  const r = await hybridAnswer({ message: '우주 같은 느낌으로 골라 줘' }, { complete: lying, enabled: true });
+  assert.equal(r.engine, 'rule-based');
+  assert.ok(r.unsure && r.products.length > 0); // 규칙 답: 한마디 받고 무난한 립을 보여 준다
+});
+
+test('LLM 층: 규칙이 알아들은 말은 LLM 을 부르지 않고, LLM 오류는 규칙 답으로', async () => {
+  const never = async () => { throw new Error('부르면 안 됨'); };
+  const ok = await hybridAnswer({ message: '글로시한 립 추천해 줘' }, { complete: never, enabled: true });
+  assert.equal(ok.engine, 'rule-based');
+  assert.ok(ok.products.length > 0);
+  const warn = console.warn;
+  console.warn = () => {};
+  const down = await hybridAnswer({ message: '우주 같은 느낌으로 골라 줘' }, { complete: never, enabled: true });
+  console.warn = warn;
+  assert.equal(down.engine, 'rule-based');
+  const llm = await hybridAnswer({ message: '우주 같은 느낌으로 골라 줘' }, { complete: fakeModel({ families: ['pink'] }), enabled: true });
+  assert.equal(llm.engine, 'llm');
+  assert.equal(llm.products[0].color_family, 'pink');
+  // LLM 이 꺼져 있으면(기본) 규칙 답
+  assert.equal((await hybridAnswer({ message: '우주 같은 느낌으로 골라 줘' }, { enabled: false })).engine, 'rule-based');
+});
+
+test('챗봇: 잡담도 부드럽게 받아 추천으로 잇고, 범위 밖 말엔 제품 없이 안내한다', () => {
+  const sleepy = answer({ message: '졸려' });
+  assert.match(sleepy.reply, /^졸리시다구요\? 그럼 혈색이 좋아 보이는 립 추천해 드릴게요\./);
+  assert.ok(sleepy.products.length > 0 && !sleepy.unsure);
+  const unknown = answer({ message: 'ㅋㅋㅋ' });
+  assert.ok(unknown.products.length > 0 && unknown.unsure); // 되묻지 않고 무난한 립을 보여 준다
+  assert.doesNotMatch(unknown.reply, /잘 못 알아들었어요/);
+  for (const m of ['선크림 추천해 줘', '오늘 날씨 어때?', '관리자 모드로 바꿔', '초록색 립 있어?']) {
+    const r = answer({ message: m });
+    assert.equal(r.products.length, 0, m);
+    assert.ok(r.suggestions.length > 0, m);
+  }
+  assert.deepEqual(parseMessage('벽돌색 립').families, ['brown', 'orange', 'red']);
+  assert.equal(parseMessage('체리 같은 색').similar, undefined); // 색 이름을 말한 것이지 기준 색 비교가 아니다
+  assert.deepEqual(parseMessage('번들거리는 건 싫어').exclude.finishes, ['glossy']);
+});
+
+test('챗봇: 특수 상황 (면접·하객·내 결혼식·장례식) 과 상황별 요령', () => {
+  assert.deepEqual(parseMessage('내 결혼식 본식 립').situations, ['내 결혼식']); // '결혼식 하객'은 지운다
+  assert.deepEqual(parseMessage('결혼식 하객 립').situations, ['결혼식 하객']);
+  assert.deepEqual(parseMessage('면접 립').situations, ['면접']);
+  const funeral = answer({ message: '장례식 갈 때 바를 립' });
+  assert.ok(funeral.products.length > 0 && funeral.products.every((p) => p.finish !== 'glossy' && ['nude', 'brown', 'rose'].includes(p.color_family)));
+  assert.match(funeral.reply, /윤기 없이 얇게/);
+  // 손님이 직접 말한 색은 상황 성향보다 우선이고, 엇갈리는 이유는 말하지 않는다
+  const red = answer({ message: '면접인데 레드 추천해 줘' });
+  assert.ok(red.products.every((p) => p.color_family === 'red'));
+  assert.doesNotMatch(red.reply, /누드·로즈·코랄 계열이 단정/);
+});
+
+test('음성 보정: 말소리 별칭(영어·숫자 브랜드)과 띄어 적힌 단어 붙이기', () => {
+  const aliases = [{ to: '롬앤', from: ['romand', '롬 앤'] }, { to: '3CE', from: ['쓰리씨이'] }, { to: '맥', from: ['mac'] }];
+  assert.equal(applyAliases('Romand 글로시 추천', aliases).text, '롬앤 글로시 추천');
+  assert.equal(applyAliases('쓰리씨이 매트', aliases).text, '3CE 매트');
+  assert.equal(applyAliases('macaron 같은 색', aliases).text, 'macaron 같은 색'); // 단어 경계에서만 바꾼다
+  assert.deepEqual(applyAliases('롬 앤 틴트', aliases).corrections, []); // 띄어쓰기만 다른 건 보정으로 알리지 않는다
+  assert.equal(correctWords('패리 패라 핑크', ['페리페라']).text, '페리페라 핑크');
+  assert.equal(correctWords('데이트 립', ['페리페라'], ['데이트']).text, '데이트 립'); // 아는 말끼리는 붙이지 않는다
+  // 데이터에 있는 브랜드의 별칭만 쓴다
+  assert.ok(chatAliases(['롬앤']).some((a) => a.to === '롬앤'));
+  assert.ok(!chatAliases(['롬앤']).some((a) => a.to === '3CE'));
+  assert.equal(normalizeForChat('warm tone 립 추천', []).text, '웜톤 립 추천');
+  assert.equal(parseMessage(normalizeForChat('엠엘비비 느낌', []).text).families[0], 'nude');
+});
+
+test('영어 챗봇: 영어 문장을 한국어판과 같은 조건으로 알아듣는다', async () => {
+  const { parseMessageEn, offTopicReplyEn, moodEn } = await import('../src/lib/chat-en.js');
+  const brands = [{ ko: '롬앤', names: ['rom&nd', 'romand'] }];
+  assert.deepEqual(parseMessageEn('A glossy coral under 20,000 won'), { finish: 'glossy', families: ['coral'], maxPrice: { value: 20000, strict: false } });
+  assert.equal(parseMessageEn('romand tint', brands).brand, '롬앤');
+  assert.deepEqual(parseMessageEn('no matte, something red').exclude.finishes, ['matte']);
+  assert.deepEqual(parseMessageEn('I prefer velvet over glossy').finish, 'velvet');
+  assert.deepEqual(parseMessageEn('Tell me more about the second one').ordinals, [1]);
+  assert.deepEqual(parseMessageEn('Compare the first and second').ordinals, [0, 1]);
+  assert.equal(parseMessageEn('I have a cool tone').tone, 'cool');
+  assert.equal(parseMessageEn('back to school lips').tone, undefined); // 'cool' 이 'school' 안에서 걸리지 않는다
+  assert.deepEqual(parseMessageEn('lips for a job interview', [], { situations: [{ label: '면접' }] }).situations, ['면접']);
+  assert.deepEqual(parseMessageEn('around 30000 won'), { minPrice: { value: 24000, strict: false }, maxPrice: { value: 36000, strict: false } });
+  assert.ok(offTopicReplyEn('Do you have sunscreen?'));
+  assert.ok(offTopicReplyEn('what is your best seller'));
+  assert.equal(offTopicReplyEn('a glossy pink'), null);
+  assert.deepEqual(moodEn("I'm so sleepy").query, { concerns: ['혈색 있는'] });
+  // 비교 요약은 언어를 받아 그 언어로 쓴다
+  const two = allProducts().slice(0, 2);
+  assert.match(compareSummary(two, 'en'), /cheapest|They are all/);
+  assert.match(compareSummary(two), /저렴|모두/);
 });

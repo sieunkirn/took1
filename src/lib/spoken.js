@@ -6,9 +6,10 @@
 // ---------- 금액 ----------
 const KO_DIGIT = { 일: 1, 한: 1, 이: 2, 두: 2, 삼: 3, 세: 3, 사: 4, 네: 4, 오: 5, 육: 6, 칠: 7, 팔: 8, 구: 9 };
 const NUM = '(?:\\d+(?:[.,]\\d+)?|[일한이두삼세사네오육칠팔구])';
-const LIMIT = '(?=\\s*(?:이하|미만|아래|까지|이내|정도|대|짜리|선))';
+const LIMIT = '(?=\\s*(?:이하|미만|아래|까지|이내|정도|대|짜리|선|이상|넘|초과|부터|안\\s*넘))';
 // [N]만 [M]천 [원] / N천 [원] — 뒤에 이하·미만 같은 말이 올 때만 금액으로 본다 ("만들어" 같은 말은 건드리지 않음)
-const AMOUNT_RE = new RegExp(`(${NUM})?\\s*만\\s*(?:(${NUM})\\s*천)?\\s*원?${LIMIT}|(${NUM})\\s*천\\s*원?${LIMIT}`, 'g');
+// 숫자 없는 "천 원"은 '원'까지 있어야 금액으로 본다 ("추천 선물"의 '천'을 금액으로 읽지 않게)
+const AMOUNT_RE = new RegExp(`(${NUM})?\\s*만\\s*(?:(${NUM})\\s*천)?\\s*원?${LIMIT}|(${NUM})\\s*천\\s*원?${LIMIT}|(?<![가-힣])천\\s*원${LIMIT}`, 'g');
 
 const numOf = (s, fallback) => {
   if (s === undefined || s === '') return fallback;
@@ -17,7 +18,8 @@ const numOf = (s, fallback) => {
 
 export function normalizeAmounts(text) {
   return text.replace(AMOUNT_RE, (m, man, chunInMan, chun) => {
-    const value = chun !== undefined
+    const value = /^천\s*원$/.test(m) ? 1000
+      : chun !== undefined
       ? numOf(chun, 1) * 1000
       : numOf(man, 1) * 10000 + (chunInMan !== undefined ? numOf(chunInMan, 1) * 1000 : 0);
     return Number.isFinite(value) ? `${Math.round(value)}원` : m;
@@ -94,6 +96,7 @@ export function correctWords(text, vocab, keep = []) {
   const words = vocab.filter(isHangul);
   const known = [...words, ...keep.filter(isHangul)];
   const corrections = [];
+  text = joinSplitWords(text, words, known, corrections);
   const tokens = text.split(/(\s+)/).map((token) => {
     if (!/[가-힣]/.test(token) || known.some((w) => token.includes(w))) return token;
     let best = null;
@@ -113,7 +116,66 @@ export function correctWords(text, vocab, keep = []) {
   return { text: tokens.join(''), corrections };
 }
 
-/** 금액 정리 + 발음 보정을 한 번에 */
-export function normalizeSpoken(text, vocab, keep = []) {
-  return correctWords(normalizeAmounts(String(text || '')), vocab, keep);
+// 음성 인식이 한 단어를 띄어 적은 경우("패리 패라", "컬러 그램")를 붙여서 어휘 단어(세 글자 이상)로 고친다.
+// 두 토막 모두 이미 아는 말이면 건드리지 않는다
+function joinSplitWords(text, words, known, corrections) {
+  const long = words.filter((w) => w.length >= 3);
+  const parts = text.split(/\s+/).filter(Boolean);
+  const out = [];
+  for (let i = 0; i < parts.length; i++) {
+    const a = parts[i], b = parts[i + 1];
+    const joinable = b && /^[가-힣]+$/.test(a) && /^[가-힣]/.test(b)
+      && !known.some((w) => a.includes(w)) && !known.some((w) => b.includes(w));
+    let hit = null;
+    if (joinable) {
+      const joined = a + b;
+      // 두 토막을 이은 앞부분이 어휘 단어와 비슷하면 그 단어로 (뒤에 붙은 조사·말은 그대로)
+      for (let k = Math.min(joined.length, 6); k > a.length; k--) {
+        const head = joined.slice(0, k);
+        if (!isHangul(head)) continue;
+        for (const w of long) {
+          if (Math.abs(w.length - head.length) > 1) continue;
+          const dist = jamoDistance(head, w);
+          if (dist <= allowed(w) && (!hit || dist < hit.dist)) hit = { head, w, dist, rest: joined.slice(k) };
+        }
+      }
+    }
+    if (hit) {
+      if (hit.head !== hit.w) corrections.push({ from: `${a} ${b}`, to: hit.w }); // 띄어쓰기만 다른 건 보정으로 알리지 않는다
+      out.push(hit.w + hit.rest);
+      i++;
+    } else out.push(a);
+  }
+  return out.join(' ');
+}
+
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/**
+ * 말소리 별칭을 챗봇이 아는 말로 바꾼다 ("romand" → "롬앤", "쓰리씨이" → "3CE").
+ * 영어 별칭은 단어 경계에서만(대소문자 무시), 한글 별칭은 단어 첫머리에서만 바꾼다.
+ * @param {{ to: string, from: string[] }[]} aliases
+ */
+export function applyAliases(text, aliases = []) {
+  const corrections = [];
+  // 긴 별칭부터 ("too cool for school" 을 "cool" 보다 먼저)
+  const pairs = aliases.flatMap(({ to, from }) => from.map((f) => ({ to, f }))).sort((x, y) => y.f.length - x.f.length);
+  for (const { to, f } of pairs) {
+    const ascii = /^[\x20-\x7e]+$/.test(f);
+    const re = ascii
+      ? new RegExp(`(^|[^a-z0-9])${escapeRe(f)}(?![a-z0-9])`, 'gi')
+      : new RegExp(`(^|\\s)${escapeRe(f)}`, 'g');
+    text = text.replace(re, (m, pre) => {
+      const from = m.slice(pre.length);
+      if (from.replace(/\s/g, '').toLowerCase() !== to.toLowerCase()) corrections.push({ from, to }); // 띄어쓰기만 다른 건 알리지 않는다
+      return pre + to;
+    });
+  }
+  return { text, corrections };
+}
+
+/** 말소리 별칭 + 금액 정리 + 발음 보정을 한 번에 */
+export function normalizeSpoken(text, vocab, keep = [], aliases = []) {
+  const a = applyAliases(normalizeAmounts(String(text || '')), aliases);
+  const r = correctWords(a.text, vocab, keep);
+  return { text: r.text, corrections: [...a.corrections, ...r.corrections] };
 }

@@ -3,34 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>took(툭) - 제품 상세</title>
+<title data-i18n="detail.pageTitle">took(툭) - 제품 상세</title>
 <link rel="stylesheet" href="css/wireframe.css">
 </head>
 <body>
 <main>
-  <h1>제품 상세 정보</h1>
+  <h1 data-i18n="detail.title">제품 상세 정보</h1>
   <div class="grid-2">
     <section class="area">
-      <div class="label">제품 이미지 영역</div>
-      <div class="placeholder" style="aspect-ratio:1/1">제품 이미지 플레이스홀더</div>
+      <div class="label" data-i18n="detail.imageArea">제품 이미지 영역</div>
+      <div class="placeholder" style="aspect-ratio:1/1" data-i18n="detail.imagePlaceholder">제품 이미지 플레이스홀더</div>
     </section>
     <section class="area">
-      <div class="label">제품 정보 영역</div>
-      <div id="product-info" class="muted">불러오는 중...</div>
+      <div class="label" data-i18n="detail.infoArea">제품 정보 영역</div>
+      <div id="product-info" class="muted" data-i18n="detail.loading">불러오는 중...</div>
     </section>
   </div>
   <section class="area">
-    <div class="label">연결 기능</div>
+    <div class="label" data-i18n="detail.actions">연결 기능</div>
     <div class="row">
-      <button type="button" id="back">이전 화면으로</button>
-      <button type="button" id="to-chat">이 제품으로 챗봇에 질문하기</button>
-      <button type="button" id="to-similar">비슷한 색상 제품 보기</button>
-      <a href="index.html">홈으로 돌아가기</a>
+      <button type="button" id="back" data-i18n="detail.back">이전 화면으로</button>
+      <button type="button" id="to-chat" data-i18n="detail.toChat">이 제품으로 챗봇에 질문하기</button>
+      <button type="button" id="to-similar" data-i18n="detail.toSimilar">비슷한 색상 제품 보기</button>
+      <a href="index.html" data-i18n="detail.home">홈으로 돌아가기</a>
     </div>
   </section>
 </main>
 <script type="module">
   import { renderNav, api, qs, go, store, productDetailTable, el } from './js/common.js';
+  import { t } from './js/i18n.js';
   renderNav();
   const id = qs('id');
   const from = qs('from');
@@ -42,9 +43,9 @@
     else if (history.length > 1) history.back();
     else location.href = 'index.html';
   });
-  const { ok, body } = id ? await api('api/products/' + encodeURIComponent(id)) : { ok: false, body: { error: '제품 ID 가 없습니다.' } };
+  const { ok, body } = id ? await api('api/products/' + encodeURIComponent(id)) : { ok: false, body: { error: t('detail.noId') } };
   if (!ok) {
-    info.replaceChildren(el('p', { class: 'msg', text: body.error || '제품을 찾을 수 없습니다.' }));
+    info.replaceChildren(el('p', { class: 'msg', text: body.error || t('detail.notFound') }));
     buttons.forEach((b) => (b.disabled = true));
   } else {
     const p = body.product;

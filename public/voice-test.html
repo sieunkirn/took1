@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 음성 인식 정확도 측정</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<style>
+  /* 측정 표: 좁은 화면(iPad 세로)에서도 가로로 넘치지 않게 칸 안에서 줄을 바꾼다 */
+  .vt-table td, .vt-table th { overflow-wrap: anywhere; }
+  .vt-table td:first-child { width: 2.5em; color: var(--mute); }
+  .vt-table button { min-height: 40px; white-space: nowrap; }
+  .vt-table tr.listening { background: var(--soft); }
+  .vt-sum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 12px 0; }
+  .vt-sum div { border: 1px solid var(--line, #ccc); border-radius: 12px; padding: 10px 12px; }
+  .vt-sum strong { display: block; font-size: 22px; }
+  .vt-wrap { overflow-x: auto; }
+</style>
+</head>
+<body data-idle-reset="off"> <!-- 직원용 화면: 키오스크 자동 초기화를 끈다 -->
+<main>
+  <h1>음성 인식 정확도 측정 <span class="muted small">(테스트용)</span></h1>
+  <p class="muted">키오스크로 쓸 iPad 에서 열고, 문장마다 <strong>말하기</strong>를 눌러 화면의 문장을 그대로 읽어 주세요.
+    챗봇과 같은 음성 인식·보정을 거쳐 <strong>들은 말</strong>, <strong>글자 정확도</strong>, <strong>뜻 일치</strong>(챗봇이 같은 조건으로 알아들었는지)를 기록합니다.
+    다 읽은 뒤 <strong>결과 내려받기</strong>로 받은 파일을 개발 쪽에 전달하면, 자주 틀리는 말을 보정 사전에 넣습니다.</p>
+  <p id="vt-support" class="msg hidden"></p>
+
+  <div class="vt-sum" id="vt-sum"></div>
+
+  <div class="row">
+    <button type="button" id="vt-download">결과 내려받기 (JSON)</button>
+    <button type="button" id="vt-copy">결과 복사</button>
+    <button type="button" id="vt-clear">결과 지우기</button>
+    <span id="vt-msg" class="muted small" aria-live="polite"></span>
+  </div>
+
+  <form id="vt-add" class="row" autocomplete="off" style="margin-top: 12px">
+    <label for="vt-new" class="small">읽을 문장 추가</label>
+    <input type="text" id="vt-new" placeholder="예: 라카 프루티 글램 틴트 추천해 줘" style="flex: 1; min-width: 200px">
+    <button type="submit">추가</button>
+  </form>
+
+  <div class="vt-wrap">
+    <table class="vt-table">
+      <thead><tr><th>#</th><th>읽을 문장</th><th></th><th>들은 말 → 챗봇이 이해한 말</th><th>글자 정확도</th><th>뜻 일치</th></tr></thead>
+      <tbody id="vt-rows"></tbody>
+    </table>
+  </div>
+</main>
+<script type="module" src="js/voice-test.js"></script>
+</body>
+</html>
