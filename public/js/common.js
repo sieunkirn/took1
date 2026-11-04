@@ -225,6 +225,21 @@ export function renderNav() {
   );
   document.body.prepend(nav);
   applyI18n();
+  // 가로·세로 바꿔 보기 (테스트 단계, 직원용): 가로 화면에서는 '세로로 보기' → 세로 미리보기(portrait.html)로 지금 화면을 연다.
+  // 세로 미리보기 안에서는 '가로로 보기' → 미리보기를 닫고 지금 화면으로 돌아간다. 실제로 세워 둔 iPad 에서는 버튼을 숨긴다
+  if (ORIENT_BUTTON) {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    const inPreview = window.top !== window && /portrait\.html$/.test(window.top.location.pathname);
+    if (inPreview || matchMedia('(orientation: landscape)').matches) {
+      nav.append(el('button', {
+        type: 'button', class: 'nav-orient', text: t(inPreview ? 'nav.landscape' : 'nav.portrait'), title: t(inPreview ? 'nav.landscapeTitle' : 'nav.portraitTitle'),
+        onclick: () => {
+          if (inPreview) window.top.location.href = page;
+          else location.href = 'portrait.html?page=' + encodeURIComponent(page);
+        },
+      }));
+    }
+  }
   const idle = setupIdleReset();
   // 테스트 단계: 90초를 기다리지 않고 자동 초기화 안내를 바로 띄워 본다 (오른쪽 끝). 배포 때는 IDLE_TEST_BUTTON 을 false 로
   if (IDLE_TEST_BUTTON && idle) {
@@ -233,6 +248,7 @@ export function renderNav() {
 }
 
 const IDLE_TEST_BUTTON = true;
+const ORIENT_BUTTON = true; // 가로·세로 바꿔 보기 버튼 (배포 때 false 로)
 
 // ---------- 키오스크 자동 초기화 ----------
 // 손님이 떠난 뒤 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않게, 한동안 조작이 없으면 안내 후 지우고 홈으로 간다.

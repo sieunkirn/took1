@@ -91,6 +91,15 @@
     fit();
   });
   addEventListener('resize', fit);
+  // 상단 '세로로 보기' 버튼으로 오면 그 화면부터 (?page=palette.html). 안에서 메뉴로 다른 화면에 가면 고르기 칸도 따라 바뀐다
+  const start = new URLSearchParams(location.search).get('page');
+  if (start && [...$('pv-page').options].some((o) => o.value === start)) $('pv-page').value = start;
+  frame.addEventListener('load', () => {
+    try {
+      const now = frame.contentWindow.location.pathname.split('/').pop() || 'index.html';
+      if ([...$('pv-page').options].some((o) => o.value === now)) $('pv-page').value = now;
+    } catch { /* 다른 주소 */ }
+  });
   setMode(mode);
   frame.src = $('pv-page').value;
 </script>

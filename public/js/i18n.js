@@ -28,6 +28,7 @@ export function setLang(next, { skipIntro = true } = {}) {
 const STRINGS = {
   ko: {
     'nav.reset': 'took(초기화)', 'nav.home': '홈', 'nav.palette': '팔레트', 'nav.chat': 'AI 뷰티 챗봇',
+    'nav.portrait': '세로로 보기', 'nav.portraitTitle': 'iPad 를 세웠을 때 화면으로 바꿔 봅니다', 'nav.landscape': '가로로 보기', 'nav.landscapeTitle': 'iPad 를 눕혔을 때 화면으로 돌아갑니다',
     'nav.idleTest': '자동 초기화 테스트', 'nav.idleTestTitle': '조작이 없을 때 뜨는 안내를 바로 띄웁니다',
     'idle.title': '계속 이용하시나요?', 'idle.desc': '{n}초 뒤 처음 화면으로 돌아가요. 지금까지의 대화와 고른 색은 지워져요.',
     'idle.keep': '계속', 'idle.keepAria': '계속 이용하기', 'idle.home': '처음으로', 'idle.homeAria': '처음 화면으로',
@@ -137,6 +138,7 @@ const STRINGS = {
   },
   en: {
     'nav.reset': 'took (reset)', 'nav.home': 'Home', 'nav.palette': 'Palette', 'nav.chat': 'AI Beauty Chat',
+    'nav.portrait': 'Portrait view', 'nav.portraitTitle': 'Preview the screen with the iPad upright', 'nav.landscape': 'Landscape view', 'nav.landscapeTitle': 'Back to the screen with the iPad lying flat',
     'nav.idleTest': 'Test auto reset', 'nav.idleTestTitle': 'Show the idle notice now',
     'idle.title': 'Still there?', 'idle.desc': 'Going back to the start in {n} seconds. Your chat and chosen colors will be cleared.',
     'idle.keep': 'Continue', 'idle.keepAria': 'Keep using', 'idle.home': 'Start over', 'idle.homeAria': 'Back to the start screen',

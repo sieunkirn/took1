@@ -443,7 +443,7 @@ table th, table td { border-bottom-color: var(--line); }
 .chat-log .user .suggest button { color: var(--ink); }
 .chat-log .suggest button:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
 /* 자동 초기화 테스트 버튼: 상단 메뉴 오른쪽 끝 (테스트 단계에만) */
-header.nav .nav-idle-test { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+header.nav .nav-idle-test, header.nav .nav-orient { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; }
 /* 언어 전환 버튼: 메뉴 오른쪽으로 밀고, 눈에 띄게 테두리 */
 header.nav .nav-lang { margin-left: auto; }
 /* 언어 선택 메뉴 (i18n.js languageMenu): 🌐 Language ▾ 를 누르면 아래에 말풍선처럼 목록이 열린다 */
