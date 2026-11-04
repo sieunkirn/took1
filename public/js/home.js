@@ -63,7 +63,13 @@ function cleanupIntro() {
   introBox?.remove();
   introBox = null;
 }
-const skip = () => finishIntro();
+// 인트로를 시작·건너뛰는 터치는 그 뒤에 따라오는 click 이 아래의 큰 took. 동그라미(링크)를 누르지 않게 한 번 삼킨다
+function swallowNextClick() {
+  const block = (e) => { e.preventDefault(); e.stopPropagation(); };
+  addEventListener('click', block, { capture: true, once: true });
+  setTimeout(() => removeEventListener('click', block, true), 700);
+}
+const skip = () => { swallowNextClick(); finishIntro(); };
 
 const run =(node, frames, opts) => {
   const an = node.animate(frames, { fill: 'both', ...opts });
@@ -90,6 +96,7 @@ function waitForTouch() {
       if (e.target?.closest?.('.intro-lang') || langWrap.contains(document.activeElement)) return;
       e.preventDefault();
       e.stopPropagation();
+      if (e.type === 'pointerdown') swallowNextClick();
       langWrap.remove();
       introBox.removeEventListener('pointerdown', go);
       removeEventListener('keydown', go, true);

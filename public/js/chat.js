@@ -11,6 +11,7 @@ import { isEn, lang as uiLang, t as tr, finishText as finishName } from './i18n.
 // 화면 문구: C(한국어, 영어). 챗봇 답은 서버(엔진)가 같은 언어로 만든다
 const C = (ko, en) => (isEn() ? en : ko);
 import { setupVoiceInput, setupSpeaker, spokenReply } from './voice.js';
+import { listenNfc, normalizeTag, resolveTag } from './nfc.js';
 import { createBarcodeScanner, cameraErrorMessage, decodeImageFile, loadZXing } from './barcode-scan.js';
 
 renderNav();
@@ -18,6 +19,9 @@ const $ = (id) => document.getElementById(id);
 // 합본 화면(studio.html): 오른쪽 탭(색 조제·챗봇·추천·바코드)이 보이는 영역을 정하고, 립 매핑(lip.js)과 창 이벤트로 주고받는다
 //   받음: took:color { hex } / took:recommend { hex }   보냄: took:apply { hex, finish } / took:show-tab { tab }
 const STUDIO = document.body.dataset.layout === 'studio';
+// 챗봇 화면의 바코드 찾기 패널: 지금은 뺀다 (오른쪽 패널은 추천 제품만). 다시 쓰려면 true 로 바꾼다.
+// 합본 화면(studio)은 이 값과 상관없이 바코드를 그대로 쓴다
+const BARCODE_PANEL = STUDIO || false;
 const showTab = (tab) => STUDIO && window.dispatchEvent(new CustomEvent('took:show-tab', { detail: { tab } }));
 const log = $('chat-log');
 const input = $('chat-input');
@@ -38,6 +42,7 @@ const state = {
   typing: false,
 };
 if (state.panel !== 'scan' && state.panel !== 'list') state.panel = state.list.length ? 'list' : 'scan';
+if (!BARCODE_PANEL) state.panel = 'list';
 let base = null;
 let brands = [];
 
@@ -145,6 +150,45 @@ function productMini(p) {
       })));
 }
 
+// 대화 속 추천 제품: 넓은 화면(키오스크)에서는 3장씩 보여 주고 큰 ‹ › 버튼(또는 손가락으로 밀기)으로 넘긴다.
+// 좁은 화면에서는 CSS 가 버튼을 숨기고 카드를 모두 보여 준다
+const PAGE_SIZE = 3;
+function productPager(products) {
+  // 모든 쪽의 카드를 같은 칸(1~3번째 칸, 첫 줄)에 겹쳐 두고 지금 쪽만 보이게 한다 → 넘겨도 말풍선 크기가 그대로 (CSS 의 --col)
+  const cards = products.map((p, i) => {
+    const c = productMini(p);
+    c.style.setProperty('--col', String((i % PAGE_SIZE) + 1));
+    return c;
+  });
+  const pages = Math.ceil(cards.length / PAGE_SIZE);
+  let page = 0;
+  const prev = el('button', { type: 'button', class: 'pc-arrow', 'aria-label': C('이전 제품', 'Previous products'), text: '‹' });
+  const next = el('button', { type: 'button', class: 'pc-arrow', 'aria-label': C('다음 제품', 'Next products'), text: '›' });
+  const count = el('span', { class: 'pc-count', 'aria-live': 'polite' });
+  const show = (n) => {
+    page = Math.max(0, Math.min(pages - 1, n));
+    cards.forEach((c, i) => c.classList.toggle('pc-off', Math.floor(i / PAGE_SIZE) !== page));
+    count.textContent = `${page + 1} / ${pages}`;
+    prev.disabled = page === 0;
+    next.disabled = page === pages - 1;
+  };
+  prev.addEventListener('click', () => show(page - 1));
+  next.addEventListener('click', () => show(page + 1));
+  const box = el('div', { class: 'mini-list pc' + (pages > 1 ? ' pc-multi' : '') }, ...cards,
+    pages > 1 ? el('div', { class: 'pc-nav' }, prev, count, next) : null);
+  // 손가락으로 옆으로 밀어도 넘어간다 (60px 이상 밀었을 때)
+  let x0 = null;
+  box.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') x0 = e.clientX; });
+  box.addEventListener('pointerup', (e) => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 60) show(page + (dx < 0 ? 1 : -1));
+  });
+  show(0);
+  return box;
+}
+
 // streaming: 이 답변을 한 글자씩 써 내려가는 중 (글이 다 나올 때까지 제품·빠른 답장은 숨긴다)
 function bubble(m, isLastBot, streaming = false) {
   const who = m.role === 'user' ? C('나', 'Me') : C('took 챗봇', 'took chat');
@@ -153,7 +197,7 @@ function bubble(m, isLastBot, streaming = false) {
     el('div', { class: 'btext', text: streaming ? '' : m.text }),
     // 비교 답변은 비교표로, 그 밖에는 좁은 화면용 카드 / 넓은 화면용 짧은 목록 (둘 중 하나만 CSS 로 보인다)
     m.kind === 'compare' && m.products?.length >= 2 ? compareTable(m.products) : null,
-    m.kind !== 'compare' && m.products?.length ? el('div', { class: 'mini-list' }, ...m.products.map((p) => productMini(p))) : null,
+    m.kind !== 'compare' && m.products?.length ? productPager(m.products) : null,
     m.kind !== 'compare' && m.products?.length ? el('div', { class: 'mini-names muted small', text: '→ ' + m.products.map((p) => shortName(p)).join(' / ') }) : null);
 }
 
@@ -182,7 +226,7 @@ function renderPanel() {
     $('panel-label').textContent = scan ? C('바코드로 제품 알아보기', 'Look up by barcode') : C('추천 제품', 'Recommended products');
     const toggle = $('panel-toggle');
     toggle.textContent = scan ? C(`추천 목록 보기 (${state.list.length})`, `See recommendations (${state.list.length})`) : C('바코드로 찾기', 'Find by barcode');
-    toggle.classList.toggle('hidden', scan && !state.list.length);
+    toggle.classList.toggle('hidden', !BARCODE_PANEL || (scan && !state.list.length));
   }
   const status = $('rec-status');
   if (!state.list.length) {
@@ -362,7 +406,9 @@ const scanner = createBarcodeScanner({
     $('scan-status').textContent = C(`읽는 중… (카메라 ${width}×${height}, ${frames}번 확인) `, `Reading… (camera ${width}×${height}, ${frames} checks) `) + SCAN_TIP + help;
   },
 });
-const narrow = () => !matchMedia('(orientation: landscape) and (min-width: 960px)').matches;
+// 넓은 화면 = 태블릿·PC 가로, 또는 태블릿 세로(css 의 세로 레이어와 같은 조건). 이때는 바코드·추천 패널이 늘 보인다
+const WIDE = '(orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px)';
+const narrow = () => !matchMedia(WIDE).matches;
 
 function setScanning(on) {
   scanVideo.classList.toggle('hidden', !on);
@@ -408,6 +454,56 @@ function flashScanner(text) {
   }, 2500);
 }
 
+// 찍거나 태그한 제품을 기준 제품으로 정하고, 대화에 제품 설명과 이어서 물어볼 질문을 띄운다 (바코드·NFC 공통). 말할 문장을 돌려준다
+async function describeProduct(p) {
+  state.baseId = p.id;
+  await loadBase();
+  const text = [`${fullName(p)} · ${p.finish ? `${finishName(p.finish)} · ` : ''}${won(p.price)}.`, isEn() ? '' : p.description,
+    C('이 제품을 기준으로 비슷한 색·더 저렴한 제품을 찾을 수 있어요.', 'I can find similar colors or cheaper products based on this one.')].filter(Boolean).join(' ');
+  state.messages.push({
+    role: 'bot', text, products: [p],
+    suggestions: C(['비슷한 색상 찾아 줘', '더 저렴한 제품 추천해 줘', '더 글로시한 제품 추천해 줘', '제품 정보 알려 줘'], ['Find similar colors', 'Something cheaper', 'Something glossier', 'Tell me about this product']),
+  });
+  return text;
+}
+
+// ---------- NFC 태그 (외부 리더기, js/nfc.js) ----------
+// 제품에 붙은 태그를 리더기에 톡 올리면 그 제품을 설명하고 기준 제품으로 정한다. 합본 화면은 바코드를 쓰므로 켜지 않는다
+const nfcHint = $('nfc-hint');
+const NFC_IDLE = C('립 제품을 리더기에 톡 올려도 알려 드려요', 'You can also tap a lip product on the reader');
+let nfcTimer = null;
+function nfcFlash(text) {
+  if (!nfcHint) return;
+  nfcHint.textContent = text;
+  nfcHint.classList.add('hit');
+  clearTimeout(nfcTimer);
+  nfcTimer = setTimeout(() => { nfcHint.textContent = NFC_IDLE; nfcHint.classList.remove('hit'); }, 2500);
+}
+async function handleTag(raw) {
+  const code = normalizeTag(raw);
+  speaker.stop();
+  state.messages.push({ role: 'user', text: C('제품을 리더기에 올렸어요', 'Tapped a product on the reader') });
+  const id = resolveTag(code);
+  const found = id ? await api('api/products/' + encodeURIComponent(id)) : null;
+  let text;
+  if (found?.ok && found.body.product) {
+    nfcFlash(C(`읽었어요 · ${shortName(found.body.product)}`, `Read · ${shortName(found.body.product)}`));
+    text = await describeProduct(found.body.product);
+  } else {
+    nfcFlash(C('등록되지 않은 태그예요', 'Unregistered tag'));
+    text = C(`등록되지 않은 태그예요 (${code}). 다른 제품을 올리거나 찾는 립을 말로 알려 주세요.`, `This tag isn't registered (${code}). Tap another product or tell me what lip you're looking for.`);
+    state.messages.push({ role: 'bot', text, suggestions: START });
+  }
+  speaker.speak(text);
+  save();
+  await streamReply(state.messages.length - 1);
+  renderLog();
+}
+if (!STUDIO) {
+  if (nfcHint) nfcHint.textContent = NFC_IDLE;
+  listenNfc(handleTag);
+}
+
 // 바코드 번호 → 등록 제품 조회 → 대화로 설명하고 기준 제품으로 정한다. 등록되지 않은 제품은 지어내지 않는다
 async function handleBarcode(raw, source) {
   const code = String(raw).replace(/\D/g, '');
@@ -432,14 +528,7 @@ async function handleBarcode(raw, source) {
     $('scan-result').replaceChildren();
   } else {
     const p = body.product;
-    state.baseId = p.id;
-    await loadBase();
-    text = [`${fullName(p)} · ${p.finish ? `${finishName(p.finish)} · ` : ''}${won(p.price)}.`, isEn() ? '' : p.description,
-      C('이 제품을 기준으로 비슷한 색·더 저렴한 제품을 찾을 수 있어요.', 'I can find similar colors or cheaper products based on this one.')].filter(Boolean).join(' ');
-    state.messages.push({
-      role: 'bot', text, products: [p],
-      suggestions: C(['비슷한 색상 찾아 줘', '더 저렴한 제품 추천해 줘', '더 글로시한 제품 추천해 줘', '제품 정보 알려 줘'], ['Find similar colors', 'Something cheaper', 'Something glossier', 'Tell me about this product']),
-    });
+    text = await describeProduct(p);
     $('scan-result').replaceChildren(el('div', { class: 'muted small', text: C('인식한 제품', 'Recognized product') }), productMini(p));
   }
   speaker.speak(text);
@@ -456,7 +545,7 @@ async function handleBarcode(raw, source) {
 const SCANNER_GAP = 60;
 let scanBuf = '';
 let scanLast = 0;
-window.addEventListener('keydown', (e) => {
+if (BARCODE_PANEL) window.addEventListener('keydown', (e) => {
   const now = performance.now();
   if (now - scanLast > SCANNER_GAP) scanBuf = '';
   scanLast = now;
@@ -619,6 +708,10 @@ if (qs('base') && base && !state.messages.some((m) => m.baseNotice === base.id))
     suggestions: C(['더 저렴한 제품 추천해 줘', '비슷한 색상 찾아 줘', '더 글로시한 제품 추천해 줘', '이 제품 가격 얼마야?'], ['Something cheaper', 'Find similar colors', 'Something glossier', 'How much is this product?']),
   });
   save();
+}
+if (!BARCODE_PANEL) {
+  $('scan-open')?.remove(); // 좁은 화면의 바코드 버튼
+  $('rec-panel').setAttribute('aria-label', C('추천 제품', 'Recommended products'));
 }
 renderLog();
 // 합본 화면: 립 매핑에서 고른 색을 챗봇의 기준 색으로 쓰고, '이 컬러로 제품 추천'을 챗봇 질문으로 처리한다

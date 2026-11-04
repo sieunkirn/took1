@@ -556,13 +556,14 @@ body.home-page main { position: relative; z-index: 1; }
 /* 홈(옛 툭ver2 대기 화면 구성, 무채색): 제목 + 가운데 큰 동그라미 하나. 화면 높이·너비 둘 다에 맞춰 크기가 줄어든다 */
 main.home.attract { --lip: #C0646A; max-width: none; min-height: calc(100dvh - var(--nav-h)); padding: clamp(20px, 4vh, 44px) 24px clamp(16px, 3vh, 32px); display: flex; flex-direction: column; }
 .at-hero { text-align: center; }
-.at-hero h1 { font-size: clamp(38px, min(5.6vw, 7.4vh), 80px); line-height: 1.1; font-weight: 800; letter-spacing: -0.05em; margin: 0; }
-.at-hero p { font-size: clamp(16px, min(1.7vw, 2.3vh), 22px); color: var(--ink-2); margin-top: clamp(10px, 1.6vh, 16px); }
+.at-hero h1 { font-size: clamp(44px, min(7vw, 9vh), 104px); line-height: 1.05; font-weight: 800; letter-spacing: -0.05em; margin: 0; }
+.at-hero p { font-size: clamp(17px, min(1.8vw, 2.4vh), 23px); color: var(--ink); font-weight: 500; margin-top: clamp(10px, 1.6vh, 16px); }
 /* 세로 간격: 제목↔동그라미, 동그라미↔버튼을 같은 --gap 으로 맞춘다 (둘레를 도는 점 포함) */
 .at-stage { --gap: clamp(60px, 7.5vh, 84px); display: flex; justify-content: center; align-items: flex-start; column-gap: clamp(110px, 10vw, 180px); row-gap: var(--gap); margin: var(--gap) 0 auto; }
 .tap { --d: max(180px, min(40vh, 30vw, 440px, calc(100vh - 500px))); position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--gap); color: var(--ink); text-decoration: none; }
-.tap .mirror { width: var(--d); aspect-ratio: 1; border-radius: 50%; position: relative; overflow: hidden; background: radial-gradient(circle at 50% 30%, #fff, #ececec); animation: breathe 2.6s ease-in-out infinite; transition: transform 0.15s var(--ease); }
-@keyframes breathe { 0%, 100% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.07), 0 0 0 24px rgba(0, 0, 0, 0.03); } 50% { box-shadow: 0 0 0 16px rgba(0, 0, 0, 0.09), 0 0 0 38px rgba(0, 0, 0, 0.02); } }
+.tap .mirror { width: var(--d); aspect-ratio: 1; border-radius: 50%; position: relative; overflow: hidden; box-sizing: border-box; background: var(--paper); border: max(8px, calc(var(--d) * 0.035)) solid var(--soft-2); animation: breathe 2.6s ease-in-out infinite; transition: transform 0.15s var(--ease); }
+/* 숨쉬기: 그림자 대신 아주 조금 커졌다 작아진다 (테두리는 회색 면 한 단계) */
+@keyframes breathe { 0%, 100% { scale: 1; } 50% { scale: 1.015; } }
 .tap:active .mirror { transform: scale(0.96); }
 .mirror svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 #demo-lips { color: var(--lip); transform-box: fill-box; transform-origin: center; }
@@ -575,13 +576,13 @@ main.home.attract { --lip: #C0646A; max-width: none; min-height: calc(100dvh - v
 @keyframes spark { 0% { opacity: 0; transform: scale(0) rotate(0); } 40% { opacity: 1; transform: scale(1.3) rotate(45deg); } 100% { opacity: 0; transform: scale(0.4) rotate(90deg); } }
 /* 동그라미 둘레를 천천히 도는 회색 점 */
 .orbit { --r: calc(var(--d) / 2 + 34px); position: absolute; left: 50%; top: calc(var(--d) / 2); width: 0; height: 0; animation: orbit 40s linear infinite; pointer-events: none; }
-.orbit i { position: absolute; width: 18px; height: 18px; margin: -9px; border-radius: 50%; border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--line-2); transform: rotate(calc(var(--k) * 45deg)) translateY(calc(var(--r) * -1)); }
+.orbit i { position: absolute; width: 18px; height: 18px; margin: -9px; border-radius: 50%; border: 2px solid var(--paper); transform: rotate(calc(var(--k) * 45deg)) translateY(calc(var(--r) * -1)); }
 .orbit i:nth-child(1) { --k: 0; background: #2a2a2a; } .orbit i:nth-child(2) { --k: 1; background: #6e6e6e; }
 .orbit i:nth-child(3) { --k: 2; background: #444; } .orbit i:nth-child(4) { --k: 3; background: #b5b5b5; }
 .orbit i:nth-child(5) { --k: 4; background: #1c1c1c; } .orbit i:nth-child(6) { --k: 5; background: #8f8f8f; }
 .orbit i:nth-child(7) { --k: 6; background: #5a5a5a; } .orbit i:nth-child(8) { --k: 7; background: #d0d0d0; }
 @keyframes orbit { to { transform: rotate(360deg); } }
-.tap-label { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--paper); padding: clamp(12px, 1.8vh, 18px) clamp(24px, 2.6vw, 36px); border-radius: 999px; font-size: clamp(19px, 2.6vh, 26px); font-weight: 800; box-shadow: var(--shadow-up); position: relative; z-index: 1; transition: transform 0.18s var(--spring); }
+.tap-label { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--paper); padding: clamp(12px, 1.8vh, 18px) clamp(24px, 2.6vw, 36px); border-radius: 999px; font-size: clamp(19px, 2.6vh, 26px); font-weight: 800; position: relative; z-index: 1; transition: transform 0.18s var(--spring); }
 .tap:hover .tap-label { transform: translateY(-2px); }
 .tap-label b { font-size: 1.15em; line-height: 1; }
 /* 챗봇 쪽 예시 대화: 동그라미 안에 말풍선 세 개 (회색 = 챗봇, 검정 = 나) */
@@ -626,6 +627,7 @@ html.intro:not(.intro-nav):not(.intro-go) header.nav { opacity: 0; transform: tr
 html.intro header.nav { transition: opacity 0.5s var(--ease), transform 0.75s cubic-bezier(0.65, 0, 0.35, 1); }
 html.intro body { overflow: hidden; }
 html.intro-go body { overflow: auto; }
+
 
 /* ---------- 팔레트: 왼쪽 카메라 | 오른쪽 ① 내 톤 찾기 ② 팔레트 ③ 텍스처·추천 (추천 후엔 ④ 결과) (js/palette.js + lip.js).
    물감·섞는 칸·조제한 색은 실제 색 (CLAUDE.md 예외) ---------- */
@@ -700,6 +702,15 @@ html.intro-go body { overflow: auto; }
 .lip-paints { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px 2px; }
 .lip-paints .paint { padding: 3px 0; }
 .pal-board .lip-paints .paint-blob { width: 30px; height: 30px; }
+/* 팔레트 화면 다듬기 (Taste Skill 앱 화면 규칙): 판은 그림자 없이 바탕과 한 단계 다른 면으로,
+   칸 이름은 읽히는 크기로, 아직 못 누르는 버튼 글자도 읽히게 (흐린 #b5b5b5 → #6e6e6e) */
+.palette-page .area { box-shadow: none; }
+.palette-page .area > .label, .palette-page .pal-board-head .label { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+.palette-page .pal-cam > .label { margin-bottom: 4px; }
+.palette-page button:disabled:not(.btn-dark) { color: #6e6e6e; opacity: 1; }
+.palette-page .stage .placeholder { font-size: 16px; line-height: 1.6; color: var(--ink-2); }
+.palette-page .mix-empty { color: #6e6e6e; font-size: 14px; }
+.palette-page .pal-match .muted { color: #6e6e6e; }
 .pal-board .paint-name { font-size: 12px; }
 @media (orientation: landscape) and (min-width: 960px) {
   .palette { grid-template-columns: minmax(0, 1.15fr) minmax(400px, 0.85fr); height: 100%; }
@@ -730,3 +741,194 @@ html.intro-go body { overflow: auto; }
 @media (prefers-reduced-motion: reduce) {
   *:not(.spinner), *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ================= 태블릿 세로 (iPad 세로 768~1024px) =================
+   키오스크를 세워 두었을 때: 한 화면에 맞추고(스크롤 없음) 위아래로 쌓는다.
+   - 홈: 두 동그라미를 위아래로 크게
+   - 팔레트: 위 카메라 | 아래 [팔레트 · 내 톤/마무리]
+   - 챗봇: 위 대화 | 아래 바코드·추천 제품 패널 (가로 화면과 같은 '넓은 화면' 동작, js/chat.js 의 WIDE)
+   휴대폰 세로(700px 미만)는 기존 좁은 화면 그대로. PC 에서는 portrait.html 로 미리 본다 */
+@media (orientation: portrait) and (min-width: 700px) {
+  header.nav { height: var(--nav-h); padding: 0 20px; flex-wrap: nowrap; }
+  .wide-only { display: flex; }
+
+  /* 홈 */
+  main.home.attract { padding: clamp(24px, 4vh, 56px) 24px clamp(20px, 3vh, 40px); }
+  .at-hero h1 { font-size: clamp(48px, min(9.4vw, 6.6vh), 96px); }
+  .at-hero p { font-size: clamp(17px, min(2.5vw, 1.9vh), 24px); word-break: keep-all; }
+  .at-stage { --gap: clamp(48px, 5vh, 68px); flex-direction: column; align-items: center; row-gap: var(--gap); }
+  /* 동그라미 지름: 화면 높이에서 제목·버튼·간격(약 620px + 화면 높이의 4.5%)을 빼고 둘로 나눈 만큼 (스크롤 없이 두 개가 다 보이게) */
+  .tap { --d: max(170px, min(54vw, 420px, calc((100dvh - var(--nav-h) - 620px - 4.5vh) / 2))); }
+
+  /* 팔레트 */
+  main.fit.palette, main.fit.chat-user { max-width: none; height: calc(100dvh - var(--nav-h)); padding: clamp(10px, 1.2vh, 14px) 18px; overflow: hidden; }
+  .palette { grid-template-rows: minmax(0, 1fr) auto; gap: clamp(8px, 1vh, 12px); }
+  /* 카메라가 주인공: 라벨은 빼고, 고른 색 이름과 아바타/카메라 버튼을 한 줄에 두어 화면을 최대한 크게 */
+  .pal-cam { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto; grid-auto-rows: auto; column-gap: 12px; row-gap: 10px; align-items: center; }
+  .pal-cam > .label { display: none; }
+  .pal-cam .stage { grid-column: 1 / -1; grid-row: 1; height: 100%; min-height: 0; aspect-ratio: auto; }
+  .pal-cam #color-name { grid-column: 1; grid-row: 2; margin: 0; font-size: 15px; font-weight: 700; }
+  .pal-cam .source-row { grid-column: 2; grid-row: 2; flex-wrap: nowrap; }
+  .pal-cam #guide, .pal-cam #error, .pal-cam > .row:not(.source-row) { grid-column: 1 / -1; margin: 0; }
+  .pal-cam #guide:empty, .pal-cam > .row:not(.source-row):not(:has(button:not(.hidden))) { display: none; }
+  /* 아래: [팔레트 물감 | 섞는 칸] 한 줄, 그 밑에 [내 톤 찾기 | 텍스처·농도·추천] */
+  .pal-right { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 12px; }
+  .pal-board { grid-column: 1 / -1; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; column-gap: 20px; row-gap: 8px; }
+  .pal-board-head { grid-column: 1; grid-row: 1; }
+  .pal-board #lip-paints { grid-column: 1; grid-row: 2; align-self: center; }
+  .pal-board .lip-paints .paint-blob { width: 34px; height: 34px; }
+  .pal-mix { grid-column: 2; grid-row: 1 / span 2; gap: 14px; }
+  .mix-wrap { width: auto; height: clamp(140px, 15vh, 210px); max-width: none; }
+  .pal-tools { min-width: 116px; }
+  .pal-match { grid-column: 1; grid-row: 2; }
+  .pal-finish { grid-column: 2; grid-row: 2; gap: 10px; }
+  .pal-finish .seg button { padding: 0 4px; }
+  .palette.show-result .pal-right { grid-template-columns: 1fr; }
+  .palette.show-result .pal-result { grid-column: 1 / -1; grid-row: 1; height: clamp(320px, 44dvh, 600px); }
+  .pal-rec { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* 챗봇: 위 대화, 아래 바코드·추천 제품 */
+  .chat-user { grid-template-rows: minmax(0, 1fr) minmax(0, 39%); height: 100%; gap: 12px; }
+  .chat-user .chat-shell { min-height: 0; }
+  .chat-user .chat-shell .chat-log { flex: 1; height: auto; min-height: 120px; }
+  .chat-user .chat-side { display: flex; flex-direction: column; gap: 6px; margin-bottom: 0; min-height: 0; overflow-y: auto; order: 0; }
+  .chat-user .chat-shell .mini-list { display: none; }
+  .chat-user .mini-names { display: block; }
+  .chat-user .narrow-only { display: none; }
+  /* 추천 제품: 아래 패널 높이 안에 한 줄로 두고 옆으로 밀어 본다 (세로 화면은 폭보다 높이가 귀하다) */
+  .chat-user #rec-list { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - 30px) / 3.6); gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-bottom: 6px; }
+  .chat-user #rec-list > * { scroll-snap-align: start; }
+  .chat-user #rec-list > p { grid-column: auto; width: max-content; max-width: 70vw; white-space: normal; }
+  .chat-user #rec-list .card-img { max-height: clamp(100px, 11vh, 160px); }
+  /* 바코드 대기 안내는 가로로 눕혀 아래 패널 높이를 아낀다 */
+  .chat-user .scanner-ready { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto; column-gap: 20px; row-gap: 4px; align-items: center; text-align: left; padding: 16px 22px; }
+  .chat-user .scanner-ready .scanner-art { grid-row: 1 / span 3; }
+  .chat-user .scanner-ready .scanner-state { justify-self: start; }
+}
+
+/* ---------- 팔레트 시안 B '거울 전면' (키오스크 가로·세로 공통) ----------
+   카메라가 화면 전체를 채우고, 도구는 아래 흰 서랍 하나에 모은다. 마크업은 그대로 두고 CSS 로만 자리를 옮긴다:
+   .pal-right 는 display: contents 로 풀어서 그 안의 판들을 main 기준으로 놓는다.
+   서랍 = 왼쪽 .pal-board(물감·섞는 칸) + 오른쪽 .pal-finish(텍스처·농도·추천), 두 판이 이어 붙어 한 장처럼 보인다.
+   카메라 위: 왼쪽 위 아바타/카메라 버튼과 고른 색, 오른쪽 위 '내 톤으로 추천받기', 서랍 바로 위 안내 문구 */
+@media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
+  .palette-page { --dock-h: 252px; --fin-w: 340px; --gap: 16px; }
+  .palette-page main.fit.palette { position: relative; display: block; padding: 0; height: calc(100dvh - var(--nav-h)); overflow: hidden; }
+  .palette-page .pal-right { display: contents; }
+  .palette-page .palette .area { position: absolute; margin: 0; }
+
+  /* 카메라: 화면 전체 (서랍 뒤로 살짝 들어간다), 화면을 꽉 채우도록 잘라서 보여 준다 */
+  .palette-page .pal-cam { inset: 0; padding: 0; border-radius: 0; background: var(--soft); display: block; }
+  .palette-page .pal-cam > .label { display: none; }
+  .palette-page .pal-cam .stage { position: absolute; inset: 0 0 calc(var(--dock-h) - 8px) 0; width: auto; height: auto; aspect-ratio: auto; border-radius: 0; }
+  .palette-page .pal-cam .stage canvas, .palette-page .pal-cam .stage video { object-fit: cover; }
+  .palette-page .pal-cam .source-row { position: absolute; top: var(--gap); left: var(--gap); margin: 0; flex-wrap: nowrap; gap: 8px; z-index: 2; }
+  .palette-page .pal-cam .source-row button:not([aria-pressed="true"]) { background: var(--paper); }
+  .palette-page .pal-cam #color-name { position: absolute; top: calc(var(--gap) + 58px); left: var(--gap); margin: 0; padding: 8px 14px; border-radius: 999px; background: var(--paper); font-size: 15px; font-weight: 700; z-index: 2; }
+  .palette-page .pal-cam #color-name:empty { display: none; }
+  .palette-page .pal-cam #guide { position: absolute; left: 50%; bottom: calc(var(--dock-h) + 12px); translate: -50% 0; margin: 0; max-width: 80%; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 15px; font-weight: 600; text-align: center; z-index: 2; }
+  .palette-page .pal-cam #guide:empty { display: none; }
+  .palette-page .pal-cam #error { position: absolute; left: var(--gap); right: var(--gap); top: calc(var(--gap) + 110px); margin: 0; z-index: 2; }
+  .palette-page .pal-cam > .row:not(.source-row) { position: absolute; left: 50%; top: 50%; translate: -50% -50%; margin: 0; z-index: 2; }
+  .palette-page .pal-cam > .row:not(.source-row):not(:has(button:not(.hidden))) { display: none; }
+
+  /* 내 톤으로 추천받기: 카메라 오른쪽 위 흰 카드 */
+  .palette-page .pal-match { top: var(--gap); right: var(--gap); max-width: 380px; padding: 10px 12px; border-radius: 20px; gap: 6px; z-index: 2; }
+  .palette-page .pal-match > .label { display: none; }
+  .palette-page .pal-match-row > button { min-height: 44px; border-radius: 999px; padding: 0 18px; }
+
+  /* 서랍 왼쪽: 팔레트 이름 + 물감 22색 | 섞는 칸 | 고른 색·한 방울 빼기 */
+  .palette-page .pal-board { left: var(--gap); right: calc(var(--gap) + var(--fin-w)); bottom: var(--gap); height: var(--dock-h); padding: 20px 8px 20px 24px; border-radius: 28px 0 0 28px;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto minmax(0, 1fr); column-gap: 20px; row-gap: 10px; align-items: center; }
+  .palette-page .pal-board-head { grid-column: 1; grid-row: 1; }
+  .palette-page .pal-board #lip-paints { grid-column: 1; grid-row: 2; align-self: center; }
+  .palette-page .pal-board .lip-paints .paint-blob { width: 32px; height: 32px; }
+  .palette-page .pal-mix { display: contents; }
+  .palette-page .mix-wrap { grid-column: 2; grid-row: 1 / span 2; width: auto; height: calc(var(--dock-h) - 40px); max-width: none; max-height: none; }
+  .palette-page .pal-tools { grid-column: 3; grid-row: 1 / span 2; min-width: 110px; }
+  .palette-page .mix-hex { font-size: 18px; }
+
+  /* 서랍 오른쪽: 텍스처 · 농도 · 추천 버튼 */
+  .palette-page .pal-finish { right: var(--gap); bottom: var(--gap); width: var(--fin-w); height: var(--dock-h); padding: 20px 24px 20px 12px; border-radius: 0 28px 28px 0; justify-content: center; gap: 14px; }
+  .palette-page .pal-finish .seg button { min-height: 40px; font-size: 14px; padding: 0 4px; }
+  .palette-page .pal-finish #find { min-height: 56px; font-size: 17px; border-radius: 16px; }
+
+  /* 추천 결과: 서랍과 똑같은 자리·크기의 흰 판 (카메라 크기는 그대로 둔다) */
+  .palette-page .palette.show-result .pal-result { left: var(--gap); right: var(--gap); bottom: var(--gap); top: auto; height: var(--dock-h); padding: 18px 24px; border-radius: 28px; grid-column: auto; grid-row: auto; z-index: 3; }
+  .palette-page .palette.show-result .pal-cam #guide { display: none; }
+}
+/* 세로: 서랍을 두 줄로 — 위 줄 물감 22색(넓게), 아래 줄 [섞는 칸 · 고른 색] | [텍스처 · 농도 · 추천] */
+@media (orientation: portrait) and (min-width: 700px) {
+  .palette-page { --dock-h: 420px; --fin-w: 50%; }
+  .palette-page .pal-board { right: var(--gap); border-radius: 28px; padding: 22px 24px; grid-template-columns: auto auto minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); }
+  .palette-page .pal-board-head { grid-column: 1 / -1; }
+  .palette-page .pal-board #lip-paints { grid-column: 1 / -1; }
+  .palette-page .pal-board .lip-paints .paint-blob { width: 40px; height: 40px; }
+  .palette-page .mix-wrap { grid-column: 1; grid-row: 3; height: 200px; }
+  .palette-page .pal-tools { grid-column: 2; grid-row: 3; }
+  .palette-page .pal-finish { height: 248px; width: calc(50% - var(--gap)); padding: 22px 24px 22px 8px; border-radius: 0 0 28px 0; background: transparent; justify-content: flex-end; }
+}
+/* 가로: 추천 제품은 서랍 높이에 맞춰 한 줄로 늘어놓고, 넘치면 옆으로 밀어 본다 */
+@media (orientation: landscape) and (min-width: 960px) {
+  .palette-page .palette.show-result .pal-result { overflow: hidden; gap: 10px; }
+  .palette-page .palette.show-result #rec-status { display: none; }
+  .palette-page .palette.show-result .pal-rec { flex: 1 1 auto; min-height: 0; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 300px; gap: 12px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-bottom: 6px; }
+  .palette-page .palette.show-result .pal-rec > * { scroll-snap-align: start; }
+  /* 서랍 높이에 맞춘 작은 카드: 왼쪽 사진, 오른쪽 브랜드·제품명·색상값·가격, 아래 두 버튼 */
+  .palette-page .palette.show-result .pal-rec .card { display: grid; grid-template-columns: 84px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 8px; padding: 10px; align-items: start; }
+  .palette-page .palette.show-result .pal-rec .card-img { grid-row: 1; width: 84px; height: 84px; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin: 0; }
+  .palette-page .palette.show-result .pal-rec .card dl { display: block; margin: 0; font-size: 14px; line-height: 1.35; }
+  .palette-page .palette.show-result .pal-rec .card dt, .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(4) { display: none; }
+  .palette-page .palette.show-result .pal-rec .card dd { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(1) { color: var(--mute); font-size: 13px; }
+  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(2) { font-weight: 700; }
+  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(5) { font-weight: 700; }
+  .palette-page .palette.show-result .pal-rec .card .actions { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 6px; align-items: center; margin: 0; flex-wrap: nowrap; }
+  .palette-page .palette.show-result .pal-rec .card .actions > * { font-size: 13px; min-height: 32px; padding: 4px 10px; white-space: nowrap; }
+}
+
+/* ---------- 챗봇: 마이크를 가운데에 크게 (음성이 주 입력인 키오스크) ----------
+   위 줄: 들은 말(테스트 단계에서는 키보드 입력도 되는 칸)을 가운데 정렬로 한 줄,
+   아래 줄: 가운데 큰 동그라미 마이크(96px), 좁은 화면에서는 그 오른쪽에 바코드 버튼. 그 밑에 듣는 중 안내 */
+.chat-input.voice-only { display: grid; grid-template-columns: 1fr auto 1fr; grid-template-areas: "heard heard heard" ". mic scan"; align-items: center; row-gap: 12px; padding: 4px 0 0; background: transparent; border-radius: 0; }
+.chat-input.voice-only:focus-within, .chat-input.voice-only:has(input[readonly]):focus-within { background: transparent; box-shadow: none; }
+.chat-input.voice-only #chat-input { grid-area: heard; width: 100%; min-height: 48px; padding: 0 20px; border-radius: 999px; background: var(--soft); text-align: center; font-size: 16px; }
+.chat-input.voice-only #chat-input:focus { background: var(--paper); box-shadow: 0 0 0 2px var(--ink); }
+.chat-input.voice-only #voice { grid-area: mic; width: 96px; height: 96px; min-height: 96px; padding: 0; border-radius: 50%; }
+.chat-input.voice-only #voice svg { width: 40px; height: 40px; }
+.chat-input.voice-only #voice.listening { animation: took-listen-big 1.2s ease-in-out infinite; }
+@keyframes took-listen-big { 50% { box-shadow: 0 0 0 14px rgba(0, 0, 0, 0.12); } }
+.chat-input.voice-only #scan-open { grid-area: scan; justify-self: start; margin-left: 20px; }
+.chat-shell:has(.chat-input.voice-only) #voice-status { margin: 0; text-align: center; min-height: 1.4em; }
+
+/* ---------- 챗봇: 추천 제품을 따로 나누지 않고 대화 안에 띄운다 (가로·세로 키오스크) ----------
+   오른쪽/아래 '추천 제품' 패널은 숨기고, 대화창이 화면을 다 쓴다. 답변 말풍선 아래에 제품 카드를 한 줄로 늘어놓고 옆으로 밀어 본다 */
+@media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
+  .chat-user { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+  .chat-user .chat-side { display: none; }
+  .chat-user .chat-shell .mini-names { display: none; }
+  /* 3장씩 한 쪽, 아래에 ‹ 1 / 2 › (js/chat.js productPager) */
+  .chat-user .chat-shell .mini-list.pc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; touch-action: pan-y; }
+  .chat-user .chat-shell .mini-list.pc-multi > .card { grid-column: var(--col); grid-row: 1; }
+  .chat-user .chat-shell .mini-list.pc-multi > .pc-nav { grid-row: 2; }
+  .chat-user .chat-shell .mini-list.pc > .card.pc-off { visibility: hidden; pointer-events: none; }
+  .chat-user .chat-shell .mini-list .card-img { max-height: 150px; }
+  .chat-user .chat-shell .pc-nav { display: flex; }
+}
+/* NFC 안내: 마이크 아래 작은 줄. 태그를 읽으면 잠깐 검게 바뀐다 */
+.nfc-hint { margin: 0 auto; width: fit-content; padding: 6px 14px; border-radius: 999px; background: var(--soft); color: var(--ink-2); font-size: 14px; font-weight: 600; text-align: center; transition: background 0.2s, color 0.2s; }
+.nfc-hint:empty { display: none; }
+.nfc-hint.hit { background: var(--ink); color: var(--paper); }
+.studio .nfc-hint { display: none; }
+/* 팔레트: NFC 안내는 카메라 위 가운데 맨 위에 작게 */
+@media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
+  .palette-page .pal-cam .pal-nfc { position: absolute; top: calc(var(--gap) + 116px); left: var(--gap); margin: 0; z-index: 2; background: var(--paper); }
+  .palette-page .pal-cam .pal-nfc.hit { background: var(--ink); }
+}
+.pal-cam .pal-nfc { margin: 0; }
+
+/* 대화 속 추천 제품: 넘기기 버튼 (넓은 화면에서만 보인다) */
+.pc-nav { display: none; grid-column: 1 / -1; justify-content: center; align-items: center; gap: 20px; padding-top: 4px; }
+.pc-arrow { width: 56px; height: 56px; min-height: 56px; padding: 0; border-radius: 50%; background: var(--ink) !important; color: var(--paper) !important; font-size: 30px; line-height: 1; font-weight: 700; }
+.pc-arrow:disabled { background: var(--soft) !important; color: #b0b0b0 !important; }
+.pc-count { min-width: 56px; text-align: center; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }

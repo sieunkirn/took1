@@ -20,6 +20,7 @@
     </div>
     <p id="color-name" class="small"></p>
     <p id="guide" class="muted" aria-live="polite"></p>
+    <p id="nfc-hint" class="nfc-hint pal-nfc" aria-live="polite"></p>
     <div id="error" class="msg hidden" role="alert"></div>
     <div class="row">
       <button type="button" id="cam-retry" class="hidden" data-i18n="pal.camRetry">카메라 다시 연결</button>
@@ -47,7 +48,7 @@
     <!-- ② 팔레트: 오른쪽 위 아이콘으로 처음부터 다시 섞는다 -->
     <section class="area pal-board" aria-label="팔레트" data-i18n-aria="pal.board">
       <div class="pal-board-head">
-        <div class="label" data-i18n="pal.board">팔레트</div>
+        <h1 class="label" data-i18n="pal.board">팔레트</h1>
         <button type="button" id="reset" class="icon-btn pal-reset" aria-label="처음부터 다시 섞기" title="처음부터 다시 섞기" data-i18n-aria="pal.reset" data-i18n-title="pal.reset">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
         </button>

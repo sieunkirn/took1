@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 세로 화면 미리보기</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<style>
+  /* 직원용: PC·노트북에서 iPad 세로 화면을 띄워 본다. 보기 방식은 두 가지:
+     ① 돌려서 꽉 차게: 웹을 90° 돌려 노트북 가로 = 웹 세로, 노트북 세로 = 웹 가로 (노트북 화면 크기 그대로)
+     ② 똑바로 보기: iPad 세로 화면(820×1180)을 돌리지 않고 창 높이에 맞춰 키우거나 줄인다
+     어느 쪽이든 세로 레이아웃(세로 방향 + 너비 700px 이상)으로 그려지고, 실제 iPad 는 세우기만 하면 같은 화면이 된다 */
+  html, body { height: 100%; overflow: hidden; background: #e4e4e4; }
+  .pv-stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  .pv-clip { overflow: hidden; background: var(--paper); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 10px 40px rgba(0, 0, 0, 0.12); }
+  .pv-clip iframe { display: block; border: 0; transform-origin: 0 0; }
+  /* 설정: 왼쪽 위 작은 버튼. 누르면 보기 방식 두 개가 펼쳐진다 */
+  .pv-bar { position: fixed; top: 12px; left: 12px; z-index: 5; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 18px; background: rgba(255, 255, 255, 0.95); box-shadow: var(--shadow-up); width: 236px; }
+  .pv-bar.folded { width: auto; }
+  .pv-bar.folded > :not(#pv-fold) { display: none; }
+  .pv-bar button { border-radius: var(--r-s); }
+  #pv-fold { min-height: 40px; padding: 4px 14px; border: 0; background: var(--soft); font-size: 14px; }
+  #pv-fold:hover { background: var(--soft-2); color: var(--ink); }
+  .pv-mode { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 12px 14px; text-align: left; border: 1px solid var(--line-2); background: var(--paper); }
+  .pv-mode b { font-size: 15px; }
+  .pv-mode span { font-size: 12px; font-weight: 500; color: var(--mute); }
+  .pv-mode[aria-pressed="true"], .pv-mode[aria-pressed="true"]:hover:not(:disabled) { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .pv-mode[aria-pressed="true"] span { color: rgba(255, 255, 255, 0.7); }
+  .pv-mode:hover:not([aria-pressed="true"]) { background: var(--soft); color: var(--ink); }
+  .pv-bar label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--mute); }
+  .pv-bar select { border-radius: var(--r-s); font-size: 14px; }
+  #pv-full { font-size: 13px; border-color: var(--line-2); }
+</style>
+</head>
+<body data-idle-reset="off">
+<div class="pv-stage">
+  <div class="pv-clip" id="pv-clip"><iframe id="pv-frame" title="세로 화면" allow="camera; microphone; autoplay; fullscreen"></iframe></div>
+</div>
+<div class="pv-bar folded" id="pv-bar">
+  <button type="button" id="pv-fold" aria-expanded="false">설정</button>
+  <button type="button" class="pv-mode" data-mode="rotate" aria-pressed="false"><b>돌려서 꽉 차게</b><span>노트북 가로 = 웹 세로 · 노트북 화면 크기 그대로</span></button>
+  <button type="button" class="pv-mode" data-mode="upright" aria-pressed="false"><b>똑바로 보기</b><span>돌리지 않고 iPad 세로 화면을 창 높이에 맞춤</span></button>
+  <label>화면
+    <select id="pv-page">
+      <option value="index.html">홈</option>
+      <option value="palette.html">팔레트</option>
+      <option value="chat.html">AI 뷰티 챗봇</option>
+    </select>
+  </label>
+  <button type="button" id="pv-full">전체 화면 (주소창 숨기기)</button>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const frame = $('pv-frame');
+  const IPAD = [820, 1180]; // 똑바로 보기: iPad Air · iPad 10세대 세로
+  const saved = (() => { try { return localStorage.getItem('took.portraitPreview'); } catch { return null; } })();
+  let mode = saved === 'upright' ? 'upright' : 'rotate';
+
+  // 그릴 크기(w×h)를 정하고, 돌리기면 시계 방향 90°(웹 위쪽 = 노트북 오른쪽)로 돌려 창에 맞춘다. 돌려도 클릭·드래그는 그대로 된다
+  const fit = () => {
+    const W = innerWidth, H = innerHeight;
+    const rot = mode === 'rotate';
+    const [w, h] = rot ? [H, W] : IPAD;
+    const vw = rot ? h : w, vh = rot ? w : h; // 화면에 보이는 크기
+    const s = Math.min(W / vw, H / vh);
+    frame.style.width = w + 'px';
+    frame.style.height = h + 'px';
+    frame.style.transform = rot ? `translate(${h * s}px, 0) rotate(90deg) scale(${s})` : `scale(${s})`;
+    $('pv-clip').style.width = vw * s + 'px';
+    $('pv-clip').style.height = vh * s + 'px';
+  };
+  const setMode = (m) => {
+    mode = m;
+    try { localStorage.setItem('took.portraitPreview', m); } catch { /* 저장 불가 환경 */ }
+    document.querySelectorAll('.pv-mode').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+    fit();
+  };
+  document.querySelectorAll('.pv-mode').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  $('pv-fold').addEventListener('click', () => {
+    const folded = $('pv-bar').classList.toggle('folded');
+    $('pv-fold').textContent = folded ? '설정' : '설정 닫기';
+    $('pv-fold').setAttribute('aria-expanded', String(!folded));
+  });
+  $('pv-page').addEventListener('change', () => { frame.src = $('pv-page').value; });
+  $('pv-full').addEventListener('click', () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => { $('pv-full').textContent = '막혔어요 · F11 키를 눌러 주세요'; });
+  });
+  document.addEventListener('fullscreenchange', () => {
+    $('pv-full').textContent = document.fullscreenElement ? '전체 화면 끝내기' : '전체 화면 (주소창 숨기기)';
+    fit();
+  });
+  addEventListener('resize', fit);
+  setMode(mode);
+  frame.src = $('pv-page').value;
+</script>
+</body>
+</html>

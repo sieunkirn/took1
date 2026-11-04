@@ -5,7 +5,8 @@
 //  - 혼합색은 방울 수를 가중치로 OKLab 공간에서 평균한다 (사람 눈에 고르게 섞여 보이는 공간)
 //  - 섞는 칸 색이 바뀌는 동안 같은 색을 took:apply 이벤트로 보내 왼쪽 카메라 입술(lip.js)에 바로 입힌다
 //  - 초기화: 팔레트를 비우고 입술 색을 기본 컬러로 되돌린다
-import { renderNav, store, api, el, productCard, toast, skeletonCards } from './common.js';
+import { renderNav, store, api, el, productCard, toast, skeletonCards, shortName } from './common.js';
+import { listenNfc, resolveTag } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
 import { hexToRgb, rgbToHex } from '../lib/color.js';
 import { PRESETS } from './lip-engine.js'; // 립 컬러 매핑 탭에서 고를 수 있는 색
 import { t as tr } from './i18n.js'; // 화면 문구 (한국어/영어)
@@ -148,22 +149,12 @@ function frame(t) {
 
 function draw(t) {
   ctx.clearRect(0, 0, W, H);
-  // 팔레트 칸 (무채색)
+  // 팔레트 칸 (무채색): 그림자 없이 흰 판보다 한 단계 짙은 회색 접시 (그림자는 캔버스 끝에서 네모로 잘려 보였다)
   ctx.save();
   ctx.beginPath();
   ctx.arc(CX, CY, R, 0, Math.PI * 2);
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = 'rgba(0,0,0,0.10)';
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 6;
+  ctx.fillStyle = '#f0f0f0';
   ctx.fill();
-  ctx.restore();
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(CX, CY, R, 0, Math.PI * 2);
-  ctx.strokeStyle = '#e6e6e6';
-  ctx.lineWidth = 2;
-  ctx.stroke();
 
   if (shownOk) {
     // 물감 웅덩이: 가장자리가 살짝 출렁인다
@@ -435,6 +426,25 @@ $('find').addEventListener('click', async () => {
       onclick: () => toLips(p.color_hex, { finish: p.finish, quiet: false, source: '추천 제품 색' }),
     })],
   })));
+});
+
+// ---------- NFC 태그: 립 제품을 리더기에 올리면 그 제품 색을 바로 입술에 바른다 (js/nfc.js) ----------
+const nfcHint = $('nfc-hint');
+let nfcTimer = null;
+function nfcFlash(text) {
+  nfcHint.textContent = text;
+  nfcHint.classList.add('hit');
+  clearTimeout(nfcTimer);
+  nfcTimer = setTimeout(() => { nfcHint.textContent = tr('pal.nfcIdle'); nfcHint.classList.remove('hit'); }, 3000);
+}
+nfcHint.textContent = tr('pal.nfcIdle');
+listenNfc(async (code) => {
+  const id = resolveTag(code);
+  const found = id ? await api('api/products/' + encodeURIComponent(id)) : null;
+  const p = found?.ok ? found.body.product : null;
+  if (!p?.color_hex) { nfcFlash(tr('pal.nfcUnknown')); return; }
+  toLips(p.color_hex, { finish: p.finish, quiet: false, source: shortName(p) });
+  nfcFlash(tr('pal.nfcApplied', { name: shortName(p) }));
 });
 
 resize();
