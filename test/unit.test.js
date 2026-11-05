@@ -523,3 +523,25 @@ test('NFC 테스트: 서버는 정해진 모양만 받고 원래 번호·레코�
   const bad = sanitizeNfcReading({ kind: 'ndef-empty', masked: '<script>', fp: 'zz', tookId: 'A0000', records: [{ type: '<x>' }] });
   assert.deepEqual(bad, { kind: 'ndef-empty', masked: '', fp: null, tookId: null, records: [] });
 });
+
+test('NFC 테스트: 실물 테스트 카드(토스뱅크·음쓰카드)를 가린 번호로 맞춘다', async () => {
+  const nfc = await import('../public/js/nfc-test.js');
+  const read = async (uid) => ({ kind: 'ndef-empty', masked: nfc.maskUid(uid), fp: await nfc.uidFingerprint(uid), tookId: null });
+  assert.equal(nfc.resolveTestProduct(await read('9F:93:12:47')).product.name, '토스뱅크 카드');
+  assert.equal(nfc.resolveTestProduct(await read('52:62:AB:54')).product.name, '음식물쓰레기 종량제 카드');
+  // 휴대폰 연결로 받은 결과(가린 번호만 있음)도 같다
+  assert.equal(nfc.resolveTestProduct({ kind: 'ndef-empty', masked: '52:62:••:54', fp: null }).product.id, 'TOOK-T02');
+  // 등록하지 않은 카드·읽기 실패는 제품을 지어내지 않는다
+  assert.equal(nfc.resolveTestProduct(await read('04:11:22:33:44:55:66')).product, null);
+  assert.equal(nfc.resolveTestProduct({ kind: 'unreadable', masked: '', fp: null }).product, null);
+  // 태그에 적힌 식별값이 가장 먼저
+  assert.equal(nfc.resolveTestProduct({ kind: 'ndef', masked: '9F:93:••:47', tookId: 'TOOK-002' }).product.id, 'TOOK-002');
+});
+
+test('NFC 팔레트: 실물 테스트 카드 → 실제 립 제품, 태그에 쓴 제품 ID 우선', async () => {
+  const { resolveReading, NFC_CARD_PRODUCTS } = await import('../public/js/nfc.js');
+  assert.equal(resolveReading({ masked: '9F:93:••:47' }), 'OY-A000000241210');
+  assert.equal(resolveReading({ masked: '52:62:••:54' }), 'OY-A000001001860');
+  assert.equal(resolveReading({ masked: '04:11:••:66' }), null);
+  assert.equal(resolveReading({ masked: '9F:93:••:47', records: [{ type: 'text', text: 'OY-A000000205485' }] }), 'OY-A000000205485');
+});

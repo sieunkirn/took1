@@ -250,7 +250,7 @@ export function renderNav() {
 }
 
 const IDLE_TEST_BUTTON = true;
-const NFC_TEST_MENU = true; // 상단 메뉴의 'NFC 테스트' (테스트 단계)
+export const NFC_TEST_MENU = true; // 상단 메뉴의 'NFC 테스트' (테스트 단계)
 const ORIENT_BUTTON = true; // 가로·세로 바꿔 보기 버튼 (배포 때 false 로)
 
 // ---------- 키오스크 자동 초기화 ----------

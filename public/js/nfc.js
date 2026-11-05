@@ -75,3 +75,20 @@ export function listenNfc(onTag) {
   window.tookNfc = (code) => onTag(String(code));
   return () => window.removeEventListener('keydown', onKey, true);
 }
+
+// ---------- 휴대폰 NFC(Web NFC) 인식 결과 → 등록 제품 (팔레트) ----------
+// 실물 테스트 카드: 가린 번호(앞 2바이트·끝 1바이트, js/nfc-test.js 의 maskUid) → 올리브영 제품 ID.
+// 원래 카드 번호는 적지 않는다. 휴대폰 연결로 받은 결과(가린 번호만 옴)도 같은 값이다
+export const NFC_CARD_PRODUCTS = {
+  '9F:93:••:47': 'OY-A000000241210', // 토스뱅크 카드 → 롬앤 더 쥬시 래스팅 틴트 (테스트용 연결)
+  '52:62:••:54': 'OY-A000001001860', // 음식물쓰레기 종량제 카드 → 시튜에아 에어리 무스 벨벳 (테스트용 연결)
+};
+
+/** 휴대폰 NFC 인식 결과 → 제품 ID (없으면 null). 태그에 제품 ID 를 써 둔 경우(NDEF text) > 실물 테스트 카드 */
+export function resolveReading(r) {
+  for (const rec of r.records || []) {
+    const id = rec.text ? resolveTag(rec.text) : null;
+    if (id) return id;
+  }
+  return (r.masked && NFC_CARD_PRODUCTS[r.masked]) || null;
+}

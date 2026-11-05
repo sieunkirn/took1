@@ -19,7 +19,32 @@ export const NFC_TEST_PRODUCTS = {
   'TOOK-001': { id: 'TOOK-001', name: '테스트 립스틱 A', type: '립스틱', note: '시뮬레이션용 가상 데이터' },
   'TOOK-002': { id: 'TOOK-002', name: '테스트 립스틱 B', type: '립스틱', note: '시뮬레이션용 가상 데이터' },
   'TOOK-003': { id: 'TOOK-003', name: '테스트 립스틱 C', type: '립스틱', note: '시뮬레이션용 가상 데이터' },
+  // 손에 있는 실물 카드로 시험하기 위한 테스트 제품 (카드 자체를 제품으로 본다)
+  'TOOK-T01': { id: 'TOOK-T01', name: '토스뱅크 카드', type: '테스트용 실물 카드', note: '테스트용 가상 제품 (카드 번호만 가려서 사용, 결제 정보는 읽지 않음)' },
+  'TOOK-T02': { id: 'TOOK-T02', name: '음식물쓰레기 종량제 카드', type: '테스트용 실물 카드', note: '테스트용 가상 제품 (카드 번호는 가려서만 표시)' },
 };
+
+// 실물 테스트 카드 표: 가린 번호(앞 2바이트·끝 1바이트) → 테스트 제품.
+// 원래 카드 번호는 코드에 적지 않는다. 가린 번호는 휴대폰 연결로 받을 때도 같아서 두 방식 모두 맞춰진다.
+// (가린 번호가 같은 다른 카드는 거의 없지만 0 은 아니다. 테스트 용도로만 쓴다)
+// 갤럭시 S24 Chrome 에서 실제로 읽힌 값 (2026-11-05)
+export const NFC_CARD_MAP = {
+  '9F:93:••:47': 'TOOK-T01', // 토스뱅크 카드
+  '52:62:••:54': 'TOOK-T02', // 음식물쓰레기 종량제 카드
+};
+
+/**
+ * 인식 결과 → 테스트 제품 (없으면 product: null). 우선순위: 태그에 적힌 식별값 > 임시 연결 > 실물 테스트 카드 표
+ * 등록되지 않은 카드는 제품을 지어내지 않는다
+ * @param {Map<string,string>} [bindings] 화면에서 임시 연결한 지문 → 제품 ID
+ */
+export function resolveTestProduct(r, bindings = new Map()) {
+  const P = NFC_TEST_PRODUCTS;
+  if (r.tookId && NFC_TEST_MAP[r.tookId]) return { product: P[NFC_TEST_MAP[r.tookId]], by: `태그에 적힌 테스트용 식별값 ${r.tookId}` };
+  if (r.fp && bindings.has(r.fp)) return { product: P[bindings.get(r.fp)], by: `임시 연결한 카드 (지문 ${r.fp.slice(0, 6)}…)` };
+  if (r.masked && NFC_CARD_MAP[r.masked]) return { product: P[NFC_CARD_MAP[r.masked]], by: `등록한 테스트 카드 (번호 ${r.masked})` };
+  return { product: null };
+}
 
 // 매핑 테이블: 태그에서 읽은 '테스트용 식별값' → 가상 제품 ID.
 // 나중에 제품 스티커(NDEF)에 'TOOK-001' 같은 글자(text 레코드)나 이 글자가 들어간 주소(url 레코드)를 써 두면 바로 맞춰진다.
