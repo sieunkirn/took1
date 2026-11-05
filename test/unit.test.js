@@ -551,10 +551,27 @@ test('NFC 팔레트: 실물 테스트 카드는 카드 이름·사진으로 보�
   const base = findById('OY-A000000241210') || { id: 'X', brand: '롬앤', name: '틴트', color_hex: '#C4707A', finish: 'glossy', price: 13000, url: 'https://x' };
   const p = cardProduct('9F:93:••:47', base);
   assert.equal(`${p.brand} ${p.name}`, '토스뱅크 카드');
-  assert.equal(p.color_hex, base.color_hex);
+  assert.equal(p.color_hex, '#FFFFFF'); // 토스뱅크 카드 → 흰색 입술
+  assert.equal(cardProduct('52:62:••:54', base).color_hex, '#000000'); // 음쓰카드 → 검정 입술
   assert.equal(p.price, null);
   assert.equal(p.url, null);
   assert.equal(p.image_url, 'images/nfc-test/toss-bank-card.png');
   assert.equal(`${cardProduct('52:62:••:54', base).brand} ${cardProduct('52:62:••:54', base).name}`, '음쓰 카드');
   assert.equal(cardProduct('04:11:••:66', base), base); // 테스트 카드가 아니면 그대로
+});
+
+test('휴대폰 연결: 네 자리 번호로 연결, 같은 번호로 다시 열기, 틀린 번호 여러 번이면 막기', async () => {
+  const pr = await import('../src/lib/pairing.js');
+  const a = pr.openCodeSession();
+  assert.match(a.code, /^\d{4}$/);
+  assert.deepEqual(pr.joinByCode(a.code, 'phone-1'), { id: a.id });
+  assert.equal(pr.openCodeSession(a.code).id, a.id); // 같은 화면이 다시 열면 같은 연결
+  const other = pr.openCodeSession();
+  assert.notEqual(other.code, a.code); // 다른 화면은 다른 번호
+  const wrong = a.code === '0000' ? '0001' : '0000';
+  let r;
+  for (let i = 0; i < 8; i++) r = pr.joinByCode(wrong === other.code ? '9999' : wrong, 'attacker');
+  assert.equal(r.error, 'wrong');
+  assert.equal(pr.joinByCode(a.code, 'attacker').error, 'blocked'); // 8번 틀리면 맞는 번호도 잠시 막힘
+  assert.deepEqual(pr.joinByCode(a.code, 'phone-2'), { id: a.id }); // 다른 휴대폰은 그대로
 });

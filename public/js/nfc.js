@@ -84,12 +84,12 @@ export const NFC_CARD_PRODUCTS = {
   '52:62:••:54': 'OY-A000001001860', // 음식물쓰레기 종량제 카드 → 시튜에아 에어리 무스 벨벳 (테스트용 연결)
 };
 
-// 실물 테스트 카드를 읽었을 때 제품 카드에 보일 모습: 이름·사진은 카드 자체로, 입술에 바를 색·제형은 연결한 제품(위 표)에서 가져온다.
+// 실물 테스트 카드를 읽었을 때 제품 카드에 보일 모습: 이름·사진·입술 색(토스뱅크 흰색, 음쓰 검정)은 카드 것으로 덮어쓴다.
 // 실제 판매 제품이 아니므로 가격·올리브영 링크는 비운다. 사진은 사용자가 준 카드 사진 (images/nfc-test/)
 export const NFC_CARD_DISPLAY = {
   // 브랜드 + 이름이 이어서 '토스뱅크 카드', '음쓰 카드'로 읽힌다 (알림 문구는 브랜드와 이름을 붙여 쓴다)
-  '9F:93:••:47': { id: 'TEST-CARD-TOSS', brand: '토스뱅크', brand_en: 'Toss Bank', name: '카드', name_en: 'card', image_url: 'images/nfc-test/toss-bank-card.png' },
-  '52:62:••:54': { id: 'TEST-CARD-WASTE', brand: '음쓰', brand_en: 'Food waste', name: '카드', name_en: 'card', image_url: 'images/nfc-test/food-waste-card.png' },
+  '9F:93:••:47': { id: 'TEST-CARD-TOSS', brand: '토스뱅크', brand_en: 'Toss Bank', name: '카드', name_en: 'card', image_url: 'images/nfc-test/toss-bank-card.png', color_hex: '#FFFFFF', finish: 'matte' }, // 입술: 흰색
+  '52:62:••:54': { id: 'TEST-CARD-WASTE', brand: '음쓰', brand_en: 'Food waste', name: '카드', name_en: 'card', image_url: 'images/nfc-test/food-waste-card.png', color_hex: '#000000', finish: 'matte' }, // 입술: 검정색
 };
 
 /** 연결한 제품(base) 위에 카드 모습을 덮어쓴 표시용 제품 (테스트 데이터) */

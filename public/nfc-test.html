@@ -45,9 +45,10 @@
   <!-- 컴퓨터(NFC 없는 기기)에서 열면: 휴대폰은 카드를 읽기만 하고, 제품은 이 화면 오른쪽에 뜬다 -->
   <section class="area hidden" id="pair-area">
     <div class="label">휴대폰으로 읽고 이 화면에 띄우기</div>
-    <p class="muted small">버튼을 누르면 QR 이 떠요. 갤럭시 S24 카메라로 QR 을 찍어 Chrome 으로 열고, 휴대폰에서 "NFC 읽기 시작"을 누른 뒤 카드를 대면 이 화면 오른쪽에 제품이 떠요.
+    <p class="muted small">버튼을 누르면 네 자리 번호와 QR 이 떠요. 갤럭시 S24 Chrome 에서 번호를 입력하거나 QR 을 찍어 연결하고, 휴대폰에서 "NFC 읽기 시작"을 누른 뒤 카드를 대면 이 화면 오른쪽에 제품이 떠요.
       서버(npm start)를 켜고 https 주소(cloudflared 터널)로 이 화면을 열어야 해요.</p>
-    <button type="button" id="pair-start" class="btn-primary big-btn">휴대폰 연결 QR 띄우기</button>
+    <button type="button" id="pair-start" class="btn-primary big-btn">휴대폰 연결 번호 띄우기</button>
+    <p id="pair-code" class="nt-code" aria-label="연결 번호"></p>
     <div id="pair-qr"></div>
     <p id="pair-url" class="muted small"></p>
     <p id="pair-status" class="small" aria-live="polite"></p>
@@ -121,6 +122,7 @@
   import { renderNav, api, el } from './js/common.js';
   import { listenNfc, normalizeTag } from './js/nfc.js';
   import { loadZXing } from './js/barcode-scan.js';
+  import { pairPhoneForNfc } from './js/nfc-relay.js';
   import { NFC_TEST_PRODUCTS, NFC_TEST_MAP, NFC_STATE_TEXT, KIND_TEXT, findTookId, normalizeUid, maskUid, uidFingerprint,
     startWebNfc, webNfcSupport, makeDedupe, resolveTestProduct } from './js/nfc-test.js';
 
@@ -320,57 +322,47 @@
   });
 
   // ② 갤럭시 S24 연결 (기존 바코드 QR 연결과 같은 서버 폴링)
-  let pairId = null;
-  let pairTimer = null;
-  $('pair-start').addEventListener('click', startPairing);
-  async function startPairing() {
-    if (pairId) return;
+  // 네 자리 번호로 연결 (js/nfc-relay.js, 팔레트와 같은 방식). 번호는 이 화면이 기억해서 새로 고쳐도 같다
+  let pairing = null;
+  $('pair-start').addEventListener('click', () => startPairing(!!pairing));
+  async function startPairing(fresh) {
+    pairing?.stop();
+    pairing = null;
     const status = $('pair-status');
-    const { ok, body } = await api('api/pair', { method: 'POST', body: JSON.stringify({ target: 'nfc' }) }).catch(() => ({ ok: false, body: {} }));
-    if (!ok || !body.id) {
-      status.textContent = '휴대폰 연결은 서버를 실행(npm start)했을 때만 쓸 수 있어요. 지금 주소(정적 배포)에서는 ① 이 기기 NFC 를 써 주세요.';
+    status.textContent = '연결을 여는 중이에요…';
+    const res = await pairPhoneForNfc({
+      fresh,
+      onReconnect: () => { status.textContent = '서버가 다시 켜져서 같은 번호로 다시 연결했어요.'; },
+      onEvent: (e) => {
+        if (e.type === 'phone') { status.textContent = '휴대폰이 연결됐어요. 휴대폰에서 "NFC 읽기 시작"을 눌러 주세요.'; setConn('갤럭시 S24 연결됨 (NFC 는 아직 시작 전)'); }
+        if (e.type === 'nfcstate') {
+          const st = e.data.state;
+          setConn(st === 'ready' ? '갤럭시 S24 연결됨 · 휴대폰 NFC 켜짐' : `갤럭시 S24 연결됨 · ${NFC_STATE_TEXT[st]}`);
+          setWait(st === 'ready' ? '휴대폰에 태그를 대 주세요 (휴대폰 화면을 켠 채 took 탭을 앞에 두세요)' : '대기 중이 아니에요');
+        }
+        if (e.type === 'nfc') handleReading({ ...e.data, uid: '', records: e.data.records || [], source: 'relay', real: true });
+      },
+    });
+    if (!res.ok) {
+      status.textContent = res.reason === 'noaddress' ? 'PC 의 와이파이 주소를 찾지 못했어요.'
+        : '휴대폰 연결은 서버가 있는 주소(Render: took-y6rn.onrender.com)에서만 돼요. 지금 주소(정적 배포)에서는 휴대폰에서 직접 열어 주세요.';
       return;
     }
-    if (!body.phoneUrl) { status.textContent = 'PC 의 와이파이 주소를 찾지 못했어요.'; return; }
-    pairId = body.id;
-    $('pair-start').disabled = true;
+    pairing = res;
+    $('pair-start').textContent = '번호 바꾸기';
+    $('pair-code').textContent = res.code;
     const ZXing = await loadZXing().catch(() => null);
     if (ZXing) {
-      const qr = new ZXing.BrowserQRCodeSvgWriter().write(body.phoneUrl, 148, 148);
+      const qr = new ZXing.BrowserQRCodeSvgWriter().write(res.phoneUrl, 148, 148);
       qr.setAttribute('shape-rendering', 'crispEdges');
       $('pair-qr').replaceChildren(qr);
     }
-    $('pair-url').textContent = `휴대폰 Chrome 주소창에 입력: ${body.phoneUrl}`;
-    status.textContent = body.phoneUrl.startsWith('https:')
-      ? '휴대폰 연결을 기다리고 있어요. 갤럭시 S24 Chrome 으로 QR 을 열어 주세요.'
-      : '휴대폰 연결을 기다리고 있어요. 주의: http 주소라 휴대폰에서 Web NFC 가 막혀요. cloudflared 터널의 https 주소로 이 화면을 열어 주세요.';
+    $('pair-url').textContent = `휴대폰 Chrome 에서 ${res.phoneBase.replace(/^https?:\/\//, '')} 를 열고 위 번호를 입력 (QR 을 찍어도 돼요)`;
+    status.textContent = res.phoneUrl.startsWith('https:')
+      ? '휴대폰 연결을 기다리고 있어요.'
+      : '휴대폰 연결을 기다리고 있어요. 주의: http 주소라 휴대폰에서 Web NFC 가 막혀요. https 주소로 이 화면을 열어 주세요.';
     setConn('갤럭시 S24 연결을 기다리는 중');
-    let after = 0;
-    let failures = 0;
-    const check = async () => {
-      const r = await api(`api/pair/${pairId}/poll?after=${after}`).catch(() => ({ ok: false, status: 0 }));
-      if (r.status === 404) {
-        clearInterval(pairTimer); pairId = null; $('pair-start').disabled = false;
-        status.textContent = '연결이 끝났어요 (서버가 다시 켜졌거나 30분 동안 쓰지 않음). QR 을 다시 띄워 주세요.';
-        setConn('휴대폰 연결이 끝났어요');
-        return;
-      }
-      if (!r.ok) { if (++failures >= 3) status.textContent = '서버와 연결이 잠시 끊겼어요. 다시 연결하는 중이에요…'; return; }
-      failures = 0;
-      after = r.body.last;
-      for (const e of r.body.events) {
-        if (e.type === 'phone') { status.textContent = '휴대폰이 연결됐어요. 휴대폰에서 "NFC 읽기 시작"을 눌러 주세요.'; setConn('갤럭시 S24 연결됨 (NFC 는 아직 시작 전)'); }
-        if (e.type === 'nfcstate') {
-          const s = e.data.state;
-          setConn(s === 'ready' ? '갤럭시 S24 연결됨 · 휴대폰 NFC 켜짐' : `갤럭시 S24 연결됨 · ${NFC_STATE_TEXT[s]}`);
-          setWait(s === 'ready' ? '휴대폰에 태그를 대 주세요 (휴대폰 화면을 켠 채 took 탭을 앞에 두세요)' : '대기 중이 아니에요');
-        }
-        if (e.type === 'nfc') handleReading({ ...e.data, uid: '', records: e.data.records || [], source: 'relay', real: true });
-      }
-    };
-    pairTimer = setInterval(check, 600);
   }
-  window.addEventListener('pagehide', () => clearInterval(pairTimer));
 
   // ③ 외부 리더기 (키보드 모드, js/nfc.js 와 같은 방식)
   listenNfc(async (code) => {

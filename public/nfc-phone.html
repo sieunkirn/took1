@@ -7,15 +7,28 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <style>
   .np-uid { font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+  .np-code input { width: 7.5em; font-size: 28px; letter-spacing: 0.3em; text-align: center; font-family: ui-monospace, Consolas, monospace; }
+  .np-code button { min-height: 52px; }
 </style>
 </head>
 <body data-idle-reset="off">
-<!-- NFC 테스트 화면(nfc-test.html)의 QR 로 여는 휴대폰 화면. 갤럭시 S24 Chrome 의 Web NFC 로 태그를 읽고,
-     가린 번호·지문·테스트용 식별값만 PC 로 보낸다 (원래 카드 번호와 레코드 내용은 보내지 않는다) -->
+<!-- 휴대폰을 NFC 리더기로 쓰는 화면. 컴퓨터(팔레트·NFC 테스트)에 뜬 네 자리 번호를 입력하거나 QR 을 찍어 연결한다.
+     이 주소(nfc-phone.html)를 북마크해 두면 마지막 번호로 자동 연결된다.
+     갤럭시 S24 Chrome 의 Web NFC 로 태그를 읽고, 가린 번호·지문·테스트용 식별값만 컴퓨터로 보낸다 (원래 카드 번호와 레코드 내용은 보내지 않는다) -->
 <main class="phone-scan">
   <p class="eyebrow">TOOK · NFC 테스트</p>
   <h1>휴대폰을<br>NFC 리더기로</h1>
-  <p id="link-status" class="msg" aria-live="polite">PC와 연결하는 중이에요…</p>
+  <p id="link-status" class="msg" aria-live="polite">컴퓨터와 연결하는 중이에요…</p>
+
+  <!-- 네 자리 번호로 연결 -->
+  <form id="code-form" class="np-code hidden" autocomplete="off">
+    <label for="code-input" class="small">컴퓨터 화면의 네 자리 번호</label>
+    <div class="row">
+      <input type="text" id="code-input" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="0000" required>
+      <button type="submit" class="btn-primary">연결</button>
+    </div>
+  </form>
+  <button type="button" id="change-code" class="hidden">다른 번호로 연결</button>
 
   <button type="button" id="start" class="btn-primary big-btn">NFC 읽기 시작</button>
   <p id="nfc-state" class="small" aria-live="polite"></p>
@@ -31,40 +44,85 @@
   import { startWebNfc, webNfcSupport, makeDedupe, NFC_STATE_TEXT, KIND_TEXT } from './js/nfc-test.js';
 
   const $ = (id) => document.getElementById(id);
-  const id = new URLSearchParams(location.search).get('s') || '';
+  const params = new URLSearchParams(location.search);
+  const CODE_KEY = 'took.nfcPhoneCode';
+  const readCode = () => { try { return localStorage.getItem(CODE_KEY); } catch { return null; } };
+  const saveCode = (c) => { try { localStorage.setItem(CODE_KEY, c); } catch { /* 저장할 수 없는 환경 */ } };
+  let id = params.get('s') || ''; // 옛 QR (연결 id 를 바로 담음)
+  let code = /^\d{4}$/.test(params.get('c') || '') ? params.get('c') : readCode(); // 새 QR(번호) 또는 지난번 번호
   const isDup = makeDedupe();
   let linked = false;
-  const ended = () => {
+  let stop = null; // NFC 읽는 중일 때 멈추는 함수 (연결 함수가 먼저 쓰므로 위에 둔다)
+  const linkStatus = (t) => { $('link-status').textContent = t; };
+  function askCode(text) {
     linked = false;
-    $('link-status').textContent = 'PC와의 연결이 끝났어요. PC 의 NFC 테스트 화면에서 QR 을 다시 띄운 뒤 다시 열어 주세요.';
-  };
-
-  if (!/^[0-9a-f]{16}$/.test(id)) ended();
-  else {
-    const { ok } = await api(`api/pair/${id}/hello`, { method: 'POST', body: '{}' }).catch(() => ({ ok: false }));
-    if (ok) { linked = true; $('link-status').textContent = 'PC와 연결됐어요. "NFC 읽기 시작"을 누른 뒤 태그를 대면 PC 화면 오른쪽 패널이 바뀌어요.'; }
-    else ended();
+    linkStatus(text);
+    $('code-form').classList.remove('hidden');
+    $('change-code').classList.add('hidden');
+    $('code-input').value = '';
   }
+  async function hello() {
+    const { ok } = await api(`api/pair/${id}/hello`, { method: 'POST', body: '{}' }).catch(() => ({ ok: false }));
+    return ok;
+  }
+  // 번호로 연결 (성공하면 번호를 기억해 다음에 자동 연결)
+  async function join(c) {
+    const r = await api('api/pair/join', { method: 'POST', body: JSON.stringify({ code: c }) }).catch(() => ({ ok: false, status: 0, body: {} }));
+    if (!r.ok || !r.body.id) return r.body?.error || '컴퓨터와 연결하지 못했어요. 인터넷 연결을 확인해 주세요.';
+    id = r.body.id;
+    code = c;
+    saveCode(c);
+    if (!(await hello())) return '컴퓨터와 연결하지 못했어요. 다시 해 주세요.';
+    linked = true;
+    linkStatus(`컴퓨터(번호 ${c})와 연결됐어요. "NFC 읽기 시작"을 누르고 카드를 대면 컴퓨터 화면에 제품이 떠요.`);
+    $('code-form').classList.add('hidden');
+    $('change-code').classList.remove('hidden');
+    if (stop) sendState('ready');
+    return null;
+  }
+  $('code-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const c = $('code-input').value.trim();
+    if (!/^\d{4}$/.test(c)) { linkStatus('네 자리 숫자를 입력해 주세요.'); return; }
+    linkStatus('연결하는 중이에요…');
+    const err = await join(c);
+    if (err) askCode(err);
+  });
+  $('change-code').addEventListener('click', () => askCode('컴퓨터 화면의 네 자리 번호를 입력해 주세요.'));
+
+  if (/^[0-9a-f]{16}$/.test(id) && (await hello())) {
+    linked = true;
+    linkStatus('컴퓨터와 연결됐어요. "NFC 읽기 시작"을 누른 뒤 카드를 대면 컴퓨터 화면에 제품이 떠요.');
+  } else if (code) {
+    const err = await join(code);
+    if (err) askCode(code === readCode() && !params.get('c') ? '지난번 번호로 연결하지 못했어요. 컴퓨터 화면의 네 자리 번호를 입력해 주세요.' : err);
+  } else askCode('컴퓨터 화면에 뜬 네 자리 번호를 입력해 주세요.');
 
   const sendState = (state) => linked && api(`api/pair/${id}/nfcstate`, { method: 'POST', body: JSON.stringify({ state }) }).catch(() => {});
   async function send(r) {
     if (!linked) return;
     // 원래 번호(uid)와 레코드 내용(text)은 빼고 보낸다
     const payload = { kind: r.kind, masked: r.masked, fp: r.fp, tookId: r.tookId, records: r.records.map(({ type, mediaType, bytes }) => ({ type, mediaType, bytes })) };
-    const res = await api(`api/pair/${id}/nfc`, { method: 'POST', body: JSON.stringify(payload) }).catch(() => ({ ok: false, status: 0 }));
-    if (res.status === 404) ended();
-    else if (!res.ok) $('nfc-state').textContent = 'PC 로 보내지 못했어요. 와이파이·서버를 확인하고 다시 대 주세요.';
+    let res = await api(`api/pair/${id}/nfc`, { method: 'POST', body: JSON.stringify(payload) }).catch(() => ({ ok: false, status: 0 }));
+    if (res.status === 404 && code) {
+      // 서버가 다시 켜져 연결이 새로 만들어졌다: 같은 번호로 다시 연결하고 한 번 더 보낸다
+      const err = await join(code);
+      if (err) { askCode('연결이 끝났어요. 컴퓨터 화면의 네 자리 번호를 다시 입력해 주세요.'); return; }
+      res = await api(`api/pair/${id}/nfc`, { method: 'POST', body: JSON.stringify(payload) }).catch(() => ({ ok: false, status: 0 }));
+    }
+    if (res.status === 404) askCode('연결이 끝났어요. 컴퓨터 화면의 네 자리 번호를 다시 입력해 주세요.');
+    else if (!res.ok) $('nfc-state').textContent = '컴퓨터로 보내지 못했어요. 와이파이·서버를 확인하고 다시 대 주세요.';
   }
 
   function show(r) {
     const when = new Date().toLocaleTimeString('ko-KR', { hour12: false });
     if (r.kind === 'unreadable') {
-      $('last').textContent = `${when} · 카드가 감지됐어요 (번호는 못 읽는 카드). PC 화면에 제품을 띄웠어요. PC 가 안 바뀌면 다시 대 보세요.`;
+      $('last').textContent = `${when} · 카드가 감지됐어요 (번호는 못 읽는 카드). 컴퓨터 화면에 제품을 띄웠어요. 안 바뀌면 다시 대 보세요.`;
       return;
     }
     const recs = r.records.map((x) => (x.text != null ? `${x.type}: ${x.text.slice(0, 60)}` : `${x.type} ${x.bytes}바이트`)).join(' / ');
     $('last').replaceChildren(`${when} · ${KIND_TEXT[r.kind]}`, document.createElement('br'),
-      Object.assign(document.createElement('span'), { className: 'np-uid', textContent: '번호: ' + (r.uid || '없음') + ' (PC 로는 ' + (r.masked || '-') + ' 만 보냄)' }),
+      Object.assign(document.createElement('span'), { className: 'np-uid', textContent: '번호: ' + (r.uid || '없음') + ' (컴퓨터로는 ' + (r.masked || '-') + ' 만 보냄)' }),
       document.createElement('br'), r.tookId ? `테스트용 식별값: ${r.tookId}` : (recs || '기록된 레코드 없음'));
   }
 
@@ -83,7 +141,6 @@
   } else $('nfc-state').textContent = '버튼을 누르면 NFC 권한을 묻고 읽기를 시작해요';
 
   // nfc-test.html 과 같은 흐름: 시작 → (켜지는 중, 누르면 다시 시도) → 읽는 중(누르면 멈춤). 6초 안에 안 켜지면 확인할 것을 알려 준다
-  let stop = null;
   let attempt = null;
   let slowTimer = null;
   const btn = $('start');

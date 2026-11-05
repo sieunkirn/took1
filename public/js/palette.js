@@ -510,11 +510,15 @@ if (NFC_TEST_MENU) {
     let pairing = null;
     btn.classList.remove('hidden');
     $('pal-nfc-close').addEventListener('click', () => dlg.close());
-    btn.addEventListener('click', async () => {
-      dlg.showModal();
-      if (pairing) return; // 이미 연결 중이면 QR 만 다시 보여 준다
+    // 번호 바꾸기: 지금 연결을 끊고 새 번호를 받는다 (번호를 아는 다른 휴대폰을 떼어 낼 때)
+    $('pal-nfc-newcode').addEventListener('click', () => { pairing?.stop(); pairing = null; connect(true); });
+    btn.addEventListener('click', () => { dlg.showModal(); if (!pairing) connect(false); });
+    async function connect(fresh) {
       pairState(tr('pal.nfcPairWait'));
+      $('pal-nfc-code').textContent = '';
       const res = await pairPhoneForNfc({
+        fresh,
+        onReconnect: () => state(tr('pal.nfcReconnected')),
         onEvent: (e) => {
           if (e.type === 'phone') { pairState(tr('pal.nfcPairOk')); state(tr('pal.nfcPairOk')); }
           if (e.type === 'nfcstate' && e.data.state === 'ready') {
@@ -523,7 +527,6 @@ if (NFC_TEST_MENU) {
           }
           if (e.type === 'nfc') onReading({ ...e.data, records: e.data.records || [] });
         },
-        onEnd: () => { pairing = null; state(tr('pal.nfcPairEnded')); },
       });
       if (!res.ok) { pairState(tr('pal.nfcPairNoServer')); return; }
       pairing = res;
@@ -533,9 +536,10 @@ if (NFC_TEST_MENU) {
         qr.setAttribute('shape-rendering', 'crispEdges');
         $('pal-nfc-qr').replaceChildren(qr);
       }
-      $('pal-nfc-url').textContent = res.phoneUrl;
+      $('pal-nfc-url').textContent = res.phoneBase.replace(/^https?:\/\//, '');
+      $('pal-nfc-code').textContent = res.code;
       if (!res.phoneUrl.startsWith('https:')) pairState(tr('pal.nfcPairHttp'));
-    });
+    }
   }
 }
 

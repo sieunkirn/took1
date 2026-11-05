@@ -949,4 +949,5 @@ html.intro-go body { overflow: auto; }
 .pal-nfc-dialog::backdrop { background: rgba(0, 0, 0, 0.35); }
 .pal-nfc-dialog h2 { margin: 0 0 6px; font-size: 18px; }
 .pal-nfc-dialog #pal-nfc-qr svg { display: block; margin: 8px auto; }
-.pal-nfc-dialog #pal-nfc-url { overflow-wrap: anywhere; }
+.pal-nfc-dialog #pal-nfc-url { overflow-wrap: anywhere; font-weight: 700; }
+.pal-nfc-code, .nt-code { margin: 4px 0; font-size: 44px; font-weight: 800; letter-spacing: 0.25em; font-family: ui-monospace, Consolas, monospace; text-align: center; }

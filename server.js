@@ -11,7 +11,7 @@ import { recommendByColor } from './src/lib/recommend.js';
 import { hybridAnswer } from './src/lib/llm/agent.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
-import { createSession, getSession, notify, poll, lanAddress } from './src/lib/pairing.js';
+import { createSession, getSession, notify, poll, lanAddress, openCodeSession, joinByCode } from './src/lib/pairing.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 // .env (LLM 주소·키 등 서버 전용 설정). 없으면 규칙 챗봇만 쓴다
@@ -100,8 +100,8 @@ async function handleApi(req, res, url) {
   // ---------- 휴대폰 ↔ PC 연결 (QR) ----------
   if (req.method === 'POST' && path === '/api/pair') {
     const body = await readBody(req).catch(() => ({}));
-    const phonePage = body.target === 'nfc' ? 'nfc-phone.html' : 'scan-phone.html'; // NFC 테스트 화면은 휴대폰을 NFC 리더기로 쓴다
-    const id = createSession();
+    const nfc = body.target === 'nfc'; // NFC 테스트·팔레트: 휴대폰을 NFC 리더기로 쓰고, 네 자리 번호로도 연결한다
+    const { id, code } = nfc ? openCodeSession(typeof body.code === 'string' ? body.code : null) : { id: createSession(), code: null };
     // PC 를 localhost 로 열었으면 휴대폰은 접속할 수 없으므로 같은 와이파이의 PC 주소로 안내한다.
     // 터널(cloudflared 등)로 공개 주소를 쓰면 원래 주소·https 여부는 X-Forwarded-* 헤더로 들어온다
     const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
@@ -109,7 +109,18 @@ async function handleApi(req, res, url) {
     const ip = local ? lanAddress() : null;
     const scheme = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || (req.socket.encrypted ? 'https' : 'http');
     const where = local ? (ip ? `${ip}:${req.socket.localPort}` : null) : host;
-    return sendJson(res, 200, { id, phoneUrl: where ? `${scheme}://${where}/${phonePage}?s=${id}` : null });
+    const base = where ? `${scheme}://${where}/` : null;
+    if (nfc) return sendJson(res, 200, { id, code, phoneUrl: base && `${base}nfc-phone.html?c=${code}`, phoneBase: base && `${base}nfc-phone.html` });
+    return sendJson(res, 200, { id, phoneUrl: base && `${base}scan-phone.html?s=${id}` });
+  }
+  // 휴대폰이 네 자리 번호로 연결 → 연결 id
+  if (req.method === 'POST' && path === '/api/pair/join') {
+    const body = await readBody(req).catch(() => ({}));
+    const who = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const r = joinByCode(String(body.code || ''), who);
+    if (r.error === 'blocked') return sendJson(res, 429, { error: '번호를 여러 번 틀렸어요. 5분 뒤에 다시 해 주세요.' });
+    if (r.error) return sendJson(res, 404, { error: '맞는 번호가 없어요. 컴퓨터 화면의 네 자리 번호를 확인해 주세요.' });
+    return sendJson(res, 200, { id: r.id });
   }
   m = path.match(/^\/api\/pair\/([0-9a-f]{16})\/(poll|hello|code|nfc|nfcstate)$/);
   if (m) {
