@@ -6,7 +6,7 @@
 //  - 섞는 칸 색이 바뀌는 동안 같은 색을 took:apply 이벤트로 보내 왼쪽 카메라 입술(lip.js)에 바로 입힌다
 //  - 초기화: 팔레트를 비우고 입술 색을 기본 컬러로 되돌린다
 import { renderNav, store, api, el, productCard, toast, skeletonCards, shortName, NFC_TEST_MENU } from './common.js';
-import { listenNfc, resolveTag, resolveReading } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
+import { listenNfc, resolveTag, resolveReading, cardProduct } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
 import { startWebNfc, webNfcSupport, makeDedupe } from './nfc-test.js'; // 휴대폰 NFC (Web NFC)
 import { pairPhoneForNfc } from './nfc-relay.js'; // 휴대폰으로 읽고 이 화면에 띄우기
 import { loadZXing } from './barcode-scan.js'; // QR 그리기
@@ -442,9 +442,10 @@ function nfcFlash(text) {
 }
 nfcHint.textContent = tr('pal.nfcIdle');
 // 읽은 제품: 그 색을 입술에 바르고, 오른쪽 ④ 자리에 제품 카드를 띄운다 (리더기·휴대폰 NFC 공통)
-async function showNfcProduct(id) {
+// masked: 실물 테스트 카드면 그 가린 번호 → 제품 카드를 카드 이름·사진으로 보여 준다 (색은 연결한 제품 색)
+async function showNfcProduct(id, masked = null) {
   const found = id ? await api('api/products/' + encodeURIComponent(id)) : null;
-  const p = found?.ok ? found.body.product : null;
+  const p = cardProduct(masked, found?.ok ? found.body.product : null);
   if (!p?.color_hex) { nfcFlash(tr('pal.nfcUnknown')); return; }
   toLips(p.color_hex, { finish: p.finish, quiet: false, source: shortName(p) });
   nfcFlash(tr('pal.nfcApplied', { name: shortName(p) }));
@@ -464,7 +465,7 @@ const isDupReading = makeDedupe();
 function onReading(r) {
   if (isDupReading(r)) return;
   if (r.kind === 'unreadable') { nfcFlash(tr('pal.nfcRetry')); return; }
-  showNfcProduct(resolveReading(r));
+  showNfcProduct(resolveReading(r), r.masked);
 }
 if (NFC_TEST_MENU) {
   $('pal-nfc-row').classList.remove('hidden');

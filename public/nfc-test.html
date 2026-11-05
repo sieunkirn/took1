@@ -204,7 +204,9 @@
     const { product, by } = resolve(r);
     if (product) {
       openPanel('p:' + product.id, [
-        el('div', { class: 'placeholder', text: '제품 이미지 플레이스홀더' }),
+        product.image
+          ? el('img', { class: 'card-img', src: product.image, alt: product.name, style: 'width:100%;margin-bottom:12px' })
+          : el('div', { class: 'placeholder', text: '제품 이미지 플레이스홀더' }),
         el('p', {}, el('strong', { text: product.name }), tag),
         rowsTable([['제품 ID', product.id], ['종류', product.type], ['데이터', product.note], ['매칭 근거', by], ['인식 경로', SOURCE_TEXT[r.source]], ['인식 시간', time(r.at)]]),
       ]);

@@ -175,7 +175,7 @@ export function productCard(product, { extraActions = [] } = {}) {
     // 가격 숫자는 카드가 나타날 때 0에서 올라간다 (motion.js)
     [t('card.price'), Number.isFinite(Number(product.price)) && product.price !== null
       ? [el('span', { 'data-count': String(product.price), text: won(product.price) })]
-      : won(product.price)],
+      : (product.price == null ? t('detail.none') : won(product.price))], // 가격이 없는 테스트 제품은 '정보 없음'
   ];
   // 대표 이미지 자리: 모든 카드에 같은 크기로 두어 줄이 맞게 한다.
   // 이미지 주소가 없거나 불러오지 못하면(외부 사이트 이미지 차단 등) '이미지 준비 중' 자리로 바꾼다

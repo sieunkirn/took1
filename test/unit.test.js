@@ -528,7 +528,7 @@ test('NFC 테스트: 실물 테스트 카드(토스뱅크·음쓰카드)를 가�
   const nfc = await import('../public/js/nfc-test.js');
   const read = async (uid) => ({ kind: 'ndef-empty', masked: nfc.maskUid(uid), fp: await nfc.uidFingerprint(uid), tookId: null });
   assert.equal(nfc.resolveTestProduct(await read('9F:93:12:47')).product.name, '토스뱅크 카드');
-  assert.equal(nfc.resolveTestProduct(await read('52:62:AB:54')).product.name, '음식물쓰레기 종량제 카드');
+  assert.equal(nfc.resolveTestProduct(await read('52:62:AB:54')).product.name, '음쓰카드');
   // 휴대폰 연결로 받은 결과(가린 번호만 있음)도 같다
   assert.equal(nfc.resolveTestProduct({ kind: 'ndef-empty', masked: '52:62:••:54', fp: null }).product.id, 'TOOK-T02');
   // 등록하지 않은 카드·읽기 실패는 제품을 지어내지 않는다
@@ -544,4 +544,17 @@ test('NFC 팔레트: 실물 테스트 카드 → 실제 립 제품, 태그에 �
   assert.equal(resolveReading({ masked: '52:62:••:54' }), 'OY-A000001001860');
   assert.equal(resolveReading({ masked: '04:11:••:66' }), null);
   assert.equal(resolveReading({ masked: '9F:93:••:47', records: [{ type: 'text', text: 'OY-A000000205485' }] }), 'OY-A000000205485');
+});
+
+test('NFC 팔레트: 실물 테스트 카드는 카드 이름·사진으로 보이고 색은 연결한 제품 색', async () => {
+  const { cardProduct } = await import('../public/js/nfc.js');
+  const base = findById('OY-A000000241210') || { id: 'X', brand: '롬앤', name: '틴트', color_hex: '#C4707A', finish: 'glossy', price: 13000, url: 'https://x' };
+  const p = cardProduct('9F:93:••:47', base);
+  assert.equal(`${p.brand} ${p.name}`, '토스뱅크 카드');
+  assert.equal(p.color_hex, base.color_hex);
+  assert.equal(p.price, null);
+  assert.equal(p.url, null);
+  assert.equal(p.image_url, 'images/nfc-test/toss-bank-card.png');
+  assert.equal(`${cardProduct('52:62:••:54', base).brand} ${cardProduct('52:62:••:54', base).name}`, '음쓰 카드');
+  assert.equal(cardProduct('04:11:••:66', base), base); // 테스트 카드가 아니면 그대로
 });

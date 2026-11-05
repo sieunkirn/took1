@@ -20,8 +20,8 @@ export const NFC_TEST_PRODUCTS = {
   'TOOK-002': { id: 'TOOK-002', name: '테스트 립스틱 B', type: '립스틱', note: '시뮬레이션용 가상 데이터' },
   'TOOK-003': { id: 'TOOK-003', name: '테스트 립스틱 C', type: '립스틱', note: '시뮬레이션용 가상 데이터' },
   // 손에 있는 실물 카드로 시험하기 위한 테스트 제품 (카드 자체를 제품으로 본다)
-  'TOOK-T01': { id: 'TOOK-T01', name: '토스뱅크 카드', type: '테스트용 실물 카드', note: '테스트용 가상 제품 (카드 번호만 가려서 사용, 결제 정보는 읽지 않음)' },
-  'TOOK-T02': { id: 'TOOK-T02', name: '음식물쓰레기 종량제 카드', type: '테스트용 실물 카드', note: '테스트용 가상 제품 (카드 번호는 가려서만 표시)' },
+  'TOOK-T01': { id: 'TOOK-T01', name: '토스뱅크 카드', type: '테스트용 실물 카드', image: 'images/nfc-test/toss-bank-card.png', note: '테스트용 가상 제품 (카드 번호만 가려서 사용, 결제 정보는 읽지 않음)' },
+  'TOOK-T02': { id: 'TOOK-T02', name: '음쓰카드', type: '테스트용 실물 카드', image: 'images/nfc-test/food-waste-card.png', note: '테스트용 가상 제품 (카드 번호는 가려서만 표시)' },
 };
 
 // 실물 테스트 카드 표: 가린 번호(앞 2바이트·끝 1바이트) → 테스트 제품.
