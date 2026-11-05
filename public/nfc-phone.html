@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 휴대폰을 NFC 리더기로</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<style>
+  .np-uid { font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+</style>
+</head>
+<body data-idle-reset="off">
+<!-- NFC 테스트 화면(nfc-test.html)의 QR 로 여는 휴대폰 화면. 갤럭시 S24 Chrome 의 Web NFC 로 태그를 읽고,
+     가린 번호·지문·테스트용 식별값만 PC 로 보낸다 (원래 카드 번호와 레코드 내용은 보내지 않는다) -->
+<main class="phone-scan">
+  <p class="eyebrow">TOOK · NFC 테스트</p>
+  <h1>휴대폰을<br>NFC 리더기로</h1>
+  <p id="link-status" class="msg" aria-live="polite">PC와 연결하는 중이에요…</p>
+
+  <button type="button" id="start" class="btn-primary big-btn">NFC 읽기 시작</button>
+  <p id="nfc-state" class="small" aria-live="polite"></p>
+  <p class="muted small">카드를 휴대폰 뒷면 가운데(카메라 아래쪽)에 1~2초 대 주세요. 읽는 동안 화면을 켜 두고 이 탭을 앞에 두세요.</p>
+
+  <section class="area" aria-live="polite">
+    <div class="label">마지막으로 읽은 태그 (이 휴대폰에만 보임)</div>
+    <p id="last" class="small">아직 없어요</p>
+  </section>
+</main>
+<script type="module">
+  import { api } from './js/common.js';
+  import { startWebNfc, webNfcSupport, makeDedupe, NFC_STATE_TEXT, KIND_TEXT } from './js/nfc-test.js';
+
+  const $ = (id) => document.getElementById(id);
+  const id = new URLSearchParams(location.search).get('s') || '';
+  const isDup = makeDedupe();
+  let linked = false;
+  const ended = () => {
+    linked = false;
+    $('link-status').textContent = 'PC와의 연결이 끝났어요. PC 의 NFC 테스트 화면에서 QR 을 다시 띄운 뒤 다시 열어 주세요.';
+  };
+
+  if (!/^[0-9a-f]{16}$/.test(id)) ended();
+  else {
+    const { ok } = await api(`api/pair/${id}/hello`, { method: 'POST', body: '{}' }).catch(() => ({ ok: false }));
+    if (ok) { linked = true; $('link-status').textContent = 'PC와 연결됐어요. "NFC 읽기 시작"을 누른 뒤 태그를 대면 PC 화면 오른쪽 패널이 바뀌어요.'; }
+    else ended();
+  }
+
+  const sendState = (state) => linked && api(`api/pair/${id}/nfcstate`, { method: 'POST', body: JSON.stringify({ state }) }).catch(() => {});
+  async function send(r) {
+    if (!linked) return;
+    // 원래 번호(uid)와 레코드 내용(text)은 빼고 보낸다
+    const payload = { kind: r.kind, masked: r.masked, fp: r.fp, tookId: r.tookId, records: r.records.map(({ type, mediaType, bytes }) => ({ type, mediaType, bytes })) };
+    const res = await api(`api/pair/${id}/nfc`, { method: 'POST', body: JSON.stringify(payload) }).catch(() => ({ ok: false, status: 0 }));
+    if (res.status === 404) ended();
+    else if (!res.ok) $('nfc-state').textContent = 'PC 로 보내지 못했어요. 와이파이·서버를 확인하고 다시 대 주세요.';
+  }
+
+  function show(r) {
+    const when = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+    if (r.kind === 'unreadable') {
+      $('last').textContent = `${when} · 감지됐지만 읽지 못했어요. NDEF 가 아닌 카드(교통카드 등)이거나 너무 빨리 뗐을 수 있어요. 다시 대 보세요.`;
+      return;
+    }
+    const recs = r.records.map((x) => (x.text != null ? `${x.type}: ${x.text.slice(0, 60)}` : `${x.type} ${x.bytes}바이트`)).join(' / ');
+    $('last').replaceChildren(`${when} · ${KIND_TEXT[r.kind]}`, document.createElement('br'),
+      Object.assign(document.createElement('span'), { className: 'np-uid', textContent: '번호: ' + (r.uid || '없음') + ' (PC 로는 ' + (r.masked || '-') + ' 만 보냄)' }),
+      document.createElement('br'), r.tookId ? `테스트용 식별값: ${r.tookId}` : (recs || '기록된 레코드 없음'));
+  }
+
+  function handle(r) {
+    if (isDup(r)) return; // 같은 태그를 잠깐 사이에 다시 읽으면 보내지 않는다
+    if (navigator.vibrate) navigator.vibrate(60);
+    show(r);
+    send(r);
+  }
+
+  const sup = webNfcSupport();
+  if (!sup.ok) {
+    $('start').disabled = true;
+    $('nfc-state').textContent = NFC_STATE_TEXT[sup.code];
+    sendState(sup.code);
+  } else $('nfc-state').textContent = '버튼을 누르면 NFC 권한을 묻고 읽기를 시작해요';
+
+  let stop = null;
+  $('start').addEventListener('click', async () => {
+    if (stop) { stop(); stop = null; $('start').textContent = 'NFC 읽기 시작'; $('nfc-state').textContent = '멈췄어요'; sendState('idle'); return; }
+    try {
+      stop = await startWebNfc({
+        onReading: handle,
+        onFail: () => handle({ kind: 'unreadable', uid: '', masked: '', fp: null, tookId: null, records: [] }),
+      });
+      $('start').textContent = 'NFC 읽기 멈추기';
+      $('nfc-state').textContent = NFC_STATE_TEXT.ready;
+      sendState('ready');
+    } catch (e) {
+      $('nfc-state').textContent = NFC_STATE_TEXT[e.code] || NFC_STATE_TEXT.error;
+      sendState(e.code || 'error');
+    }
+  });
+</script>
+</body>
+</html>

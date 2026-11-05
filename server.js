@@ -46,6 +46,20 @@ async function readBody(req) {
   return data ? JSON.parse(data) : {};
 }
 
+// ---------- NFC 테스트: 휴대폰이 보낸 인식 결과 검사 (정해진 모양만 통과, 나머지는 버린다) ----------
+const NFC_KINDS = new Set(['ndef', 'ndef-empty', 'unreadable']);
+const NFC_STATES = new Set(['idle', 'ready', 'unsupported', 'insecure', 'denied', 'off', 'nohw', 'error']);
+export function sanitizeNfcReading(b) {
+  if (!b || !NFC_KINDS.has(b.kind)) return null;
+  const masked = typeof b.masked === 'string' && /^[0-9A-F•:]{0,64}$/.test(b.masked) ? b.masked : '';
+  const fp = typeof b.fp === 'string' && /^[0-9a-f]{16}$/.test(b.fp) ? b.fp : null;
+  const tookId = typeof b.tookId === 'string' && /^TOOK-\d{3}$/.test(b.tookId) ? b.tookId : null;
+  const records = (Array.isArray(b.records) ? b.records : []).slice(0, 8)
+    .map((r) => ({ type: String(r?.type || '').slice(0, 40), mediaType: r?.mediaType ? String(r.mediaType).slice(0, 60) : null, bytes: Math.max(0, Math.min(1e6, Number(r?.bytes) || 0)) }))
+    .filter((r) => /^[\w:./+\-]{1,40}$/.test(r.type));
+  return { kind: b.kind, masked, fp, tookId, records };
+}
+
 async function handleApi(req, res, url) {
   const path = url.pathname;
   const q = url.searchParams;
@@ -85,6 +99,8 @@ async function handleApi(req, res, url) {
   }
   // ---------- 휴대폰 ↔ PC 연결 (QR) ----------
   if (req.method === 'POST' && path === '/api/pair') {
+    const body = await readBody(req).catch(() => ({}));
+    const phonePage = body.target === 'nfc' ? 'nfc-phone.html' : 'scan-phone.html'; // NFC 테스트 화면은 휴대폰을 NFC 리더기로 쓴다
     const id = createSession();
     // PC 를 localhost 로 열었으면 휴대폰은 접속할 수 없으므로 같은 와이파이의 PC 주소로 안내한다.
     // 터널(cloudflared 등)로 공개 주소를 쓰면 원래 주소·https 여부는 X-Forwarded-* 헤더로 들어온다
@@ -93,9 +109,9 @@ async function handleApi(req, res, url) {
     const ip = local ? lanAddress() : null;
     const scheme = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || (req.socket.encrypted ? 'https' : 'http');
     const where = local ? (ip ? `${ip}:${req.socket.localPort}` : null) : host;
-    return sendJson(res, 200, { id, phoneUrl: where ? `${scheme}://${where}/scan-phone.html?s=${id}` : null });
+    return sendJson(res, 200, { id, phoneUrl: where ? `${scheme}://${where}/${phonePage}?s=${id}` : null });
   }
-  m = path.match(/^\/api\/pair\/([0-9a-f]{16})\/(poll|hello|code)$/);
+  m = path.match(/^\/api\/pair\/([0-9a-f]{16})\/(poll|hello|code|nfc|nfcstate)$/);
   if (m) {
     const [, id, action] = m;
     if (!getSession(id)) return sendJson(res, 404, { error: '연결이 끝났어요. PC 화면에서 QR 을 다시 띄워 주세요.' });
@@ -111,6 +127,20 @@ async function handleApi(req, res, url) {
       const p = findByBarcode(code);
       notify(id, 'code', { code });
       return sendJson(res, 200, { ok: true, code, found: !!p, name: p ? `${p.brand} ${p.name} ${p.shade_name}` : null });
+    }
+    // 휴대폰(갤럭시 S24 등)이 Web NFC 로 읽은 태그. 원래 카드 번호는 받지 않고 가린 번호·지문·테스트용 식별값만 받아 메모리에 잠깐 둔다
+    if (req.method === 'POST' && action === 'nfc') {
+      const reading = sanitizeNfcReading(await readBody(req));
+      if (!reading) return sendJson(res, 400, { error: 'NFC 인식 결과 형식이 맞지 않아요.' });
+      notify(id, 'nfc', reading);
+      return sendJson(res, 200, { ok: true });
+    }
+    // 휴대폰 쪽 NFC 상태 (대기 중·꺼짐·미지원 등)
+    if (req.method === 'POST' && action === 'nfcstate') {
+      const body = await readBody(req);
+      if (!NFC_STATES.has(body.state)) return sendJson(res, 400, { error: '알 수 없는 NFC 상태예요.' });
+      notify(id, 'nfcstate', { state: body.state });
+      return sendJson(res, 200, { ok: true });
     }
   }
   return sendJson(res, 404, { error: '알 수 없는 API 입니다.' });

@@ -50,6 +50,14 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 - PC 에서 공개 주소로 챗봇을 열면 QR 에도 공개 주소가 자동으로 들어간다 (X-Forwarded-Host/Proto 반영)
 - 터널을 켤 때마다 주소가 바뀌고, 켜져 있는 동안은 주소를 아는 누구나 접속할 수 있다 (민감 정보 없음)
 
+### NFC 태그 인식 테스트 (갤럭시 S24, 직원용 `nfc-test.html`, 상단 메뉴 'NFC 테스트')
+- **방법 A (서버 없이, 지금 바로)**: S24 Chrome 에서 `https://took-sieunkirns-projects.vercel.app/nfc-test.html` → "이 기기로 NFC 읽기 시작" → 카드를 뒷면에 대기
+- **방법 B (PC·iPad 화면 + S24 리더기)**: `npm start` + `cloudflared tunnel --url http://localhost:3000` → PC 에서 터널 https 주소의 `nfc-test.html` → "휴대폰 연결 QR 띄우기" → S24 Chrome 으로 QR 열기(`nfc-phone.html`) → "NFC 읽기 시작". 휴대폰이 읽은 결과가 0.6초 폴링으로 PC 오른쪽 패널에 뜬다
+  - http(LAN IP) 주소에서는 휴대폰 Web NFC 가 막힌다 (https 필요)
+- Web NFC 는 NDEF 태그만 읽는다. 티머니·캐시비 같은 교통카드는 "감지됐지만 읽지 못함"으로 나오는 것이 정상이다. 출입카드는 종류에 따라 다르다(125kHz 는 감지 안 됨)
+- 매핑 테이블: `public/js/nfc-test.js` 의 `NFC_TEST_MAP` (TOOK-001~003 → 테스트 립스틱 A~C, 가상 데이터). NDEF text/url 레코드에 `TOOK-001` 을 써 둔 스티커가 바로 맞춰진다. 번호만 읽히는 카드는 화면의 '임시 연결'(메모리만)로 시험한다
+- 카드 번호는 저장하지 않고, 휴대폰 → PC 로는 가린 번호와 SHA-256 지문만 보낸다 (서버는 `sanitizeNfcReading` 으로 그 모양만 받는다)
+
 ### iPad(가로 화면)에서 실행
 1. PC 에서 `npm run cert` (openssl 로 자체 서명 인증서 생성, PC 의 IP 포함) → `npm start`
 2. 콘솔에 표시되는 `https://<PC IP>:3000` 을 같은 Wi-Fi 의 iPad Safari 에서 열기

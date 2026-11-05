@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - NFC 태그 인식 테스트</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<style>
+  /* NFC 테스트(직원용). 기존 무채색 토큰만 쓴다 */
+  .nt-main { transition: margin-right 0.3s var(--ease); }
+  body.nt-panel-open .nt-main { margin-right: min(380px, 100%); }
+  .nt-status { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+  .nt-status dt { color: var(--mute); font-size: 13px; font-weight: 700; padding-top: 2px; }
+  .nt-status dd { margin: 0; overflow-wrap: anywhere; }
+  .nt-uid { font-family: ui-monospace, Consolas, monospace; letter-spacing: 0.02em; }
+  .nt-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line-2); font-size: 12px; font-weight: 700; color: var(--ink-2); margin-left: 6px; vertical-align: 1px; }
+  .nt-tag.real { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .nt-routes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .nt-routes .area { margin: 0; box-shadow: inset 0 0 0 1px var(--line); }
+  .nt-routes h3 { margin: 0 0 4px; font-size: 16px; }
+  .nt-routes button { min-height: 44px; }
+  #pair-qr svg { display: block; margin-top: 8px; }
+  .nt-log { margin: 0; padding-left: 20px; font-size: 13px; color: var(--ink-2); }
+  .nt-log li { margin: 2px 0; }
+  .nt-flash { animation: nt-flash 0.6s var(--ease); }
+  @keyframes nt-flash { from { background: var(--soft-2); } to { background: transparent; } }
+  /* 오른쪽 제품 정보 패널: 화면을 바꾸지 않고 오른쪽에서 밀려 나온다 */
+  .nt-panel { position: fixed; top: var(--nav-h); right: 0; bottom: 0; width: min(380px, 100%); background: var(--paper); border-left: 1px solid var(--line-2);
+    box-shadow: var(--shadow-up); padding: 20px; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s var(--ease); z-index: 20; }
+  body.nt-panel-open .nt-panel { transform: none; }
+  .nt-panel header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .nt-panel h2 { margin: 0; font-size: 18px; }
+  .nt-panel .placeholder { aspect-ratio: 1 / 1; margin-bottom: 12px; }
+  .nt-panel table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .nt-panel th, .nt-panel td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+  .nt-panel th { color: var(--mute); width: 7.5em; font-weight: 700; }
+  @media (max-width: 760px) { body.nt-panel-open .nt-main { margin-right: 0; } }
+</style>
+</head>
+<body data-idle-reset="off"> <!-- 직원용 화면: 키오스크 자동 초기화를 끈다 -->
+<main class="nt-main">
+  <h1>NFC 태그 인식 테스트 <span class="muted small">(테스트용)</span></h1>
+  <p class="muted">NFC 리더기를 사기 전에 갤럭시 S24 의 NFC 로 태그를 읽어 보는 화면이에요. 태그를 읽으면 페이지를 옮기지 않고 오른쪽에 제품 정보 패널이 열려요.
+    <strong>실제</strong> 표시는 진짜 태그를 읽은 결과이고, <strong>시뮬레이션</strong> 표시는 버튼으로 흉내 낸 결과예요.
+    카드 번호는 저장하지 않고(새로 고치면 사라짐), 다른 기기로 보낼 때는 가린 번호와 지문(해시)만 보내요.</p>
+
+  <section class="area" aria-live="polite">
+    <div class="label">NFC 상태</div>
+    <dl class="nt-status">
+      <dt>연결 상태</dt><dd id="st-conn">아직 연결한 NFC 가 없어요 (아래에서 이 기기 NFC 나 휴대폰 연결을 시작하세요). 외부 리더기(키보드 모드)는 항상 듣고 있어요</dd>
+      <dt>인식 대기</dt><dd id="st-wait">대기 중이 아니에요</dd>
+      <dt>인식 결과</dt><dd id="st-result">아직 읽은 태그가 없어요</dd>
+      <dt>태그 ID</dt><dd><span id="st-uid" class="nt-uid">-</span> <button type="button" id="uid-toggle" class="hidden">전체 보기</button></dd>
+      <dt>읽은 데이터</dt><dd id="st-data">-</dd>
+      <dt>태그 종류·기술</dt><dd id="st-kind">-</dd>
+      <dt>인식 경로</dt><dd id="st-source">-</dd>
+      <dt>마지막 인식</dt><dd id="st-time">-</dd>
+      <dt>중복 무시</dt><dd id="st-dup">0회 (같은 태그를 2.5초 안에 다시 읽으면 다시 처리하지 않아요)</dd>
+    </dl>
+    <p id="st-msg" class="msg hidden"></p>
+  </section>
+
+  <section class="area">
+    <div class="label">입력 경로</div>
+    <div class="nt-routes">
+      <div class="area">
+        <h3>① 이 기기 NFC <span class="nt-tag real">실제</span></h3>
+        <p class="muted small">갤럭시 S24 의 Chrome 에서 이 화면을 열었을 때 쓰는 방식이에요 (Web NFC, https 필요).</p>
+        <button type="button" id="webnfc-start">이 기기로 NFC 읽기 시작</button>
+        <p id="webnfc-state" class="small"></p>
+      </div>
+      <div class="area">
+        <h3>② 갤럭시 S24 연결 <span class="nt-tag real">실제</span></h3>
+        <p class="muted small">PC·iPad 에 이 화면을 열어 두고, 휴대폰을 NFC 리더기로 써요. 서버 실행(npm start)이 필요하고, 휴대폰 쪽 Web NFC 때문에 https 주소(cloudflared 터널)로 열어야 해요.</p>
+        <button type="button" id="pair-start">휴대폰 연결 QR 띄우기</button>
+        <div id="pair-qr"></div>
+        <p id="pair-url" class="muted small"></p>
+        <p id="pair-status" class="small"></p>
+      </div>
+      <div class="area">
+        <h3>③ 외부 리더기 <span class="nt-tag real">실제</span></h3>
+        <p class="muted small">USB·블루투스 NFC 리더기(키보드 모드)를 연결하면 따로 시작하지 않아도 태그 입력을 받아요. 리더기를 사면 이 경로로 시험해요.</p>
+      </div>
+      <div class="area">
+        <h3>④ 시뮬레이션 <span class="nt-tag">시뮬레이션</span></h3>
+        <p class="muted small">실제 태그 없이 같은 처리 길을 지나 봐요. 결과에 '시뮬레이션'으로 표시돼요.</p>
+        <div class="row">
+          <button type="button" data-sim="TOOK-001">TOOK-001</button>
+          <button type="button" data-sim="TOOK-002">TOOK-002</button>
+          <button type="button" data-sim="TOOK-003">TOOK-003</button>
+          <button type="button" data-sim="unregistered">등록 안 된 카드</button>
+          <button type="button" data-sim="unreadable">읽기 실패</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="area" id="bind-area">
+    <div class="label">임시 연결 (이 화면에서만, 저장하지 않음)</div>
+    <p class="muted small">교통카드·출입카드처럼 번호(지문)만 읽히는 카드를 시험용 제품에 잠깐 연결해요. 카드 번호를 제품 ID 로 쓰지 않고, 이 화면을 새로 고치면 사라져요.</p>
+    <div class="row">
+      <span id="bind-target" class="small">마지막으로 읽은 카드: 없음</span>
+      <select id="bind-product" aria-label="연결할 시험용 제품"></select>
+      <button type="button" id="bind-btn" disabled>이 카드를 연결</button>
+    </div>
+    <ul id="bind-list" class="nt-log"></ul>
+  </section>
+
+  <section class="area">
+    <div class="label">인식 기록 (최근 10개, 가린 번호)</div>
+    <ol id="log" class="nt-log"><li class="muted">아직 없어요</li></ol>
+  </section>
+</main>
+
+<aside class="nt-panel" id="nt-panel" aria-label="제품 정보" aria-hidden="true">
+  <header>
+    <h2>제품 정보</h2>
+    <button type="button" id="panel-close" aria-label="제품 정보 닫기">닫기</button>
+  </header>
+  <div id="panel-body"></div>
+</aside>
+
+<script type="module">
+  import { renderNav, api, el } from './js/common.js';
+  import { listenNfc, normalizeTag } from './js/nfc.js';
+  import { loadZXing } from './js/barcode-scan.js';
+  import { NFC_TEST_PRODUCTS, NFC_TEST_MAP, NFC_STATE_TEXT, KIND_TEXT, findTookId, normalizeUid, maskUid, uidFingerprint,
+    startWebNfc, webNfcSupport, makeDedupe } from './js/nfc-test.js';
+
+  renderNav();
+  const $ = (id) => document.getElementById(id);
+  const SOURCE_TEXT = { webnfc: '이 기기 NFC (Web NFC)', relay: '갤럭시 S24 연결', hid: '외부 리더기', sim: '시뮬레이션 버튼' };
+  const bindings = new Map(); // 지문 → 시험용 제품 ID (메모리만)
+  const log = [];
+  const isDup = makeDedupe();
+  let dupCount = 0;
+  let current = null; // 마지막 인식 결과
+  let shownKey = null; // 패널에 지금 보이는 내용
+  let uidFull = false;
+
+  // ---------- 상태 표시 ----------
+  const time = (t) => { const d = new Date(t); return [d.getHours(), d.getMinutes(), d.getSeconds()].map((n) => String(n).padStart(2, '0')).join(':') + '.' + String(d.getMilliseconds()).padStart(3, '0'); };
+  function message(text) {
+    $('st-msg').textContent = text || '';
+    $('st-msg').classList.toggle('hidden', !text);
+  }
+  function setConn(text) { $('st-conn').textContent = text; }
+  function setWait(text) { $('st-wait').textContent = text; }
+
+  function resolve(r) {
+    if (r.tookId && NFC_TEST_MAP[r.tookId]) return { product: NFC_TEST_PRODUCTS[NFC_TEST_MAP[r.tookId]], by: `태그에 적힌 테스트용 식별값 ${r.tookId}` };
+    if (r.fp && bindings.has(r.fp)) return { product: NFC_TEST_PRODUCTS[bindings.get(r.fp)], by: `임시 연결한 카드 (지문 ${r.fp.slice(0, 6)}…)` };
+    return { product: null };
+  }
+
+  function showUid() {
+    const r = current;
+    const btn = $('uid-toggle');
+    if (!r || (!r.uid && !r.masked)) { $('st-uid').textContent = r?.kind === 'unreadable' ? '읽지 못함' : '-'; btn.classList.add('hidden'); return; }
+    $('st-uid').textContent = uidFull && r.uid ? r.uid : (r.masked || '-');
+    // 원래 번호는 이 기기에서 읽은 경우에만 있다 (휴대폰 연결로 받은 번호는 처음부터 가려져 있음)
+    btn.classList.toggle('hidden', !r.uid);
+    btn.textContent = uidFull ? '가리기' : '전체 보기';
+  }
+  $('uid-toggle').addEventListener('click', () => { uidFull = !uidFull; showUid(); });
+
+  function dataText(r) {
+    if (r.kind === 'simulation') return r.tookId ? `시뮬레이션 값 ${r.tookId}` : '시뮬레이션 (데이터 없음)';
+    if (r.kind === 'hid') return r.tookId ? `리더기 입력 ${r.tookId}` : '리더기가 보낸 번호 (위 태그 ID)';
+    if (r.kind === 'unreadable') return '읽을 수 있는 데이터가 없어요';
+    if (!r.records?.length) return '기록된 NDEF 레코드 없음';
+    return r.records.map((x) => {
+      const head = x.mediaType ? `${x.type} (${x.mediaType})` : x.type;
+      // 레코드 내용은 이 기기에서 읽었을 때만 보인다 (휴대폰 연결은 종류·크기만 보낸다)
+      return x.text != null ? `${head}: ${x.text.slice(0, 80)}` : `${head} · ${x.bytes}바이트`;
+    }).join(' / ');
+  }
+
+  function render(r) {
+    const okText = { ndef: '성공', 'ndef-empty': '성공 (번호만)', unreadable: '실패', hid: '성공', simulation: '성공 (시뮬레이션)' }[r.kind];
+    $('st-result').textContent = okText;
+    showUid();
+    $('st-data').textContent = dataText(r);
+    $('st-kind').textContent = KIND_TEXT[r.kind] + (r.source === 'webnfc' || r.source === 'relay'
+      ? ' · Web NFC 는 기술 종류(NfcA·IsoDep·MIFARE 등)를 알려 주지 않아요' : '');
+    $('st-source').replaceChildren(SOURCE_TEXT[r.source] + ' ', el('span', { class: 'nt-tag' + (r.real ? ' real' : ''), text: r.real ? '실제' : '시뮬레이션' }));
+    $('st-time').textContent = time(r.at);
+    document.querySelectorAll('.nt-status dd').forEach((d) => { d.classList.remove('nt-flash'); void d.offsetWidth; d.classList.add('nt-flash'); });
+    if (r.kind === 'unreadable') {
+      message('태그는 감지됐지만 읽지 못했어요. NDEF 가 아닌 카드(티머니·캐시비 같은 교통카드, 많은 출입카드)이거나 너무 빨리 뗐을 수 있어요. 휴대폰 뒷면 가운데에 1~2초 대고 다시 시도해 주세요. 교통카드는 Web NFC 로는 번호를 읽을 수 없어요 (지원하지 않는 태그).');
+    } else message('');
+  }
+
+  // ---------- 오른쪽 제품 정보 패널 ----------
+  function openPanel(key, body) {
+    document.body.classList.add('nt-panel-open');
+    $('nt-panel').setAttribute('aria-hidden', 'false');
+    if (key === shownKey) return false; // 같은 내용이면 다시 그리지 않는다
+    shownKey = key;
+    $('panel-body').replaceChildren(...body);
+    return true;
+  }
+  $('panel-close').addEventListener('click', () => {
+    document.body.classList.remove('nt-panel-open');
+    $('nt-panel').setAttribute('aria-hidden', 'true');
+    shownKey = null;
+  });
+  const rowsTable = (rows) => el('table', {}, rows.map(([k, v]) => el('tr', {}, el('th', { text: k }), el('td', { text: v }))));
+
+  function updatePanel(r) {
+    if (r.kind === 'unreadable') return; // 읽기 실패는 패널을 바꾸지 않고 위 상태에서 재시도를 안내한다
+    const { product, by } = resolve(r);
+    const tag = el('span', { class: 'nt-tag' + (r.real ? ' real' : ''), text: r.real ? '실제 태그' : '시뮬레이션' });
+    if (product) {
+      openPanel('p:' + product.id, [
+        el('div', { class: 'placeholder', text: '제품 이미지 플레이스홀더' }),
+        el('p', {}, el('strong', { text: product.name }), tag),
+        rowsTable([['제품 ID', product.id], ['종류', product.type], ['데이터', product.note], ['매칭 근거', by], ['인식 경로', SOURCE_TEXT[r.source]], ['인식 시간', time(r.at)]]),
+      ]);
+    } else {
+      openPanel('u:' + (r.fp || r.tookId || r.at), [
+        el('p', {}, el('strong', { text: '등록되지 않은 태그' }), tag),
+        el('p', { class: 'muted small', text: r.tookId
+          ? `${r.tookId} 는 매핑 테이블에 없는 식별값이에요. 제품 정보를 지어내지 않아요.`
+          : '이 태그는 매핑 테이블에 없어요. 제품 정보를 지어내지 않아요. 시험해 보려면 왼쪽 아래 "임시 연결"로 시험용 제품에 붙여 보세요.' }),
+        rowsTable([['태그 ID', r.masked || '-'], ['인식 경로', SOURCE_TEXT[r.source]], ['인식 시간', time(r.at)]]),
+      ]);
+    }
+  }
+
+  // ---------- 임시 연결 ----------
+  $('bind-product').replaceChildren(...Object.values(NFC_TEST_PRODUCTS).map((p) => el('option', { value: p.id, text: `${p.id} · ${p.name}` })));
+  function refreshBind() {
+    const can = current && current.fp && !current.tookId;
+    $('bind-target').textContent = can ? `마지막으로 읽은 카드: ${current.masked || '번호 가림'}` : '마지막으로 읽은 카드: 없음 (번호가 읽힌 카드를 대 주세요)';
+    $('bind-btn').disabled = !can;
+    $('bind-list').replaceChildren(...[...bindings].map(([fp, pid]) => el('li', {},
+      `지문 ${fp.slice(0, 6)}… → ${pid} `,
+      el('button', { type: 'button', text: '연결 끊기', onclick: () => { bindings.delete(fp); shownKey = null; refreshBind(); } }))));
+  }
+  $('bind-btn').addEventListener('click', () => {
+    if (!current?.fp) return;
+    bindings.set(current.fp, $('bind-product').value);
+    refreshBind();
+    updatePanel(current);
+  });
+
+  // ---------- 모든 입력 경로가 지나는 한 곳 ----------
+  function handleReading(r) {
+    r.at = Date.now();
+    if (isDup(r)) {
+      dupCount++;
+      $('st-dup').textContent = `${dupCount}회 (마지막: ${time(r.at)}, 같은 태그라 다시 처리하지 않았어요)`;
+      return;
+    }
+    current = r;
+    uidFull = false;
+    render(r);
+    updatePanel(r);
+    refreshBind();
+    log.unshift(`${time(r.at)} · ${r.real ? '실제' : '시뮬레이션'} · ${SOURCE_TEXT[r.source]} · ${KIND_TEXT[r.kind]}${r.masked ? ' · ' + r.masked : ''}${r.tookId ? ' · ' + r.tookId : ''}`);
+    log.length = Math.min(log.length, 10);
+    $('log').replaceChildren(...log.map((t) => el('li', { text: t })));
+  }
+
+  // ① 이 기기 Web NFC
+  let stopWebNfc = null;
+  const sup = webNfcSupport();
+  $('webnfc-state').textContent = sup.ok ? '버튼을 누르면 NFC 권한을 묻고 읽기를 시작해요' : NFC_STATE_TEXT[sup.code];
+  if (!sup.ok) $('webnfc-start').disabled = true;
+  $('webnfc-start').addEventListener('click', async () => {
+    if (stopWebNfc) {
+      stopWebNfc(); stopWebNfc = null;
+      $('webnfc-start').textContent = '이 기기로 NFC 읽기 시작';
+      $('webnfc-state').textContent = '멈췄어요';
+      setConn('이 기기 NFC 를 멈췄어요'); setWait('대기 중이 아니에요');
+      return;
+    }
+    $('webnfc-state').textContent = 'NFC 를 켜는 중이에요…';
+    try {
+      stopWebNfc = await startWebNfc({
+        onReading: (x) => handleReading({ ...x, source: 'webnfc', real: true }),
+        onFail: () => handleReading({ kind: 'unreadable', uid: '', masked: '', fp: null, tookId: null, records: [], source: 'webnfc', real: true }),
+      });
+      $('webnfc-start').textContent = 'NFC 읽기 멈추기';
+      $('webnfc-state').textContent = NFC_STATE_TEXT.ready;
+      setConn('이 기기 NFC 연결됨 (Web NFC)');
+      setWait('태그를 기다리는 중 · 화면을 켠 채 이 탭을 앞에 두세요');
+    } catch (e) {
+      $('webnfc-state').textContent = NFC_STATE_TEXT[e.code] || NFC_STATE_TEXT.error;
+      setConn('이 기기 NFC 를 시작하지 못했어요');
+    }
+  });
+
+  // ② 갤럭시 S24 연결 (기존 바코드 QR 연결과 같은 서버 폴링)
+  let pairId = null;
+  let pairTimer = null;
+  $('pair-start').addEventListener('click', startPairing);
+  async function startPairing() {
+    if (pairId) return;
+    const status = $('pair-status');
+    const { ok, body } = await api('api/pair', { method: 'POST', body: JSON.stringify({ target: 'nfc' }) }).catch(() => ({ ok: false, body: {} }));
+    if (!ok || !body.id) {
+      status.textContent = '휴대폰 연결은 서버를 실행(npm start)했을 때만 쓸 수 있어요. 지금 주소(정적 배포)에서는 ① 이 기기 NFC 를 써 주세요.';
+      return;
+    }
+    if (!body.phoneUrl) { status.textContent = 'PC 의 와이파이 주소를 찾지 못했어요.'; return; }
+    pairId = body.id;
+    $('pair-start').disabled = true;
+    const ZXing = await loadZXing().catch(() => null);
+    if (ZXing) {
+      const qr = new ZXing.BrowserQRCodeSvgWriter().write(body.phoneUrl, 148, 148);
+      qr.setAttribute('shape-rendering', 'crispEdges');
+      $('pair-qr').replaceChildren(qr);
+    }
+    $('pair-url').textContent = `휴대폰 Chrome 주소창에 입력: ${body.phoneUrl}`;
+    status.textContent = body.phoneUrl.startsWith('https:')
+      ? '휴대폰 연결을 기다리고 있어요. 갤럭시 S24 Chrome 으로 QR 을 열어 주세요.'
+      : '휴대폰 연결을 기다리고 있어요. 주의: http 주소라 휴대폰에서 Web NFC 가 막혀요. cloudflared 터널의 https 주소로 이 화면을 열어 주세요.';
+    setConn('갤럭시 S24 연결을 기다리는 중');
+    let after = 0;
+    let failures = 0;
+    const check = async () => {
+      const r = await api(`api/pair/${pairId}/poll?after=${after}`).catch(() => ({ ok: false, status: 0 }));
+      if (r.status === 404) {
+        clearInterval(pairTimer); pairId = null; $('pair-start').disabled = false;
+        status.textContent = '연결이 끝났어요 (서버가 다시 켜졌거나 30분 동안 쓰지 않음). QR 을 다시 띄워 주세요.';
+        setConn('휴대폰 연결이 끝났어요');
+        return;
+      }
+      if (!r.ok) { if (++failures >= 3) status.textContent = '서버와 연결이 잠시 끊겼어요. 다시 연결하는 중이에요…'; return; }
+      failures = 0;
+      after = r.body.last;
+      for (const e of r.body.events) {
+        if (e.type === 'phone') { status.textContent = '휴대폰이 연결됐어요. 휴대폰에서 "NFC 읽기 시작"을 눌러 주세요.'; setConn('갤럭시 S24 연결됨 (NFC 는 아직 시작 전)'); }
+        if (e.type === 'nfcstate') {
+          const s = e.data.state;
+          setConn(s === 'ready' ? '갤럭시 S24 연결됨 · 휴대폰 NFC 켜짐' : `갤럭시 S24 연결됨 · ${NFC_STATE_TEXT[s]}`);
+          setWait(s === 'ready' ? '휴대폰에 태그를 대 주세요 (휴대폰 화면을 켠 채 took 탭을 앞에 두세요)' : '대기 중이 아니에요');
+        }
+        if (e.type === 'nfc') handleReading({ ...e.data, uid: '', records: e.data.records || [], source: 'relay', real: true });
+      }
+    };
+    pairTimer = setInterval(check, 600);
+  }
+  window.addEventListener('pagehide', () => clearInterval(pairTimer));
+
+  // ③ 외부 리더기 (키보드 모드, js/nfc.js 와 같은 방식)
+  listenNfc(async (code) => {
+    const tookId = findTookId(code);
+    const uid = tookId ? '' : normalizeUid(normalizeTag(code));
+    handleReading({ kind: 'hid', uid, masked: uid ? maskUid(uid) : '', fp: uid ? await uidFingerprint(uid) : null, tookId, records: [], source: 'hid', real: true });
+  });
+
+  // ④ 시뮬레이션
+  document.querySelectorAll('[data-sim]').forEach((b) => b.addEventListener('click', async () => {
+    const v = b.dataset.sim;
+    if (v === 'unreadable') return handleReading({ kind: 'unreadable', uid: '', masked: '', fp: null, tookId: null, records: [], source: 'sim', real: false });
+    if (v === 'unregistered') {
+      const uid = '04:5A:00:00:00:00:01'; // 시뮬레이션용 가짜 번호 (실제 카드 아님)
+      return handleReading({ kind: 'simulation', uid, masked: maskUid(uid), fp: await uidFingerprint(uid), tookId: null, records: [], source: 'sim', real: false });
+    }
+    handleReading({ kind: 'simulation', uid: '', masked: '', fp: null, tookId: v, records: [], source: 'sim', real: false });
+  }));
+  refreshBind();
+</script>
+</body>
+</html>

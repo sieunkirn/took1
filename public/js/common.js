@@ -220,6 +220,8 @@ export function renderNav() {
     // 홈의 두 갈래와 같은 순서. 립 컬러 매핑·합본 화면은 파일만 남기고 메뉴에서 뺐다
     freshLink('palette.html', t('nav.palette')), // 물감을 섞어 립 색 조제 + 카메라로 발라 보기
     freshLink('chat.html', t('nav.chat')),
+    // 테스트 단계 직원용: NFC 태그 인식 테스트 (배포 때는 NFC_TEST_MENU 를 false 로)
+    NFC_TEST_MENU ? freshLink('nfc-test.html', t('nav.nfcTest')) : null,
     // 언어 전환 (오른쪽 끝): 한국어 화면에선 'English', 영어 화면에선 '한국어'
     el('div', { class: 'nav-lang' }, languageMenu()),
   );
@@ -248,6 +250,7 @@ export function renderNav() {
 }
 
 const IDLE_TEST_BUTTON = true;
+const NFC_TEST_MENU = true; // 상단 메뉴의 'NFC 테스트' (테스트 단계)
 const ORIENT_BUTTON = true; // 가로·세로 바꿔 보기 버튼 (배포 때 false 로)
 
 // ---------- 키오스크 자동 초기화 ----------

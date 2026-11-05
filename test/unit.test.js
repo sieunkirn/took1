@@ -471,3 +471,55 @@ test('영어 챗봇: 영어 문장을 한국어판과 같은 조건으로 알아
   assert.match(compareSummary(two, 'en'), /cheapest|They are all/);
   assert.match(compareSummary(two), /저렴|모두/);
 });
+
+// ---------- NFC 태그 인식 테스트 (public/js/nfc-test.js, server.js) ----------
+test('NFC 테스트: 식별값 찾기·번호 가리기·지문', async () => {
+  const nfc = await import('../public/js/nfc-test.js');
+  assert.equal(nfc.findTookId('TOOK-001'), 'TOOK-001');
+  assert.equal(nfc.findTookId('https://took.example/p?id=took002'), 'TOOK-002');
+  assert.equal(nfc.findTookId('TOOK-0012'), null);
+  assert.equal(nfc.findTookId('04A1B2C3'), null);
+  assert.equal(nfc.normalizeUid('04:a1:b2:c3:d4:e5:f6'), '04:A1:B2:C3:D4:E5:F6');
+  assert.equal(nfc.normalizeUid('04A1B'), '');
+  assert.equal(nfc.maskUid('04:A1:B2:C3:D4:E5:F6'), '04:A1:••:••:••:••:F6');
+  assert.equal(nfc.maskUid('04:A1:B2'), '••:••:••');
+  const a = await nfc.uidFingerprint('04:a1:b2:c3');
+  assert.match(a, /^[0-9a-f]{16}$/);
+  assert.equal(a, await nfc.uidFingerprint('04A1B2C3')); // 표기가 달라도 같은 카드면 같은 지문
+  assert.notEqual(a, await nfc.uidFingerprint('04A1B2C4'));
+  assert.equal(await nfc.uidFingerprint(''), null);
+  // 매핑 테이블은 테스트용 가상 제품만 가리킨다
+  for (const [k, v] of Object.entries(nfc.NFC_TEST_MAP)) assert.ok(nfc.NFC_TEST_PRODUCTS[v], k);
+  assert.equal(nfc.NFC_TEST_PRODUCTS['TOOK-001'].name, '테스트 립스틱 A');
+});
+
+test('NFC 테스트: NDEF 이벤트 해석, 같은 태그 중복 거르기', async () => {
+  const nfc = await import('../public/js/nfc-test.js');
+  const enc = new TextEncoder();
+  const r = await nfc.fromNdefEvent({ serialNumber: '04:aa:bb:cc', message: { records: [{ recordType: 'text', encoding: 'utf-8', data: new DataView(enc.encode('TOOK-003').buffer) }] } });
+  assert.equal(r.kind, 'ndef');
+  assert.equal(r.tookId, 'TOOK-003');
+  assert.equal(r.masked, '04:AA:••:CC');
+  const empty = await nfc.fromNdefEvent({ serialNumber: '04:aa:bb:cc', message: { records: [] } });
+  assert.equal(empty.kind, 'ndef-empty');
+  assert.equal(empty.tookId, null);
+  let t = 0;
+  const isDup = nfc.makeDedupe(2500, () => t);
+  assert.equal(isDup({ tookId: 'TOOK-001' }), false);
+  t = 1000; assert.equal(isDup({ tookId: 'TOOK-001' }), true);
+  t = 1500; assert.equal(isDup({ tookId: 'TOOK-002' }), false); // 다른 태그는 바로 처리
+  t = 5000; assert.equal(isDup({ tookId: 'TOOK-002' }), false); // 시간이 지나면 다시 처리
+  assert.equal(nfc.scanErrorCode({ name: 'NotReadableError' }), 'off');
+  assert.equal(nfc.scanErrorCode({ name: 'NotSupportedError' }), 'nohw');
+  assert.equal(nfc.scanErrorCode({ name: 'NotAllowedError' }), 'denied');
+});
+
+test('NFC 테스트: 서버는 정해진 모양만 받고 원래 번호·레코드 내용은 버린다', async () => {
+  const { sanitizeNfcReading } = await import('../server.js');
+  const r = sanitizeNfcReading({ kind: 'ndef', masked: '04:A1:••:F6', fp: '0123456789abcdef', tookId: 'TOOK-001', uid: '04:A1:B2:F6',
+    records: [{ type: 'text', mediaType: null, bytes: 8, text: '비밀' }] });
+  assert.deepEqual(r, { kind: 'ndef', masked: '04:A1:••:F6', fp: '0123456789abcdef', tookId: 'TOOK-001', records: [{ type: 'text', mediaType: null, bytes: 8 }] });
+  assert.equal(sanitizeNfcReading({ kind: 'evil' }), null);
+  const bad = sanitizeNfcReading({ kind: 'ndef-empty', masked: '<script>', fp: 'zz', tookId: 'A0000', records: [{ type: '<x>' }] });
+  assert.deepEqual(bad, { kind: 'ndef-empty', masked: '', fp: null, tookId: null, records: [] });
+});
