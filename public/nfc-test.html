@@ -40,55 +40,49 @@
 <body data-idle-reset="off"> <!-- 직원용 화면: 키오스크 자동 초기화를 끈다 -->
 <main class="nt-main">
   <h1>NFC 태그 인식 테스트 <span class="muted small">(테스트용)</span></h1>
-  <p class="muted">NFC 리더기를 사기 전에 갤럭시 S24 의 NFC 로 태그를 읽어 보는 화면이에요. 태그를 읽으면 페이지를 옮기지 않고 오른쪽에 제품 정보 패널이 열려요.
-    <strong>실제</strong> 표시는 진짜 태그를 읽은 결과이고, <strong>시뮬레이션</strong> 표시는 버튼으로 흉내 낸 결과예요.
-    카드 번호는 저장하지 않고(새로 고치면 사라짐), 다른 기기로 보낼 때는 가린 번호와 지문(해시)만 보내요.</p>
+  <p class="muted">갤럭시 S24 Chrome 에서 아래 버튼을 누르고 카드를 휴대폰 뒷면 가운데에 대 보세요. 카드가 감지되면 오른쪽에 제품이 떠요.</p>
+
+  <section class="area">
+    <button type="button" id="webnfc-start" class="btn-primary big-btn">NFC 읽기 시작</button>
+    <p id="webnfc-state" class="small" aria-live="polite"></p>
+  </section>
 
   <section class="area" aria-live="polite">
     <div class="label">NFC 상태</div>
     <dl class="nt-status">
-      <dt>연결 상태</dt><dd id="st-conn">아직 연결한 NFC 가 없어요 (아래에서 이 기기 NFC 나 휴대폰 연결을 시작하세요). 외부 리더기(키보드 모드)는 항상 듣고 있어요</dd>
+      <dt>연결 상태</dt><dd id="st-conn">아직 시작하지 않았어요</dd>
       <dt>인식 대기</dt><dd id="st-wait">대기 중이 아니에요</dd>
       <dt>인식 결과</dt><dd id="st-result">아직 읽은 태그가 없어요</dd>
-      <dt>태그 ID</dt><dd><span id="st-uid" class="nt-uid">-</span> <button type="button" id="uid-toggle" class="hidden">전체 보기</button></dd>
+      <dt>태그 ID</dt><dd><span id="st-uid" class="nt-uid">-</span></dd>
       <dt>읽은 데이터</dt><dd id="st-data">-</dd>
       <dt>태그 종류·기술</dt><dd id="st-kind">-</dd>
       <dt>인식 경로</dt><dd id="st-source">-</dd>
       <dt>마지막 인식</dt><dd id="st-time">-</dd>
-      <dt>중복 무시</dt><dd id="st-dup">0회 (같은 태그를 2.5초 안에 다시 읽으면 다시 처리하지 않아요)</dd>
+      <dt>중복 무시</dt><dd id="st-dup">0회</dd>
     </dl>
     <p id="st-msg" class="msg hidden"></p>
-    <label class="row small" style="margin-top:8px; flex-wrap:nowrap; align-items:flex-start">
-      <input type="checkbox" id="demo-detect" checked>
-      <span><strong>데모 모드</strong>: 읽지 못한 카드(토스뱅크·교통카드 등 결제·IC 카드)도 <strong>감지만 되면</strong> 등록 제품 중 아무거나 하나를 띄워요.
-        어떤 카드인지 구분하지 않고, 카드 정보는 읽지 않아요.</span>
-    </label>
+    <p class="muted small">번호를 읽지 못하는 카드(토스뱅크·교통카드 등)도 <strong>감지만 되면</strong> 등록 제품 중 하나를 임의로 띄워요 (데모). 카드 정보는 읽거나 저장하지 않아요.</p>
   </section>
 
   <section class="area">
-    <div class="label">입력 경로</div>
+    <div class="label">인식 기록 (최근 10개, 가린 번호)</div>
+    <ol id="log" class="nt-log"><li class="muted">아직 없어요</li></ol>
+  </section>
+
+  <!-- 개발·테스트 도구: 주소 끝에 ?dev=1 을 붙였을 때만 보인다 (휴대폰 연결 QR, 시뮬레이션, 임시 연결) -->
+  <section class="area hidden" id="dev-tools">
+    <div class="label">개발·테스트 도구 (?dev=1)</div>
     <div class="nt-routes">
       <div class="area">
-        <h3>① 이 기기 NFC <span class="nt-tag real">실제</span></h3>
-        <p class="muted small">갤럭시 S24 의 Chrome 에서 이 화면을 열었을 때 쓰는 방식이에요 (Web NFC, https 필요).</p>
-        <button type="button" id="webnfc-start">이 기기로 NFC 읽기 시작</button>
-        <p id="webnfc-state" class="small"></p>
-      </div>
-      <div class="area">
-        <h3>② 갤럭시 S24 연결 <span class="nt-tag real">실제</span></h3>
-        <p class="muted small">PC·iPad 에 이 화면을 열어 두고, 휴대폰을 NFC 리더기로 써요. 서버 실행(npm start)이 필요하고, 휴대폰 쪽 Web NFC 때문에 https 주소(cloudflared 터널)로 열어야 해요.</p>
+        <h3>휴대폰 연결 <span class="nt-tag real">실제</span></h3>
+        <p class="muted small">PC·iPad 에 이 화면을 열고 휴대폰을 NFC 리더기로 써요. 서버(npm start)와 https 터널이 필요해요.</p>
         <button type="button" id="pair-start">휴대폰 연결 QR 띄우기</button>
         <div id="pair-qr"></div>
         <p id="pair-url" class="muted small"></p>
         <p id="pair-status" class="small"></p>
       </div>
       <div class="area">
-        <h3>③ 외부 리더기 <span class="nt-tag real">실제</span></h3>
-        <p class="muted small">USB·블루투스 NFC 리더기(키보드 모드)를 연결하면 따로 시작하지 않아도 태그 입력을 받아요. 리더기를 사면 이 경로로 시험해요.</p>
-      </div>
-      <div class="area">
-        <h3>④ 시뮬레이션 <span class="nt-tag">시뮬레이션</span></h3>
-        <p class="muted small">실제 태그 없이 같은 처리 길을 지나 봐요. 결과에 '시뮬레이션'으로 표시돼요.</p>
+        <h3>시뮬레이션 <span class="nt-tag">시뮬레이션</span></h3>
         <div class="row">
           <button type="button" data-sim="TOOK-001">TOOK-001</button>
           <button type="button" data-sim="TOOK-002">TOOK-002</button>
@@ -97,23 +91,16 @@
           <button type="button" data-sim="unreadable">읽기 실패</button>
         </div>
       </div>
+      <div class="area">
+        <h3>임시 연결 (저장 안 함)</h3>
+        <div class="row">
+          <span id="bind-target" class="small">마지막으로 읽은 카드: 없음</span>
+          <select id="bind-product" aria-label="연결할 시험용 제품"></select>
+          <button type="button" id="bind-btn" disabled>이 카드를 연결</button>
+        </div>
+        <ul id="bind-list" class="nt-log"></ul>
+      </div>
     </div>
-  </section>
-
-  <section class="area" id="bind-area">
-    <div class="label">임시 연결 (이 화면에서만, 저장하지 않음)</div>
-    <p class="muted small">교통카드·출입카드처럼 번호(지문)만 읽히는 카드를 시험용 제품에 잠깐 연결해요. 카드 번호를 제품 ID 로 쓰지 않고, 이 화면을 새로 고치면 사라져요.</p>
-    <div class="row">
-      <span id="bind-target" class="small">마지막으로 읽은 카드: 없음</span>
-      <select id="bind-product" aria-label="연결할 시험용 제품"></select>
-      <button type="button" id="bind-btn" disabled>이 카드를 연결</button>
-    </div>
-    <ul id="bind-list" class="nt-log"></ul>
-  </section>
-
-  <section class="area">
-    <div class="label">인식 기록 (최근 10개, 가린 번호)</div>
-    <ol id="log" class="nt-log"><li class="muted">아직 없어요</li></ol>
   </section>
 </main>
 
@@ -134,6 +121,8 @@
 
   renderNav();
   const $ = (id) => document.getElementById(id);
+  const DEMO = true; // 감지만 된 카드도 등록 제품 하나를 임의로 띄운다
+  if (new URLSearchParams(location.search).has('dev')) $('dev-tools').classList.remove('hidden');
   const SOURCE_TEXT = { webnfc: '이 기기 NFC (Web NFC)', relay: '갤럭시 S24 연결', hid: '외부 리더기', sim: '시뮬레이션 버튼' };
   const bindings = new Map(); // 지문 → 시험용 제품 ID (메모리만)
   const log = [];
@@ -160,14 +149,9 @@
 
   function showUid() {
     const r = current;
-    const btn = $('uid-toggle');
-    if (!r || (!r.uid && !r.masked)) { $('st-uid').textContent = r?.kind === 'unreadable' ? '읽지 못함' : '-'; btn.classList.add('hidden'); return; }
-    $('st-uid').textContent = uidFull && r.uid ? r.uid : (r.masked || '-');
-    // 원래 번호는 이 기기에서 읽은 경우에만 있다 (휴대폰 연결로 받은 번호는 처음부터 가려져 있음)
-    btn.classList.toggle('hidden', !r.uid);
-    btn.textContent = uidFull ? '가리기' : '전체 보기';
+    if (!r || !r.masked) { $('st-uid').textContent = r?.kind === 'unreadable' ? '읽지 못함 (번호를 주지 않는 카드)' : '-'; return; }
+    $('st-uid').textContent = r.masked; // 가린 번호만 보인다
   }
-  $('uid-toggle').addEventListener('click', () => { uidFull = !uidFull; showUid(); });
 
   function dataText(r) {
     if (r.kind === 'simulation') return r.tookId ? `시뮬레이션 값 ${r.tookId}` : '시뮬레이션 (데이터 없음)';
@@ -182,7 +166,7 @@
   }
 
   function render(r) {
-    const okText = { ndef: '성공', 'ndef-empty': '성공 (번호만)', unreadable: '실패', hid: '성공', simulation: '성공 (시뮬레이션)' }[r.kind];
+    const okText = { ndef: '성공', 'ndef-empty': '성공 (번호만)', unreadable: DEMO ? '카드 감지됨 (번호는 못 읽음)' : '실패', hid: '성공', simulation: '성공 (시뮬레이션)' }[r.kind];
     $('st-result').textContent = okText;
     showUid();
     $('st-data').textContent = dataText(r);
@@ -191,7 +175,7 @@
     $('st-source').replaceChildren(SOURCE_TEXT[r.source] + ' ', el('span', { class: 'nt-tag' + (r.real ? ' real' : ''), text: r.real ? '실제' : '시뮬레이션' }));
     $('st-time').textContent = time(r.at);
     document.querySelectorAll('.nt-status dd').forEach((d) => { d.classList.remove('nt-flash'); void d.offsetWidth; d.classList.add('nt-flash'); });
-    if (r.kind === 'unreadable' && $('demo-detect').checked) {
+    if (r.kind === 'unreadable' && DEMO) {
       message('카드가 감지됐어요. 번호는 읽지 못하는 카드(결제·교통카드 등)라서, 데모 모드로 등록 제품 하나를 임의로 띄웠어요. 어떤 카드인지는 알 수 없어요.');
     } else if (r.kind === 'unreadable') {
       message('태그는 감지됐지만 읽지 못했어요. NDEF 가 아닌 카드(티머니·캐시비 같은 교통카드, 많은 출입카드)이거나 너무 빨리 뗐을 수 있어요. 휴대폰 뒷면 가운데에 1~2초 대고 다시 시도해 주세요. 교통카드는 Web NFC 로는 번호를 읽을 수 없어요 (지원하지 않는 태그).');
@@ -222,7 +206,7 @@
     const tag = el('span', { class: 'nt-tag' + (r.real ? ' real' : ''), text: r.real ? '실제 태그' : '시뮬레이션' });
     if (r.kind === 'unreadable') {
       // 읽기 실패: 데모 모드가 꺼져 있으면 패널을 바꾸지 않고 위 상태에서 재시도를 안내한다
-      if (!$('demo-detect').checked) return;
+      if (!DEMO) return;
       // 데모 모드: '감지됐다'는 사실만으로 등록 제품(올리브영 데이터, 사진 있는 것) 중 아무거나 하나 고른다
       // (지금 보이는 제품과 다른 것으로, 댈 때마다 바뀌는 게 보이게)
       const pool = (await catalog()).filter((p) => 'd:' + p.id !== shownKey);
@@ -289,31 +273,58 @@
   }
 
   // ① 이 기기 Web NFC
-  let stopWebNfc = null;
+  // 시작 버튼 하나로: 시작 → (켜지는 중) → 읽는 중(누르면 멈춤). 켜지는 중에 다시 누르면 처음부터 다시 시도한다
+  let stopWebNfc = null;   // 읽는 중일 때 멈추는 함수
+  let attempt = null;      // 켜지는 중인 시도 (AbortController)
+  let slowTimer = null;
+  const btn = $('webnfc-start');
+  const stateText = (t) => { $('webnfc-state').textContent = t; };
   const sup = webNfcSupport();
-  $('webnfc-state').textContent = sup.ok ? '버튼을 누르면 NFC 권한을 묻고 읽기를 시작해요' : NFC_STATE_TEXT[sup.code];
-  if (!sup.ok) $('webnfc-start').disabled = true;
-  $('webnfc-start').addEventListener('click', async () => {
-    if (stopWebNfc) {
+  stateText(sup.ok ? '버튼을 누르면 NFC 권한을 묻고 읽기를 시작해요' : NFC_STATE_TEXT[sup.code]);
+  if (!sup.ok) { btn.disabled = true; setConn(NFC_STATE_TEXT[sup.code]); }
+  function idle(text) {
+    clearTimeout(slowTimer);
+    btn.textContent = 'NFC 읽기 시작';
+    stateText(text);
+    setWait('대기 중이 아니에요');
+  }
+  btn.addEventListener('click', async () => {
+    if (stopWebNfc) { // 읽는 중 → 멈춤
       stopWebNfc(); stopWebNfc = null;
-      $('webnfc-start').textContent = '이 기기로 NFC 읽기 시작';
-      $('webnfc-state').textContent = '멈췄어요';
-      setConn('이 기기 NFC 를 멈췄어요'); setWait('대기 중이 아니에요');
+      idle('멈췄어요'); setConn('NFC 를 멈췄어요');
       return;
     }
-    $('webnfc-state').textContent = 'NFC 를 켜는 중이에요…';
+    if (attempt) attempt.abort(); // 켜지는 중에 다시 누름 → 앞의 시도를 버리고 다시
+    const ctrl = new AbortController();
+    attempt = ctrl;
+    btn.textContent = '다시 시도';
+    stateText('NFC 를 켜는 중이에요… 권한 창이 뜨면 "허용"을 눌러 주세요');
+    setConn('NFC 를 켜는 중');
+    // 권한 창이 안 보이거나 Chrome 이 응답하지 않으면 scan() 이 끝나지 않는다. 멈춘 것처럼 두지 않고 할 일을 알려 준다
+    clearTimeout(slowTimer);
+    slowTimer = setTimeout(() => {
+      if (attempt !== ctrl) return;
+      stateText('아직 NFC 가 켜지지 않았어요. ① 설정 → 연결 → "NFC 및 비접촉 결제"가 켜져 있는지 ② 카카오톡·네이버 같은 앱 안의 브라우저가 아니라 Chrome 앱에서 열었는지 확인한 뒤 "다시 시도"를 눌러 주세요. ③ 그래도 안 되면 주소창 왼쪽 아이콘 → 권한 → NFC 를 "허용"으로 바꾼 뒤 새로 고쳐 주세요.');
+    }, 6000);
     try {
-      stopWebNfc = await startWebNfc({
+      const stop = await startWebNfc({
+        signal: ctrl.signal,
         onReading: (x) => handleReading({ ...x, source: 'webnfc', real: true }),
         onFail: () => handleReading({ kind: 'unreadable', uid: '', masked: '', fp: null, tookId: null, records: [], source: 'webnfc', real: true }),
       });
-      $('webnfc-start').textContent = 'NFC 읽기 멈추기';
-      $('webnfc-state').textContent = NFC_STATE_TEXT.ready;
-      setConn('이 기기 NFC 연결됨 (Web NFC)');
-      setWait('태그를 기다리는 중 · 화면을 켠 채 이 탭을 앞에 두세요');
+      if (attempt !== ctrl) return; // 그사이 다시 시도를 눌렀다
+      attempt = null;
+      clearTimeout(slowTimer);
+      stopWebNfc = stop;
+      btn.textContent = 'NFC 읽기 멈추기';
+      stateText(NFC_STATE_TEXT.ready);
+      setConn('NFC 켜짐 (이 기기, Web NFC)');
+      setWait('카드를 기다리는 중 · 화면을 켠 채 이 탭을 앞에 두세요');
     } catch (e) {
-      $('webnfc-state').textContent = NFC_STATE_TEXT[e.code] || NFC_STATE_TEXT.error;
-      setConn('이 기기 NFC 를 시작하지 못했어요');
+      if (attempt !== ctrl) return; // 다시 시도로 버린 시도의 실패는 무시
+      attempt = null;
+      idle(NFC_STATE_TEXT[e.code] || NFC_STATE_TEXT.error);
+      setConn('NFC 를 시작하지 못했어요');
     }
   });
 

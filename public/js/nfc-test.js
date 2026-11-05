@@ -126,22 +126,21 @@ export function scanErrorCode(err) {
  * Web NFC 읽기 시작 (반드시 버튼 누름 안에서 불러야 한다)
  * onReading(result) / onFail() 은 태그를 댈 때마다 불린다. 멈추는 함수를 돌려준다
  */
-export async function startWebNfc({ onReading, onFail }) {
+export async function startWebNfc({ onReading, onFail, signal }) {
   const sup = webNfcSupport();
   if (!sup.ok) throw Object.assign(new Error(sup.code), { code: sup.code });
-  try {
-    const perm = await navigator.permissions?.query({ name: 'nfc' }).catch(() => null);
-    if (perm?.state === 'denied') throw Object.assign(new Error('denied'), { code: 'denied' });
-  } catch (e) { if (e.code) throw e; }
   const reader = new window.NDEFReader();
   const ctrl = new AbortController();
+  signal?.addEventListener('abort', () => ctrl.abort()); // 바깥에서 '다시 시도'로 버릴 때
+  // 듣는 함수는 scan() 전에 단다 (Chrome 예제와 같은 순서. 시작 직후 대 둔 카드도 놓치지 않게)
+  reader.addEventListener('reading', async (e) => { if (!ctrl.signal.aborted) onReading(await fromNdefEvent(e)); });
+  reader.addEventListener('readingerror', () => { if (!ctrl.signal.aborted) onFail(); });
+  // 권한 확인은 scan() 을 부르기 전에 기다리지 않는다: 버튼 누름(사용자 동작)이 scan() 까지 그대로 이어져야 권한 창이 뜬다
   try {
     await reader.scan({ signal: ctrl.signal });
   } catch (e) {
     throw Object.assign(new Error(e.message), { code: scanErrorCode(e) });
   }
-  reader.addEventListener('reading', async (e) => onReading(await fromNdefEvent(e)));
-  reader.addEventListener('readingerror', () => onFail());
   return () => ctrl.abort();
 }
 
