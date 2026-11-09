@@ -34,7 +34,8 @@ const START = C(['데일리로 바를 립 추천해 줘', '데이트 립 추천�
 // 테스트 화면과 대화가 섞이지 않게 대화 기록은 따로 저장한다 (기준 제품·립 색상은 공유)
 const state = {
   baseId: qs('base') || store.get('chatBaseId'),
-  selectedHex: normalizeHex(qs('hex') || '') || store.get('lipColor')?.hex || null,
+  // 기준 색: 주소(QR) > 매장에서 가져온 색(휴대폰, 챗봇 홈에서 다시 와도 유지) > 립 컬러 매핑에서 고른 색
+  selectedHex: normalizeHex(qs('hex') || '') || store.get('chatHandoff')?.hex || store.get('lipColor')?.hex || null,
   messages: store.get('chatUserMessages', []),
   ctx: store.get('chatUserContext', null), // 직전 대화 상태: 서버가 돌려준 context 를 다음 질문에 그대로 보낸다
   list: store.get('chatUserList', []), // 오른쪽 패널의 현재 추천 목록 (번호 = 대화에서 가리키는 번호)

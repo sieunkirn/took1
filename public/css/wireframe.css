@@ -1130,3 +1130,21 @@ html.phone-mode:has(body.privacy-page), html.phone-mode body.privacy-page { heig
 .pv-row dt { font-size: 13px; font-weight: 700; color: var(--ink); }
 .pv-row dd { margin: 2px 0 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); word-break: keep-all; }
 .pv-draft { margin: 0; font-size: 12px; color: var(--mute); }
+/* 챗봇 시작 화면 (chat-home.html, 2026-11-10 단순화): 가운데 정렬 한 화면. 동그라미 → 작은 제목줄 → 제목 → 설명 → 매장 색 한 줄 → 버튼 하나.
+   움직임은 동그라미 안 예시 질문 타이핑과 처음 한 번 부드럽게 나타나기뿐 */
+.ph-home { padding-bottom: calc(28px + env(safe-area-inset-bottom)); gap: 16px; }
+.ph-start { min-height: calc(100dvh - 52px - 120px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; animation: ph-in 0.5s ease-out both; }
+@keyframes ph-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .ph-start { animation: none; } }
+.ph-circle { --d: min(62vw, 250px); display: block; margin-bottom: 14px; text-decoration: none; }
+.ph-circle .mirror { width: var(--d); aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--paper); border: max(7px, calc(var(--d) * 0.035)) solid var(--soft-2); }
+.ph-start .ph-eyebrow { margin: 0; }
+.ph-start h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
+.ph-start .ph-sub { margin: 0 0 6px; max-width: 300px; font-size: 15px; line-height: 1.55; color: var(--ink-2); word-break: keep-all; }
+.ph-color { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 340px; padding: 12px 16px; border-radius: 16px; background: var(--soft); text-align: left; }
+.ph-color .ph-swatch { width: 40px; height: 40px; }
+.ph-color-text { display: flex; flex-direction: column; line-height: 1.35; }
+.ph-color-label { font-size: 12px; color: var(--mute); }
+.ph-color-text strong { font-size: 15px; }
+.ph-start .ph-primary { width: 100%; max-width: 340px; margin-top: 6px; }
+.ph-tools { justify-content: center; margin-top: 0; }

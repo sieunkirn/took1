@@ -1,8 +1,9 @@
-// 챗봇 홈 (손님 휴대폰 전용): 휴대폰 챗봇의 왼쪽 위 로고를 누르면 오는 화면. 한눈에 보이게 요소를 적게:
-//  ① 인사 한 줄
-//  ② 매장에서 만든 색 카드(있을 때): 색 견본(실제 색) + 제형·농도·톤 + 버튼 하나(대화가 있으면 '대화 이어가기', 없으면 '이 색으로 상담 시작')
-//  ③ 바로 물어보기 칩 3개 (누르면 챗봇이 그 질문으로 바로 답한다: chat.html?q=…)
-//  아래 고정 입력줄: 누르면 챗봇 입력칸으로 (chat.html?focus=1). 맨 아래 한 줄 고지
+// 챗봇 시작 화면 (손님 휴대폰 전용): 휴대폰 챗봇의 왼쪽 위 로고를 누르면 오는 화면. 챗봇의 시작을 알리는 간단한 화면:
+//  - 챗봇 동그라미(옛 홈의 챗봇 쪽): 예시 대화에서 질문이 한 글자씩 타이핑된다 (실제 대화 아님)
+//  - 제목 한 줄 + 설명 한 줄
+//  - 매장에서 만든 색(QR 로 가져온 결과가 있을 때): 색 견본(실제 색) + 제형·농도·톤 한 줄
+//  - 버튼 하나: 대화가 있으면 '대화 이어가기', 매장 결과만 있으면 그 색으로 상담 시작, 둘 다 없으면 '대화 시작하기'
+//  - 작게: 결과 저장·공유 / 이 기기에서 대화 지우기
 // 이 휴대폰에 저장된 상담 상태(common.js store → tookPhone.*)만 읽는다. 서버에 따로 저장하지 않는다.
 import { renderNav, PHONE, store, el, toast } from './common.js';
 import { isEn, t as tr } from './i18n.js';
@@ -11,7 +12,7 @@ import { isEn, t as tr } from './i18n.js';
 if (!PHONE) location.replace('palette.html');
 
 const C = (ko, en) => (isEn() ? en : ko);
-document.title = C('took(툭) - 챗봇 홈', 'took - Chat home');
+document.title = C('took(툭) - AI 뷰티 챗봇', 'took - AI beauty chat');
 renderNav();
 
 const $ = (id) => document.getElementById(id);
@@ -19,14 +20,27 @@ const home = $('ph-home');
 const handoff = store.get('chatHandoff');
 const talked = store.get('chatUserMessages', []).some((m) => m.role === 'user');
 const season = store.get('lipMatch')?.season || handoff?.tone || null;
-const chat = (q) => 'chat.html?q=' + encodeURIComponent(q);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ① 인사
-home.append(el('header', { class: 'ph-hello' },
+// 버튼이 가는 곳: 대화가 있으면 이어서, 매장 결과만 있으면 그 색으로 바로 상담, 없으면 새 대화
+const startHref = talked || !handoff?.hex ? 'chat.html' : 'chat.html?q=' + encodeURIComponent(C('이 색과 비슷한 제품 추천해 줘', 'Recommend products similar to this color'));
+const startText = talked ? C('대화 이어가기', 'Continue the chat') : C('대화 시작하기', 'Start chatting');
+
+// 챗봇 동그라미 (누르면 버튼과 같은 곳)
+const circle = el('a', { class: 'ph-circle', href: startHref, 'aria-hidden': 'true', tabindex: '-1' });
+circle.innerHTML = '<span class="mirror chat-demo"><span class="cd-msgs">'
+  + '<span class="cd-bubble bot" id="cd-bot"></span>'
+  + '<span class="cd-bubble me"><span id="chat-demo-text"></span><i class="cd-caret"></i></span>'
+  + '<span class="cd-bubble bot typing"><i></i><i></i><i></i></span></span></span>';
+
+const parts = [
+  circle,
   el('p', { class: 'ph-eyebrow', text: C('took AI 도우미', 'took AI assistant') }),
-  el('h1', { text: handoff?.hex ? C('고른 색으로 이어서 볼까요?', 'Shall we keep going with your color?') : C('어떤 립을 찾아볼까요?', 'What lip are you looking for?') })));
-
-// ② 매장에서 만든 색
+  el('h1', { text: C('툭에게 물어보세요', 'Ask Took') }),
+  el('p', { class: 'ph-sub', text: handoff?.hex
+    ? C('매장에서 만든 색으로 어울리는 립을 같이 찾아 드려요.', 'I’ll help you find lips for the color you made in store.')
+    : C('찾는 색, 바를 자리, 입술 고민을 편하게 말해 주세요.', 'Tell me the color, occasion or lip concern you have in mind.') }),
+];
 if (handoff?.hex) {
   const swatch = el('span', { class: 'ph-swatch', 'aria-hidden': 'true' });
   swatch.style.background = handoff.hex; // 색 견본은 실제 색 (CLAUDE.md 예외)
@@ -35,32 +49,30 @@ if (handoff?.hex) {
     Number.isFinite(handoff.intensity) && C(`농도 ${handoff.intensity}%`, `${handoff.intensity}%`),
     season && tr('season.' + season),
   ].filter(Boolean).join(' · ');
-  home.append(el('section', { class: 'ph-card', 'aria-label': C('매장에서 만든 색', 'Your in-store color') },
-    el('div', { class: 'ph-card-row' }, swatch,
-      el('div', { class: 'ph-card-text' },
-        el('span', { class: 'ph-card-label', text: C('매장에서 만든 색', 'Your in-store color') }),
-        el('strong', { class: 'ph-card-facts', text: facts || handoff.hex }))),
-    el('a', { class: 'ph-primary', href: talked ? 'chat.html' : chat(C('이 색과 비슷한 제품 추천해 줘', 'Recommend products similar to this color')) },
-      el('span', { text: talked ? C('대화 이어가기', 'Continue the chat') : C('이 색으로 상담 시작', 'Start with this color') }),
-      el('span', { class: 'ph-arrow', 'aria-hidden': 'true', text: '→' }))));
-} else if (talked) {
-  home.append(el('a', { class: 'ph-primary', href: 'chat.html' },
-    el('span', { text: C('대화 이어가기', 'Continue the chat') }), el('span', { class: 'ph-arrow', 'aria-hidden': 'true', text: '→' })));
+  parts.push(el('div', { class: 'ph-color', role: 'group', 'aria-label': C('매장에서 만든 색', 'Your in-store color') }, swatch,
+    el('span', { class: 'ph-color-text' }, el('span', { class: 'ph-color-label', text: C('매장에서 만든 색', 'Your in-store color') }), el('strong', { text: facts || handoff.hex }))));
+}
+parts.push(el('a', { class: 'ph-primary', href: startHref }, el('span', { text: startText }), el('span', { class: 'ph-arrow', 'aria-hidden': 'true', text: '→' })));
+home.append(el('section', { class: 'ph-start' }, ...parts));
+
+$('cd-bot').textContent = handoff?.hex ? C('매장에서 만든 색으로 이어서 볼까요?', 'Shall we keep going with your color?') : C('찾는 립 컬러를 편하게 말씀해 주세요', 'Tell me the lip color you want');
+const DEMO_Q = handoff?.hex
+  ? C(['조금 더 밝은 색 있어?', '2만원 이하로 보여 줘', '더 촉촉한 제형은?'], ['Anything a bit lighter?', 'Under 20,000 won?', 'Something glossier?'])
+  : C(['데이트 립 추천해 줘', '데일리로 바를 립', '혈색 도는 립 찾아 줘'], ['A lip for a date', 'An everyday lip', 'Something with a healthy flush']);
+const demo = $('chat-demo-text');
+demo.textContent = DEMO_Q[0];
+if (!reduce) {
+  (async () => {
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    for (let qi = 0; ; qi = (qi + 1) % DEMO_Q.length) {
+      await wait(2600);
+      const q = DEMO_Q[(qi + 1) % DEMO_Q.length];
+      for (let n = 1; n <= q.length; n++) { demo.textContent = q.slice(0, n); await wait(70); }
+    }
+  })();
 }
 
-// ③ 바로 물어보기 (3개)
-const QUESTIONS = handoff?.hex
-  ? C(['조금 더 밝은 색', '2만원 이하로', '더 촉촉한 제형'], ['A bit lighter', 'Under 20,000 won', 'Glossier finish'])
-  : C(['데일리 립 추천', '데이트 립 추천', '혈색 도는 립'], ['Everyday lip', 'Lip for a date', 'A healthy flush']);
-// 칩 글자는 짧게, 챗봇에는 뜻이 분명한 문장으로 보낸다
-const SENT = handoff?.hex
-  ? C(['이 색보다 조금 더 밝은 거 추천해 줘', '이 색으로 2만원 이하 추천해 줘', '이 색인데 더 촉촉한 제형 추천해 줘'], ['Something a bit lighter than this color', 'This color under 20,000 won', 'This color but glossier'])
-  : C(['데일리로 바를 립 추천해 줘', '데이트 립 추천해 줘', '혈색 도는 립 찾아 줘'], ['Recommend an everyday lip', 'Recommend a lip for a date', 'Find a lip that adds a healthy flush']);
-home.append(el('section', { class: 'ph-quick', 'aria-label': C('바로 물어보기', 'Quick questions') },
-  el('h2', { class: 'ph-label', text: C('바로 물어보기', 'Quick questions') }),
-  el('div', { class: 'ph-chips' }, ...QUESTIONS.map((q, i) => el('a', { class: 'ph-chip', href: chat(SENT[i]), text: q })))));
-
-// 결과 저장·지우기 (작게): 공유 시트(카카오톡·메시지 등) → 안 되면 링크 복사 / 이 기기에 저장된 대화 지우기
+// 작게: 결과 저장·공유 (공유 시트 → 안 되면 링크 복사) / 이 기기에서 대화 지우기
 const shareUrl = store.get('chatHandoffUrl');
 const tools = el('div', { class: 'ph-tools' });
 if (shareUrl) {
@@ -88,11 +100,3 @@ if (handoff || talked) {
   }));
 }
 if (tools.children.length) home.append(tools);
-
-// 한 줄 고지 (AI 도우미·화면 색·사진 미저장·이 기기에만 저장·개인정보 안내)
-home.append(el('p', { class: 'ph-foot' },
-  el('span', { text: C('AI 도우미가 등록된 제품으로만 답해요 · 화면 속 색은 실제와 조금 다를 수 있어요 · 사진은 저장하지 않고, 대화는 이 휴대폰에만 30일 보관돼요 · ', 'An AI assistant answering from registered products only · On-screen colors may differ · No photos are saved; the chat stays on this phone for 30 days · ') }),
-  el('a', { href: 'privacy.html', text: C('개인정보 안내', 'Privacy') })));
-
-$('ph-askbar-text').textContent = C('궁금한 걸 물어보세요', 'Ask me anything');
-$('ph-askbar').setAttribute('aria-label', C('챗봇에게 물어보기', 'Ask the chatbot'));
