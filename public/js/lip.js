@@ -12,7 +12,8 @@
 import { renderNav, store, api, el, productCard, FINISH_LABELS, fullName, shortName, toast, skeletonCards } from './common.js';
 import { hexToRgb, rgbToHsl, hslToHex } from '../lib/color.js';
 import { loadTracker, detectVideo } from './lip-tracker.js';
-import { applyLipColor, smoothLips, measureTone, classifyTone, matchPresets, SEASONS, TONE_THRESHOLDS, TEXTURES, PRESETS } from './lip-engine.js';
+import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, FINISH_TO_TEXTURE } from './lip-view.js'; // 그리기·카메라 공통 (거울 모드와 함께 쓴다)
+import { measureTone, classifyTone, matchPresets, SEASONS, TONE_THRESHOLDS, TEXTURES, PRESETS } from './lip-engine.js';
 import { t as tr, setText, finishText as finishName } from './i18n.js'; // 화면 문구 (한국어/영어). 이 파일엔 t 라는 지역 변수가 있어 tr 로 부른다
 
 renderNav();
@@ -27,8 +28,6 @@ const STUDIO = document.body.dataset.layout === 'studio';
 const PALETTE = document.body.dataset.layout === 'palette';
 const MATCH_FRAMES = 15; // 피부색은 여러 프레임 평균으로 측정해 순간적인 빛 변화의 영향을 줄인다
 const MATCH_TIMEOUT_MS = 6000;
-// 제품 제형 → 가장 가까운 가상 텍스처
-const FINISH_TO_TEXTURE = { glossy: 'glossy', matte: 'matte', satin: 'satin', velvet: 'matte' };
 
 const state = {
   hex: '#C08A94', // 처음 들어왔을 때의 기본 컬러 (프리셋 중 차분한 로즈 핑크)
@@ -86,35 +85,14 @@ function sourceFrame() {
 function render() {
   const f = sourceFrame();
   if (!f?.w || !f?.h) return;
-  const { w, h } = f;
-  if (view.width !== w || view.height !== h) { view.width = w; view.height = h; }
-  viewCtx.save();
-  if (f.mirror) viewCtx.setTransform(-1, 0, 0, 1, w, 0); // 셀피 화면처럼 좌우 반전
-  viewCtx.drawImage(f.src, 0, 0, w, h);
-  viewCtx.restore();
-  if (state.lips) applyLipColor(viewCtx, state.lips, w, h, f.mirror, state);
+  drawLipFrame(viewCtx, f, state.lips, state);
 }
 
 // ---------- 카메라 ('카메라로 테스트하기'를 누르면 켜지고, 아바타로 바꾸거나 나갈 때 꺼진다) ----------
-function cameraErrorMessage(e) {
-  switch (e?.name) {
-    case 'NotAllowedError':
-    case 'SecurityError':
-      return tr('lip.camDenied');
-    case 'NotFoundError':
-    case 'OverconstrainedError':
-      return tr('lip.camNotFound');
-    case 'NotReadableError':
-      return tr('lip.camBusy');
-    default:
-      return tr('lip.camFailed') + (e?.message || e);
-  }
-}
-
 function stopCamera() {
   if (state.rafId) cancelAnimationFrame(state.rafId);
   state.rafId = null;
-  if (state.stream) state.stream.getTracks().forEach((t) => t.stop());
+  stopStream(state.stream);
   state.stream = null;
   video.srcObject = null;
 }
@@ -176,7 +154,7 @@ async function loop() {
   if (video.readyState >= 2) {
     if (state.tracker && video.currentTime !== state.lastVideoTime) {
       state.lastVideoTime = video.currentTime;
-      state.lips = smoothLips(state.lips, await detectVideo(video, performance.now()));
+      state.lips = await trackLips(state.lips, video);
       if (state.analyze) collectSkin();
     }
     render();

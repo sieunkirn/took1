@@ -24,6 +24,24 @@ export function storeLink(p, text = t('card.store')) {
 // 빌드 스크립트(scripts/build-static.js)가 <meta name="took-mode" content="static"> 을 넣는다.
 export const STATIC = !!document.querySelector('meta[name="took-mode"][content="static"]');
 
+// ---------- 노트북·가로 화면: 갤럭시탭 세로 크기 틀로만 보기 ----------
+// 키오스크는 갤럭시탭 S10 FE+ 를 세워 쓴다. 노트북처럼 넓은 가로 화면에서 열면 화면을 가로로 꽉 채우지 않고,
+// 세로 미리보기(portrait.html)의 탭 크기 틀(800×1280 을 창 높이에 맞춤) 안에 지금 화면을 띄운다.
+// - 상단 '가로로 보기' 버튼(ORIENT_BUTTON, 지금은 숨김)을 누르면 이번 탭 세션 동안은 가로로 (sessionStorage took.landscape, 자동 초기화 때 지워진다)
+// - 휴대폰용·직원 도구 화면과 자동 테스트(navigator.webdriver)는 그대로
+export const TAB_FRAME = true;
+/** 이 화면을 탭 크기 틀로 옮기는 중이면 true (곧 다시 열리므로 화면마다 한 번만 할 일은 건너뛴다) */
+export let MOVING_TO_TAB_FRAME = false;
+const TAB_FRAME_SKIP = ['portrait.html', 'nfc-phone.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
+(function openInTabFrame() {
+  const page = location.pathname.split('/').pop() || 'index.html';
+  if (!TAB_FRAME || window.top !== window || navigator.webdriver || TAB_FRAME_SKIP.includes(page)) return;
+  if (!matchMedia('(orientation: landscape) and (min-width: 960px)').matches) return;
+  try { if (sessionStorage.getItem('took.landscape') === '1') return; } catch { /* 저장소를 못 쓰면 틀로 */ }
+  MOVING_TO_TAB_FRAME = true;
+  location.replace('portrait.html?auto=1&page=' + encodeURIComponent(page + location.search));
+})();
+
 let localApi = null;
 async function getLocalApi() {
   if (!localApi) {
@@ -210,7 +228,12 @@ export function productDetailTable(p) {
     storeUrlOf(p) ? el('tr', {}, el('th', { text: t('detail.store') }), el('td', {}, storeLink(p, t('detail.storeOpen')))) : null));
 }
 
-export function renderNav() {
+/**
+ * 상단 메뉴 + 키오스크 자동 초기화
+ * @param {{ idle?: { seconds?: () => number, active?: () => boolean, onReset?: () => void } }} [opts]
+ *   idle: 화면마다 자동 초기화를 바꿀 때 (거울 모드: 30초, 대기 화면이면 기다리기만, 초기화하면 홈 대신 대기 화면으로)
+ */
+export function renderNav(opts = {}) {
   if (document.querySelector('header.nav')) return; // 합본 화면처럼 스크립트 두 개가 함께 부르면 한 번만 그린다
   const nav = el('header', { class: 'nav' },
     // 로고: 저장된 상태를 모두 지우고 홈으로 이동 (처음 상태로 초기화)
@@ -220,6 +243,8 @@ export function renderNav() {
     // 홈의 두 갈래와 같은 순서. 립 컬러 매핑·합본 화면은 파일만 남기고 메뉴에서 뺐다
     freshLink('palette.html', t('nav.palette')), // 물감을 섞어 립 색 조제 + 카메라로 발라 보기
     freshLink('chat.html', t('nav.chat')),
+    freshLink('mirror.html', t('nav.mirror')), // 스마트 미러: 카메라 영상이 화면 전체
+    freshLink('mirror-v4.html', t('nav.mirrorV4')), // 하프미러 창 모드: 검정 화면 + 눈높이 카메라 창
     // 테스트 단계 직원용: NFC 태그 인식 테스트 (배포 때는 NFC_TEST_MENU 를 false 로)
     NFC_TEST_MENU ? freshLink('nfc-test.html', t('nav.nfcTest')) : null,
     // 언어 전환 (오른쪽 끝): 한국어 화면에선 'English', 영어 화면에선 '한국어'
@@ -236,13 +261,16 @@ export function renderNav() {
       nav.append(el('button', {
         type: 'button', class: 'nav-orient', text: t(inPreview ? 'nav.landscape' : 'nav.portrait'), title: t(inPreview ? 'nav.landscapeTitle' : 'nav.portraitTitle'),
         onclick: () => {
-          if (inPreview) window.top.location.href = page;
+          if (inPreview) {
+            try { sessionStorage.setItem('took.landscape', '1'); } catch { /* 저장 불가 환경 */ }
+            window.top.location.href = page;
+          }
           else location.href = 'portrait.html?page=' + encodeURIComponent(page);
         },
       }));
     }
   }
-  const idle = setupIdleReset();
+  const idle = setupIdleReset(opts.idle);
   // 테스트 단계: 90초를 기다리지 않고 자동 초기화 안내를 바로 띄워 본다 (오른쪽 끝). 배포 때는 IDLE_TEST_BUTTON 을 false 로
   if (IDLE_TEST_BUTTON && idle) {
     nav.append(el('button', { type: 'button', class: 'nav-idle-test', text: t('nav.idleTest'), title: t('nav.idleTestTitle'), onclick: idle.warnNow }));
@@ -251,7 +279,7 @@ export function renderNav() {
 
 const IDLE_TEST_BUTTON = true;
 export const NFC_TEST_MENU = true; // 상단 메뉴의 'NFC 테스트' (테스트 단계)
-const ORIENT_BUTTON = true; // 가로·세로 바꿔 보기 버튼 (배포 때 false 로)
+const ORIENT_BUTTON = false; // 상단 '가로로 보기'·'세로로 보기' 버튼 (사용자 요청으로 숨김. 다시 쓰려면 true)
 
 // ---------- 키오스크 자동 초기화 ----------
 // 손님이 떠난 뒤 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않게, 한동안 조작이 없으면 안내 후 지우고 홈으로 간다.
@@ -282,8 +310,13 @@ function hasSessionState() {
   } catch { return false; }
 }
 
-function setupIdleReset() {
+function setupIdleReset(custom = {}) {
   if (document.body.dataset.idleReset === 'off') return;
+  // 손님 휴대폰(거울 QR 로 연 챗봇, ?take=1)은 키오스크가 아니므로 자동 초기화를 하지 않는다. 그 휴대폰 탭에서 다른 화면으로 가도 유지
+  try {
+    if (new URLSearchParams(location.search).get('take') === '1') sessionStorage.setItem('took.phone', '1');
+    if (sessionStorage.getItem('took.phone') === '1') return;
+  } catch { /* 저장소를 못 쓰면 그대로 */ }
   const onHome = /(^|\/)(index\.html)?$/.test(location.pathname);
   let timer = null;
   let dialog = null;
@@ -298,11 +331,25 @@ function setupIdleReset() {
     return Date.now() - busySince < 60000;
   };
 
+  const seconds = () => {
+    const v = Number(custom.seconds?.());
+    return v >= 10 ? v : idleSeconds();
+  };
+  // 초기화: 기본은 저장한 상태를 지우고 홈으로, 화면이 따로 정했으면 그 동작 (거울 모드: 대기 화면으로)
+  const reset = () => {
+    if (!custom.onReset) return resetToHome();
+    clearInterval(countdown);
+    dialog?.remove();
+    dialog = null;
+    custom.onReset();
+    schedule();
+  };
   const schedule = () => {
     clearTimeout(timer);
-    timer = setTimeout(onIdle, idleSeconds() * 1000);
+    timer = setTimeout(onIdle, seconds() * 1000);
   };
   const onIdle = () => {
+    if (custom.active && !custom.active()) return schedule(); // 지울 것이 없는 상태(예: 거울 대기 화면)
     if (document.hidden || busy() || (onHome && !hasSessionState())) return schedule();
     showWarning();
   };
@@ -341,14 +388,14 @@ function setupIdleReset() {
       ring,
       desc,
       el('div', { class: 'idle-actions' }, keep,
-        el('button', { type: 'button', 'aria-label': t('idle.homeAria'), onclick: resetToHome }, icon(HOME), el('span', { text: t('idle.home') })))));
+        el('button', { type: 'button', 'aria-label': t('idle.homeAria'), onclick: reset }, icon(HOME), el('span', { text: t('idle.home') })))));
     document.body.append(dialog);
     keep.focus();
     countdown = setInterval(() => {
       left -= 1;
       if (left <= 0) {
         clearInterval(countdown);
-        resetToHome();
+        reset();
       } else update();
     }, 1000);
   }

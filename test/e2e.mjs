@@ -50,12 +50,16 @@ const at = (file) => new RegExp('/' + file.replace('.', '\\.') + '(\\?.*)?$');
 const refColorHas = (pg, hex) => pg.waitForFunction((h) => document.getElementById('ref-color').textContent.includes(h), hex);
 const consoleErrors = [];
 
+// ONLY=<이름 일부> 를 주면 그 단계만 돌린다 (예: ONLY=거울 npm run e2e)
 async function step(name, fn) {
+  if (process.env.ONLY && !name.includes(process.env.ONLY)) return;
   try {
     await fn();
     results.push(['PASS', name]);
   } catch (e) {
-    results.push(['FAIL', name, e.message.split('\n')[0]]);
+    // 어느 줄에서 실패했는지 (e2e.mjs:줄번호)
+    const line = (e.stack || '').match(/e2e\.mjs:(\d+)/)?.[1];
+    results.push(['FAIL', name, e.message.split('\n')[0] + (line ? ` (e2e.mjs:${line})` : '')]);
   }
 }
 
@@ -63,6 +67,8 @@ function watch(page, label) {
   page.on('request', (r) => { if (r.url().includes('/api/')) apiRequests.push(r.url()); });
   page.on('console', (m) => {
     // MediaPipe WASM 은 정보성 로그(INFO: ...)를 console.error 로 출력하므로 제외한다
+    // 거울 대기 화면의 두 번째 사진(images/mirror/standby-2.webp)은 넣어 두면 나오는 선택 파일이라, 없을 때의 404 는 뺀다
+    if (m.type() === 'error' && /standby-\d+\.(webp|jpg)$/.test(m.location()?.url || '')) return;
     if (m.type() === 'error' && !m.text().startsWith('INFO:')) consoleErrors.push(`${label}: ${m.text()}`);
   });
   page.on('pageerror', (e) => consoleErrors.push(`${label}: ${e.message}`));
@@ -81,7 +87,7 @@ async function assertAchromatic(page) {
       return Math.max(+m[1], +m[2], +m[3]) - Math.min(+m[1], +m[2], +m[3]) > 2;
     };
     // CLAUDE.md 의 실제 색 예외: 립 매핑 영상·프리셋, 색 견본, 제품 사진, 팔레트의 물감·섞는 칸·조제한 색·레시피
-    const colorDemo = (el) => el.closest('#swatches, #match-swatches, .stage, .color-dot, .card-img, .paints, .mix-wrap, .result-swatch, .recipe-bar, .fly-drop, #demo-lips');
+    const colorDemo = (el) => el.closest('#swatches, #match-swatches, .stage, .color-dot, .card-img, .paints, .mix-wrap, .result-swatch, .recipe-bar, .fly-drop, #demo-lips, .mirror-standby');
     for (const el of document.querySelectorAll('*')) {
       if (colorDemo(el)) continue;
       const cs = getComputedStyle(el);
@@ -307,7 +313,7 @@ await step('iPad 가로: 립 매핑/챗봇/합본/팔레트가 스크롤 없이 
 await step('그 밖의 화면 크기(PC·세로 태블릿): 가로 스크롤 없음', async () => {
   for (const vp of [{ width: 820, height: 1180 }, { width: 1440, height: 900 }, { width: 1920, height: 1080 }]) {
     await page.setViewportSize(vp);
-    for (const path of ['/', '/lip-together.html', '/studio.html', '/palette.html', '/recommend.html?hex=%23B3122E', '/chat.html', '/product.html?id=P001']) {
+    for (const path of ['/', '/lip-together.html', '/studio.html', '/palette.html', '/mirror.html', '/mirror-v4.html', '/recommend.html?hex=%23B3122E', '/chat.html', '/product.html?id=P001']) {
       await page.goto(BASE + path);
       await page.waitForLoadState('networkidle');
       const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -316,6 +322,251 @@ await step('그 밖의 화면 크기(PC·세로 태블릿): 가로 스크롤 없
     }
   }
   await page.setViewportSize({ width: 1280, height: 900 });
+});
+
+// ---------- 거울 모드 (mirror.html) ----------
+await step('거울 모드: 대기 → 터치 → 화면 전체 영상·독 → 팔레트 → 유휴 초기화로 대기·스트림 정지 → NFC(제품·휴대폰 챗봇 QR) → 회전', async () => {
+  const pg = await ctx.newPage();
+  watch(pg, 'mirror');
+  // 켠 카메라 스트림을 모아 두고, 대기로 돌아간 뒤 모두 멈췄는지 본다
+  await pg.addInitScript(() => {
+    window.__streams = [];
+    const md = navigator.mediaDevices;
+    const orig = md.getUserMedia.bind(md);
+    md.getUserMedia = async (c) => { const s = await orig(c); window.__streams.push(s); return s; };
+    // 카메라·입술 추적 준비가 느린 날에는 유휴 30초 안내가 화면을 덮어 클릭이 막히므로 길게 둔다 (유휴 복귀는 아래에서 테스트 버튼으로)
+    if (!localStorage.getItem('took.mirror')) localStorage.setItem('took.mirror', JSON.stringify({ idle: 600 }));
+  });
+  const VW = 820, VH = 1180; // iPad 세로
+  await pg.setViewportSize({ width: VW, height: VH });
+  await pg.goto(BASE + '/mirror.html');
+  await pg.waitForLoadState('networkidle');
+  // 1) 대기: 올영세일 사진이 화면 가운데 가득, 안내, 카메라 꺼짐, 독 없음
+  assert.equal(await pg.getAttribute('body', 'data-mirror'), 'standby');
+  await pg.waitForFunction(() => { const i = document.getElementById('mirror-standby-img'); return i.complete && i.naturalWidth > 0; });
+  const img = await pg.locator('#mirror-standby-img').boundingBox();
+  assert.ok(img.x <= 0 && img.y <= 0 && img.width >= VW && img.height >= VH, '대기 사진이 화면 전체가 아님: ' + JSON.stringify(img));
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.getElementById('mirror')).backgroundColor), 'rgb(0, 0, 0)'); // 카메라 뒤 바탕
+  assert.ok(await pg.isVisible('#mirror-standby .mirror-hint'));
+  assert.equal(await pg.isVisible('#mirror-dock'), false);
+  assert.equal(await pg.isVisible('header.nav'), false);
+  assert.equal(await pg.evaluate(() => window.__streams.length), 0);
+  await assertAchromatic(pg);
+  // 2) 터치 → 카메라가 켜지고 #view 캔버스가 화면 전체에 그려진다
+  await pg.mouse.click(VW / 2, VH * 0.4);
+  await pg.waitForFunction(() => document.body.dataset.mirror === 'live');
+  await pg.waitForFunction(() => getComputedStyle(document.getElementById('mirror-standby')).visibility === 'hidden'); // 대기 사진은 사라진다
+  await pg.waitForFunction(() => {
+    const c = document.getElementById('view');
+    if (!c.width || !c.height) return false;
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    for (let i = 0; i < d.length; i += 4 * 997) if (d[i] + d[i + 1] + d[i + 2] > 0) return true;
+    return false;
+  }, null, { timeout: 15000 });
+  // 캔버스 내부 해상도 = 영상 해상도 (DPR 로 키우지 않음), 화면에는 전체로
+  assert.ok(await pg.evaluate(() => {
+    const c = document.getElementById('view'), v = document.getElementById('video');
+    return c.width === v.videoWidth && c.height === v.videoHeight;
+  }), '캔버스 해상도가 영상 해상도와 다름');
+  const viewBox = await pg.locator('#view').boundingBox();
+  assert.ok(viewBox.x <= 0 && viewBox.y <= 0 && viewBox.width >= VW && viewBox.height >= VH, '영상이 화면 전체가 아님: ' + JSON.stringify(viewBox));
+  // 3) 독: 보이고, 화면 높이의 1/3 이내(팔레트를 크게 쓰기로 해 25% → 1/3), 버튼 56px 이상
+  assert.ok(await pg.isVisible('#mirror-dock'));
+  const dock = await pg.locator('#mirror-dock').boundingBox();
+  assert.ok(dock.height <= VH / 3 && dock.y + dock.height <= VH, '독 크기/위치: ' + JSON.stringify(dock));
+  for (const b of await pg.locator('#mirror-dock button:visible').all()) assert.ok((await b.boundingBox()).height >= 56, '버튼 높이 56px 미만');
+  assert.equal(await pg.locator('#mirror-pill').count(), 0); // 왼쪽 위 '실시간' 알약은 뺐다
+  await assertAchromatic(pg);
+  // 4) 팔레트: 시작하면 바로 뜬다 (팔레트 탭과 같은 물감·섞는 칸). 물감 두 방울 → 섞은 색이 이름에 반영, 독은 1/3 이내
+  assert.ok(await pg.isVisible('#mirror-palette'), '시작했는데 팔레트가 바로 뜨지 않음');
+  assert.equal(await pg.isVisible('#mirror-main'), false);
+  await pg.click('#mirror-paints .paint >> nth=1');
+  await pg.waitForTimeout(800); // 방울이 날아가는 시간
+  await pg.click('#mirror-paints .paint >> nth=8');
+  await pg.waitForFunction(() => /#[0-9A-F]{6}/.test(document.getElementById('mirror-name').textContent) && !document.getElementById('mirror-undo').disabled);
+  const palDock = await pg.locator('#mirror-dock').boundingBox();
+  assert.ok(palDock.height <= VH / 3, '팔레트를 연 독이 1/3 넘음: ' + JSON.stringify(palDock));
+  for (const b of await pg.locator('#mirror-palette button:visible').all()) assert.ok((await b.boundingBox()).height >= 56, '팔레트 버튼 높이 56px 미만');
+  // 팔레트 탭 기능: 텍스처·농도, 비슷한 제품(닫으면 팔레트로 돌아온다)
+  await pg.click('#mirror-textures [data-texture="glossy"]');
+  assert.equal(await pg.getAttribute('#mirror-textures [data-texture="glossy"]', 'aria-pressed'), 'true');
+  await pg.locator('#mirror-intensity').fill('55');
+  assert.equal(await pg.textContent('#mirror-intensity-out'), '55%');
+  // 비슷한 제품: 팔레트 탭과 같은 추천(색이 가까운 순 6개) → 카드를 누르면 바로 바른다(✓ 바르는 중) → 다시 섞기
+  const mixHex = (await pg.textContent('#mirror-name')).match(/#[0-9A-F]{6}/)[0];
+  await pg.click('#mirror-find');
+  await pg.waitForSelector('#mirror-rec-list .m-card');
+  const recIds = await pg.$$eval('#mirror-rec-list .m-card', (cs) => cs.map((c) => c.dataset.productId));
+  // 카드에는 올리브영 링크·색상값이 없다
+  assert.equal(await pg.locator('#mirror-rec-list a, #mirror-rec-list .color-dot').count(), 0);
+  for (const c of await pg.locator('#mirror-rec-list .m-card').all()) assert.ok(!/#[0-9A-F]{6}/i.test(await c.textContent()), '카드에 색상값이 보임');
+  // 서버 모드는 가상 데이터라 기대값을 계산해 비교한다 (정적 빌드는 올리브영 실제 데이터라 개수만)
+  if (STATIC) assert.equal(recIds.length, 6);
+  else assert.deepEqual(recIds, recommendByColor(mixHex, { limit: 6 }).map((p) => p.id));
+  assert.ok((await pg.locator('#mirror-dock').boundingBox()).height <= VH / 3, '추천 결과를 연 독이 1/3 넘음');
+  await assertAchromatic(pg);
+  const before = await pg.textContent('#mirror-name');
+  await pg.click('#mirror-rec-list .m-card >> nth=0');
+  await pg.waitForFunction((b) => document.getElementById('mirror-name').textContent !== b, before); // 이름이 제품 이름으로 바뀐다
+  assert.equal(await pg.getAttribute('#mirror-rec-list .m-card >> nth=0', 'aria-pressed'), 'true');
+  await pg.click('#mirror-back-mix');
+  assert.ok(await pg.isVisible('#mirror-palette'), '다시 섞기를 눌렀는데 팔레트로 돌아오지 않음');
+  await assertAchromatic(pg);
+  // 팔레트에는 닫기 버튼이 없다 (끝내기는 자동 초기화)
+  assert.equal(await pg.locator('#mirror-pal-close').count(), 0);
+  // 5) 유휴 초기화: 기존 안내(자동 초기화 테스트 버튼으로 바로 띄움) → '처음으로' → 대기, 스트림 정지
+  await pg.evaluate(() => document.querySelector('.nav-idle-test').click());
+  await pg.waitForSelector('.idle-overlay');
+  await pg.click('.idle-overlay .idle-actions button:not(.primary)');
+  await pg.waitForFunction(() => document.body.dataset.mirror === 'standby');
+  assert.ok(await pg.evaluate(() => window.__streams.length > 0
+    && window.__streams.every((s) => s.getTracks().every((t) => t.readyState === 'ended'))
+    && document.getElementById('video').srcObject === null), '대기로 돌아왔는데 카메라 스트림이 멈추지 않음');
+  assert.equal(await pg.isVisible('#mirror-dock'), false);
+  // 6) NFC(리더기 입력과 같은 길): 대기에서 깨우고 제품 색을 입히거나, 등록되지 않은 태그면 그렇게 알린다
+  const nErr = consoleErrors.length;
+  await pg.evaluate(() => window.tookNfc('TEST0001'));
+  await pg.waitForFunction(() => document.body.dataset.mirror === 'live');
+  if (STATIC) {
+    // 정적 빌드(올리브영 실제 데이터): 시험용 태그 → 등록 제품. 제품 화면 + 손님 휴대폰 챗봇 QR
+    await pg.waitForSelector('#mirror-product:not(.hidden) #mirror-qr svg', { timeout: 15000 });
+    const qrUrl = await pg.getAttribute('#mirror-qr', 'data-url');
+    assert.match(qrUrl, /chat\.html\?base=OY-[^&]+&hex=%23[0-9A-F]{6}&take=1/);
+    assert.ok((await pg.locator('#mirror-dock').boundingBox()).height <= VH / 3, '제품 화면 독이 1/3 넘음');
+    await assertAchromatic(pg);
+    // 손님 휴대폰: 그 주소를 열면 그 제품이 기준인 챗봇, 자동 초기화 없음
+    const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const ph = await phone.newPage();
+    watch(ph, 'phone');
+    const u = new URL(qrUrl);
+    await ph.goto(BASE + u.pathname + u.search);
+    await ph.waitForSelector('#base-chip:not(.hidden)');
+    assert.equal(await ph.evaluate(() => sessionStorage.getItem('took.phone')), '1');
+    assert.equal(await ph.locator('.nav-idle-test').count(), 0);
+    await phone.close();
+  } else {
+    // 서버 모드(가상 데이터): 그 제품이 없으니 지어내지 않고 '등록되지 않은 태그' + 팔레트
+    await pg.waitForFunction(() => /등록되지 않은 태그/.test(document.getElementById('mirror-pal-status').textContent));
+    assert.ok(await pg.isVisible('#mirror-palette'), 'NFC 로 시작했는데 팔레트가 바로 뜨지 않음');
+  }
+  // 가상 데이터(서버 모드)에는 그 제품이 없어 404 가 나는 것이 의도된 동작이므로 그 로그는 뺀다
+  consoleErrors.splice(nErr, consoleErrors.length - nErr, ...consoleErrors.slice(nErr).filter((e) => !e.includes('404')));
+  // 7) 설정: 영상 90° 회전 → 캔버스 가로·세로가 영상과 바뀐다
+  await pg.evaluate(() => document.querySelector('#ms-rotate [data-v="90"]').click());
+  await pg.waitForFunction(() => {
+    const c = document.getElementById('view'), v = document.getElementById('video');
+    return v.videoWidth && c.width === v.videoHeight && c.height === v.videoWidth;
+  }, null, { timeout: 15000 });
+  await pg.evaluate(() => { localStorage.removeItem('took.mirror'); document.getElementById('mirror-end').click(); });
+  await pg.waitForFunction(() => document.body.dataset.mirror === 'standby');
+  if (SHOTS) await pg.screenshot({ path: `${SHOTS}/mirror-standby.png` });
+  await pg.close();
+});
+
+// ---------- 거울 ver4 (mirror-v4.html) ----------
+await step('거울 ver4: 대기(전체 검정·사진 없음) → 터치 → 가운데 카메라 창·독과 안 겹침 → 팔레트(창이 줄어듦) → 가로 화면(독 오른쪽·창 65dvh) → 유휴 초기화', async () => {
+  const pg = await ctx.newPage();
+  watch(pg, 'mirror-v4');
+  await pg.addInitScript(() => {
+    window.__streams = [];
+    const md = navigator.mediaDevices;
+    const orig = md.getUserMedia.bind(md);
+    md.getUserMedia = async (c) => { const s = await orig(c); window.__streams.push(s); return s; };
+    // 전체 실행에서는 카메라·입술 추적 준비가 느려 유휴 30초 안내가 화면을 덮을 수 있어 길게 둔다 (유휴 복귀는 아래에서 테스트 버튼으로)
+    if (!localStorage.getItem('took.mirror4')) localStorage.setItem('took.mirror4', JSON.stringify({ idle: 600 }));
+  });
+  const VW = 820, VH = 1180; // 태블릿 세로
+  await pg.setViewportSize({ width: VW, height: VH });
+  await pg.goto(BASE + '/mirror-v4.html');
+  await pg.waitForLoadState('networkidle');
+  const box = (sel) => pg.locator(sel).boundingBox();
+  const overlap = (a, b) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+  const settle = () => pg.waitForTimeout(450); // 창 크기 전환 0.3초
+  // 1) 대기: body·루트 배경 검정, 홍보 사진 없음(기본 끄기), 안내 보임, 독 숨김, 카메라 꺼짐
+  assert.equal(await pg.getAttribute('body', 'data-mirror'), 'standby');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(0, 0, 0)');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.getElementById('mirror-standby')).backgroundColor), 'rgb(0, 0, 0)');
+  assert.equal(await pg.isVisible('#mirror-standby-img'), false, '대기 사진이 보임 (기본은 끄기)');
+  assert.equal(await pg.getAttribute('#mirror-standby-img', 'src'), null, '사진을 끈 상태인데 사진을 불러옴');
+  assert.ok(await pg.isVisible('#mirror-standby .mirror-hint'));
+  assert.ok(await pg.isVisible('.m4-face') && await pg.isVisible('.m4-logo'), '대기 화면 점선 얼굴·로고가 없음');
+  assert.match(await pg.textContent('#m4-clock'), /^\d{2}:\d{2}$/);
+  assert.equal(await pg.isVisible('#mirror-dock'), false);
+  assert.equal(await pg.evaluate(() => window.__streams.length), 0);
+  await assertAchromatic(pg);
+  // 2) 터치 → live. 카메라 창은 화면 전체가 아니라 가로 중앙의 창
+  await pg.mouse.click(VW / 2, VH * 0.4);
+  await pg.waitForFunction(() => document.body.dataset.mirror === 'live');
+  await pg.waitForFunction(() => {
+    const c = document.getElementById('view');
+    if (!c.width || !c.height) return false;
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    for (let i = 0; i < d.length; i += 4 * 997) if (d[i] + d[i + 1] + d[i + 2] > 0) return true;
+    return false;
+  }, null, { timeout: 15000 });
+  assert.ok(await pg.evaluate(() => {
+    const c = document.getElementById('view'), v = document.getElementById('video');
+    return c.width === v.videoWidth && c.height === v.videoHeight;
+  }), '캔버스 해상도가 영상 해상도와 다름');
+  await settle();
+  // 3) 시작하면 팔레트가 바로 뜬다 → 창이 독 위로 비켜 줄어든다 (겹치지 않음)
+  assert.ok(await pg.isVisible('#mirror-palette'), '시작했는데 팔레트가 바로 뜨지 않음');
+  let win = await box('#mirror-stage');
+  let dock = await box('#mirror-dock');
+  assert.ok(win.width < VW && win.height < VH, '카메라 창이 화면 전체: ' + JSON.stringify(win));
+  assert.ok(Math.abs(win.x + win.width / 2 - VW / 2) <= 2, '카메라 창이 가로 중앙이 아님: ' + JSON.stringify(win));
+  assert.ok(!overlap(win, dock), '팔레트 독이 창과 겹침: ' + JSON.stringify({ win, dock }));
+  assert.ok(win.height < VH * 0.65 && win.height >= VH * 0.2, '팔레트를 열었는데 창이 줄지 않음: ' + win.height);
+  assert.ok(dock.y + dock.height <= VH, '독이 화면 아래로 넘침');
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.getElementById('mirror-dock')).backgroundColor), 'rgba(0, 0, 0, 0)'); // 독 배경 투명
+  assert.equal(await pg.evaluate(() => getComputedStyle(document.getElementById('mirror-dock')).backdropFilter), 'none');
+  for (const b of await pg.locator('#mirror-dock button:visible').all()) assert.ok(((await b.boundingBox())?.height ?? 56) >= 56, '버튼 높이 56px 미만');
+  await assertAchromatic(pg);
+  // 팔레트 기능(ver3 와 같은 모듈): 물감 두 방울 → 비슷한 제품 → 그때도 겹치지 않음 → 다시 섞기
+  await pg.click('#mirror-paints .paint >> nth=1');
+  await pg.waitForTimeout(800);
+  await pg.click('#mirror-paints .paint >> nth=8');
+  await pg.waitForFunction(() => /#[0-9A-F]{6}/.test(document.getElementById('mirror-name').textContent) && !document.getElementById('mirror-find').disabled);
+  await pg.click('#mirror-find');
+  await pg.waitForSelector('#mirror-rec-list .m-card');
+  await settle();
+  win = await box('#mirror-stage');
+  dock = await box('#mirror-dock');
+  assert.ok(!overlap(win, dock), '비슷한 제품 독이 창과 겹침: ' + JSON.stringify({ win, dock }));
+  await assertAchromatic(pg);
+  if (SHOTS) await pg.screenshot({ path: `${SHOTS}/mirror-v4-portrait-result.png` });
+  await pg.click('#mirror-back-mix');
+  await settle();
+  if (SHOTS) await pg.screenshot({ path: `${SHOTS}/mirror-v4-portrait-palette.png` });
+  // 4) 가로 화면: 독이 창 오른쪽으로 가고, 창은 설정 높이(65dvh ±2%)로 돌아온다
+  const LW = 1280, LH = 900;
+  await pg.setViewportSize({ width: LW, height: LH });
+  await settle();
+  win = await box('#mirror-stage');
+  dock = await box('#mirror-dock');
+  assert.ok(Math.abs(win.height - LH * 0.65) <= LH * 0.02, '가로 화면 창 높이가 65dvh 가 아님: ' + win.height);
+  assert.ok(Math.abs(win.y + win.height / 2 - LH * 0.4) <= LH * 0.02, '창 중심이 위에서 40% 가 아님: ' + JSON.stringify(win));
+  assert.ok(dock.x >= win.x + win.width && !overlap(win, dock), '가로 화면 독이 창 오른쪽이 아님: ' + JSON.stringify({ win, dock }));
+  assert.ok(dock.x + dock.width <= LW && dock.y >= 0 && dock.y + dock.height <= LH, '가로 화면 독이 화면을 넘음');
+  for (const b of await pg.locator('#mirror-dock button:visible').all()) assert.ok(((await b.boundingBox())?.height ?? 56) >= 56, '가로 화면 버튼 높이 56px 미만');
+  if (SHOTS) await pg.screenshot({ path: `${SHOTS}/mirror-v4-landscape-palette.png` });
+  await pg.setViewportSize({ width: VW, height: VH });
+  // 5) 직원 설정: 창 높이·위치 슬라이더, 창 픽셀 크기 표시, 저장 키 took.mirror4 (ver3 의 took.mirror 와 따로)
+  await pg.evaluate(() => { const r = document.getElementById('ms-win-h'); r.value = '50'; r.dispatchEvent(new Event('input')); });
+  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem('took.mirror4')).winH), 50);
+  assert.equal(await pg.evaluate(() => JSON.parse(localStorage.getItem('took.mirror') || '{}').winH), undefined, 'ver3 설정 키에 ver4 값이 섞임');
+  assert.match(await pg.textContent('#ms-win'), /\d+×\d+px/);
+  await pg.evaluate(() => localStorage.removeItem('took.mirror4'));
+  // 6) 유휴 초기화 → 대기, 스트림 정지, 독 숨김
+  await pg.evaluate(() => document.querySelector('.nav-idle-test').click());
+  await pg.waitForSelector('.idle-overlay');
+  await pg.click('.idle-overlay .idle-actions button:not(.primary)');
+  await pg.waitForFunction(() => document.body.dataset.mirror === 'standby');
+  assert.ok(await pg.evaluate(() => window.__streams.length > 0
+    && window.__streams.every((s) => s.getTracks().every((t) => t.readyState === 'ended'))
+    && document.getElementById('video').srcObject === null), '대기로 돌아왔는데 카메라 스트림이 멈추지 않음');
+  assert.equal(await pg.isVisible('#mirror-dock'), false);
+  await pg.close();
 });
 
 await step('잘못된 제품 ID / 색상 없음 처리', async () => {

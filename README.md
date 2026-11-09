@@ -107,6 +107,7 @@ src/lib/recommend.js    색상 기반 추천
 src/lib/spoken.js       말·입력 보정 (한글 금액 → 숫자, 비슷한 발음 → 챗봇 단어, 자모 단위 비교)
 src/lib/chat.js         규칙 기반 챗봇
 public/*.html           index, lip-together(립 컬러 매핑), chat(AI 뷰티 챗봇), studio(합본), palette(팔레트), recommend, product, barcodes(시연용 바코드), scan-phone(휴대폰 바코드)
+public/mirror-v4.html   거울 ver4 (하프미러 창 모드, js/mirror-v4.js): 화면 대부분 검정 + 눈높이 카메라 창, 독은 창 아래(가로 화면은 오른쪽). 설정 took.mirror4
 public/js/              페이지 스크립트, common.js(공통 카드/네비/세션 저장), lip-tracker.js(입술 추적), lip-engine.js(립 컬러 합성 공용), motion.js(화면 움직임: 카드 등장·세그먼트 밑판·슬라이더 채우기·가격 올라가기·토스트·스켈레톤)
 public/css/wireframe.css 무채색 토스풍 스타일 (회색 바탕·흰 카드·둥근 모서리·부드러운 움직임)
 ```
@@ -219,6 +220,13 @@ public/css/wireframe.css 무채색 토스풍 스타일 (회색 바탕·흰 카�
 - 검사에 실패하거나 LLM 이 오류·시간 초과면 규칙 챗봇 답을 그대로 씁니다. `/api/chat` 응답의 `engine` 이 `llm` / `rule-based` 로 어느 쪽이 답했는지 알려 줍니다.
 - 정적 버전(Vercel)은 서버가 없어 규칙만 씁니다.
 - 평가: `npm run eval:chat -- --provider hybrid` ([test/eval/README.md](test/eval/README.md))
+
+## 거울 ver4 (`mirror-v4.html`, 상단 메뉴 '거울 ver4', 하프미러용)
+- 거울(ver3, `mirror.html`)은 카메라 영상을 화면 전체에 채워 하프미러 뒤에서는 실제 반사상과 겹치고 밝은 화면 때문에 거울 효과가 사라집니다. ver4 는 "검은 부분 = 거울"을 이용해 화면 대부분을 `#000` 으로 두고 카메라 영상은 가로 중앙의 세로형 창(기본 높이 65dvh, 창 중심은 위에서 40%)에만 그립니다.
+- 대기: 전체 검정(= 거울) 위에 흰 선만 — 왼쪽 위 TOOK 로고(흰색 SVG), 오른쪽 위 시계, 가운데 점선 얼굴(천천히 밝아졌다 어두워짐), 아래 '제품을 태그해보세요'. 홍보 사진은 직원 설정(끄기 기본 / 작게 / 전체). 체험: 창 안에 영상·입술 매핑, 독은 창 아래 검정 영역(배경 투명, 흰 글자·흰 버튼). 팔레트·비슷한 제품처럼 키가 큰 패널이 열리면 창이 0.3초 동안 줄어 독과 겹치지 않습니다. 가로 화면에서는 독이 창 오른쪽에 세로로 놓입니다.
+- 직원 설정(`?setup=1` 또는 왼쪽 위 2초): ver3 항목 + 창 높이(40~90%)·창 세로 위치(20~60%)·창 테두리·대기 홍보 사진. 아래에 지금 창의 픽셀 크기·위치가 보여 거울 도착 후 실측 조정에 씁니다. 저장 키 `took.mirror4`(ver3 `took.mirror` 와 따로), 색 보정 행렬 `took.colorProfile` 은 공유.
+- 코드는 `mirror.js` 를 `mirror-v4.js` 로 복제해 레이아웃(대기 사진·창 배치·설정 항목)만 바꿨습니다. 카메라·입술 매핑·팔레트·추천·NFC 는 같은 모듈(lip-view, lip-tracker, palette-mixer, lip-engine, nfc)을 씁니다. 스크린샷: `node scripts/shots-mirror-v4.mjs` → `screenshots/`
+- 실제 하프미러·iPad·갤럭시탭 기기 테스트는 하지 않았고, Chromium 가짜 카메라로 태블릿 세로(820×1180, 800×1280)·가로(1280×900, 1280×800) 화면 크기에서 레이아웃을 검증했습니다.
 
 ## 아직 구현되지 않은 기능 / 제약
 - **외부 AI API 기본 꺼짐**: 챗봇은 규칙 기반이며 화면에 그렇게 표시합니다. LLM 보조는 `.env` 를 채운 서버 버전에서만 켜지고, 아직 실제 모델로 평가하지 않았습니다(가짜 모델로 연결·검증 동작만 확인).

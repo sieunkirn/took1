@@ -6,6 +6,11 @@
 // 아직 영어 문구가 없는 화면은 한국어로 보인다 (STRINGS.en 에 없는 키는 한국어로 대신한다)
 const KEY = 'took.lang';
 export const LANGS = ['ko', 'en'];
+// 거울 QR 로 휴대폰에서 열면 거울의 언어를 주소로 넘긴다 (?lang=en)
+try {
+  const want = new URLSearchParams(location.search).get('lang');
+  if (LANGS.includes(want)) sessionStorage.setItem(KEY, want);
+} catch { /* 저장 불가 환경 */ }
 
 export function lang() {
   try {
@@ -27,7 +32,24 @@ export function setLang(next, { skipIntro = true } = {}) {
 
 const STRINGS = {
   ko: {
-    'nav.reset': 'took(초기화)', 'nav.home': '홈', 'nav.palette': '팔레트', 'nav.chat': 'AI 뷰티 챗봇', 'nav.nfcTest': 'NFC 테스트',
+    'nav.reset': 'took(초기화)', 'nav.home': '홈', 'nav.palette': '팔레트', 'nav.chat': 'AI 뷰티 챗봇', 'nav.nfcTest': 'NFC 테스트', 'nav.mirror': '거울', 'nav.mirrorV4': '거울 ver4',
+    // 거울 ver4 (mirror-v4.html, 하프미러 창 모드). 나머지 문구는 mirror.* 를 같이 쓴다
+    'mirror4.pageTitle': 'took(툭) - 거울 ver4', 'mirror4.standby': '제품을 태그해보세요', 'mirror4.setup': '거울 ver4 설정 (직원용)', 'mirror4.winH': '창 높이', 'mirror4.winY': '창 세로 위치',
+    'mirror4.border': '창 테두리', 'mirror4.photo': '대기 홍보 사진', 'mirror4.photoSmall': '작게', 'mirror4.photoFull': '전체',
+    'mirror4.winInfo': '카메라 창 {w}×{h}px · 위치 x {x}, y {y}',
+    // 거울 모드 (mirror.html)
+    'mirror.pageTitle': 'took(툭) - 거울', 'mirror.standby': '제품을 선반에 올려 보세요', 'mirror.standbyTouch': '또는 화면을 눌러 시작해요',
+    'mirror.defaultColor': '기본 색', 'mirror.recommend': '추천 제품 보기', 'mirror.palette': '팔레트', 'mirror.mixReset': '처음부터', 'mirror.match': '내 톤 찾기', 'mirror.matchShort': '내 톤', 'mirror.nfcTag': '선반에 올린 제품', 'mirror.toPalette': '팔레트로 섞어 보기', 'mirror.qrText': '휴대폰 카메라로 찍으면\n이 제품으로 챗봇과 이어서 대화해요', 'mirror.qrAria': '휴대폰 챗봇 연결 QR 코드', 'mirror.backProduct': '← 제품으로', 'mirror.phoneBase': '휴대폰용 주소', 'mirror.phoneBaseHint': '비우면 자동 (예: https://took-sieunkirns-projects.vercel.app/)', 'mirror.similarTitle': '이 색과 비슷한 제품', 'mirror.similarCount': '{n}개 · 색이 가까운 순', 'mirror.tryOnShort': '발라보기', 'mirror.wearing': '✓ 바르는 중', 'mirror.cardAria': '{name} 발라보기', 'mirror.find': '비슷한 제품', 'mirror.undoShort': '빼기', 'mirror.toneResult': "{label} · 어울리는 물감에 '내 톤' 표시", 'mirror.mixed': '조제한 색 {hex}', 'mirror.end': '종료',
+    'mirror.back': '닫기', 'mirror.recAria': '비슷한 색의 추천 제품', 'mirror.recLoading': '비슷한 색 제품을 찾는 중…',
+    'mirror.recNone': '비슷한 색 제품이 없어요', 'mirror.recFail': '추천 제품을 불러오지 못했어요', 'mirror.tryAria': '{name} 색 발라 보기',
+    'mirror.applied': '{name} 색을 발랐어요', 'mirror.unknownTag': '등록되지 않은 태그예요', 'mirror.retry': '다시 연결', 'mirror.camStarting': '카메라를 켜는 중…',
+    'mirror.setup': '거울 설정 (직원용)', 'mirror.rotate': '영상 회전', 'mirror.flip': '좌우 반전', 'mirror.on': '켜기', 'mirror.off': '끄기',
+    'mirror.scale': '얼굴 크기 배율', 'mirror.trigger': '전환 트리거', 'mirror.trigNfc': 'NFC', 'mirror.trigTouch': '터치', 'mirror.trigBoth': '둘 다',
+    'mirror.idle': '유휴 시간(초)', 'mirror.fullscreen': '전체 화면 켜기', 'mirror.fullscreenFail': '전체 화면을 열지 못했어요. 키보드의 F11 을 눌러 주세요',
+    'mirror.matrix': '색 보정 행렬 (3×3, 행 순서로 숫자 9개)', 'mirror.matrixApply': '적용', 'mirror.matrixReset': '기본값',
+    'mirror.matrixBad': '숫자 9개를 입력해 주세요', 'mirror.matrixNote': '거울 도착 후 실측값으로 채울 자리예요. 기본값은 항등 행렬(보정 없음)입니다.',
+    'mirror.matrixSaved': '저장했어요', 'mirror.close': '닫기', 'mirror.camInfo': '카메라 {w}×{h} · {fps}fps', 'mirror.camOff': '카메라 꺼짐 (대기)', 'mirror.screenInfo': '화면 {w}×{h} · 배율 {dpr}',
+    'mirror.lowered': '30fps 가 안 나와 해상도를 {w}×{h} 로 낮췄어요',
     'nav.portrait': '세로로 보기', 'nav.portraitTitle': 'iPad 를 세웠을 때 화면으로 바꿔 봅니다', 'nav.landscape': '가로로 보기', 'nav.landscapeTitle': 'iPad 를 눕혔을 때 화면으로 돌아갑니다',
     'nav.idleTest': '자동 초기화 테스트', 'nav.idleTestTitle': '조작이 없을 때 뜨는 안내를 바로 띄웁니다',
     'idle.title': '계속 이용하시나요?', 'idle.desc': '{n}초 뒤 처음 화면으로 돌아가요. 지금까지의 대화와 고른 색은 지워져요.',
@@ -144,7 +166,22 @@ const STRINGS = {
     'voice.candidates': ' (후보 {n}개 중 선택)', 'voice.understood': ' → 이해한 내용: "{text}"', 'voice.nothing': '인식된 말이 없습니다. 버튼을 다시 누르고 말씀해 주세요.',
   },
   en: {
-    'nav.reset': 'took (reset)', 'nav.home': 'Home', 'nav.palette': 'Palette', 'nav.chat': 'AI Beauty Chat', 'nav.nfcTest': 'NFC test',
+    'nav.reset': 'took (reset)', 'nav.home': 'Home', 'nav.palette': 'Palette', 'nav.chat': 'AI Beauty Chat', 'nav.nfcTest': 'NFC test', 'nav.mirror': 'Mirror', 'nav.mirrorV4': 'Mirror v4',
+    'mirror4.pageTitle': 'took - Mirror v4', 'mirror4.standby': 'Tag a product to start', 'mirror4.setup': 'Mirror v4 settings (staff)', 'mirror4.winH': 'Window height', 'mirror4.winY': 'Window position',
+    'mirror4.border': 'Window border', 'mirror4.photo': 'Standby photo', 'mirror4.photoSmall': 'Small', 'mirror4.photoFull': 'Full',
+    'mirror4.winInfo': 'Camera window {w}×{h}px · at x {x}, y {y}',
+    'mirror.pageTitle': 'took - Mirror', 'mirror.standby': 'Place a product on the shelf', 'mirror.standbyTouch': 'or touch the screen to start',
+    'mirror.defaultColor': 'Default color', 'mirror.recommend': 'See products', 'mirror.palette': 'Palette', 'mirror.mixReset': 'Start over', 'mirror.match': 'My tone', 'mirror.matchShort': 'My tone', 'mirror.nfcTag': 'On the shelf', 'mirror.toPalette': 'Mix in palette', 'mirror.qrText': 'Scan with your phone camera\nto keep chatting about this product', 'mirror.qrAria': 'QR code to continue the chat on your phone', 'mirror.backProduct': '← Product', 'mirror.phoneBase': 'Phone address', 'mirror.phoneBaseHint': 'Leave empty for auto (e.g. https://took-sieunkirns-projects.vercel.app/)', 'mirror.similarTitle': 'Similar to this color', 'mirror.similarCount': '{n} · closest first', 'mirror.tryOnShort': 'Try on', 'mirror.wearing': '✓ Wearing', 'mirror.cardAria': 'Try on {name}', 'mirror.find': 'Similar', 'mirror.undoShort': 'Undo', 'mirror.toneResult': '{label} · matching paints are marked', 'mirror.mixed': 'Mixed color {hex}', 'mirror.end': 'Finish',
+    'mirror.back': 'Close', 'mirror.recAria': 'Products in similar colors', 'mirror.recLoading': 'Finding similar products…',
+    'mirror.recNone': 'No products in a similar color', 'mirror.recFail': "Couldn't load products", 'mirror.tryAria': 'Try on {name}',
+    'mirror.applied': 'Trying on {name}', 'mirror.unknownTag': 'Unregistered tag', 'mirror.retry': 'Reconnect', 'mirror.camStarting': 'Starting the camera…',
+    'mirror.setup': 'Mirror settings (staff)', 'mirror.rotate': 'Video rotation', 'mirror.flip': 'Mirror flip', 'mirror.on': 'On', 'mirror.off': 'Off',
+    'mirror.scale': 'Face size', 'mirror.trigger': 'Start trigger', 'mirror.trigNfc': 'NFC', 'mirror.trigTouch': 'Touch', 'mirror.trigBoth': 'Both',
+    'mirror.idle': 'Idle time (s)', 'mirror.fullscreen': 'Go full screen', 'mirror.fullscreenFail': "Couldn't go full screen. Press F11 on the keyboard",
+    'mirror.matrix': 'Color matrix (3×3, 9 numbers row by row)', 'mirror.matrixApply': 'Apply', 'mirror.matrixReset': 'Default',
+    'mirror.matrixBad': 'Enter 9 numbers', 'mirror.matrixNote': 'To be filled with measured values once the mirror arrives. The default is the identity matrix (no correction).',
+    'mirror.matrixSaved': 'Saved', 'mirror.close': 'Close', 'mirror.camInfo': 'Camera {w}×{h} · {fps}fps', 'mirror.camOff': 'Camera off (standby)', 'mirror.screenInfo': 'Screen {w}×{h} · scale {dpr}',
+    'mirror.lowered': 'Below 30fps, so the resolution was lowered to {w}×{h}',
     'nav.portrait': 'Portrait view', 'nav.portraitTitle': 'Preview the screen with the iPad upright', 'nav.landscape': 'Landscape view', 'nav.landscapeTitle': 'Back to the screen with the iPad lying flat',
     'nav.idleTest': 'Test auto reset', 'nav.idleTestTitle': 'Show the idle notice now',
     'idle.title': 'Still there?', 'idle.desc': 'Going back to the start in {n} seconds. Your chat and chosen colors will be cleared.',
@@ -281,6 +318,7 @@ export function applyI18n(root = document) {
   for (const node of root.querySelectorAll('[data-i18n]')) setText(node, t(node.dataset.i18n));
   for (const node of root.querySelectorAll('[data-i18n-aria]')) node.setAttribute('aria-label', t(node.dataset.i18nAria));
   for (const node of root.querySelectorAll('[data-i18n-title]')) node.setAttribute('title', t(node.dataset.i18nTitle));
+  for (const node of root.querySelectorAll('[data-i18n-placeholder]')) node.setAttribute('placeholder', t(node.dataset.i18nPlaceholder));
 }
 
 /** 글자 넣기: 문구 속 줄바꿈(\n)은 <br> 로 */

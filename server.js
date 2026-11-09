@@ -60,6 +60,18 @@ export function sanitizeNfcReading(b) {
   return { kind: b.kind, masked, fp, tookId, records };
 }
 
+// 휴대폰이 열 수 있는 이 서버 주소 (끝에 /). 없으면 null
+// PC 를 localhost 로 열었으면 휴대폰은 접속할 수 없으므로 같은 와이파이의 PC 주소로 안내한다.
+// 터널(cloudflared 등)로 공개 주소를 쓰면 원래 주소·https 여부는 X-Forwarded-* 헤더로 들어온다
+function phoneBase(req) {
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  const local = /^(localhost|127\.|\[::1\])/.test(host);
+  const ip = local ? lanAddress() : null;
+  const scheme = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || (req.socket.encrypted ? 'https' : 'http');
+  const where = local ? (ip ? `${ip}:${req.socket.localPort}` : null) : host;
+  return where ? `${scheme}://${where}/` : null;
+}
+
 async function handleApi(req, res, url) {
   const path = url.pathname;
   const q = url.searchParams;
@@ -97,19 +109,16 @@ async function handleApi(req, res, url) {
     // 규칙 챗봇 먼저, 규칙이 뜻을 못 잡은 말만 LLM (설정했을 때). engine 으로 어느 쪽이 답했는지 알려 준다
     return sendJson(res, 200, await hybridAnswer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true, lang: body.lang === 'en' ? 'en' : 'ko' }));
   }
+  // 휴대폰용 주소 (거울의 '휴대폰으로 챗봇 이어가기' QR): 휴대폰이 열 수 있는 이 서버 주소
+  if (req.method === 'GET' && path === '/api/phone-base') {
+    return sendJson(res, 200, { base: phoneBase(req) });
+  }
   // ---------- 휴대폰 ↔ PC 연결 (QR) ----------
   if (req.method === 'POST' && path === '/api/pair') {
     const body = await readBody(req).catch(() => ({}));
     const nfc = body.target === 'nfc'; // NFC 테스트·팔레트: 휴대폰을 NFC 리더기로 쓰고, 네 자리 번호로도 연결한다
     const { id, code } = nfc ? openCodeSession(typeof body.code === 'string' ? body.code : null) : { id: createSession(), code: null };
-    // PC 를 localhost 로 열었으면 휴대폰은 접속할 수 없으므로 같은 와이파이의 PC 주소로 안내한다.
-    // 터널(cloudflared 등)로 공개 주소를 쓰면 원래 주소·https 여부는 X-Forwarded-* 헤더로 들어온다
-    const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
-    const local = /^(localhost|127\.|\[::1\])/.test(host);
-    const ip = local ? lanAddress() : null;
-    const scheme = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || (req.socket.encrypted ? 'https' : 'http');
-    const where = local ? (ip ? `${ip}:${req.socket.localPort}` : null) : host;
-    const base = where ? `${scheme}://${where}/` : null;
+    const base = phoneBase(req);
     if (nfc) return sendJson(res, 200, { id, code, phoneUrl: base && `${base}nfc-phone.html?c=${code}`, phoneBase: base && `${base}nfc-phone.html` });
     return sendJson(res, 200, { id, phoneUrl: base && `${base}scan-phone.html?s=${id}` });
   }

@@ -951,3 +951,308 @@ html.intro-go body { overflow: auto; }
 .pal-nfc-dialog #pal-nfc-qr svg { display: block; margin: 8px auto; }
 .pal-nfc-dialog #pal-nfc-url { overflow-wrap: anywhere; font-weight: 700; }
 .pal-nfc-code, .nt-code { margin: 4px 0; font-size: 44px; font-weight: 800; letter-spacing: 0.25em; font-family: ui-monospace, Consolas, monospace; text-align: center; }
+
+/* ================= 거울 모드 (mirror.html, js/mirror.js) =================
+   하프미러 뒤 디스플레이. 대기 화면은 사용자가 정한 올영세일 사진, 체험 중 독은 검정 반투명이라 그 자리는 거울로 비친다.
+   체험 중에는 카메라 영상이 화면 전체(cover, 좌우 반전)이고 UI 는 하단 독(화면 높이 25% 이내)만.
+   독은 영상 위에서도 읽히도록 반투명 검정 + 흰 글자 (무채색). 실제 색은 영상·색 견본(.color-dot)뿐.
+   터치 화면 규칙: 버튼 56px 이상·간격 12px 이상, :hover 효과는 (hover: hover) 안에서만 */
+html:has(body.mirror-page) { background: #000; }
+.mirror-page { background: #000; color: #fff; overflow: hidden; }
+.mirror-page header.nav { display: none; }
+.mirror-page.mirror-setup-open header.nav { display: flex; position: fixed; top: 0; left: 0; right: 0; z-index: 30; }
+.mirror-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.mirror-root { position: fixed; inset: 0; overflow: hidden; background: #000; } /* 홈 캐릭터의 .mirror 와 이름이 겹치지 않게 mirror-root */
+.mirror-root, .mirror-dock, .mirror-standby, .mirror-corner {
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+
+/* 카메라: 화면 전체. 캔버스 내부 해상도는 영상 그대로, CSS 로만 확대 (얼굴 크기 배율 = 설정값) */
+.mirror-page .mirror-stage { position: fixed; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; background: #000; overflow: hidden; opacity: 0; transition: opacity 0.6s var(--ease); }
+.mirror-page[data-mirror="live"] .mirror-stage { opacity: 1; }
+.mirror-page .mirror-stage canvas, .mirror-page .mirror-stage video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(var(--mirror-scale, 1)); }
+
+/* 대기: 올영세일 사진(사용자 제공 대기 화면, CLAUDE.md 실제 색 예외)을 가운데 가득, 바탕은 사진 가장자리 색(#F5E7E7).
+   아래쪽에 작은 안내 + 아주 옅게 숨 쉬는 선. 카메라로 넘어갈 때 0.6초 동안 사라진다 */
+.mirror-standby { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding: 16px 16px max(48px, 8dvh); background: #F5E7E7; text-align: center; pointer-events: none; transition: opacity 0.6s var(--ease), visibility 0.6s; }
+.mirror-page:not([data-mirror="standby"]) .mirror-standby { opacity: 0; visibility: hidden; }
+.mirror-standby-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+/* 어두운 사진일 때 안내 글자를 밝게 */
+.mirror-standby[data-tone="dark"] .mirror-hint { color: #e6e6e6; }
+.mirror-standby[data-tone="dark"] .mirror-hint-sub { color: #a0a0a0; }
+.mirror-standby[data-tone="dark"] .mirror-breath { background: #777; }
+/* 검정 사진은 별 무늬 위에 안내가 놓이므로 글자 뒤에 옅은 그림자 */
+.mirror-standby[data-tone="dark"] .mirror-hint, .mirror-standby[data-tone="dark"] .mirror-hint-sub { text-shadow: 0 1px 8px #000, 0 0 2px #000; }
+.mirror-standby > :not(img) { position: relative; }
+.mirror-hint { margin: 0; font-size: clamp(18px, 2.4vh, 26px); font-weight: 600; color: #3a3a3a; word-break: keep-all; }
+.mirror-hint-sub { margin: 0; font-size: clamp(14px, 1.7vh, 18px); color: #666; word-break: keep-all; }
+.mirror-breath { width: 64px; height: 2px; margin-bottom: 14px; border-radius: 2px; background: #8a8a8a; animation: mirror-breath 4.8s ease-in-out infinite; }
+@keyframes mirror-breath { 0%, 100% { opacity: 0.25; transform: scaleX(0.6); } 50% { opacity: 0.8; transform: scaleX(1); } }
+
+
+/* 하단 독 */
+.mirror-dock { position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 5; display: none; max-height: 25dvh; overflow: hidden; padding: 14px 16px; border-radius: 24px; background: rgba(0, 0, 0, 0.6); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; }
+.mirror-page[data-mirror="starting"] .mirror-dock, .mirror-page[data-mirror="live"] .mirror-dock { display: block; }
+.mirror-main { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.mirror-product { display: flex; flex: 1 1 240px; align-items: center; gap: 12px; min-width: 0; }
+.mirror-page .mirror-dot { flex: none; width: 40px; height: 40px; margin: 0; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85); }
+.mirror-product-text { display: flex; flex-direction: column; min-width: 0; }
+#mirror-name { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mirror-status { min-height: 1.4em; font-size: 14px; line-height: 1.4; color: #cfcfcf; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; word-break: keep-all; }
+.mirror-actions { display: flex; flex: 1 1 auto; justify-content: flex-end; gap: 12px; }
+.mirror-page .m-btn, .mirror-page .m-btn:hover:not(:disabled) { min-height: 56px; padding: 0 22px; border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 16px; background: transparent; color: #fff; font-size: 17px; font-weight: 700; white-space: nowrap; box-shadow: none; }
+.mirror-page .m-btn-primary, .mirror-page .m-btn-primary:hover:not(:disabled) { border-color: #fff; background: #fff; color: #000; }
+.mirror-page .m-btn:active:not(:disabled) { transform: scale(0.97); }
+.mirror-panel { display: flex; align-items: center; gap: 12px; }
+.mirror-panel > .m-btn { flex: none; }
+.mirror-strip { display: flex; flex: 1; gap: 12px; min-width: 0; padding: 2px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; }
+.mirror-strip::-webkit-scrollbar { display: none; }
+.mirror-page .m-swatch, .mirror-page .m-swatch:hover:not(:disabled) { flex: none; display: grid; place-items: center; width: 56px; height: 56px; min-height: 56px; padding: 0; border: 2px solid transparent; border-radius: 50%; background: transparent; scroll-snap-align: start; }
+.mirror-page .m-swatch .color-dot { width: 44px; height: 44px; margin: 0; }
+.mirror-page .m-swatch[aria-pressed="true"] { border-color: #fff; }
+.mirror-page .m-prod, .mirror-page .m-prod:hover:not(:disabled) { flex: none; display: flex; align-items: center; gap: 10px; max-width: 260px; min-height: 64px; padding: 8px 14px; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 16px; background: rgba(255, 255, 255, 0.08); color: #fff; text-align: left; scroll-snap-align: start; }
+.mirror-page .m-prod[aria-pressed="true"] { border-color: #fff; background: rgba(255, 255, 255, 0.2); }
+.mirror-page .m-prod .color-dot { flex: none; width: 28px; height: 28px; margin: 0; }
+.m-prod-text { display: flex; flex-direction: column; min-width: 0; }
+.m-prod-name { max-width: 190px; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-prod-meta { font-size: 13px; font-weight: 500; color: #cfcfcf; }
+.mirror-note { margin: 0; font-size: 15px; color: #cfcfcf; }
+/* 독 속 팔레트 (팔레트 탭과 같은 물감·섞는 칸): 독을 더 투명하게 해 뒤의 영상이 비친다.
+   버튼을 줄이고 위계를 나눈다: 주인공은 섞는 칸·물감, 강조 버튼은 '비슷한 제품' 하나,
+   보조 동작(빼기·처음부터·닫기)은 테두리 없는 둥근 아이콘, 텍스처는 칸이 이어진 알약 하나 */
+.mirror-dock:has(.mirror-palette:not(.hidden)) { background: rgba(0, 0, 0, 0.28); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.mirror-palette { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 56px auto auto; column-gap: 16px; row-gap: 10px; align-items: center; }
+.mirror-page .mirror-mix { grid-column: 1; grid-row: 1 / 3; width: auto; height: 178px; aspect-ratio: 1; }
+.mirror-page .mirror-mix .mix-empty { color: rgba(255, 255, 255, 0.85); font-size: 14px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
+/* 위 줄: 제목(또는 안내) · 내 톤 칩 · 아이콘 셋 */
+.mirror-pal-head { grid-column: 2; grid-row: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mirror-pal-status { flex: 1; min-width: 0; margin: 0; font-size: 14px; font-weight: 600; line-height: 1.35; color: #e6e6e6; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); word-break: keep-all;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.mirror-pal-status.is-title { font-size: 18px; font-weight: 800; color: #fff; }
+.mirror-page .m-icon, .mirror-page .m-icon:hover:not(:disabled) { flex: none; display: grid; place-items: center; width: 56px; height: 56px; min-height: 56px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: #fff; box-shadow: none; }
+.mirror-page .m-chip, .mirror-page .m-chip:hover:not(:disabled) { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 56px; padding: 0 18px 0 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 15px; font-weight: 700; box-shadow: none; white-space: nowrap; }
+.mirror-page .m-icon:disabled, .mirror-page .m-chip:disabled { background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.35); }
+.mirror-page .m-icon:active:not(:disabled), .mirror-page .m-chip:active:not(:disabled) { transform: scale(0.94); }
+/* 가운데: 물감 22색 두 줄 */
+.mirror-pal-paints { grid-column: 2; grid-row: 2; }
+.mirror-page .mirror-palette .lip-paints { gap: 0 2px; }
+.mirror-page .mirror-palette .paint, .mirror-page .mirror-palette .paint:hover:not(:disabled) { min-height: 56px; padding: 0; border: 0; border-radius: 12px; background: transparent; box-shadow: none; }
+.mirror-page .mirror-palette .paint-blob { width: 34px; height: 34px; box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.55), inset -3px -5px 8px rgba(0, 0, 0, 0.18); }
+/* 내 톤 표시: 어두운 독 위에서 보이게 흰 배지·흰 테 */
+.mirror-page .mirror-palette .paint-pick .paint-blob { box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), 0 0 0 4px #fff, inset -3px -5px 8px rgba(0, 0, 0, 0.18); }
+.mirror-page .mirror-palette .paint-pick::after { top: -2px; background: #fff; color: #000; }
+/* 아래 줄: 텍스처 알약 | 농도 | 비슷한 제품 */
+.mirror-pal-foot { grid-column: 1 / -1; grid-row: 3; display: flex; align-items: center; gap: 16px; }
+.mirror-textures { display: flex; flex: none; padding: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.12); }
+.mirror-page .mirror-textures .m-seg, .mirror-page .mirror-textures .m-seg:hover:not(:disabled) { min-height: 56px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: rgba(255, 255, 255, 0.85); font-size: 15px; font-weight: 600; box-shadow: none; }
+.mirror-page .mirror-textures .m-seg[aria-pressed="true"], .mirror-page .mirror-textures .m-seg[aria-pressed="true"]:hover { background: #fff; color: #000; font-weight: 700; }
+.mirror-intensity { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; min-height: 56px; color: rgba(255, 255, 255, 0.85); font-size: 14px; font-weight: 600; }
+.mirror-intensity input { flex: 1; min-width: 0; height: 56px; accent-color: #fff; }
+.mirror-intensity output { min-width: 3em; text-align: right; font-variant-numeric: tabular-nums; }
+.mirror-page .mirror-pal-foot .m-btn-primary { flex: none; padding: 0 22px; }
+.mirror-page .m-btn:disabled, .mirror-page .m-btn:disabled:hover { border-color: rgba(255, 255, 255, 0.3); background: transparent; color: rgba(255, 255, 255, 0.45); }
+@media (hover: hover) {
+  .mirror-page .mirror-palette .paint:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); }
+  .mirror-page .m-icon:hover:not(:disabled), .mirror-page .m-chip:hover:not(:disabled) { background: rgba(255, 255, 255, 0.22); }
+  .mirror-page .mirror-textures .m-seg:hover:not(:disabled):not([aria-pressed="true"]) { color: #fff; }
+}
+@media (hover: hover) {
+  .mirror-page .m-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.16); }
+  .mirror-page .m-btn-primary:hover:not(:disabled) { background: #e6e6e6; }
+  .mirror-page .m-prod:hover:not(:disabled) { background: rgba(255, 255, 255, 0.16); }
+  .mirror-page .m-swatch:hover:not(:disabled) { border-color: rgba(255, 255, 255, 0.5); }
+}
+
+/* 팔레트 박스를 크게 (화면 높이의 약 30%, 1/3 이내): 섞는 칸 268px, 물감 44px 를 8개씩 세 줄, 버튼·글자도 한 단계 크게.
+   얼굴이 비치는 가운데는 여전히 비워 둔다 */
+.mirror-dock:has(.mirror-palette:not(.hidden)), .mirror-dock:has(.mirror-result:not(.hidden)) { max-height: 34dvh; padding: 18px; border-radius: 28px; }
+.mirror-palette { grid-template-rows: 64px auto auto; column-gap: 18px; row-gap: 12px; }
+.mirror-page .mirror-mix { height: calc(64px + 12px + 3 * 64px); }
+.mirror-page .mirror-mix .mix-empty { font-size: 16px; }
+.mirror-pal-status { font-size: 15px; }
+.mirror-pal-status.is-title { font-size: 21px; }
+.mirror-page .m-icon, .mirror-page .m-icon:hover:not(:disabled) { width: 60px; height: 60px; min-height: 60px; }
+.mirror-page .m-icon svg { width: 26px; height: 26px; }
+.mirror-page .m-chip, .mirror-page .m-chip:hover:not(:disabled) { min-height: 60px; padding: 0 20px 0 16px; font-size: 16px; }
+.mirror-page .mirror-palette .lip-paints { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0 4px; }
+.mirror-page .mirror-palette .paint, .mirror-page .mirror-palette .paint:hover:not(:disabled) { min-height: 64px; }
+.mirror-page .mirror-palette .paint-blob { width: 44px; height: 44px; }
+.mirror-pal-foot { gap: 18px; }
+.mirror-page .mirror-textures .m-seg, .mirror-page .mirror-textures .m-seg:hover:not(:disabled) { min-height: 64px; padding: 0 16px; font-size: 16px; }
+.mirror-intensity { min-height: 64px; font-size: 15px; }
+.mirror-intensity input { height: 64px; }
+.mirror-page .mirror-pal-foot .m-btn-primary, .mirror-page .mirror-pal-foot .m-btn-primary:hover:not(:disabled) { min-height: 64px; padding: 0 26px; font-size: 18px; }
+
+/* 비슷한 제품 (팔레트 탭 추천 결과와 같은 카드): 위 줄 조제한 색·상태·다시 섞기, 아래 작은 카드를 한 줄로 늘어놓고 옆으로 밀어 본다 */
+.mirror-dock:has(.mirror-result:not(.hidden)) { background: rgba(0, 0, 0, 0.28); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.mirror-result { display: flex; flex-direction: column; gap: 10px; }
+.mirror-result-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.mirror-page .mirror-result-head .color-dot { flex: none; width: 32px; height: 32px; margin: 0; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85); }
+#mirror-res-hex { flex: none; font-size: 16px; color: #fff; }
+.mirror-rec-status { flex: 1; min-width: 0; font-size: 13px; color: #cfcfcf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mirror-result-head .m-btn { flex: none; }
+.mirror-rec { display: grid; grid-auto-flow: column; grid-auto-columns: 280px; gap: 12px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; padding: 6px; margin: -6px; } /* 바르는 중 카드의 흰 테두리가 잘리지 않게 여백 */
+.mirror-rec::-webkit-scrollbar { display: none; }
+.mirror-rec > * { scroll-snap-align: start; }
+/* 거울용 제품 카드: 카드 전체가 버튼. 왼쪽 사진, 오른쪽 브랜드·제품명(두 줄까지)·가격, 아래 '발라보기' (바르는 중이면 흰 테두리·'✓ 바르는 중') */
+.mirror-page .m-card, .mirror-page .m-card:hover:not(:disabled) { display: grid; grid-template-columns: 96px minmax(0, 1fr); column-gap: 12px; align-items: stretch; min-height: 116px; margin: 0; padding: 10px; border: 0; border-radius: 18px; background: var(--paper); color: var(--ink); text-align: left; box-shadow: none; scroll-snap-align: start; }
+.mirror-page .m-card[aria-pressed="true"], .mirror-page .m-card[aria-pressed="true"]:hover:not(:disabled) { box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6), 0 0 0 5px #fff; }
+.mirror-page .m-card:active { transform: scale(0.98); }
+.m-card-img { width: 96px; height: 96px; border-radius: 12px; object-fit: cover; background: var(--soft); }
+.m-card-noimg { display: grid; place-items: center; padding: 6px; font-size: 12px; color: var(--mute); text-align: center; }
+.m-card-text { display: flex; flex-direction: column; min-width: 0; }
+.m-card-brand { font-size: 13px; font-weight: 600; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-card-name { font-size: 15px; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; word-break: keep-all; }
+.m-card-price { margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.m-card-cta { align-self: flex-end; margin-top: auto; padding: 5px 12px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.m-card[aria-pressed="true"] .m-card-cta { background: var(--soft-2); color: var(--ink); }
+.mirror-rec .card.skeleton { min-height: 116px; margin: 0; }
+
+/* 팔레트 ↔ 비슷한 제품: 박스 크기를 똑같이 고정 (섞는 칸 268 + 줄 사이 12 + 아래 줄 64 = 344px) */
+.mirror-palette, .mirror-result { height: 344px; }
+.mirror-result { gap: 12px; }
+.mirror-result-head { flex: none; min-height: 60px; }
+.mirror-rec { flex: 1; min-height: 0; grid-auto-columns: 210px; align-items: stretch; }
+/* 세로형 카드: 위 큰 사진, 아래 브랜드·제품명·가격·발라보기 */
+.mirror-page .m-card, .mirror-page .m-card:hover:not(:disabled) { display: flex; flex-direction: column; gap: 4px; height: 100%; min-height: 0; padding: 10px; }
+.mirror-page .m-card .m-card-img { flex: none; width: 100%; height: 128px; border-radius: 14px; }
+.mirror-page .m-card .m-card-text { flex: 1; min-height: 0; gap: 2px; }
+.mirror-page .m-card .m-card-name { font-size: 16px; }
+.mirror-page .m-card .m-card-cta { align-self: stretch; margin-top: auto; padding: 8px 12px; font-size: 14px; text-align: center; }
+.mirror-rec .card.skeleton { height: 100%; min-height: 0; }
+
+/* 선반에 올린 제품(NFC) + 휴대폰 챗봇 QR: 팔레트와 같은 크기 박스. 왼쪽 위 제품, 왼쪽 아래 버튼 둘, 오른쪽 QR (흰 바탕이라 휴대폰이 잘 읽는다) */
+.mirror-dock:has(.mirror-product:not(.hidden)) { max-height: 34dvh; padding: 18px; border-radius: 28px; background: rgba(0, 0, 0, 0.28); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.mirror-product { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto; gap: 16px 20px; height: 344px; }
+.mp-info { grid-column: 1; grid-row: 1; display: flex; gap: 16px; align-items: center; min-width: 0; min-height: 0; }
+.mp-img { flex: none; width: 176px; height: 176px; overflow: hidden; border-radius: 20px; background: var(--paper); }
+.mp-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mp-noimg { display: grid; place-items: center; width: 100%; height: 100%; padding: 8px; font-size: 13px; color: var(--mute); text-align: center; }
+.mp-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.mp-tag { align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-size: 13px; font-weight: 700; color: #fff; }
+.mp-brand { font-size: 15px; font-weight: 600; color: #cfcfcf; }
+.mp-name { font-size: 22px; line-height: 1.3; color: #fff; word-break: keep-all; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+.mp-price { font-size: 17px; font-weight: 700; color: #fff; }
+.mp-actions { grid-column: 1; grid-row: 2; display: flex; gap: 12px; }
+.mirror-page .mp-actions .m-btn, .mirror-page .mp-actions .m-btn:hover:not(:disabled) { flex: 1; min-height: 64px; font-size: 17px; }
+.mp-qr-box { grid-column: 2; grid-row: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 236px; padding: 14px; border-radius: 22px; background: var(--paper); color: var(--ink); }
+.mp-qr { display: grid; place-items: center; width: 200px; height: 200px; }
+.mp-qr svg { display: block; width: 200px; height: 200px; }
+.mp-qr-url { font-size: 12px; overflow-wrap: anywhere; text-align: center; }
+.mp-qr-text { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.4; text-align: center; word-break: keep-all; }
+
+/* 직원용 설정 열기 자리 (왼쪽 위, 보이지 않음) */
+.mirror-corner { position: fixed; top: 0; left: 0; z-index: 6; width: 72px; height: 72px; }
+
+/* 터치 자리 표시: 눌린 곳에 짧게 퍼지는 고리 */
+.mirror-ripple { position: fixed; z-index: 2000; width: 56px; height: 56px; margin: -28px 0 0 -28px; border: 2px solid rgba(255, 255, 255, 0.85); border-radius: 50%; pointer-events: none; animation: mirror-ripple 0.6s var(--ease) forwards; }
+.mirror-ripple.still { animation: none; opacity: 0.8; }
+@keyframes mirror-ripple { from { transform: scale(0.3); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+
+/* 설정 패널 (흰 카드, 직원만 연다) */
+.mirror-setup { position: fixed; top: 50%; left: 50%; z-index: 40; translate: -50% -50%; width: min(520px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: 0; padding: 20px 22px; overflow-y: auto; border: 0; border-radius: var(--r); background: var(--paper); color: var(--ink); box-shadow: var(--shadow-up); }
+.mirror-setup h2 { margin: 0 0 6px; font-size: 18px; }
+.ms-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: 12px; margin: 10px 0; }
+.ms-label { font-size: 14px; font-weight: 600; }
+.ms-block { display: block; margin-top: 12px; }
+.ms-seg { display: flex; gap: 6px; }
+.ms-seg button { flex: 1; min-height: 48px; }
+.mirror-setup .ms-seg button[aria-pressed="true"] { color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); } /* 기존 .seg 처럼 눌린 칸만 흰 면 */
+.mirror-setup .ms-slider { display: flex; align-items: center; gap: 12px; margin: 0; }
+.mirror-setup .ms-slider input { flex: 1; min-width: 0; }
+#ms-idle { width: 120px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: var(--r-s); background: var(--paper); }
+#ms-matrix { width: 100%; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: var(--r-s); font-family: ui-monospace, Consolas, monospace; resize: vertical; }
+.ms-foot { justify-content: flex-end; margin-top: 8px; }
+
+/* === 거울 ver4 === (mirror-v4.html, js/mirror-v4.js) 하프미러 창 모드
+   하프미러에서는 검은 부분 = 거울, 밝은 부분 = 화면. 그래서 화면 대부분을 #000 으로 두고 카메라 영상은 눈높이의 '창'에만 그린다.
+   ver3(거울 모드) 클래스를 그대로 쓰고 body.mirror-v4 아래에서만 덮어쓴다 (ver3 화면은 바뀌지 않는다).
+   UI 는 검정 위의 밝은 요소(흰 글자·흰 테두리·흰 버튼)로만: 반투명 검정·blur·넓은 회색 면을 쓰지 않는다(거울에서 뿌연 안개처럼 보인다).
+   창 위치·크기는 js 의 layout() 이 --m4-x/--m4-top/--m4-w/--m4-h 로 넣는다 (기본은 설정값 --m4-win-h 65dvh, --m4-win-y 40dvh) */
+.mirror-v4 { --m4-win-h: 65dvh; --m4-win-y: 40dvh; }
+.mirror-v4 .mirror-stage.m4-window {
+  position: fixed; inset: auto; left: var(--m4-x, 50%); top: var(--m4-top, calc(var(--m4-win-y) - var(--m4-win-h) / 2));
+  width: var(--m4-w, calc(var(--m4-win-h) * 9 / 16)); height: var(--m4-h, var(--m4-win-h)); max-width: calc(100vw - 32px);
+  border-radius: 24px; background: #000; overflow: hidden;
+  transition: opacity 0.6s var(--ease), left 0.3s var(--ease), top 0.3s var(--ease), width 0.3s var(--ease), height 0.3s var(--ease);
+}
+.mirror-v4 .mirror-stage.m4-border { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3); }
+.mirror-v4 .mirror-stage.m4-border::after { content: ''; position: absolute; inset: 0; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: inherit; pointer-events: none; }
+/* 창 안: 영상 해상도 그대로 그린 캔버스를 cover 로 확대 (얼굴 크기 배율은 창 기준) */
+.mirror-v4 .mirror-stage canvas, .mirror-v4 .mirror-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(var(--mirror-scale, 1)); }
+
+/* 대기: 전체 검정 + 아래 안내(흰색 70~85%) + 숨 쉬는 선. 홍보 사진은 설정(끄기 / 작게 / 전체) */
+.mirror-v4 .mirror-standby { background: #000; }
+.mirror-v4 .mirror-standby .mirror-hint { color: rgba(255, 255, 255, 0.85); text-shadow: none; }
+.mirror-v4 .mirror-standby .mirror-hint-sub { color: rgba(255, 255, 255, 0.7); text-shadow: none; }
+.mirror-v4 .mirror-standby .mirror-breath { background: rgba(255, 255, 255, 0.75); }
+.mirror-v4 .mirror-standby-img[hidden] { display: none; }
+/* 작게: 화면 폭 40% 이하 카드, 60% 밝기 (눈높이쯤) */
+.mirror-v4 .mirror-standby[data-photo="small"] .mirror-standby-img { inset: auto; left: 50%; top: 40%; translate: -50% -50%; width: min(40vw, 44dvh); height: auto; max-height: 56dvh; object-fit: contain; border-radius: 16px; filter: brightness(0.6); }
+/* 전체: ver3 와 같다 (사진 위 안내 글자는 사진 톤을 따른다) */
+.mirror-v4 .mirror-standby[data-photo="full"][data-tone="light"] .mirror-hint { color: #3a3a3a; }
+.mirror-v4 .mirror-standby[data-photo="full"][data-tone="light"] .mirror-hint-sub { color: #666; }
+.mirror-v4 .mirror-standby[data-photo="full"][data-tone="light"] .mirror-breath { background: #8a8a8a; }
+
+/* 독: 세로 화면은 창 아래 검정 영역(창은 js 가 독 위로 비켜 준다). 배경 투명, 흰 글자·흰 버튼. 높이 제한 없음(창이 줄어든다) */
+.mirror-v4 #mirror-dock { left: max(16px, env(safe-area-inset-left)); right: max(16px, env(safe-area-inset-right)); max-height: none; padding: 0; border-radius: 0; background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.mirror-v4 .mirror-main > .mirror-product { display: flex; height: auto; } /* 아래 NFC 제품 패널과 이름이 같아 높이가 잡히지 않게 */
+.mirror-v4 .mirror-status, .mirror-v4 .mirror-note, .mirror-v4 .m-prod-meta, .mirror-v4 .mp-brand, .mirror-v4 .mirror-rec-status { color: rgba(255, 255, 255, 0.75); }
+/* 회색 면 대신 흰 테두리 */
+.mirror-v4 .m-icon, .mirror-v4 .m-icon:hover:not(:disabled), .mirror-v4 .m-chip, .mirror-v4 .m-chip:hover:not(:disabled) { background: transparent; border: 1px solid rgba(255, 255, 255, 0.6); }
+.mirror-v4 .m-icon:disabled, .mirror-v4 .m-chip:disabled { background: transparent; border-color: rgba(255, 255, 255, 0.2); }
+.mirror-v4 .mirror-textures { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6); }
+.mirror-v4 .m-prod, .mirror-v4 .m-prod:hover:not(:disabled) { background: transparent; }
+.mirror-v4 .m-prod[aria-pressed="true"] { background: transparent; border-color: #fff; box-shadow: inset 0 0 0 1px #fff; }
+.mirror-v4 .mp-tag { background: transparent; border: 1px solid rgba(255, 255, 255, 0.6); }
+.mirror-v4 .mp-img { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); }
+/* 비슷한 제품 카드: 흰 판 대신 흰 테두리 + 흰 글자 (제품 사진만 실제 색) */
+.mirror-v4 .m-card, .mirror-v4 .m-card:hover:not(:disabled) { border: 1px solid rgba(255, 255, 255, 0.45); background: transparent; color: #fff; }
+.mirror-v4 .m-card[aria-pressed="true"], .mirror-v4 .m-card[aria-pressed="true"]:hover:not(:disabled) { border-color: #fff; box-shadow: inset 0 0 0 1px #fff; }
+.mirror-v4 .m-card-brand { color: rgba(255, 255, 255, 0.7); }
+.mirror-v4 .m-card-price { color: #fff; }
+.mirror-v4 .m-card-img { background: transparent; }
+.mirror-v4 .m-card-noimg { border: 1px solid rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.7); }
+.mirror-v4 .m-card-cta { background: #fff; color: #000; }
+.mirror-v4 .m-card[aria-pressed="true"] .m-card-cta { background: transparent; color: #fff; box-shadow: inset 0 0 0 1px #fff; }
+.mirror-v4 .mirror-rec .card.skeleton { border: 1px solid rgba(255, 255, 255, 0.25); background: transparent; box-shadow: none; }
+.mirror-v4 .mirror-rec .card.skeleton * { visibility: hidden; }
+@media (hover: hover) {
+  .mirror-v4 .m-icon:hover:not(:disabled), .mirror-v4 .m-chip:hover:not(:disabled), .mirror-v4 .m-btn:hover:not(:disabled):not(.m-btn-primary), .mirror-v4 .m-prod:hover:not(:disabled) { background: transparent; border-color: #fff; }
+  .mirror-v4 .mirror-palette .paint:hover:not(:disabled) { background: transparent; }
+}
+
+/* 가로 화면(폭 > 높이): 독을 창 오른쪽 검정 영역에 세로로. 팔레트는 한 줄씩 위에서 아래로 */
+@media (orientation: landscape) {
+  .mirror-v4 #mirror-dock { left: auto; right: max(16px, env(safe-area-inset-right)); top: 50%; bottom: auto; translate: 0 -50%; width: clamp(360px, 40vw, 560px); max-height: calc(100dvh - 32px); overflow-y: auto; scrollbar-width: none; }
+  .mirror-v4 .mirror-main { flex-direction: column; align-items: stretch; }
+  .mirror-v4 .mirror-main > .mirror-product { flex: none; }
+  .mirror-v4 .mirror-actions { flex-direction: column; }
+  .mirror-v4 .mirror-palette { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; }
+  .mirror-v4 .mirror-pal-head { grid-column: 1; grid-row: 1; }
+  .mirror-v4 .mirror-mix { grid-column: 1; grid-row: 2; justify-self: center; height: min(220px, 26dvh); }
+  .mirror-v4 .mirror-pal-paints { grid-column: 1; grid-row: 3; }
+  .mirror-v4 .mirror-pal-foot { grid-column: 1; grid-row: 4; flex-wrap: wrap; gap: 12px; }
+  .mirror-v4 .mirror-textures { flex: 1 1 100%; justify-content: space-between; }
+  .mirror-v4 .mirror-result { height: auto; }
+  .mirror-v4 .mirror-result-head { flex-wrap: wrap; }
+  .mirror-v4 .mirror-rec { flex: none; height: 320px; }
+  .mirror-v4 .mirror-product:not(.mirror-main > *) { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; }
+  .mirror-v4 .mp-info, .mirror-v4 .mp-actions, .mirror-v4 .mp-qr-box { grid-column: 1; grid-row: auto; }
+  .mirror-v4 .mp-img { width: 120px; height: 120px; }
+  .mirror-v4 .mp-qr-box { justify-self: center; }
+}
+
+/* 거울 ver4 대기 화면: 왼쪽 위 TOOK 로고(흰색 SVG), 오른쪽 위 시계, 가운데 점선 얼굴, 그 아래 안내 한 줄. 모두 검정 위 흰 선 */
+.mirror-v4 .mirror-standby { justify-content: flex-start; padding: 0; color: #fff; }
+.mirror-v4 .m4-top { position: absolute; top: max(28px, 4.2dvh); left: max(28px, 7vw); right: max(28px, 7vw); display: flex; align-items: center; justify-content: space-between; }
+.mirror-v4 .m4-logo { display: block; width: clamp(96px, 17vw, 200px); height: auto; color: rgba(255, 255, 255, 0.92); }
+.mirror-v4 .m4-clock { font-size: clamp(26px, 4.6vw, 52px); font-weight: 300; letter-spacing: 0.02em; color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+.mirror-v4 .m4-face { position: absolute; left: 50%; top: 41%; translate: -50% -50%; width: clamp(150px, 30vw, 300px); height: auto; color: rgba(255, 255, 255, 0.85); animation: m4-face 4.8s ease-in-out infinite; }
+@keyframes m4-face { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.95; } }
+.mirror-v4 .mirror-standby .mirror-breath { display: none; }
+.mirror-v4 .mirror-standby .mirror-hint { position: absolute; left: 16px; right: 16px; top: 69%; font-size: clamp(22px, 4.2vw, 44px); font-weight: 400; letter-spacing: 0.02em; }
+.mirror-v4 .mirror-standby .mirror-hint-sub { position: absolute; left: 16px; right: 16px; top: calc(69% + clamp(40px, 6.5vw, 72px)); font-size: clamp(14px, 2.1vw, 20px); color: rgba(255, 255, 255, 0.55); }
+/* 홍보 사진을 켜면 사진이 얼굴 자리에 오므로 점선 얼굴은 숨긴다 */
+.mirror-v4 .mirror-standby:not([data-photo="off"]) .m4-face { display: none; }
+@media (prefers-reduced-motion: reduce) { .mirror-v4 .m4-face { animation: none; opacity: 0.85; } }

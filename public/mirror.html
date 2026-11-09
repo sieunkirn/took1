@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title data-i18n="mirror.pageTitle">took(툭) - 거울</title>
+<link rel="stylesheet" href="css/wireframe.css">
+</head>
+<!-- 거울 모드 (스마트 미러, 하프미러 뒤 디스플레이): js/mirror.js
+     대기(올영세일 사진, 카메라 꺼짐) → NFC 태그나 화면 터치 → 카메라 영상이 화면 전체로 페이드인 + 입술 매핑 → 하단 독에서 추천·다른 색·종료.
+     body[data-mirror] 가 지금 단계: standby(대기) / starting(카메라 켜는 중) / live(체험)
+     얼굴이 비치는 가운데에는 UI 를 두지 않는다 (아래 독만) -->
+<body class="mirror-page" data-mirror="standby">
+<!-- 색 보정 훅: 전체 화면에 거는 3×3 색 행렬 (localStorage took.colorProfile). 항등 행렬이면 필터를 걸지 않는다 -->
+<svg class="mirror-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <filter id="took-color-profile" color-interpolation-filters="sRGB">
+    <feColorMatrix id="took-color-matrix" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+  </filter>
+</svg>
+<main class="mirror-root" id="mirror">
+  <!-- 카메라: 화면 전체 (영상 해상도 그대로 그리고 CSS 로만 확대) -->
+  <div class="stage mirror-stage" id="mirror-stage">
+    <canvas id="view"></canvas>
+    <video id="video" class="hidden" playsinline muted></video>
+  </div>
+
+  <!-- 대기: 올영세일 사진(사용자 제공, 실제 색)을 화면 가운데 가득. 새로고침할 때마다 다른 사진 (js/mirror.js 의 STANDBY_SLIDES 가 src 를 넣는다).
+       바탕은 지금 사진의 가장자리 색이라 위아래가 이어진다. 아래쪽에 작은 안내와 아주 옅은 움직임 -->
+  <section class="mirror-standby" id="mirror-standby" data-tone="light">
+    <img class="mirror-standby-img on" id="mirror-standby-img" alt="올영세일" decoding="async">
+    <span class="mirror-breath" aria-hidden="true"></span>
+    <p class="mirror-hint" data-i18n="mirror.standby">제품을 선반에 올려 보세요</p>
+    <p class="mirror-hint-sub" id="mirror-hint-touch" data-i18n="mirror.standbyTouch">또는 화면을 눌러 시작해요</p>
+  </section>
+
+
+  <!-- 하단 독 (화면 높이의 25% 이내) -->
+  <section class="mirror-dock" id="mirror-dock">
+    <div class="mirror-main" id="mirror-main">
+      <div class="mirror-product">
+        <span class="color-dot mirror-dot" id="mirror-dot" aria-hidden="true"></span>
+        <div class="mirror-product-text">
+          <strong id="mirror-name"></strong>
+          <span id="mirror-status" class="mirror-status" aria-live="polite"></span>
+        </div>
+      </div>
+      <div class="mirror-actions">
+        <button type="button" id="mirror-rec" class="m-btn m-btn-primary" data-i18n="mirror.recommend">추천 제품 보기</button>
+        <button type="button" id="mirror-palette-open" class="m-btn" data-i18n="mirror.palette">팔레트</button>
+        <button type="button" id="mirror-retry" class="m-btn hidden" data-i18n="mirror.retry">다시 연결</button>
+        <button type="button" id="mirror-end" class="m-btn" data-i18n="mirror.end">종료</button>
+      </div>
+    </div>
+    <!-- 추천 제품: 독 안에서 한 줄로 늘어놓고 옆으로 밀어 본다 -->
+    <div class="mirror-panel hidden" id="mirror-panel">
+      <button type="button" id="mirror-back" class="m-btn" data-i18n="mirror.back">닫기</button>
+      <div class="mirror-strip" id="mirror-strip" role="group"></div>
+    </div>
+    <!-- 팔레트 (팔레트 탭 기능 그대로, 물감·섞는 칸은 js/palette-mixer.js): 독이 반투명해져 뒤의 영상이 비친다.
+         섞는 동안 그 색을 입술에 바로 입힌다. 섞은 방울·텍스처·농도·내 톤 결과는 팔레트 탭과 같은 저장값을 쓴다 (연동)
+         ┌──────────┬ 팔레트(안내)        [✦ 내 톤] ↶ ⟲ ┐  위: 제목·보조 동작은 테두리 없는 아이콘 (닫기 없음: 끝내기는 자동 초기화)
+         │ 섞는 칸  │ 물감 22색 (두 줄)                 │  가운데: 섞는 칸 + 물감 (주인공)
+         ├──────────┴───────────────────────────────────┤
+         │ (매트|새틴|글로시|시어|쉬머)  농도 ──●  [비슷한 제품] │  아래: 텍스처 알약 · 농도 · 강조 버튼 하나
+         └──────────────────────────────────────────────┘ -->
+    <div class="mirror-palette hidden" id="mirror-palette">
+      <div class="mix-wrap mirror-mix">
+        <canvas id="mirror-mix" role="img" aria-label="섞는 칸 (드래그하면 저어져요)" data-i18n-aria="pal.mixAria"></canvas>
+        <p id="mirror-mix-empty" class="mix-empty" data-i18n="pal.mixEmpty">물감을 눌러<br>떨어뜨려요</p>
+      </div>
+      <div class="mirror-pal-head">
+        <p id="mirror-pal-status" class="mirror-pal-status is-title" aria-live="polite" data-i18n="mirror.palette">팔레트</p>
+        <button type="button" id="mirror-match" class="m-chip" disabled><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg><span data-i18n="mirror.matchShort">내 톤</span></button>
+        <button type="button" id="mirror-undo" class="m-icon" aria-label="한 방울 빼기" title="한 방울 빼기" data-i18n-aria="pal.undo" data-i18n-title="pal.undo"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg></button>
+        <button type="button" id="mirror-mix-reset" class="m-icon" aria-label="처음부터" title="처음부터" data-i18n-aria="mirror.mixReset" data-i18n-title="mirror.mixReset"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+      </div>
+      <div id="mirror-paints" class="paints lip-paints mirror-pal-paints" role="group" aria-label="립 컬러 물감" data-i18n-aria="pal.paints"></div>
+      <div class="mirror-pal-foot">
+        <div class="mirror-textures" id="mirror-textures" role="group" aria-label="텍스처" data-i18n-aria="pal.textures"></div>
+        <div class="mirror-intensity"><label for="mirror-intensity" data-i18n="pal.intensity">농도</label><input type="range" id="mirror-intensity" min="0" max="100" step="1"><output id="mirror-intensity-out"></output></div>
+        <button type="button" id="mirror-find" class="m-btn m-btn-primary" data-i18n="mirror.find" disabled>비슷한 제품</button>
+      </div>
+    </div>
+    <!-- 선반에 올린 제품 (NFC) + 손님 휴대폰으로 챗봇 이어가기 QR. 팔레트와 같은 크기의 박스
+         ┌ 사진 │ 선반에 올린 제품 · 브랜드 · 제품명 · 가격 ┬──────────┐
+         │      │                                       │   QR     │  QR = chat.html?base=제품&hex=색&take=1
+         ├ [팔레트로 섞어 보기]  [비슷한 제품]           ┤ 찍으면…  │  (손님 휴대폰에서 그 제품 기준으로 챗봇 시작)
+         └───────────────────────────────────────────────┴──────────┘ -->
+    <div class="mirror-product hidden" id="mirror-product">
+      <div class="mp-info">
+        <span class="mp-img" id="mp-img"></span>
+        <div class="mp-text">
+          <span class="mp-tag" data-i18n="mirror.nfcTag">선반에 올린 제품</span>
+          <span class="mp-brand" id="mp-brand"></span>
+          <strong class="mp-name" id="mp-name"></strong>
+          <span class="mp-price" id="mp-price"></span>
+        </div>
+      </div>
+      <div class="mp-actions">
+        <button type="button" id="mp-palette" class="m-btn" data-i18n="mirror.toPalette">팔레트로 섞어 보기</button>
+        <button type="button" id="mp-similar" class="m-btn m-btn-primary" data-i18n="mirror.find">비슷한 제품</button>
+      </div>
+      <div class="mp-qr-box">
+        <div id="mirror-qr" class="mp-qr" role="img" aria-label="휴대폰 챗봇 연결 QR 코드" data-i18n-aria="mirror.qrAria"></div>
+        <p class="mp-qr-text" data-i18n="mirror.qrText">휴대폰 카메라로 찍으면<br>이 제품으로 챗봇과 이어서 대화해요</p>
+      </div>
+    </div>
+    <!-- 비슷한 제품 (팔레트 탭의 '이 색과 비슷한 제품 추천'과 같은 추천): 색 견본 · 이 색과 비슷한 제품 · 개수 · 다시 섞기.
+         카드는 사진·브랜드·제품명·가격만, 누르면 바로 바른다. 옆으로 밀어 본다 -->
+    <div class="mirror-result hidden" id="mirror-result">
+      <div class="mirror-result-head">
+        <span id="mirror-res-swatch" class="color-dot" aria-hidden="true"></span>
+        <strong id="mirror-res-hex"></strong>
+        <span id="mirror-rec-status" class="mirror-rec-status" aria-live="polite"></span>
+        <button type="button" id="mirror-back-mix" class="m-btn" data-i18n="pal.backMix">← 다시 섞기</button>
+      </div>
+      <div id="mirror-rec-list" class="mirror-rec"></div>
+    </div>
+  </section>
+
+  <!-- 직원용 설정 열기: 왼쪽 위 2초 길게 누르기 (보이지 않는다) -->
+  <div class="mirror-corner" id="mirror-corner" aria-hidden="true"></div>
+</main>
+
+<!-- 직원용 설정 (?setup=1 또는 왼쪽 위 2초 길게 누르기). 값은 localStorage took.mirror -->
+<dialog class="mirror-setup" id="mirror-setup" aria-labelledby="mirror-setup-title">
+  <h2 id="mirror-setup-title" data-i18n="mirror.setup">거울 설정 (직원용)</h2>
+  <div class="ms-row"><span class="ms-label" data-i18n="mirror.rotate">영상 회전</span>
+    <div class="seg ms-seg" id="ms-rotate" role="group">
+      <button type="button" data-v="0">0°</button><button type="button" data-v="90">90°</button><button type="button" data-v="180">180°</button><button type="button" data-v="270">270°</button>
+    </div></div>
+  <div class="ms-row"><span class="ms-label" data-i18n="mirror.flip">좌우 반전</span>
+    <div class="seg ms-seg" id="ms-flip" role="group">
+      <button type="button" data-v="on" data-i18n="mirror.on">켜기</button><button type="button" data-v="off" data-i18n="mirror.off">끄기</button>
+    </div></div>
+  <div class="ms-row"><label class="ms-label" for="ms-scale" data-i18n="mirror.scale">얼굴 크기 배율</label>
+    <div class="slider ms-slider"><input type="range" id="ms-scale" min="0.8" max="1.3" step="0.05"><output id="ms-scale-out"></output></div></div>
+  <div class="ms-row"><span class="ms-label" data-i18n="mirror.trigger">전환 트리거</span>
+    <div class="seg ms-seg" id="ms-trigger" role="group">
+      <button type="button" data-v="nfc" data-i18n="mirror.trigNfc">NFC</button><button type="button" data-v="touch" data-i18n="mirror.trigTouch">터치</button><button type="button" data-v="both" data-i18n="mirror.trigBoth">둘 다</button>
+    </div></div>
+  <div class="ms-row"><label class="ms-label" for="ms-idle" data-i18n="mirror.idle">유휴 시간(초)</label>
+    <input type="number" id="ms-idle" min="10" max="600" step="5" inputmode="numeric"></div>
+  <div class="ms-row"><label class="ms-label" for="ms-phone-base" data-i18n="mirror.phoneBase">휴대폰용 주소</label>
+    <input type="text" id="ms-phone-base" inputmode="url" spellcheck="false" placeholder="비우면 자동 (예: https://took-sieunkirns-projects.vercel.app/)" data-i18n-placeholder="mirror.phoneBaseHint"></div>
+  <div class="ms-row"><span class="ms-label"></span>
+    <button type="button" id="ms-fullscreen" data-i18n="mirror.fullscreen">전체 화면 켜기</button></div>
+  <p id="ms-fs-msg" class="small" aria-live="polite"></p>
+  <label class="ms-label ms-block" for="ms-matrix" data-i18n="mirror.matrix">색 보정 행렬</label>
+  <textarea id="ms-matrix" rows="3" spellcheck="false"></textarea>
+  <div class="row">
+    <button type="button" id="ms-matrix-apply" data-i18n="mirror.matrixApply">적용</button>
+    <button type="button" id="ms-matrix-reset" data-i18n="mirror.matrixReset">기본값</button>
+    <span id="ms-matrix-msg" class="small" aria-live="polite"></span>
+  </div>
+  <p class="muted small" data-i18n="mirror.matrixNote">거울 도착 후 실측값으로 채울 자리예요.</p>
+  <p id="ms-cam" class="muted small" aria-live="polite"></p>
+  <div class="row ms-foot"><button type="button" id="ms-close" class="btn-dark" data-i18n="mirror.close">닫기</button></div>
+</dialog>
+<script type="module" src="js/mirror.js"></script>
+</body>
+</html>
