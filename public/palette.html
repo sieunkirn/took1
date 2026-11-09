@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n="pal.pageTitle">took(툭) - 팔레트</title>
 <link rel="stylesheet" href="css/wireframe.css">
+<script>
+  // 첫 화면이 그려지기 전에: 다크 모드를 바로 켜고(밝게 깜빡이지 않게), 시작 화면에서 넘어왔으면 들어오는 움직임(.enter-fx)을 켠다
+  (function () {
+    var r = document.documentElement;
+    try {
+      if (localStorage.getItem('took.theme') === 'dark') r.dataset.theme = 'dark';
+      if (sessionStorage.getItem('took.enterFx')) {
+        sessionStorage.removeItem('took.enterFx');
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          r.classList.add('enter-fx');
+          setTimeout(function () { r.classList.remove('enter-fx'); }, 1500);
+        }
+      }
+    } catch (e) { /* 저장 불가 환경 */ }
+  })();
+</script>
 </head>
 <!-- 팔레트: 왼쪽은 립 매핑 카메라와 어울리는 컬러 측정(lip.js), 오른쪽 위는 조제한 색·텍스처·추천, 오른쪽 아래는 팔레트(palette.js).
      물감을 섞을 때마다 palette.js 가 took:apply 이벤트로 섞은 색을 보내 카메라 입술에 바로 입힌다 -->
@@ -77,6 +93,8 @@
       <div class="row seg" id="textures" role="group" aria-label="텍스처" data-i18n-aria="pal.textures"></div>
       <div class="slider"><label for="intensity" data-i18n="pal.intensity">농도</label><input type="range" id="intensity" min="0" max="100" step="1"><output id="intensity-out"></output></div>
       <button type="button" id="find" class="btn-dark" disabled data-i18n="pal.find">이 색과 비슷한 제품 추천</button>
+      <!-- 지금 결과(색·텍스처·농도·내 톤·추천 제품)를 QR 로 손님 휴대폰에 넘겨 챗봇과 이어서 대화 (js/palette.js openTake) -->
+      <button type="button" id="take-phone" class="take-phone" disabled data-i18n="pal.take">휴대폰으로 가져가기</button>
     </section>
 
     <!-- ④ 추천 결과 (추천을 받은 뒤에만) -->
@@ -87,6 +105,7 @@
       </div>
       <p id="rec-status" class="muted small" aria-live="polite"></p>
       <div id="rec-list" class="pal-rec"></div>
+      <button type="button" id="take-phone-res" class="take-phone" data-i18n="pal.take">휴대폰으로 가져가기</button>
     </section>
   </div>
 
@@ -101,6 +120,17 @@
   <div class="row">
     <button type="button" id="pal-nfc-close" data-i18n="pal.nfcClose">닫기</button>
     <button type="button" id="pal-nfc-newcode" data-i18n="pal.nfcNewCode">번호 바꾸기</button>
+  </div>
+</dialog>
+<!-- 휴대폰으로 가져가기: QR 을 찍으면 손님 휴대폰의 챗봇(chat.html?from=palette…)이 이 결과로 대화를 시작한다 -->
+<dialog id="take-dialog" class="pal-nfc-dialog take-dialog" aria-labelledby="take-title">
+  <h2 id="take-title" data-i18n="pal.takeTitle">휴대폰으로 이어서 상담하기</h2>
+  <p class="muted small" data-i18n="pal.takeHelp">휴대폰 카메라로 QR 을 찍으면 이 결과로 챗봇과 이어서 대화해요. 사진·영상은 보내지 않아요.</p>
+  <div class="take-sum"><span id="take-swatch" class="color-dot" aria-hidden="true"></span><strong id="take-summary"></strong></div>
+  <div id="take-qr" class="take-qr" role="img" aria-label="휴대폰 챗봇 연결 QR 코드" data-i18n-aria="pal.takeQrAria"></div>
+  <p id="take-url" class="small take-url"></p>
+  <div class="row">
+    <button type="button" id="take-close" class="btn-dark" data-i18n="pal.takeClose">닫기</button>
   </div>
 </dialog>
 <script type="module" src="js/lip.js"></script>

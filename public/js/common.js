@@ -2,7 +2,7 @@
 import { FINISH_LABELS, FAMILY_LABELS, finishLabel } from '../lib/constants.js';
 import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
 import { toast, skeletonCards } from './motion.js'; // 화면 움직임(모든 화면 공통)
-import { t, isEn, languageMenu, applyI18n, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js'; // 화면 언어
+import { t, isEn, languageMenu, themeToggle, applyI18n, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js'; // 화면 언어
 
 // 화면에 보이는 제품 이름: 영어 화면이면 글로벌 올리브영 영어 이름(없으면 한국어 이름), 한국어면 그대로
 export const fullName = (p) => (isEn() ? displayName(p) : koFullName(p));
@@ -228,6 +228,18 @@ export function productDetailTable(p) {
     storeUrlOf(p) ? el('tr', {}, el('th', { text: t('detail.store') }), el('td', {}, storeLink(p, t('detail.storeOpen')))) : null));
 }
 
+// TOOK 로고 (사용자가 준 로고 그림을 따라 그림, 홈 대기 화면·상단 메뉴 공용): 굵은 T, 서로 맞닿은 두 O, 살짝 기운 K 기둥 + 길게 뻗은 사선 + 아래로 말리는 다리
+const LOGO_INNER = '<g fill="currentColor">'
+  + '<rect x="215" y="38" width="112" height="20"/><rect x="251" y="38" width="25" height="122"/>'
+  + '<path d="M535 38H557L508 160H486Z"/>'
+  + '</g><g fill="none" stroke="currentColor" stroke-width="24">'
+  + '<ellipse cx="345" cy="98" rx="44" ry="50"/><ellipse cx="444" cy="98" rx="45" ry="50"/>'
+  + '</g><g fill="none" stroke="currentColor" stroke-width="20">'
+  + '<path d="M645 44L512 134"/><path d="M508 131C556 124 590 136 588 160"/>'
+  + '</g></svg>';
+/** TOOK 로고 SVG 문자열. 색은 글자색(currentColor)을 따른다 */
+export const logoSvg = (cls = '') => `<svg class="${cls}" viewBox="212 36 442 126" role="img" aria-label="TOOK">${LOGO_INNER}</svg>`;
+
 /**
  * 상단 메뉴 + 키오스크 자동 초기화
  * @param {{ idle?: { seconds?: () => number, active?: () => boolean, onReset?: () => void } }} [opts]
@@ -236,19 +248,14 @@ export function productDetailTable(p) {
 export function renderNav(opts = {}) {
   if (document.querySelector('header.nav')) return; // 합본 화면처럼 스크립트 두 개가 함께 부르면 한 번만 그린다
   const nav = el('header', { class: 'nav' },
-    // 로고: 저장된 상태를 모두 지우고 홈으로 이동 (처음 상태로 초기화)
-    el('strong', {}, el('a', { href: 'index.html', text: t('nav.reset'), id: 'nav-reset', onclick: () => store.clear() })),
-    // 상단 '홈' 버튼으로 가면 홈 인트로 애니메이션을 건너뛴다 (index.html 머리 스크립트가 읽고 지운다)
-    Object.assign(freshLink('index.html', t('nav.home')), { onclick: () => { store.remove('navCurrent.index.html'); store.set('homeSkipIntro', true); } }),
+    // 로고(TOOK 그림): 누르면 저장된 상태를 모두 지우고 홈(대기 화면)으로. 읽어 주는 이름은 'took(초기화)'
+    el('strong', {}, Object.assign(el('a', { href: 'index.html', id: 'nav-reset', class: 'nav-logo', 'aria-label': t('nav.reset'), title: t('nav.reset'), onclick: () => store.clear() }), { innerHTML: logoSvg() })),
+    // 상단 '홈' 메뉴는 2026-11-09 뺐다 (홈 = 대기 화면은 왼쪽 로고를 눌러 간다)
     // 홈의 두 갈래와 같은 순서. 립 컬러 매핑·합본 화면은 파일만 남기고 메뉴에서 뺐다
     freshLink('palette.html', t('nav.palette')), // 물감을 섞어 립 색 조제 + 카메라로 발라 보기
     freshLink('chat.html', t('nav.chat')),
-    freshLink('mirror.html', t('nav.mirror')), // 스마트 미러: 카메라 영상이 화면 전체
-    freshLink('mirror-v4.html', t('nav.mirrorV4')), // 하프미러 창 모드: 검정 화면 + 눈높이 카메라 창
-    // 테스트 단계 직원용: NFC 태그 인식 테스트 (배포 때는 NFC_TEST_MENU 를 false 로)
-    NFC_TEST_MENU ? freshLink('nfc-test.html', t('nav.nfcTest')) : null,
-    // 언어 전환 (오른쪽 끝): 한국어 화면에선 'English', 영어 화면에선 '한국어'
-    el('div', { class: 'nav-lang' }, languageMenu()),
+    // 오른쪽 끝: 다크 모드 켜기/끄기 + 언어 전환
+    el('div', { class: 'nav-lang' }, themeToggle(), languageMenu()),
   );
   document.body.prepend(nav);
   applyI18n();
@@ -278,7 +285,7 @@ export function renderNav(opts = {}) {
 }
 
 const IDLE_TEST_BUTTON = true;
-export const NFC_TEST_MENU = true; // 상단 메뉴의 'NFC 테스트' (테스트 단계)
+export const NFC_TEST_MENU = true; // 팔레트 화면의 휴대폰 NFC 읽기 줄 (테스트 단계. 상단 'NFC 테스트' 메뉴·화면은 2026-11-09 삭제)
 const ORIENT_BUTTON = false; // 상단 '가로로 보기'·'세로로 보기' 버튼 (사용자 요청으로 숨김. 다시 쓰려면 true)
 
 // ---------- 키오스크 자동 초기화 ----------

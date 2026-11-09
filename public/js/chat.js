@@ -709,6 +709,44 @@ if (qs('base') && base && !state.messages.some((m) => m.baseNotice === base.id))
   });
   save();
 }
+// 매장 팔레트에서 QR 로 가져온 결과 (palette.js openTake): 손님 휴대폰에서 그 결과로 대화를 시작한다.
+//   ?from=palette&hex=색&fin=텍스처&int=농도&tone=내 톤&recs=추천 제품 ID 들&take=1
+//   색은 이후 질문의 기준 색(selectedHex), 톤은 추천에 쓰는 내 톤(lipMatch)으로 쓴다. 같은 결과로 다시 열면 인사는 한 번만
+const TEXTURE_KEYS = ['matte', 'satin', 'glossy', 'sheer', 'shimmer'];
+const SEASON_KEYS = ['spring', 'summer', 'autumn', 'winter'];
+async function paletteHandoff() {
+  const hex = normalizeHex(qs('hex') || '');
+  if (qs('from') !== 'palette' || !hex) return;
+  const fin = TEXTURE_KEYS.includes(qs('fin')) ? qs('fin') : null;
+  const n = Math.round(Number(qs('int')));
+  const strength = Number.isFinite(n) && n >= 0 && n <= 100 ? n : null;
+  const tone = SEASON_KEYS.includes(qs('tone')) ? qs('tone') : null;
+  const ids = (qs('recs') || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3);
+  const key = [hex, fin, strength, tone, ids.join(',')].join('|');
+  state.selectedHex = hex;
+  if (tone) store.set('lipMatch', { ...(store.get('lipMatch') || {}), season: tone });
+  if (state.messages.some((m) => m.handoff === key)) return;
+  const found = await Promise.all(ids.map((id) => api('api/products/' + encodeURIComponent(id)).catch(() => null)));
+  const products = found.filter((r) => r?.ok && r.body.product).map((r, i) => ({ ...r.body.product, n: i + 1 }));
+  const facts = [hex, fin && tr('texture.' + fin), strength !== null && C(`농도 ${strength}%`, `intensity ${strength}%`), tone && C(`내 톤 ${tr('season.' + tone)}`, `my tone ${tr('season.' + tone)}`)].filter(Boolean).join(' · ');
+  const text = C(`매장 팔레트에서 만든 결과를 가져왔어요: ${facts}.`, `I brought over the result you made on the in-store palette: ${facts}.`)
+    + (products.length
+      ? C(' 매장에서 추천받은 제품이에요. 이 색으로 더 찾거나 궁금한 걸 물어보세요.', ' Here are the products recommended in store. Ask me anything or find more in this color.')
+      : C(' 이 색과 비슷한 제품을 찾아 드릴까요?', ' Shall I find products similar to this color?'));
+  if (products.length) {
+    state.list = products;
+    state.focus = [];
+    state.panel = 'list';
+  }
+  state.messages.push({
+    role: 'bot', handoff: key, text, products,
+    suggestions: C(
+      ['이 색과 비슷한 제품 추천해 줘', '이 색으로 2만원 이하 추천해 줘', fin ? `${tr('texture.' + fin)} 제형으로 추천해 줘` : '글로시한 제품 추천해 줘', '입술이 건조한데 뭐가 좋아?'],
+      ['Recommend products similar to this color', 'This color under 20,000 won', fin ? `Recommend a ${tr('texture.' + fin).toLowerCase()} finish` : 'Recommend something glossy', 'My lips are dry. What should I use?']),
+  });
+  save();
+}
+await paletteHandoff();
 if (!BARCODE_PANEL) {
   $('scan-open')?.remove(); // 좁은 화면의 바코드 버튼
   $('rec-panel').setAttribute('aria-label', C('추천 제품', 'Recommended products'));

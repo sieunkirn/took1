@@ -6,6 +6,11 @@
 <title>took(툭)</title>
 <link rel="stylesheet" href="css/wireframe.css">
 <script>
+  // 첫 화면이 그려지기 전에 다크 모드를 바로 켠다 (밝게 깜빡이지 않게)
+  try { if (localStorage.getItem('took.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* 저장 불가 환경 */ }
+</script>
+<!-- (2026-11-09 사용 안 함) 옛 홈 인트로 머리 스크립트. 안쪽 주석 기호는 <!~~ ~~> 로 바꿔 두었다
+<script>
   // 홈 인트로: 첫 화면이 그려지기 전에 숨김 상태를 켠다 (js/home.js 가 이어서 움직인다).
   // 스크립트가 3초 안에 돌지 않으면 숨김을 풀어 내용이 항상 보이게 한다.
   // 상단 '홈' 버튼으로 온 경우(took.homeSkipIntro)에는 인트로 없이 바로 보여 준다
@@ -17,20 +22,28 @@
     setTimeout(function () { if (!r.dataset.homeReady) r.classList.remove('motion', 'intro'); }, 3000);
   })();
 </script>
+-->
 </head>
 <body class="home-page">
-<!-- 홈: 옛 툭ver2 대기 화면 구성을 무채색으로. 큰 동그라미 두 개 중 하나를 눌러 시작한다 -->
+<!-- 홈 = 대기 화면 (옛 거울 ver4 대기 화면, js/home.js). 화면을 누르면 바로 팔레트로 간다.
+     라이트 모드는 흰 바탕 위 검정 선, 다크 모드는 검정 바탕 위 흰 선 -->
+<main class="home-standby" id="home-standby"></main>
+<script type="module" src="js/home.js"></script>
+
+<!-- (2026-11-09 사용 안 함) 옛 홈 화면: 두 동그라미(팔레트·챗봇) + took. 인트로. 되살리려면 이 주석을 풀고
+     안쪽 주석 기호 <!~~ ~~> 를 원래대로 바꾼 뒤, js/home.js 아래쪽 주석의 옛 코드를 쓴다
+<!~~ 홈: 옛 툭ver2 대기 화면 구성을 무채색으로. 큰 동그라미 두 개 중 하나를 눌러 시작한다 ~~>
 <main class="home attract" id="home">
   <div class="at-hero">
     <h1 data-i18n="home.title">툭.</h1>
     <p data-i18n="home.lead">AI가 내 입술을 찾아 바로 발라 보고, 찰떡 컬러의 립까지 찾아 줘요</p>
   </div>
-  <!-- 두 갈래: 왼쪽 팔레트(물감을 섞어 립 색 조제·카메라로 발라 보기), 오른쪽 AI 뷰티 챗봇 -->
+  <!~~ 두 갈래: 왼쪽 팔레트(물감을 섞어 립 색 조제·카메라로 발라 보기), 오른쪽 AI 뷰티 챗봇 ~~>
   <div class="at-stage">
     <a class="tap" id="go-palette" href="palette.html" aria-label="팔레트에서 립 색 섞어 발라 보기" data-i18n-aria="home.paletteAria">
       <span class="orbit" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
       <span class="mirror" aria-hidden="true">
-        <!-- 예시 그림: 무채색으로 그린 브랜드 캐릭터 (실제 카메라 영상 아님) -->
+        <!~~ 예시 그림: 무채색으로 그린 브랜드 캐릭터 (실제 카메라 영상 아님) ~~>
         <svg viewBox="0 0 400 400">
           <defs>
             <linearGradient id="av-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#555"/><stop offset="1" stop-color="#333"/></linearGradient>
@@ -48,7 +61,7 @@
           <path d="M146 176q14-7 28-2M226 174q14-5 28 2" stroke="#333" stroke-width="4.5" stroke-linecap="round" fill="none"/>
           <ellipse cx="160" cy="202" rx="8" ry="10.5" fill="#191919"/><ellipse cx="240" cy="202" rx="8" ry="10.5" fill="#191919"/>
           <circle cx="162.5" cy="198" r="2.6" fill="#fff"/><circle cx="242.5" cy="198" r="2.6" fill="#fff"/>
-          <!-- 속눈썹: 눈 바깥쪽에 짧게 두 가닥 -->
+          <!~~ 속눈썹: 눈 바깥쪽에 짧게 두 가닥 ~~>
           <path d="M154 194q-2-2-3-5M153 198q-3-1-5-3M246 194q2-2 3-5M247 198q3-1 5-3" stroke="#191919" stroke-width="2.4" stroke-linecap="round" fill="none"/>
           <ellipse cx="138" cy="236" rx="22" ry="13" fill="url(#av-blush)"/><ellipse cx="262" cy="236" rx="22" ry="13" fill="url(#av-blush)"/>
           <path d="M198 220q4 3 8 0" stroke="#bbb" stroke-width="3" stroke-linecap="round" fill="none"/>
@@ -72,7 +85,7 @@
     <a class="tap" id="go-chat" href="chat.html" aria-label="AI 뷰티 챗봇에게 물어보기" data-i18n-aria="home.chatAria">
       <span class="orbit" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
       <span class="mirror chat-demo" aria-hidden="true">
-        <!-- 예시 대화: 챗봇 첫 화면의 추천 질문이 차례로 타이핑된다 (실제 대화 아님) -->
+        <!~~ 예시 대화: 챗봇 첫 화면의 추천 질문이 차례로 타이핑된다 (실제 대화 아님) ~~>
         <span class="cd-msgs">
           <span class="cd-bubble bot" data-i18n="home.chatBot">찾는 립 컬러를 편하게 말씀해 주세요</span>
           <span class="cd-bubble me"><span id="chat-demo-text">데이트 립 추천해 줘</span><i class="cd-caret"></i></span>
@@ -90,5 +103,6 @@
   document.querySelectorAll('.tap').forEach((a) => a.addEventListener('click', () => store.remove('navCurrent.' + a.getAttribute('href'))));
   await import('./js/home.js'); // 인트로·예시 입술 색·예시 대화·커서 반응 배경 (메뉴가 그려진 뒤에 불러야 로고 자리를 잰다)
 </script>
+-->
 </body>
 </html>

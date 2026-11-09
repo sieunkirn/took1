@@ -6,7 +6,7 @@
 // 아직 영어 문구가 없는 화면은 한국어로 보인다 (STRINGS.en 에 없는 키는 한국어로 대신한다)
 const KEY = 'took.lang';
 export const LANGS = ['ko', 'en'];
-// 거울 QR 로 휴대폰에서 열면 거울의 언어를 주소로 넘긴다 (?lang=en)
+// 휴대폰 QR 로 열면 화면 언어를 주소로 넘긴다 (?lang=en)
 try {
   const want = new URLSearchParams(location.search).get('lang');
   if (LANGS.includes(want)) sessionStorage.setItem(KEY, want);
@@ -32,24 +32,7 @@ export function setLang(next, { skipIntro = true } = {}) {
 
 const STRINGS = {
   ko: {
-    'nav.reset': 'took(초기화)', 'nav.home': '홈', 'nav.palette': '팔레트', 'nav.chat': 'AI 뷰티 챗봇', 'nav.nfcTest': 'NFC 테스트', 'nav.mirror': '거울', 'nav.mirrorV4': '거울 ver4',
-    // 거울 ver4 (mirror-v4.html, 하프미러 창 모드). 나머지 문구는 mirror.* 를 같이 쓴다
-    'mirror4.pageTitle': 'took(툭) - 거울 ver4', 'mirror4.standby': '제품을 태그해보세요', 'mirror4.setup': '거울 ver4 설정 (직원용)', 'mirror4.winH': '창 높이', 'mirror4.winY': '창 세로 위치',
-    'mirror4.border': '창 테두리', 'mirror4.photo': '대기 홍보 사진', 'mirror4.photoSmall': '작게', 'mirror4.photoFull': '전체',
-    'mirror4.winInfo': '카메라 창 {w}×{h}px · 위치 x {x}, y {y}',
-    // 거울 모드 (mirror.html)
-    'mirror.pageTitle': 'took(툭) - 거울', 'mirror.standby': '제품을 선반에 올려 보세요', 'mirror.standbyTouch': '또는 화면을 눌러 시작해요',
-    'mirror.defaultColor': '기본 색', 'mirror.recommend': '추천 제품 보기', 'mirror.palette': '팔레트', 'mirror.mixReset': '처음부터', 'mirror.match': '내 톤 찾기', 'mirror.matchShort': '내 톤', 'mirror.nfcTag': '선반에 올린 제품', 'mirror.toPalette': '팔레트로 섞어 보기', 'mirror.qrText': '휴대폰 카메라로 찍으면\n이 제품으로 챗봇과 이어서 대화해요', 'mirror.qrAria': '휴대폰 챗봇 연결 QR 코드', 'mirror.backProduct': '← 제품으로', 'mirror.phoneBase': '휴대폰용 주소', 'mirror.phoneBaseHint': '비우면 자동 (예: https://took-sieunkirns-projects.vercel.app/)', 'mirror.similarTitle': '이 색과 비슷한 제품', 'mirror.similarCount': '{n}개 · 색이 가까운 순', 'mirror.tryOnShort': '발라보기', 'mirror.wearing': '✓ 바르는 중', 'mirror.cardAria': '{name} 발라보기', 'mirror.find': '비슷한 제품', 'mirror.undoShort': '빼기', 'mirror.toneResult': "{label} · 어울리는 물감에 '내 톤' 표시", 'mirror.mixed': '조제한 색 {hex}', 'mirror.end': '종료',
-    'mirror.back': '닫기', 'mirror.recAria': '비슷한 색의 추천 제품', 'mirror.recLoading': '비슷한 색 제품을 찾는 중…',
-    'mirror.recNone': '비슷한 색 제품이 없어요', 'mirror.recFail': '추천 제품을 불러오지 못했어요', 'mirror.tryAria': '{name} 색 발라 보기',
-    'mirror.applied': '{name} 색을 발랐어요', 'mirror.unknownTag': '등록되지 않은 태그예요', 'mirror.retry': '다시 연결', 'mirror.camStarting': '카메라를 켜는 중…',
-    'mirror.setup': '거울 설정 (직원용)', 'mirror.rotate': '영상 회전', 'mirror.flip': '좌우 반전', 'mirror.on': '켜기', 'mirror.off': '끄기',
-    'mirror.scale': '얼굴 크기 배율', 'mirror.trigger': '전환 트리거', 'mirror.trigNfc': 'NFC', 'mirror.trigTouch': '터치', 'mirror.trigBoth': '둘 다',
-    'mirror.idle': '유휴 시간(초)', 'mirror.fullscreen': '전체 화면 켜기', 'mirror.fullscreenFail': '전체 화면을 열지 못했어요. 키보드의 F11 을 눌러 주세요',
-    'mirror.matrix': '색 보정 행렬 (3×3, 행 순서로 숫자 9개)', 'mirror.matrixApply': '적용', 'mirror.matrixReset': '기본값',
-    'mirror.matrixBad': '숫자 9개를 입력해 주세요', 'mirror.matrixNote': '거울 도착 후 실측값으로 채울 자리예요. 기본값은 항등 행렬(보정 없음)입니다.',
-    'mirror.matrixSaved': '저장했어요', 'mirror.close': '닫기', 'mirror.camInfo': '카메라 {w}×{h} · {fps}fps', 'mirror.camOff': '카메라 꺼짐 (대기)', 'mirror.screenInfo': '화면 {w}×{h} · 배율 {dpr}',
-    'mirror.lowered': '30fps 가 안 나와 해상도를 {w}×{h} 로 낮췄어요',
+    'nav.reset': 'took(초기화)', 'nav.home': '홈', 'nav.palette': '팔레트', 'nav.chat': 'AI 뷰티 챗봇',
     'nav.portrait': '세로로 보기', 'nav.portraitTitle': 'iPad 를 세웠을 때 화면으로 바꿔 봅니다', 'nav.landscape': '가로로 보기', 'nav.landscapeTitle': 'iPad 를 눕혔을 때 화면으로 돌아갑니다',
     'nav.idleTest': '자동 초기화 테스트', 'nav.idleTestTitle': '조작이 없을 때 뜨는 안내를 바로 띄웁니다',
     'idle.title': '계속 이용하시나요?', 'idle.desc': '{n}초 뒤 처음 화면으로 돌아가요. 지금까지의 대화와 고른 색은 지워져요.',
@@ -57,7 +40,7 @@ const STRINGS = {
     'home.brandWord': '툭', 'home.title': '툭.', 'home.lead': 'AI가 내 입술을 찾아 바로 발라 보고, 찰떡 컬러의 립까지 찾아 줘요',
     'home.palette': '섞어서 발라 보기', 'home.paletteAria': '팔레트에서 립 색 섞어 발라 보기',
     'home.chat': '말로 물어보기', 'home.chatAria': 'AI 뷰티 챗봇에게 물어보기', 'home.chatBot': '찾는 립 컬러를 편하게 말씀해 주세요',
-    'home.touch': '화면을 눌러 시작하기',
+    'home.touch': '화면을 눌러 시작하기', 'home.standby': '제품을 태그해보세요', 'home.standbyTouch': '또는 화면을 눌러 시작해요',
     'card.brand': '브랜드', 'card.name': '제품명', 'card.color': '색상값', 'card.finish': '제형', 'card.price': '가격',
     'card.noImage': '이미지 준비 중', 'card.store': '올리브영에서 보기', 'card.detail': '상세 보기',
     'finish.glossy': '글로시', 'finish.matte': '매트', 'finish.satin': '새틴', 'finish.velvet': '벨벳', 'finish.none': '정보 없음',
@@ -166,22 +149,7 @@ const STRINGS = {
     'voice.candidates': ' (후보 {n}개 중 선택)', 'voice.understood': ' → 이해한 내용: "{text}"', 'voice.nothing': '인식된 말이 없습니다. 버튼을 다시 누르고 말씀해 주세요.',
   },
   en: {
-    'nav.reset': 'took (reset)', 'nav.home': 'Home', 'nav.palette': 'Palette', 'nav.chat': 'AI Beauty Chat', 'nav.nfcTest': 'NFC test', 'nav.mirror': 'Mirror', 'nav.mirrorV4': 'Mirror v4',
-    'mirror4.pageTitle': 'took - Mirror v4', 'mirror4.standby': 'Tag a product to start', 'mirror4.setup': 'Mirror v4 settings (staff)', 'mirror4.winH': 'Window height', 'mirror4.winY': 'Window position',
-    'mirror4.border': 'Window border', 'mirror4.photo': 'Standby photo', 'mirror4.photoSmall': 'Small', 'mirror4.photoFull': 'Full',
-    'mirror4.winInfo': 'Camera window {w}×{h}px · at x {x}, y {y}',
-    'mirror.pageTitle': 'took - Mirror', 'mirror.standby': 'Place a product on the shelf', 'mirror.standbyTouch': 'or touch the screen to start',
-    'mirror.defaultColor': 'Default color', 'mirror.recommend': 'See products', 'mirror.palette': 'Palette', 'mirror.mixReset': 'Start over', 'mirror.match': 'My tone', 'mirror.matchShort': 'My tone', 'mirror.nfcTag': 'On the shelf', 'mirror.toPalette': 'Mix in palette', 'mirror.qrText': 'Scan with your phone camera\nto keep chatting about this product', 'mirror.qrAria': 'QR code to continue the chat on your phone', 'mirror.backProduct': '← Product', 'mirror.phoneBase': 'Phone address', 'mirror.phoneBaseHint': 'Leave empty for auto (e.g. https://took-sieunkirns-projects.vercel.app/)', 'mirror.similarTitle': 'Similar to this color', 'mirror.similarCount': '{n} · closest first', 'mirror.tryOnShort': 'Try on', 'mirror.wearing': '✓ Wearing', 'mirror.cardAria': 'Try on {name}', 'mirror.find': 'Similar', 'mirror.undoShort': 'Undo', 'mirror.toneResult': '{label} · matching paints are marked', 'mirror.mixed': 'Mixed color {hex}', 'mirror.end': 'Finish',
-    'mirror.back': 'Close', 'mirror.recAria': 'Products in similar colors', 'mirror.recLoading': 'Finding similar products…',
-    'mirror.recNone': 'No products in a similar color', 'mirror.recFail': "Couldn't load products", 'mirror.tryAria': 'Try on {name}',
-    'mirror.applied': 'Trying on {name}', 'mirror.unknownTag': 'Unregistered tag', 'mirror.retry': 'Reconnect', 'mirror.camStarting': 'Starting the camera…',
-    'mirror.setup': 'Mirror settings (staff)', 'mirror.rotate': 'Video rotation', 'mirror.flip': 'Mirror flip', 'mirror.on': 'On', 'mirror.off': 'Off',
-    'mirror.scale': 'Face size', 'mirror.trigger': 'Start trigger', 'mirror.trigNfc': 'NFC', 'mirror.trigTouch': 'Touch', 'mirror.trigBoth': 'Both',
-    'mirror.idle': 'Idle time (s)', 'mirror.fullscreen': 'Go full screen', 'mirror.fullscreenFail': "Couldn't go full screen. Press F11 on the keyboard",
-    'mirror.matrix': 'Color matrix (3×3, 9 numbers row by row)', 'mirror.matrixApply': 'Apply', 'mirror.matrixReset': 'Default',
-    'mirror.matrixBad': 'Enter 9 numbers', 'mirror.matrixNote': 'To be filled with measured values once the mirror arrives. The default is the identity matrix (no correction).',
-    'mirror.matrixSaved': 'Saved', 'mirror.close': 'Close', 'mirror.camInfo': 'Camera {w}×{h} · {fps}fps', 'mirror.camOff': 'Camera off (standby)', 'mirror.screenInfo': 'Screen {w}×{h} · scale {dpr}',
-    'mirror.lowered': 'Below 30fps, so the resolution was lowered to {w}×{h}',
+    'nav.reset': 'took (reset)', 'nav.home': 'Home', 'nav.palette': 'Palette', 'nav.chat': 'AI Beauty Chat',
     'nav.portrait': 'Portrait view', 'nav.portraitTitle': 'Preview the screen with the iPad upright', 'nav.landscape': 'Landscape view', 'nav.landscapeTitle': 'Back to the screen with the iPad lying flat',
     'nav.idleTest': 'Test auto reset', 'nav.idleTestTitle': 'Show the idle notice now',
     'idle.title': 'Still there?', 'idle.desc': 'Going back to the start in {n} seconds. Your chat and chosen colors will be cleared.',
@@ -189,7 +157,7 @@ const STRINGS = {
     'home.brandWord': 'took', 'home.title': 'took.', 'home.lead': 'AI finds your lips, tries colors on instantly, and picks the lip product that suits you',
     'home.palette': 'Mix & try on', 'home.paletteAria': 'Mix lip colors on the palette and try them on',
     'home.chat': 'Ask by voice', 'home.chatAria': 'Ask the AI beauty chat', 'home.chatBot': 'Tell me the lip color you are looking for',
-    'home.touch': 'Tap the screen to start',
+    'home.touch': 'Tap the screen to start', 'home.standby': 'Tag a product to start', 'home.standbyTouch': 'or touch the screen to start',
     'card.brand': 'Brand', 'card.name': 'Product', 'card.color': 'Color', 'card.finish': 'Finish', 'card.price': 'Price',
     'card.noImage': 'Image coming soon', 'card.store': 'View on OLIVE YOUNG', 'card.detail': 'Details',
     'finish.glossy': 'Glossy', 'finish.matte': 'Matte', 'finish.satin': 'Satin', 'finish.velvet': 'Velvet', 'finish.none': 'N/A',
@@ -337,6 +305,21 @@ STRINGS.ko['lang.current'] = '현재 언어: {name}';
 STRINGS.en['lang.current'] = 'Current language: {name}';
 STRINGS.ko['lang.menu'] = '언어 선택';
 STRINGS.en['lang.menu'] = 'Choose language';
+// 팔레트 → 휴대폰으로 가져가기 (palette.js openTake, chat.js 의 from=palette)
+Object.assign(STRINGS.ko, {
+  'pal.take': '휴대폰으로 가져가기', 'pal.takeTitle': '휴대폰으로 이어서 상담하기',
+  'pal.takeHelp': '휴대폰 카메라로 QR 을 찍으면 이 결과로 챗봇과 이어서 대화해요. 사진·영상은 보내지 않아요.',
+  'pal.takeSummary': '{hex} · {texture} · 농도 {n}%', 'pal.takeClose': '닫기', 'pal.takeQrAria': '휴대폰 챗봇 연결 QR 코드',
+  'pal.takeNoQr': 'QR 을 그리지 못했어요. 아래 주소를 휴대폰에서 열어 주세요.',
+});
+Object.assign(STRINGS.en, {
+  'pal.take': 'Take it to my phone', 'pal.takeTitle': 'Continue on your phone',
+  'pal.takeHelp': 'Scan the QR with your phone camera to keep chatting about this result. No photos or video are sent.',
+  'pal.takeSummary': '{hex} · {texture} · intensity {n}%', 'pal.takeClose': 'Close', 'pal.takeQrAria': 'QR code to continue the chat on your phone',
+  'pal.takeNoQr': "Couldn't draw the QR. Open the address below on your phone.",
+});
+STRINGS.ko['theme.dark'] = '다크 모드'; STRINGS.ko['theme.light'] = '라이트 모드';
+STRINGS.en['theme.dark'] = 'Dark mode'; STRINGS.en['theme.light'] = 'Light mode';
 
 const svg = (inner, size) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
 const GLOBE = '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/>';
@@ -388,6 +371,42 @@ export function languageMenu({ skipIntro = true } = {}) {
   });
   box.append(trigger, pop);
   return box;
+}
+
+// ---------- 다크 모드 (배경 검정) ----------
+// 언어 버튼 옆 버튼으로 켜고 끈다. <html data-theme="dark"> 이면 wireframe.css 가 색 변수를 검정 바탕용으로 바꾼다.
+// 기기 설정처럼 남도록 localStorage 'took.theme' 에 둔다 (키오스크 자동 초기화는 sessionStorage 만 지우므로 유지된다)
+const THEME_KEY = 'took.theme';
+export function theme() {
+  try { return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; } catch { return 'light'; }
+}
+function applyTheme(v = theme()) {
+  if (v === 'dark') document.documentElement.dataset.theme = 'dark';
+  else delete document.documentElement.dataset.theme;
+}
+applyTheme(); // 이 모듈을 읽는 모든 화면에서 바로 적용
+
+const MOON = '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/>';
+const SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+
+/** 다크 모드 켜기/끄기 버튼 (언어 메뉴 옆). 지금 상태의 반대쪽을 보여 준다: 밝은 화면에선 '다크 모드' */
+export function themeToggle() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'theme-toggle';
+  const draw = () => {
+    const dark = theme() === 'dark';
+    btn.innerHTML = `${svg(dark ? SUN : MOON, 18)}<span>${t(dark ? 'theme.light' : 'theme.dark')}</span>`;
+    btn.setAttribute('aria-pressed', String(dark));
+  };
+  btn.addEventListener('click', () => {
+    const next = theme() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(THEME_KEY, next); } catch { /* 저장 불가 환경: 이 화면에서만 */ }
+    applyTheme(next);
+    draw();
+  });
+  draw();
+  return btn;
 }
 
 // ---------- 제품 표시 ----------

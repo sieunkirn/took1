@@ -1,4 +1,4 @@
-// 립 매핑 화면 그리기 (lip.js · mirror.js 공통)
+// 립 매핑 화면 그리기 (lip.js · palette.js 공통)
 // 영상 프레임 → #view 캔버스: 좌우 반전·회전해서 그린 뒤 같은 프레임의 입술 위치에 선택 색을 입힌다.
 // 캔버스 내부 해상도는 원본(영상) 해상도 그대로 두고, 화면 크기는 CSS 로만 맞춘다 (DPR 배율로 키우지 않는다: 성능)
 import { detectVideo } from './lip-tracker.js';

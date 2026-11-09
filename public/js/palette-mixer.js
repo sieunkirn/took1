@@ -1,4 +1,4 @@
-// 팔레트 물감·섞는 칸 (팔레트 탭 palette.js · 거울 탭 mirror.js 공통)
+// 팔레트 물감·섞는 칸 (팔레트 탭 palette.js)
 //  - 물감을 누르면 한 방울이 포물선을 그리며 섞는 칸으로 날아가고, 끌어다 놓으면 놓은 자리에 떨어진다
 //  - 떨어진 물감은 소용돌이 줄무늬로 퍼지면서 바탕색이 새 혼합색으로 천천히 바뀐다
 //  - 섞는 칸을 드래그하면 저은 방향으로 줄무늬가 생긴다
@@ -66,9 +66,9 @@ function mixOf(drops) {
  * @param {(hex: string|null) => void} [o.onColor] 섞는 칸 색이 바뀌는 동안 계속 (다 비우면 null)
  * @param {() => void} [o.onChange] 방울을 넣거나 빼거나 비웠을 때 (버튼 상태 등을 다시 그릴 때)
  * @param {string} [o.storeKey] 섞은 방울을 저장할 이름 (sessionStorage took.<이름>)
- * @param {string} [o.plate] 섞는 접시 색 (팔레트 탭: 옅은 회색, 거울: 반투명)
+ * @param {string} [o.plate] 섞는 접시 색 (기본: 옅은 회색, 다크 모드면 어두운 회색)
  */
-export function createMixer({ paintsEl, canvas, onColor = () => {}, onChange = () => {}, storeKey = 'paletteDrops', plate = '#f0f0f0' }) {
+export function createMixer({ paintsEl, canvas, onColor = () => {}, onChange = () => {}, storeKey = 'paletteDrops', plate }) {
   let drops = (store.get(storeKey, []) || []).filter((k) => PAINT[k]).slice(0, MAX_DROPS);
   let mixOk = mixOf(drops);
   let shownOk = mixOk; // 화면에 보이는 바탕색 (새 혼합색으로 천천히 따라간다)
@@ -152,7 +152,7 @@ export function createMixer({ paintsEl, canvas, onColor = () => {}, onChange = (
     ctx.save();
     ctx.beginPath();
     ctx.arc(CX, CY, R, 0, Math.PI * 2);
-    ctx.fillStyle = plate;
+    ctx.fillStyle = plate ?? (document.documentElement.dataset.theme === 'dark' ? '#1c1c1c' : '#f0f0f0'); // 다크 모드면 어두운 접시
     ctx.fill();
 
     if (shownOk) {
