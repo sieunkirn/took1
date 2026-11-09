@@ -105,7 +105,8 @@ $('find').addEventListener('click', async () => {
 
 // ---------- 휴대폰으로 가져가기: 지금 결과를 QR 로 넘겨 손님 휴대폰에서 챗봇과 이어서 대화 ----------
 // QR 에는 숫자·글자 값만 담는다 (서버에 저장하지 않고, 카메라 사진·영상은 넘기지 않는다):
-//   chat.html?from=palette&hex=색&fin=텍스처&int=농도&tone=내 톤&recs=추천 제품 ID(최대 3개)&take=1&lang=en
+//   chat.html#from=palette&hex=색&fin=텍스처&int=농도&tone=내 톤&recs=추천 제품 ID(최대 3개)&take=1&lang=en
+//   결과는 #조각에 담는다: 서버로 보내지지 않아 서버 기록·Referer 에 남지 않는다
 //   take=1: 손님 휴대폰이라 키오스크 자동 초기화를 하지 않는다 (common.js)
 // QR 주소: 공개 주소로 띄웠으면 지금 주소, localhost 면 서버가 알려 주는 같은 와이파이 PC 주소 (휴대폰은 localhost 를 열 수 없다)
 let phoneBaseCache;
@@ -146,10 +147,12 @@ async function openTake() {
   delete $('take-qr').dataset.url;
   $('take-url').textContent = '';
   dlg.showModal();
-  const url = (await phoneBase()) + 'chat.html?' + q;
+  const url = (await phoneBase()) + 'chat.html#' + q;
   if (!dlg.open) return;
   $('take-qr').dataset.url = url;
-  $('take-url').textContent = url.replace(/^https?:\/\//, '').replace(/\?.*$/, '');
+  // 노트북 미리보기(portrait.html)면 옆 스마트폰 프레임이 이 QR 을 '찍을' 수 있게 알린다
+  try { if (window.top !== window) window.top.postMessage({ type: 'took:qr', url }, location.origin); } catch { /* 다른 주소의 틀 */ }
+  $('take-url').textContent = url.replace(/^https?:\/\//, '').replace(/[?#].*$/, '');
   const ZXing = await loadZXing().catch(() => null);
   if (ZXing) {
     const qr = new ZXing.BrowserQRCodeSvgWriter().write(url, 240, 240);

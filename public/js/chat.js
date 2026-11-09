@@ -3,14 +3,14 @@
 // 제품 카드의 '+ 비교'로 비교함에 담고(최대 3개) '비교하기'를 누르면 대화에 비교표를 보여 준다.
 // 오른쪽 패널은 추천 목록이 없을 때 '바코드로 제품 알아보기'(카메라 스캔·번호 입력)를 보여 주고, 인식한 제품을 대화로 설명한다.
 // 답변은 규칙 기반 엔진(src/lib/chat.js)이 만든다.
-import { renderNav, api, store, el, qs, detailLink, won, FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName, storeLink, toast } from './common.js';
+import { renderNav, PHONE, STATIC, api, store, el, qs, detailLink, won, FINISH_LABELS, FAMILY_LABELS, finishLabel, fullName, shortName, storeLink, toast } from './common.js';
 import { normalizeHex } from '../lib/color.js';
 import { compareSummary } from '../lib/chat.js';
 import { isEn, lang as uiLang, t as tr, finishText as finishName } from './i18n.js';
 
 // 화면 문구: C(한국어, 영어). 챗봇 답은 서버(엔진)가 같은 언어로 만든다
 const C = (ko, en) => (isEn() ? en : ko);
-import { setupVoiceInput, setupSpeaker, spokenReply } from './voice.js';
+import { setupVoiceInput, setupSpeaker, spokenReply, speechApi } from './voice.js';
 import { listenNfc, normalizeTag, resolveTag } from './nfc.js';
 import { createBarcodeScanner, cameraErrorMessage, decodeImageFile, loadZXing } from './barcode-scan.js';
 
@@ -19,6 +19,8 @@ const $ = (id) => document.getElementById(id);
 // 합본 화면(studio.html): 오른쪽 탭(색 조제·챗봇·추천·바코드)이 보이는 영역을 정하고, 립 매핑(lip.js)과 창 이벤트로 주고받는다
 //   받음: took:color { hex } / took:recommend { hex }   보냄: took:apply { hex, finish } / took:show-tab { tab }
 const STUDIO = document.body.dataset.layout === 'studio';
+// 매장 태블릿은 팔레트만 쓴다: 챗봇은 손님 휴대폰(팔레트 QR, 휴대폰 모드)에서만. 태블릿에서 챗봇 주소로 오면 팔레트로
+if (!PHONE && !STUDIO) location.replace('palette.html');
 // 챗봇 화면의 바코드 찾기 패널: 지금은 뺀다 (오른쪽 패널은 추천 제품만). 다시 쓰려면 true 로 바꾼다.
 // 합본 화면(studio)은 이 값과 상관없이 바코드를 그대로 쓴다
 const BARCODE_PANEL = STUDIO || false;
@@ -45,6 +47,21 @@ if (state.panel !== 'scan' && state.panel !== 'list') state.panel = state.list.l
 if (!BARCODE_PANEL) state.panel = 'list';
 let base = null;
 let brands = [];
+
+// 말투 다듬기 A/B (서버판, src/lib/ab.js): 대화마다 무작위 id 하나로 반을 나눈다. 개인정보가 아닌 무작위 값이고, 자동 초기화 때 지워진다.
+// 화면 행동은 횟수만 보낸다(빠른 답장·올리브영 제품 카드 클릭). 서버 없는 정적 버전은 보내지 않는다
+const AB_ID = (() => {
+  let id = store.get('abId');
+  if (!/^[0-9a-f]{16}$/.test(id || '')) {
+    id = [...crypto.getRandomValues(new Uint8Array(8))].map((b) => b.toString(16).padStart(2, '0')).join('');
+    store.set('abId', id);
+  }
+  return id;
+})();
+const track = (name) => {
+  if (STATIC) return;
+  fetch('api/ab-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session: AB_ID, name }), keepalive: true }).catch(() => {});
+};
 
 function save() {
   store.set('chatBaseId', state.baseId);
@@ -189,11 +206,20 @@ function productPager(products) {
   return box;
 }
 
+// 매장 팔레트에서 가져온 색 (QR 첫인사): 색 견본(실제 색) + '매장에서 만든 색' + 제형·농도·톤
+function swatchCard({ hex, label, facts }) {
+  const dot = el('span', { class: 'handoff-dot', 'aria-hidden': 'true' });
+  dot.style.background = hex;
+  return el('div', { class: 'handoff-card', role: 'group', 'aria-label': `${label} ${hex}` }, dot,
+    el('span', { class: 'handoff-text' }, el('span', { class: 'handoff-label', text: label }), el('strong', { text: facts || hex })));
+}
+
 // streaming: 이 답변을 한 글자씩 써 내려가는 중 (글이 다 나올 때까지 제품·빠른 답장은 숨긴다)
 function bubble(m, isLastBot, streaming = false) {
   const who = m.role === 'user' ? C('나', 'Me') : C('took 챗봇', 'took chat');
   return el('div', { class: 'bubble ' + m.role + (streaming ? ' streaming' : '') },
     el('div', { class: 'who', text: who }),
+    m.swatch ? swatchCard(m.swatch) : null,
     el('div', { class: 'btext', text: streaming ? '' : m.text }),
     // 비교 답변은 비교표로, 그 밖에는 좁은 화면용 카드 / 넓은 화면용 짧은 목록 (둘 중 하나만 CSS 로 보인다)
     m.kind === 'compare' && m.products?.length >= 2 ? compareTable(m.products) : null,
@@ -205,7 +231,7 @@ function bubble(m, isLastBot, streaming = false) {
 function quickReplies(m) {
   if (!m || m.role !== 'bot' || !m.suggestions?.length || state.typing || streamAt >= 0) return null;
   return el('div', { class: 'row suggest quick-replies', role: 'group', 'aria-label': C('빠른 답장', 'Quick replies') },
-    ...m.suggestions.map((q) => el('button', { type: 'button', text: q, onclick: () => send(q) })));
+    ...m.suggestions.map((q) => el('button', { type: 'button', text: q, onclick: () => { track('quick_reply'); send(q); } })));
 }
 
 function welcome() {
@@ -297,6 +323,8 @@ async function send(text) {
       message, baseProductId: state.baseId, selectedHex: state.selectedHex,
       context: state.ctx, tone: store.get('lipMatch')?.season || null, // 립 컬러 매핑에서 측정한 톤
       lang: uiLang(), // 묻고 답하는 언어
+      channel: PHONE ? 'phone' : 'kiosk', handoff: store.get('chatHandoff'), // 상담 프롬프트가 기기·매장 결과를 알게
+      session: AB_ID, // 말투 다듬기 A/B
     }),
   });
   // 타이핑 표시를 잠깐은 보여 준다 (답이 너무 빨라 깜빡이고 지나가지 않게)
@@ -330,6 +358,21 @@ async function send(text) {
       state.baseId = body.action.id;
       await loadBase();
     }
+    // 못 알아들음 폴백 3단계 (딥리서치 P1): 1~2번째는 챗봇이 무난한 추천과 예시 버튼으로 받고,
+    // 연달아 3번째면 한 번 사과하고 매장 직원 안내 + 매장에서 만든 색 카드(직원이 보고 이어서 도울 수 있게). 이모지 없음
+    const miss = body.unsure ? (store.get('chatMiss', 0) + 1) : 0;
+    store.set('chatMiss', miss);
+    if (miss === 3) {
+      const h = store.get('chatHandoff');
+      state.messages.push({
+        role: 'bot',
+        text: PHONE
+          ? C('제가 몇 번 잘 못 알아들은 것 같아요, 죄송해요. 매장에 계시면 직원에게 이 화면을 보여 주세요. 아래 예시처럼 짧게 물어보셔도 돼요.', "Sorry, I didn't quite get that a few times. If you're in the store, show this screen to a staff member. You can also try a short question below.")
+          : C('제가 몇 번 잘 못 알아들은 것 같아요, 죄송해요. 옆에 있는 매장 직원에게 도움을 요청해 주세요. 아래 예시처럼 짧게 물어보셔도 돼요.', "Sorry, I didn't quite get that a few times. Please ask a staff member nearby. You can also try a short question below."),
+        ...(h?.hex ? { swatch: { hex: h.hex, label: C('매장에서 만든 색', 'Your in-store color'), facts: [h.finish && tr('texture.' + h.finish), Number.isFinite(h.intensity) && C(`농도 ${h.intensity}%`, `intensity ${h.intensity}%`)].filter(Boolean).join(' · ') } } : {}),
+        suggestions: START.slice(0, 3),
+      });
+    }
   }
   // 오래된 대화는 앞에서부터 지워 저장 공간을 아낀다
   if (state.messages.length > 60) state.messages = state.messages.slice(-60);
@@ -340,7 +383,7 @@ async function send(text) {
 
 // ---------- 음성 질문 / 읽어주기 ----------
 const ttsBtn = $('tts');
-let ttsOn = store.get('chatTts', true);
+let ttsOn = PHONE ? false : store.get('chatTts', true); // 손님 휴대폰은 소리로 읽지 않는다 (밖에서 갑자기 소리 나지 않게)
 const speaker = setupSpeaker({ isOn: () => ttsOn });
 function renderTts() {
   ttsBtn.setAttribute('aria-pressed', String(ttsOn));
@@ -384,6 +427,41 @@ if (KEYBOARD_INPUT) {
   input.tabIndex = -1;
   input.placeholder = C('마이크를 누르고 말씀하세요 · 오른쪽 질문을 눌러도 돼요', 'Tap the microphone and speak · or tap a question on the right');
   $('chat-send')?.remove();
+}
+// 손님 휴대폰: 키보드 입력이 기본. 칸 오른쪽에 보내기 버튼, 마이크는 칸 왼쪽에 작게 (휴대폰 음성 인식은 기기마다 달라 보조로)
+if (PHONE) {
+  $('chat-form').classList.remove('voice-only');
+  input.placeholder = C('궁금한 걸 입력하세요', 'Type your question');
+  input.enterKeyHint = 'send';
+  $('chat-form').append(el('button', { type: 'submit', id: 'chat-send', class: 'icon-btn', 'aria-label': C('보내기', 'Send'), title: C('보내기', 'Send') }));
+  $('chat-send').innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  for (const id of ['tts', 'nfc-hint']) $(id)?.remove(); // 바코드 버튼은 아래(BARCODE_PANEL)에서 뺀다
+  // 마이크: 이 브라우저가 음성 인식을 지원할 때만 보인다 (아이폰 카카오톡 같은 앱 안 브라우저는 대부분 안 됨). 안 되면 키보드 받아쓰기 안내
+  if (!speechApi()) {
+    $('voice')?.remove();
+    input.placeholder = C('궁금한 걸 입력하세요 (키보드 마이크로 말해도 돼요)', 'Type your question (or use your keyboard mic)');
+  }
+  // 아이폰 키보드: 키보드가 열리면 보이는 높이(visualViewport)에 맞춰 화면을 줄이고, 닫히면(blur) 다시 잰다 (iOS 가 높이를 늦게 돌려주는 문제)
+  const vv = window.visualViewport;
+  if (vv) {
+    const fit = () => {
+      document.documentElement.style.setProperty('--vvh', vv.height + 'px');
+      if (document.activeElement === input) log.scrollTop = log.scrollHeight;
+    };
+    vv.addEventListener('resize', fit);
+    vv.addEventListener('scroll', fit);
+    input.addEventListener('blur', () => setTimeout(() => { fit(); window.scrollTo(0, 0); }, 250));
+    fit();
+  }
+  // AI 고지는 대화 내내 보이게 (AI 기본법 투명성, 딥리서치 P0): 서버 없는 정적 버전은 규칙 자동 상담, 서버 버전은 AI 도우미(일부 답은 생성형 AI)
+  const note = document.querySelector('.chat-head [data-i18n="chat.subtitle"]');
+  if (note) {
+    note.removeAttribute('data-i18n');
+    note.classList.add('ai-note');
+    note.textContent = STATIC
+      ? C('AI 도우미 · 정해진 규칙으로 답하는 자동 상담이에요', 'AI assistant · automated replies based on set rules')
+      : C('AI 도우미 · 자동 응답이에요 (일부 답은 생성형 AI가 만들어요)', 'AI assistant · automated replies (some are AI-generated)');
+  }
 }
 $('chat-form').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -499,7 +577,7 @@ async function handleTag(raw) {
   await streamReply(state.messages.length - 1);
   renderLog();
 }
-if (!STUDIO) {
+if (!STUDIO && !PHONE) { // 손님 휴대폰엔 NFC 리더기가 없다
   if (nfcHint) nfcHint.textContent = NFC_IDLE;
   listenNfc(handleTag);
 }
@@ -668,6 +746,8 @@ $('scan-close').addEventListener('click', () => {
 });
 
 $('compare-run').addEventListener('click', runCompare);
+// 제품 카드에서 올리브영으로 가는 클릭 (A/B 지표)
+log.addEventListener('click', (e) => { const a = e.target.closest?.('a[href]'); if (a && /oliveyoung/i.test(a.href)) track('card_click'); });
 $('compare-clear').addEventListener('click', () => {
   state.compare = [];
   save();
@@ -676,6 +756,7 @@ $('compare-clear').addEventListener('click', () => {
 
 $('chat-reset').addEventListener('click', () => {
   speaker.stop();
+  store.remove('chatMiss');
   state.messages = [];
   state.ctx = null;
   state.list = [];
@@ -724,15 +805,21 @@ async function paletteHandoff() {
   const ids = (qs('recs') || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3);
   const key = [hex, fin, strength, tone, ids.join(',')].join('|');
   state.selectedHex = hex;
+  store.set('chatHandoff', { hex, finish: fin, intensity: strength, tone });
+  // 결과 링크 (챗봇 홈의 '결과 저장'): 결과는 #조각에 그대로 두고 챗봇 홈에서 온 ?q= 같은 값은 뺀다
+  store.set('chatHandoffUrl', location.origin + location.pathname + location.hash); // 챗봇 홈(chat-home.js)의 '매장에서 만든 색' 카드도 쓴다
   if (tone) store.set('lipMatch', { ...(store.get('lipMatch') || {}), season: tone });
   if (state.messages.some((m) => m.handoff === key)) return;
   const found = await Promise.all(ids.map((id) => api('api/products/' + encodeURIComponent(id)).catch(() => null)));
   const products = found.filter((r) => r?.ok && r.body.product).map((r, i) => ({ ...r.body.product, n: i + 1 }));
-  const facts = [hex, fin && tr('texture.' + fin), strength !== null && C(`농도 ${strength}%`, `intensity ${strength}%`), tone && C(`내 톤 ${tr('season.' + tone)}`, `my tone ${tr('season.' + tone)}`)].filter(Boolean).join(' · ');
-  const text = C(`매장 팔레트에서 만든 결과를 가져왔어요: ${facts}.`, `I brought over the result you made on the in-store palette: ${facts}.`)
+  // 색상값(#A0202C)은 손님에게 뜻이 없어 글에서 빼고, 말풍선 위 색 견본 카드로 보여 준다 (딥리서치 P0)
+  const facts = [fin && tr('texture.' + fin), strength !== null && C(`농도 ${strength}%`, `intensity ${strength}%`), tone && C(`${tr('season.' + tone)} (추정)`, `${tr('season.' + tone)} (estimate)`)].filter(Boolean).join(' · ');
+  // 첫인사 (상담 프롬프트 src/lib/llm/agent.js 와 같은 성격): 인사·AI 도우미 소개 → 가져온 결과 → 할 수 있는 것 → 한계 고지. 아래 바로답변 3개
+  const text = C('안녕하세요, took AI 도우미 툭이에요. 매장에서 섞으신 색을 그대로 가져왔어요.', "Hi, I'm Took, took's AI beauty assistant. I brought over the color you mixed in store.")
     + (products.length
-      ? C(' 매장에서 추천받은 제품이에요. 이 색으로 더 찾거나 궁금한 걸 물어보세요.', ' Here are the products recommended in store. Ask me anything or find more in this color.')
-      : C(' 이 색과 비슷한 제품을 찾아 드릴까요?', ' Shall I find products similar to this color?'));
+      ? C(' 매장에서 추천받은 제품도 같이 담아 왔어요. 아래 버튼을 누르거나 편하게 물어보세요.', ' Your in-store picks are here too. Tap a button below or just ask.')
+      : C(' 이 색과 비슷한 립을 같이 찾아볼까요? 아래 버튼을 누르거나 편하게 물어보세요.', ' Shall we find lips close to this color? Tap a button below or just ask.'))
+    + C(' 화면 속 색이라 실제 발색은 조금 다를 수 있어요.', ' On-screen colors may look a little different in real life.');
   if (products.length) {
     state.list = products;
     state.focus = [];
@@ -740,9 +827,9 @@ async function paletteHandoff() {
   }
   state.messages.push({
     role: 'bot', handoff: key, text, products,
-    suggestions: C(
-      ['이 색과 비슷한 제품 추천해 줘', '이 색으로 2만원 이하 추천해 줘', fin ? `${tr('texture.' + fin)} 제형으로 추천해 줘` : '글로시한 제품 추천해 줘', '입술이 건조한데 뭐가 좋아?'],
-      ['Recommend products similar to this color', 'This color under 20,000 won', fin ? `Recommend a ${tr('texture.' + fin).toLowerCase()} finish` : 'Recommend something glossy', 'My lips are dry. What should I use?']),
+    swatch: { hex, label: C('매장에서 만든 색', 'Your in-store color'), facts },
+    // 바로답변: 규칙 챗봇이 알아듣는 짧은 말 (한/영 모두 확인)
+    suggestions: C(['이 색보다 밝은 색', '이 색으로 더 촉촉하게', '이 색으로 2만원 이하'], ['Lighter than this color', 'Glossy in this color', 'This color under 20,000 won']),
   });
   save();
 }
@@ -752,6 +839,20 @@ if (!BARCODE_PANEL) {
   $('rec-panel').setAttribute('aria-label', C('추천 제품', 'Recommended products'));
 }
 renderLog();
+
+// 챗봇 홈(chat-home.js)에서 온 경우: ?q= 질문을 바로 보내고, ?focus=1 이면 입력칸에 커서. 새로고침 때 다시 보내지 않게 주소에서 지운다
+if (PHONE) {
+  const here = new URLSearchParams(location.search);
+  const q = (here.get('q') || '').trim().slice(0, 200);
+  const focus = here.get('focus') === '1';
+  if (q || focus) {
+    here.delete('q');
+    here.delete('focus');
+    history.replaceState(null, '', location.pathname + (here.toString() ? '?' + here : ''));
+    if (q) setTimeout(() => send(q), 300);
+    else setTimeout(() => input.focus(), 300);
+  }
+}
 // 합본 화면: 립 매핑에서 고른 색을 챗봇의 기준 색으로 쓰고, '이 컬러로 제품 추천'을 챗봇 질문으로 처리한다
 if (STUDIO) {
   if (window.tookLipHex) state.selectedHex = window.tookLipHex; // 립 매핑이 먼저 로드된 경우

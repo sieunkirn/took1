@@ -8,7 +8,7 @@ const KEY = 'took.lang';
 export const LANGS = ['ko', 'en'];
 // 휴대폰 QR 로 열면 화면 언어를 주소로 넘긴다 (?lang=en)
 try {
-  const want = new URLSearchParams(location.search).get('lang');
+  const want = new URLSearchParams(location.search).get('lang') ?? new URLSearchParams(location.hash.replace(/^#/, '')).get('lang'); // 팔레트 QR 은 #조각
   if (LANGS.includes(want)) sessionStorage.setItem(KEY, want);
 } catch { /* 저장 불가 환경 */ }
 
@@ -317,6 +317,17 @@ Object.assign(STRINGS.en, {
   'pal.takeHelp': 'Scan the QR with your phone camera to keep chatting about this result. No photos or video are sent.',
   'pal.takeSummary': '{hex} · {texture} · intensity {n}%', 'pal.takeClose': 'Close', 'pal.takeQrAria': 'QR code to continue the chat on your phone',
   'pal.takeNoQr': "Couldn't draw the QR. Open the address below on your phone.",
+});
+// 기기 선택 해제 (common.js deviceResetButton)
+Object.assign(STRINGS.ko, {
+  'nav.chatHome': '챗봇 홈',
+  'nav.deviceReset': '기기 선택 해제', 'nav.deviceResetTitle': '태블릿·휴대폰 고정을 풀고 처음 상태로 돌아가요',
+  'nav.deviceResetConfirm': '이 기기의 태블릿·휴대폰 고정을 풀고 처음 상태로 돌아갈까요?',
+});
+Object.assign(STRINGS.en, {
+  'nav.chatHome': 'Chat home',
+  'nav.deviceReset': 'Reset device', 'nav.deviceResetTitle': 'Unpin tablet/phone mode and go back to the start',
+  'nav.deviceResetConfirm': 'Unpin the tablet/phone mode on this device and go back to the start?',
 });
 STRINGS.ko['theme.dark'] = '다크 모드'; STRINGS.ko['theme.light'] = '라이트 모드';
 STRINGS.en['theme.dark'] = 'Dark mode'; STRINGS.en['theme.light'] = 'Light mode';

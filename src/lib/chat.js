@@ -130,6 +130,9 @@ const GENERIC_ACKS = [
   '좋아요, 그럼 데일리로 무난한 립으로 골라 볼게요.',
 ];
 
+// 개인정보 패턴: 휴대폰 번호, 이메일, 주민등록번호 (hybridAnswer 도 같은 패턴이면 LLM 에 보내지 않는다)
+export const PII_RE = /01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+|\d{6}[-\s]?[1-4]\d{6}/;
+
 const OTHER_CATEGORIES = ['선크림', '썬크림', '선블록', '아이섀도', '섀도', '마스카라', '파운데이션', '쿠션', '컨실러', '토너', '로션',
   '향수', '샴푸', '네일', '블러셔', '아이라이너', '브로우'];
 const UNSUPPORTED_COLORS = ['초록', '녹색', '파랑', '파란', '하늘색', '노랑', '노란', '검정', '검은', '블랙', '흰색', '화이트', '회색', '민트'];
@@ -137,7 +140,7 @@ const UNSUPPORTED_COLORS = ['초록', '녹색', '파랑', '파란', '하늘색',
 function offTopicReply(text) {
   const reply = (r, suggestions = startSuggestions()) => ({ reply: r, suggestions });
   if (has(text, ['무시하고', '프롬프트', '관리자', '모드로', '지어내', '지어서', '라고 말해', '라고 해 줘', '척해', '척 해'])) {
-    return reply('그건 도와드릴 수 없어요. 저는 등록된 립 제품 정보만 있는 그대로 알려 드려요.');
+    return reply('그건 도와드릴 수 없어요. 저는 등록된 립 제품 정보만 있는 그대로 알려 드려요. 찾는 색이나 느낌을 말씀해 주시면 바로 골라 드릴게요.');
   }
   if (has(text, ['바보', '멍청', '못생', '쓰레기', '최악'])) {
     return reply('앗, 마음에 안 드셨나요? 원하는 색이나 느낌을 말씀해 주시면 다시 골라 볼게요.', ['더 밝은 색 추천해 줘', '더 저렴한 걸로', '데일리로 바를 립 추천해 줘']);
@@ -159,8 +162,12 @@ function offTopicReply(text) {
   if (has(text, ['할인', '세일', '쿠폰', '이벤트', '적립'])) {
     return reply('할인·이벤트 정보는 아직 연결되어 있지 않아요. 대신 가격대에 맞는 립은 바로 찾아 드릴게요.', ['2만원 이하 추천해 줘', '제일 싼 립 알려 줘']);
   }
-  if (has(text, ['성분', '알레르기', '알러지', '임산부', '임신', '수유', '아기', '피부과', '부작용'])) {
-    return reply('성분이나 건강에 관한 건 제가 정확히 말씀드리기 어려워요. 제품 상세 페이지나 전문가에게 꼭 확인해 주세요.');
+  if (has(text, ['성분', '알레르기', '알러지', '임산부', '임신', '수유', '아기', '피부과', '부작용', '터졌', '터져', '찢어', '상처', '피가', '물집', '염증', '헤르페스', '포진', '가려', '따가', '부었', '부어', '발진', '두드러기', '아파', '아픈'])) {
+    return reply('입술이 불편하시면 걱정되시죠. 건강이나 성분은 제가 판단할 수 없어서, 제품 성분표를 확인하시고 피부과나 약사와 상담해 보세요. 촉촉하게 발리는 립을 찾으시면 골라 드릴게요.', ['촉촉한 글로시 립 추천해 줘', '데일리로 바를 립 추천해 줘']);
+  }
+  // 개인정보(전화번호·이메일·주소·주민번호)는 받지 않는다: 저장·되풀이하지 않고 LLM 에도 보내지 않는다
+  if (PII_RE.test(text) || has(text, ['내 번호', '전화번호', '주민번호', '주민등록', '집 주소', '계좌'])) {
+    return reply('개인정보는 적지 않으셔도 돼요. 저는 립 색 상담에 필요한 것만 여쭤볼게요. 찾는 색이나 느낌을 말씀해 주세요.');
   }
   if (has(text, ['날씨', '몇 시야', '몇시야', '뉴스', '며칠이야'])) {
     return reply('그건 제가 알 수 없지만, 어떤 날이든 어울리는 립은 골라 드릴 수 있어요.', ['더운 날 바를 립 추천해 줘', '비 오는 날 어울리는 립', '데일리로 바를 립 추천해 줘']);
@@ -169,6 +176,50 @@ function offTopicReply(text) {
 }
 
 const has = (text, words) => words.some((w) => text.includes(w));
+
+// ---------- 답 조립: [여는 말] + [고정 사실(제품·가격·이유)] + [마무리 말] (딥리서치 P1) ----------
+// 여는 말은 손님이 말한 조건을 되받는다. 공감하는 말은 입술 고민이 있을 때만. 마무리 말은 다음에 해 볼 것 하나를 가볍게 권한다.
+// 같은 표현이 연달아 나오지 않게 대화 턴 번호(context.turn)로 고르고 직전 표현(context.lastOpener·lastCloser)은 건너뛴다 (무작위 아님: 같은 대화면 같은 답)
+// 이모지는 쓰지 않는다 (무채색 화면, 매장에선 소리로 읽음, 실패·거절 답에는 특히 금지)
+const EMPATHY = {
+  '건조한 입술': ['건조한 입술이면 신경 쓰이죠.', 'Dry lips can be bothersome.'],
+  '오래 가는': ['오래 가는 게 중요하죠.', 'Staying power matters.'],
+  '자연스러운': ['자연스러운 느낌 좋죠.', 'A natural look is always nice.'],
+  '강렬한': ['포인트 주고 싶은 날이군요.', 'Going for a statement today.'],
+  '화사한': ['화사하게 가 볼까요.', "Let's go bright."],
+};
+const OPENERS = [
+  ["'{s}' 쪽으로 골라 봤어요.", 'Here are picks for "{s}".'],
+  ["'{s}' 반영해서 다시 골랐어요.", 'Updated with "{s}".'],
+  ["'{s}' 기준으로 찾아봤어요.", 'I searched with "{s}".'],
+];
+const CLOSERS = [
+  { ko: '마음에 드는 번호를 말해 주시면 자세히 알려 드릴게요.', en: 'Tell me a number and I will share more about it.' },
+  { ko: '더 밝은 쪽도 볼까요?', en: 'Want to see lighter shades too?', skip: (q) => !!q.lightness },
+  { ko: '가격대를 바꿔서 볼 수도 있어요.', en: 'We can try a different price range too.', skip: (q) => !!(q.maxPrice || q.minPrice || q.price) },
+];
+function pickRotating(list, turn, last, key = (x) => x) {
+  if (!list.length) return null;
+  let i = turn % list.length;
+  if (list.length > 1 && key(list[i]) === last) i = (i + 1) % list.length;
+  return list[i];
+}
+// own: 이번 말에서 새로 나온 조건만 (이전 조건에 이어 붙인 것은 되받지 않는다 → 공감·되받기가 턴마다 반복되지 않게)
+function openerFor(own, env, ctx, mine = false) {
+  if (mine && !(own && Object.keys(own).length)) return L('측정한 톤에 맞춰 골라 봤어요.', 'I picked these to suit your measured tone.');
+  if (!own || !Object.keys(own).length) return '';
+  const concern = (own.concerns || []).find((c) => EMPATHY[c]);
+  if (concern) return EMPATHY[concern][EN ? 1 : 0];
+  const s = friendlySummary(own, env);
+  if (!s || s.length > 24) return ''; // 조건이 길면 되받지 않는다 (답이 길어지지 않게)
+  const t = pickRotating(OPENERS, ctx.turn || 0, ctx.lastOpener, (o) => o[0]);
+  return t ? t[EN ? 1 : 0].replace('{s}', s) : '';
+}
+function closerFor(query, ctx) {
+  const pool = CLOSERS.filter((c) => !c.skip?.(query));
+  const c = pickRotating(pool, (ctx.turn || 0) + 1, ctx.lastCloser, (x) => x.ko);
+  return c ? c : null;
+}
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const NOT_RE = '[가-힣]{0,2}\\s*(?:말고|빼고|제외|아닌|싫|별로)';
 
@@ -831,7 +882,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       greet: 'Hello! Tell me the color, price range or occasion (everyday, date, interview) you have in mind.',
       thanks: 'Let me know if you need anything else.',
       bye: 'Have a lovely day!',
-      identity: "I'm the took beauty chatbot. I'm not an external AI; I find matching lip products from the registered list using set rules.",
+      identity: "I'm Took, took's AI assistant. I'm not a person, and I'm not an external AI: I find matching lip products from the registered list using set rules.",
       help: 'For example: "a glossy coral under 20,000 won", "lips for an interview", "cool tone lips", "my lips are dry". After that, try "the cheapest of those", "tell me about the second one", "show more" or "no matte".',
       like: 'I can also find other colors or price ranges.',
       dislike: 'Oh, not quite right? Tell me what fell short (color, price or finish) and I will pick again.',
@@ -839,7 +890,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       greet: '안녕하세요. 찾는 색, 가격대, 바를 자리(데일리·데이트·면접)를 말씀해 주세요.',
       thanks: '더 필요한 게 있으면 말씀해 주세요.',
       bye: '좋은 하루 보내세요.',
-      identity: 'took 뷰티 챗봇이에요. 외부 AI 가 아니라, 등록된 립 제품에서 조건에 맞는 걸 정해진 규칙으로 찾아요.',
+      identity: 'took AI 도우미 툭이에요. 사람이 아니고, 외부 AI 가 아니라 등록된 립 제품에서 조건에 맞는 걸 정해진 규칙으로 찾아요.',
       help: '예: "2만원 이하 글로시한 코랄", "면접 립", "쿨톤 립", "입술이 건조해". 추천 뒤엔 "그중 제일 싼 거", "두 번째 거 자세히", "더 보여 줘", "매트 말고"도 돼요.',
       like: '다른 색이나 가격대도 찾아 드릴 수 있어요.',
       dislike: '앗, 마음에 안 드셨군요. 색, 가격, 제형 중 어떤 게 아쉬웠는지 말씀해 주시면 다시 골라 볼게요.',
@@ -880,7 +931,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
   const r = runSearch(query, env);
   const total = r.scored.length;
   const page = r.scored.slice(0, limit);
-  const nextCtx = { query, shown: page.map((p) => p.id), offset: 0, lastConditions: r.conditions, lastReasons: r.reasons };
+  const nextCtx = { query, shown: page.map((p) => p.id), offset: 0, lastConditions: r.conditions, lastReasons: r.reasons, turn: (ctx.turn || 0) + 1, lastOpener: ctx.lastOpener || null, lastCloser: ctx.lastCloser || null };
 
   let reply;
   let suggestions;
@@ -907,6 +958,15 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       + (r.tips.length ? ' ' + r.tips[0] : '')
       + (r.notes.length ? ' ' + r.notes.join(' ') : '');
     suggestions = resultSuggestions(page, query, total > limit);
+    // 여는 말·마무리 말: 되묻는 이음말(bridge)이 없을 때만. 이유·팁·안내가 붙은 답은 이미 길어서 마무리 말은 생략 (휴대폰 한 화면 2~3문장)
+    if (!bridge) {
+      const open = openerFor(q, env, ctx, !!(c.mine && toneHint));
+      if (open) { reply = `${open} ${reply}`; nextCtx.lastOpener = open; }
+      if (!r.reasons.length && !r.tips.length && !r.notes.length && total > 1) {
+        const close = closerFor(query, ctx);
+        if (close) { reply = `${reply} ${EN ? close.en : close.ko}`; nextCtx.lastCloser = close.ko; }
+      }
+    }
   }
   if (bridge) reply = `${bridge.ack} ${reply}`;
   return out({ reply, conditions: r.conditions, products: page, total, suggestions, context: nextCtx, unsure: r.onlyUnmetColor || !!bridge?.unsure });

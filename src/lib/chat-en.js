@@ -313,8 +313,11 @@ export function offTopicReplyEn(message) {
   if (has(text, ['discount', 'sale', 'coupon', 'promotion', 'deal', 'points'])) {
     return reply("Discount and event info isn't connected yet. I can find lips in your price range, though.", ['Under 20,000 won', 'Cheapest lip']);
   }
-  if (has(text, ['ingredient', 'ingredients', 'allergy', 'allergic', 'pregnant', 'pregnancy', 'breastfeeding', 'baby', 'side effect', 'side effects', 'dermatologist'])) {
-    return reply("I can't give reliable answers about ingredients or health. Please check the product page or ask a professional.");
+  if (has(text, ['ingredient', 'ingredients', 'allergy', 'allergic', 'pregnant', 'pregnancy', 'breastfeeding', 'baby', 'side effect', 'side effects', 'dermatologist', 'cracked', 'bleeding', 'blister', 'cold sore', 'herpes', 'infection', 'rash', 'itchy', 'swollen', 'hurts', 'painful'])) {
+    return reply("Sorry your lips feel uncomfortable. I can't judge health or ingredients, so please check the ingredient list and talk to a dermatologist or pharmacist. I can still pick a lip that goes on smoothly.", ['Recommend a glossy lip', 'Recommend an everyday lip']);
+  }
+  if (/01[016789][-\s.]?\d{3,4}[-\s.]?\d{4}|[\w.+-]+@[\w-]+\.[\w.]+/.test(text) || has(text, ['my phone number', 'my address', 'my email'])) {
+    return reply("No need to share personal details. I'll only ask what helps pick a lip color. Tell me the color or mood you want.");
   }
   if (has(text, ['weather', 'what time', 'news', 'what day'])) {
     return reply("I can't tell you that, but I can pick a lip for any kind of day.", ['A lip for a hot day', 'A calm lip for a rainy day', 'Recommend an everyday lip']);

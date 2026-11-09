@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>took(툭) - 챗봇 홈</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<script>
+  // 첫 화면이 그려지기 전에 다크 모드를 바로 켠다 (밝게 깜빡이지 않게)
+  try { if (localStorage.getItem('took.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* 저장 불가 환경 */ }
+</script>
+</head>
+<!-- 챗봇 홈 (손님 휴대폰 전용, js/chat-home.js): 휴대폰 챗봇 상단 왼쪽 로고를 누르면 오는 곳.
+     위에서 아래로: 인사 → 매장에서 만든 색 → 최근 대화 → 추천받은 제품 → 이렇게 물어보세요 → 맨 아래 '물어보기' 입력줄.
+     내용은 이 휴대폰에 저장된 상담 상태(tookPhone.*)로 채운다. 매장 태블릿에서 열면 팔레트로 보낸다 -->
+<body class="ph-home-page">
+<main class="ph-home" id="ph-home" aria-live="polite"></main>
+<a class="ph-askbar" id="ph-askbar" href="chat.html?focus=1">
+  <span class="ph-askbar-text" id="ph-askbar-text">궁금한 걸 물어보세요</span>
+  <span class="ph-askbar-go" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+</a>
+<script type="module" src="js/chat-home.js"></script>
+</body>
+</html>

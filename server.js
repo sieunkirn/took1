@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { allProducts, findById, findByBarcode, normalizeBarcode } from './src/lib/repository.js';
 import { recommendByColor } from './src/lib/recommend.js';
 import { hybridAnswer } from './src/lib/llm/agent.js';
+import { abEnabled, abStats, recordEvent } from './src/lib/ab.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
 import { createSession, getSession, notify, poll, lanAddress, openCodeSession, joinByCode } from './src/lib/pairing.js';
@@ -107,7 +108,18 @@ async function handleApi(req, res, url) {
     const body = await readBody(req);
     if (!body.message || typeof body.message !== 'string') return sendJson(res, 400, { error: 'message 가 필요합니다.' });
     // 규칙 챗봇 먼저, 규칙이 뜻을 못 잡은 말만 LLM (설정했을 때). engine 으로 어느 쪽이 답했는지 알려 준다
-    return sendJson(res, 200, await hybridAnswer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true, lang: body.lang === 'en' ? 'en' : 'ko' }));
+    return sendJson(res, 200, await hybridAnswer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, imageOnly: body.imageOnly === true, lang: body.lang === 'en' ? 'en' : 'ko',
+      // 상담 프롬프트의 '지금 상황': 어느 기기에서 묻는지, 매장 팔레트에서 넘어온 제형·농도 (src/lib/llm/agent.js contextNote)
+      session: typeof body.session === 'string' ? body.session.slice(0, 32) : null, // 말투 다듬기 A/B 나누기용 무작위 id (개인정보 아님)
+      channel: body.channel === 'phone' ? 'phone' : 'kiosk', handoff: body.handoff && typeof body.handoff === 'object' ? { finish: String(body.handoff.finish || ''), intensity: Number(body.handoff.intensity) } : null }));
+  }
+  // 말투 다듬기 A/B (src/lib/ab.js): 화면 행동 기록(빠른 답장·제품 카드 클릭)과 집계 보기. 질문 글·개인정보는 받지 않는다
+  if (req.method === 'POST' && path === '/api/ab-event') {
+    const body = await readBody(req).catch(() => ({}));
+    return sendJson(res, 200, { ok: abEnabled() && recordEvent(String(body.session || ''), String(body.name || '')) });
+  }
+  if (req.method === 'GET' && path === '/api/ab-stats') {
+    return sendJson(res, 200, { enabled: abEnabled(), llm: llmEnabled(), stats: abStats() });
   }
   // 휴대폰용 주소 (거울의 '휴대폰으로 챗봇 이어가기' QR): 휴대폰이 열 수 있는 이 서버 주소
   if (req.method === 'GET' && path === '/api/phone-base') {

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>took(툭) - 개인정보 안내</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<script>
+  try { if (localStorage.getItem('took.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* 저장 불가 환경 */ }
+</script>
+</head>
+<!-- 개인정보 안내 (한/영, js/privacy.js): 손님 휴대폰 챗봇 홈 아래 '개인정보 안내'에서 연다.
+     실제 코드가 하는 일만 적는다 (카메라 영상 미저장, QR 은 #조각, 휴대폰 대화는 이 기기에 30일, 서버판 생성형 AI 사용 여부는 서버에 물어 표시).
+     법률 검토 전 시범 운영용 초안이다. 변호사 확인 항목: docs/legal-review-checklist.md -->
+<body class="privacy-page">
+<main class="pv-doc" id="pv-doc"></main>
+<script type="module" src="js/privacy.js"></script>
+</body>
+</html>

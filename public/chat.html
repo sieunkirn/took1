@@ -2,7 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- viewport-fit=cover: 아이폰 아래 홈 표시줄 자리(env(safe-area-inset-bottom))를 쓴다. interactive-widget: 안드로이드 키보드가 열리면 화면 높이를 줄여 입력줄이 가려지지 않게 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="referrer" content="no-referrer">
 <title data-i18n="chat.pageTitle">took(툭) - AI 뷰티 챗봇</title>
 <link rel="stylesheet" href="css/wireframe.css">
 </head>
@@ -27,7 +29,7 @@
       <button type="button" id="base-clear" data-i18n="chat.baseClear">해제</button>
     </div>
 
-    <div id="chat-log" class="chat-log" aria-live="polite"></div>
+    <div id="chat-log" class="chat-log" role="log" aria-live="polite"></div>
 
     <div id="compare-box" class="compare-box hidden" role="region" aria-label="비교함" data-i18n-aria="chat.compare">
       <strong data-i18n="chat.compare">비교함</strong>
