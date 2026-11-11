@@ -35,7 +35,6 @@
       <canvas id="view" class="hidden"></canvas>
       <video id="video" class="hidden" playsinline muted></video>
     </div>
-    <p id="color-name" class="small"></p>
     <p id="guide" class="muted" aria-live="polite"></p>
     <p id="nfc-hint" class="nfc-hint pal-nfc" aria-live="polite"></p>
     <!-- 휴대폰 NFC (테스트 단계): 휴대폰에서 열면 '휴대폰 NFC 켜기', 컴퓨터·iPad 에서 열면 '휴대폰으로 NFC 읽기'(QR 연결) -->
@@ -61,11 +60,6 @@
         <div class="swatches hidden" id="match-swatches" role="group" aria-label="추천 컬러" data-i18n-aria="pal.matchSwatches"></div>
       </div>
       <p id="match-result" class="small" aria-live="polite"></p>
-      <details class="pal-match-more small">
-        <summary class="muted" data-i18n="pal.matchMore">측정값 · 안내</summary>
-        <p id="match-metrics" class="muted"></p>
-        <p class="muted" data-i18n="pal.matchNote">볼·이마 피부색으로 톤을 추정한 참고용 결과입니다. 조명에 따라 달라질 수 있어요.</p>
-      </details>
     </section>
 
     <!-- ② 팔레트: 오른쪽 위 아이콘으로 처음부터 다시 섞는다 -->
@@ -83,7 +77,6 @@
           <p id="mix-empty" class="mix-empty" data-i18n="pal.mixEmpty">물감을 눌러<br>떨어뜨려요</p>
         </div>
         <div class="pal-tools">
-          <p id="mix-hex" class="mix-hex" aria-live="polite"></p>
           <button type="button" id="undo" disabled data-i18n="pal.undo">한 방울 빼기</button>
         </div>
       </div>

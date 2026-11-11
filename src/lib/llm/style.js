@@ -14,6 +14,7 @@ const SYSTEM = {
 규칙:
 - 뜻·사실·순서를 바꾸지 않는다. 새 정보(효능, 지속 시간, 재고, 할인, 성분)를 더하지 않는다.
 - {{P1}}, {{N1}} 같은 자리표시는 글자 하나 바꾸지 말고 모두 그대로 한 번씩 쓴다. 자리표시 밖에 숫자를 쓰지 않는다.
+- 괄호로 덧붙이지 않는다. 덧붙일 말은 문장으로 쓴다.
 - 부드러운 해요체, 1~3문장, 원래 길이와 비슷하게. 이모지·느낌표 남발·과장 표현(최고, 완벽, 무조건)을 쓰지 않는다.
 - 다듬은 글만 쓴다. 설명이나 따옴표를 붙이지 않는다.`,
   en: `You polish the tone of "Took", the AI assistant of the lip color service took. The user text is the assistant's final answer.

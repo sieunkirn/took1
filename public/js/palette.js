@@ -9,6 +9,7 @@ import { pairPhoneForNfc } from './nfc-relay.js'; // 휴대폰으로 읽고 이 
 import { loadZXing } from './barcode-scan.js'; // QR 그리기
 import { createMixer, ALL_PAINTS, PAINT } from './palette-mixer.js'; // 물감·섞는 칸
 import { t as tr, isEn } from './i18n.js'; // 화면 문구 (한국어/영어)
+import { setShelfTake } from './shelf.js'; // 매대 위치 시트의 '휴대폰으로 가져가기'
 
 renderNav();
 
@@ -41,9 +42,7 @@ function render() {
   $('find').disabled = !hex;
   $('reset').disabled = !hex;
   $('take-phone').disabled = !hex;
-  // 조제한 색은 섞는 칸에 보이므로 옆에 색상값과 방울 수만 적는다
-  $('mix-hex').textContent = hex ? `${hex}
-${tr('pal.drops', { n: mixer.count() })}` : '';
+  // 조제한 색은 섞는 칸에 보이므로 색상값·방울 수 글자는 따로 적지 않는다 (2026-11-11)
 }
 
 $('undo').addEventListener('click', () => mixer.undo());
@@ -131,12 +130,15 @@ function takeData() {
     recs: hex && hex === result.hex ? result.recs : [],
   };
 }
-async function openTake() {
+// loc: 매대 위치 시트에서 열면 그 제품 ID (휴대폰 챗봇이 첫 말풍선에 위치 카드를 보여 준다). 버튼 클릭으로 열면 이벤트가 들어오므로 문자열만 쓴다
+async function openTake(opts) {
+  const loc = typeof opts?.loc === "string" ? opts.loc : null;
   const d = takeData();
   if (!d.hex) return;
   const q = new URLSearchParams({ from: 'palette', hex: d.hex, fin: d.fin, int: String(d.int) });
   if (d.tone) q.set('tone', d.tone);
   if (d.recs.length) q.set('recs', d.recs.join(','));
+  if (loc) q.set('loc', loc);
   q.set('take', '1');
   if (isEn()) q.set('lang', 'en');
   const dlg = $('take-dialog');
@@ -165,6 +167,7 @@ async function openTake() {
 }
 $('take-phone').addEventListener('click', openTake);
 $('take-phone-res').addEventListener('click', openTake);
+setShelfTake((p) => openTake({ loc: p.id }));
 $('take-close').addEventListener('click', () => $('take-dialog').close());
 $('take-dialog').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); }); // 바깥(어두운 곳)을 누르면 닫기
 
@@ -175,9 +178,9 @@ function nfcFlash(text) {
   nfcHint.textContent = text;
   nfcHint.classList.add('hit');
   clearTimeout(nfcTimer);
-  nfcTimer = setTimeout(() => { nfcHint.textContent = tr('pal.nfcIdle'); nfcHint.classList.remove('hit'); }, 3000);
+  nfcTimer = setTimeout(() => { nfcHint.textContent = ''; nfcHint.classList.remove('hit'); }, 3000);
 }
-nfcHint.textContent = tr('pal.nfcIdle');
+// 기다리는 동안의 안내 문구는 뺐다: 태그를 읽었을 때만 잠깐 알려 준다
 // 읽은 제품: 그 색을 입술에 바르고, 오른쪽 ④ 자리에 제품 카드를 띄운다 (리더기·휴대폰 NFC 공통)
 // masked: 실물 테스트 카드면 그 가린 번호 → 제품 카드를 카드 이름·사진으로 보여 준다 (색은 연결한 제품 색)
 async function showNfcProduct(id, masked = null) {

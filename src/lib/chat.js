@@ -111,7 +111,7 @@ const AVOID_FINISHES = [
 // ---------- 잡담도 부드럽게 받는다 ("졸려" → "졸리시다구요? 그럼 혈색이 좋아 보이는 립 추천해 드릴게요") ----------
 // 기분·상태 말 → 한마디 받아 주고 그에 맞는 조건으로 추천한다 (검색 조건이 없는 말일 때만)
 const MOODS = [
-  { words: ['졸려', '졸리', '잠 와', '잠와', '잠이 와', '하품'], ack: '졸리시다구요? 그럼 혈색이 좋아 보이는 립 추천해 드릴게요.', query: { concerns: ['혈색 있는'] } },
+  { words: ['졸려', '졸리', '잠 와', '잠와', '잠이 와', '하품'], ack: '졸리시군요. 그럼 혈색이 좋아 보이는 립을 골라 드릴게요.', query: { concerns: ['혈색 있는'] } },
   { words: ['피곤', '지쳐', '지친', '힘들', '기운 없', '기운이 없'], ack: '많이 피곤하시죠. 생기 있어 보이게 혈색 도는 립으로 골라 볼게요.', query: { concerns: ['혈색 있는'] } },
   { words: ['배고', '출출', '밥 먹', '점심', '저녁 먹', '간식'], ack: '배고프시군요! 먹고 나서도 잘 안 지워지는 립으로 골라 볼게요.', query: { concerns: ['오래 가는'] } },
   { words: ['심심', '지루', '따분'], ack: '심심하시면 평소와 다른 포인트 색에 도전해 볼까요?', query: { concerns: ['강렬한'] } },
@@ -126,7 +126,7 @@ const MOODS = [
 // 알아듣지 못한 말: 되묻지 않고 한마디 받은 뒤 무난한 립을 보여 준다 (말 길이로 돌려 가며 고른다)
 const GENERIC_ACKS = [
   '그렇군요! 그럼 오늘 바르기 좋은 립을 하나 골라 볼게요.',
-  '말씀 고마워요. 그럼 부담 없이 바르기 좋은 색부터 보여 드릴게요.',
+  '알려 주셔서 고마워요. 그럼 부담 없이 바르기 좋은 색부터 보여 드릴게요.',
   '좋아요, 그럼 데일리로 무난한 립으로 골라 볼게요.',
 ];
 
@@ -140,7 +140,7 @@ const UNSUPPORTED_COLORS = ['초록', '녹색', '파랑', '파란', '하늘색',
 function offTopicReply(text) {
   const reply = (r, suggestions = startSuggestions()) => ({ reply: r, suggestions });
   if (has(text, ['무시하고', '프롬프트', '관리자', '모드로', '지어내', '지어서', '라고 말해', '라고 해 줘', '척해', '척 해'])) {
-    return reply('그건 도와드릴 수 없어요. 저는 등록된 립 제품 정보만 있는 그대로 알려 드려요. 찾는 색이나 느낌을 말씀해 주시면 바로 골라 드릴게요.');
+    return reply('그건 도와드리기 어려워요. 등록된 립 제품 정보만 있는 그대로 알려 드릴 수 있어요. 찾는 색이나 느낌을 말씀해 주시면 바로 골라 드릴게요.');
   }
   if (has(text, ['바보', '멍청', '못생', '쓰레기', '최악'])) {
     return reply('앗, 마음에 안 드셨나요? 원하는 색이나 느낌을 말씀해 주시면 다시 골라 볼게요.', ['더 밝은 색 추천해 줘', '더 저렴한 걸로', '데일리로 바를 립 추천해 줘']);
@@ -163,7 +163,7 @@ function offTopicReply(text) {
     return reply('할인·이벤트 정보는 아직 연결되어 있지 않아요. 대신 가격대에 맞는 립은 바로 찾아 드릴게요.', ['2만원 이하 추천해 줘', '제일 싼 립 알려 줘']);
   }
   if (has(text, ['성분', '알레르기', '알러지', '임산부', '임신', '수유', '아기', '피부과', '부작용', '터졌', '터져', '찢어', '상처', '피가', '물집', '염증', '헤르페스', '포진', '가려', '따가', '부었', '부어', '발진', '두드러기', '아파', '아픈'])) {
-    return reply('입술이 불편하시면 걱정되시죠. 건강이나 성분은 제가 판단할 수 없어서, 제품 성분표를 확인하시고 피부과나 약사와 상담해 보세요. 촉촉하게 발리는 립을 찾으시면 골라 드릴게요.', ['촉촉한 글로시 립 추천해 줘', '데일리로 바를 립 추천해 줘']);
+    return reply('입술이 불편하면 신경 쓰이죠. 건강이나 성분은 제가 판단할 수 없어서, 제품 성분표를 확인하시고 피부과나 약사와 상담해 보세요. 촉촉하게 발리는 립을 찾으시면 골라 드릴게요.', ['촉촉한 글로시 립 추천해 줘', '데일리로 바를 립 추천해 줘']);
   }
   // 개인정보(전화번호·이메일·주소·주민번호)는 받지 않는다: 저장·되풀이하지 않고 LLM 에도 보내지 않는다
   if (PII_RE.test(text) || has(text, ['내 번호', '전화번호', '주민번호', '주민등록', '집 주소', '계좌'])) {
@@ -189,8 +189,8 @@ const EMPATHY = {
   '화사한': ['화사하게 가 볼까요.', "Let's go bright."],
 };
 const OPENERS = [
-  ["'{s}' 쪽으로 골라 봤어요.", 'Here are picks for "{s}".'],
-  ["'{s}' 반영해서 다시 골랐어요.", 'Updated with "{s}".'],
+  ["'{s}'에 맞춰 골라 봤어요.", 'Here are picks for "{s}".'],
+  ["'{s}' 조건을 반영해 다시 골랐어요.", 'Updated with "{s}".'],
   ["'{s}' 기준으로 찾아봤어요.", 'I searched with "{s}".'],
 ];
 const CLOSERS = [
@@ -518,7 +518,7 @@ function runSearch(q, { products, base, ref, shown, toneHint }) {
   for (const label of q.situations || []) prefs.push({ ...SITUATIONS.find((s) => s.label === label), en: SITUATIONS_EN[label] });
   const toneKey = q.tone || (q.mine ? toneHint : null);
   if (toneKey && TONES[toneKey]) {
-    prefs.push({ ...TONES[toneKey], label: `${TONES[toneKey].label}${q.tone ? '' : '(립 컬러 매핑 측정)'}`,
+    prefs.push({ ...TONES[toneKey], label: q.tone ? TONES[toneKey].label : `측정한 ${TONES[toneKey].label}`,
       en: { ...TONES_EN[toneKey], label: TONES_EN[toneKey].label + (q.tone ? '' : ' (measured)') } });
   }
   for (const label of q.concerns || []) prefs.push({ ...CONCERNS.find((x) => x.label === label), en: CONCERNS_EN[label] });
@@ -616,8 +616,8 @@ function compareLines(items) {
   else {
     // 같은 가격이 여럿이면 모두 말한다 (예: "리플 01 코랄 비치·리플 02 핑크 소다가 9,900원으로")
     const names = (price) => items.filter((p) => p.price === price).map(shortOf).join(L('·', ' / '));
-    lines.push(L(`가장 저렴한 건 ${names(byPrice[0].price)}(${won(byPrice[0].price)}), 가장 비싼 건 ${names(byPrice.at(-1).price)}(${won(byPrice.at(-1).price)})이에요.`,
-      `The cheapest is ${names(byPrice[0].price)} (${won(byPrice[0].price)}) and the priciest is ${names(byPrice.at(-1).price)} (${won(byPrice.at(-1).price)}).`));
+    lines.push(L(`가장 저렴한 건 ${names(byPrice[0].price)}, ${won(byPrice[0].price)}이에요. 가장 비싼 건 ${names(byPrice.at(-1).price)}, ${won(byPrice.at(-1).price)}이에요.`,
+      `The cheapest is ${names(byPrice[0].price)} at ${won(byPrice[0].price)}, and the priciest is ${names(byPrice.at(-1).price)} at ${won(byPrice.at(-1).price)}.`));
   }
   // 색 차이: 가장 비슷한 두 개를 기준으로 말한다
   let best = null;
@@ -647,18 +647,23 @@ function compareLines(items) {
   return lines.join(' ');
 }
 
-export function resultSuggestions(products, q, hasMore) {
-  const mostlyGlossy = products.filter((p) => p.finish === 'glossy').length * 2 > products.length;
+// 추천 뒤 빠른 답장 (2026-11-11 다시 짬): 손님이 다음에 하고 싶은 '방향 바꾸기'를 짧은 말로, 최대 4개.
+//  ① 색 방향(기준 색이 있을 때만: 밝게 ↔ 진하게) ② 제형 바꾸기(지금 많은 쪽의 반대) ③ 가격 낮추기(가격 조건이 없을 때)
+//  ④ 다른 거 더 보기(더 있으면) 또는 1번·2번 비교. 자리가 남으면 1번 자세히. 모두 규칙 챗봇이 알아듣는 말인지 확인했다
+export function resultSuggestions(products, q, hasMore, hasRef = false) {
+  if (!products.length) return startSuggestions();
+  const glossy = q.finish === 'glossy' || products.filter((p) => p.finish === 'glossy').length * 2 > products.length;
   const out = [];
-  if (products.length) out.push(L('첫 번째 거 자세히 알려 줘', 'Tell me more about the first one'));
-  if (products.length >= 2) out.push(L('그중에 제일 싼 거는?', 'Which is the cheapest of those?'));
-  if (hasMore) out.push(L('더 보여 줘', 'Show more'));
-  if (products.length >= 2) out.push(L('첫 번째랑 두 번째 비교해 줘', 'Compare the first and second'));
-  if (products.length) out.push(q.finish === 'glossy' || mostlyGlossy ? L('매트한 걸로 바꿔 줘', 'Switch to matte') : L('글로시한 걸로 바꿔 줘', 'Switch to glossy'));
-  return out.slice(0, 5);
+  if (hasRef) out.push(q.lightness === 'lighter' ? L('더 진한 색', 'A deeper shade') : L('더 밝은 색', 'A lighter shade'));
+  out.push(glossy ? L('보송한 매트로', 'Switch to matte') : L('촉촉한 글로시로', 'Switch to glossy'));
+  if (!q.maxPrice && !q.minPrice && !q.price) out.push(L('더 저렴한 걸로', 'Something cheaper'));
+  if (hasMore) out.push(L('다른 거 더 보여 줘', 'Show more'));
+  else if (products.length >= 2) out.push(L('1번이랑 2번 비교', 'Compare the first and second'));
+  if (out.length < 4) out.push(L('1번 자세히', 'Tell me more about the first one'));
+  return out.slice(0, 4);
 }
 
-const START_SUGGESTIONS_KO = ['데일리로 바를 립 추천해 줘', '데이트 립 추천해 줘', '입술이 건조한데 뭐가 좋아?', '2만원 이하 글로시한 코랄 추천해 줘'];
+const START_SUGGESTIONS_KO = ['데일리 립 추천해 줘', '데이트 립 추천해 줘', '입술이 건조해요', '내 톤에 맞는 립'];
 // 처음 질문 추천 (지금 답하는 언어로)
 const startSuggestions = () => (EN ? START_SUGGESTIONS_EN : START_SUGGESTIONS_KO);
 
@@ -774,7 +779,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       return out({
         reply: L(`${josa(shortOf(p), '을', '를')} 기준 제품으로 정했어요. "더 저렴한 거", "비슷한 색"처럼 물어보세요.`, `${shortOf(p)} is now the base product. Try asking "something cheaper" or "similar colors".`),
         action: { type: 'setBase', id: p.id },
-        suggestions: L(['비슷한 색상 찾아 줘', '더 저렴한 제품 추천해 줘', '더 밝은 색 추천해 줘'], ['Find similar colors', 'Something cheaper', 'A lighter shade']),
+        suggestions: L(['비슷한 색 더 보기', '더 저렴한 걸로', '더 밝은 색'], ['Find similar colors', 'Something cheaper', 'A lighter shade']),
       });
     }
     const parts = [];
@@ -784,9 +789,10 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
         ? L(`${josa(shortOf(p), '은', '는')} ${finL(p.finish)} 제형이에요.`, `${shortOf(p)} has a ${finL(p.finish).toLowerCase()} finish.`)
         : L(`${josa(shortOf(p), '은', '는')} 제형 정보가 없어요. 상세 페이지에서 확인해 주세요.`, `There is no finish info for ${shortOf(p)}. Please check the details page.`));
     } else {
-      // 설명(description)은 한국어로만 수집돼 영어 답에는 넣지 않는다
-      parts.push(`${nameOf(p)} · ${p.finish ? `${finL(p.finish)} · ` : ''}${won(p.price)}.`, EN ? '' : p.description,
-        p.color_options ? L(`${p.color_options}가지 색 중 대표색 기준이에요.`, `Shown in the representative shade of ${p.color_options}.`) : '');
+      // 설명(description)은 한국어로만 수집돼 영어 답에는 넣지 않는다. 가운뎃점 나열 대신 문장으로 (읽기 쉽게)
+      parts.push(L(`${josa(nameOf(p), '은', '는')} ${p.finish ? `${finL(p.finish)} 제형이고, ` : ''}가격은 ${won(p.price)}이에요.`,
+        `${nameOf(p)} ${p.finish ? `has a ${finL(p.finish).toLowerCase()} finish and ` : ''}costs ${won(p.price)}.`), EN ? '' : p.description,
+        p.color_options ? L(`화면 색은 ${p.color_options}가지 색 중 대표색이에요.`, `The color shown is one of ${p.color_options} shades.`) : '');
       if (p.similarity !== undefined) parts.push(L(`${base ? '기준 제품' : '고른 색'}과 ${p.similarity}% 비슷해요.`, `${p.similarity}% similar to ${base ? 'the base product' : 'your color'}.`));
     }
     return out({
@@ -794,7 +800,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       products: [p],
       suggestions: (EN
         ? [shown.length >= 2 ? `Compare the first and ${ord(i === 0 ? 1 : i)}` : null, 'Which is the cheapest of those?', 'Show more']
-        : [shown.length >= 2 ? `첫 번째랑 ${ord(i === 0 ? 1 : i)} 비교해 줘` : null, '그중에 제일 싼 거는?', '다른 거 더 보여 줘']).filter(Boolean),
+        : [`${ord(i)} 거 기준으로 골라 줘`, shown.length >= 2 ? `첫 번째랑 ${ord(i === 0 ? 1 : i)} 비교해 줘` : null, '다른 거 더 보여 줘']).filter(Boolean),
     });
   }
 
@@ -805,10 +811,10 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
     const p = sorted[0];
     const i = shown.findIndex((x) => x.id === p.id);
     return out({
-      reply: L(`가장 ${c.superlative === 'cheapest' ? '저렴한' : '비싼'} 건 ${ord(i)} ${josa(shortOf(p), '이에요', '예요')} (${p.finish ? `${finL(p.finish)} · ` : ''}${won(p.price)}).`,
-        `The ${c.superlative === 'cheapest' ? 'cheapest' : 'priciest'} is the ${ord(i)} one, ${shortOf(p)} (${p.finish ? `${finL(p.finish)} · ` : ''}${won(p.price)}).`),
+      reply: L(`가장 ${c.superlative === 'cheapest' ? '저렴한' : '비싼'} 건 ${ord(i)} ${josa(shortOf(p), '이에요', '예요')}. 가격은 ${won(p.price)}이에요.`,
+        `The ${c.superlative === 'cheapest' ? 'cheapest' : 'priciest'} is the ${ord(i)} one, ${shortOf(p)}, at ${won(p.price)}.`),
       products: [p],
-      suggestions: L([`${ord(i)} 거 자세히 알려 줘`, '더 저렴한 걸로 더 보여 줘'], [`Tell me more about the ${ord(i)} one`, 'Show cheaper ones']),
+      suggestions: L([`${ord(i)} 거 자세히 알려 줘`, `${ord(i)} 거 기준으로 골라 줘`, '다른 거 더 보여 줘'], [`Tell me more about the ${ord(i)} one`, 'Show more']),
     });
   }
 
@@ -817,7 +823,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
     const { brand: _, ...rest } = q;
     const phrase = EN ? phraseOfEn(rest) : phraseOf(rest);
     return out({
-      reply: L(`'${c.unknownBrand}' 제품은 아직 등록되어 있지 않아요. 지금은 올리브영 립 제품 ${products.length}개(${brands.length}개 브랜드) 안에서 찾을 수 있어요.`,
+      reply: L(`'${c.unknownBrand}' 제품은 아직 등록되어 있지 않아요. 지금은 ${brands.length}개 브랜드, 올리브영 립 제품 ${products.length}개 안에서 찾을 수 있어요.`,
         `${c.unknownBrand} isn't registered yet. I can search ${products.length} OLIVE YOUNG lip products from ${new Set(products.map((p) => p.brand)).size} brands.`),
       suggestions: [phrase, ...L(['데일리로 바를 립 추천해 줘', '2만원 이하 추천해 줘'], ['Recommend an everyday lip', 'Under 20,000 won'])].filter(Boolean),
     });
@@ -831,7 +837,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       reply: (EN
         ? `${summary ? `I picked them for: ${summary}. ` : ''}${(ctx.lastReasons || []).join(' ')} ${ref ? 'They are ordered by closeness to the reference color.' : ''}`
         : `${summary ? `'${summary}' 조건으로 골랐어요. ` : ''}${(ctx.lastReasons || []).join(' ')} ${ref ? '기준 색과 가까운 순서예요.' : ''}`).replace(/\s+/g, ' ').trim(),
-      suggestions: L(['더 보여 줘', '그중에 제일 싼 거는?'], ['Show more', 'Which is the cheapest of those?']),
+      suggestions: L(['다른 거 더 보여 줘', '이 중에 제일 싼 거'], ['Show more', 'Which is the cheapest of those?']),
     });
   }
 
@@ -841,12 +847,12 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
     const r = runSearch(ctx.query, env);
     const page = r.scored.slice(offset, offset + limit);
     if (!page.length) {
-      return out({ reply: L('이 조건의 제품은 여기까지예요. 조건을 바꿔 보세요.', "That's all for these conditions. Try changing them."), suggestions: L(['글로시한 걸로 바꿔 줘', '더 저렴한 걸로', '데일리로 바를 립 추천해 줘'], ['Switch to glossy', 'Something cheaper', 'Recommend an everyday lip']) });
+      return out({ reply: L('이 조건의 제품은 여기까지예요. 조건을 바꿔 보세요.', "That's all for these conditions. Try changing them."), suggestions: L(['촉촉한 글로시로', '더 저렴한 걸로', '데일리 립 추천해 줘'], ['Switch to glossy', 'Something cheaper', 'Recommend an everyday lip']) });
     }
     return out({
-      reply: L(`다음 ${page.length}개예요 (${offset + 1}~${offset + page.length} / 전체 ${r.scored.length}개).`, `Here are ${page.length} more (${offset + 1}-${offset + page.length} of ${r.scored.length}).`),
+      reply: L(`다음 ${page.length}개예요. 전체 ${r.scored.length}개 중 ${offset + 1}~${offset + page.length}번째예요.`, `Here are ${page.length} more, ${offset + 1} to ${offset + page.length} of ${r.scored.length}.`),
       conditions: r.conditions, products: page, total: r.scored.length,
-      suggestions: resultSuggestions(page, ctx.query, r.scored.length > offset + limit),
+      suggestions: resultSuggestions(page, ctx.query, r.scored.length > offset + limit, !!env.ref),
       context: { ...ctx, shown: page.map((p) => p.id), offset },
     });
   }
@@ -855,17 +861,17 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
   if (!isSearch && base && (c.askPrice || c.askFinish || c.askBarcode || c.askInfo)) {
     const parts = [];
     if (c.askPrice) parts.push(L(`${josa(shortOf(base), '은', '는')} ${won(base.price)}이에요.`, `${shortOf(base)} is ${won(base.price)}.`));
-    if (c.askFinish) parts.push(base.finish ? L(`제형은 ${finL(base.finish)}이에요.`, `The finish is ${finL(base.finish).toLowerCase()}.`) : L('제형 정보는 수집되지 않았어요.', 'There is no finish info for it.'));
+    if (c.askFinish) parts.push(base.finish ? L(`제형은 ${finL(base.finish)}이에요.`, `The finish is ${finL(base.finish).toLowerCase()}.`) : L('이 제품은 제형 정보가 없어요.', 'There is no finish info for it.'));
     if (c.askBarcode) parts.push(base.barcode ? L(`바코드 번호는 ${base.barcode}예요.`, `The barcode is ${base.barcode}.`) : L('이 제품은 바코드 정보가 없어요.', 'There is no barcode info for this product.'));
     if (c.askInfo) parts.push(L(`${josa(nameOf(base), '이에요', '예요')}.`, `This is ${nameOf(base)}.`), EN ? '' : base.description);
-    return out({ reply: parts.filter(Boolean).join(' '), suggestions: L(['비슷한 색상 찾아 줘', '더 저렴한 제품 추천해 줘', '더 밝은 색 추천해 줘'], ['Find similar colors', 'Something cheaper', 'A lighter shade']) });
+    return out({ reply: parts.filter(Boolean).join(' '), suggestions: L(['비슷한 색 더 보기', '더 저렴한 걸로', '더 밝은 색'], ['Find similar colors', 'Something cheaper', 'A lighter shade']) });
   }
 
   // ---------- 나에게 어울리는 립 (퍼스널 톤을 모를 때는 되묻는다) ----------
   if (c.mine && !c.tone && !toneHint && !q.families) {
     return out({
-      reply: L('퍼스널 톤을 알려 주세요. 웜톤·쿨톤을 말하거나, 팔레트의 "내 톤으로 추천받기"로 재 볼 수 있어요.', 'Tell me your personal tone: warm or cool. You can also measure it with "Find my tone" on the palette.'),
-      suggestions: L(['웜톤이야, 추천해 줘', '쿨톤이야, 추천해 줘', '봄 웜 립 추천해 줘', '겨울 쿨 립 추천해 줘'], ['I have a warm tone', 'I have a cool tone', 'Spring warm lips', 'Winter cool lips']),
+      reply: L('퍼스널 톤을 알려 주세요. 웜톤인지 쿨톤인지 말씀하시거나, 팔레트의 "내 톤으로 추천받기"로 톤을 재 볼 수도 있어요.', 'Tell me your personal tone: warm or cool. You can also measure it with "Find my tone" on the palette.'),
+      suggestions: L(['웜톤이에요', '쿨톤이에요', '봄 웜', '겨울 쿨', '잘 모르겠어요'], ['I have a warm tone', 'I have a cool tone', 'Spring warm lips', 'Winter cool lips', 'Not sure']),
     });
   }
 
@@ -879,19 +885,19 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
   }
   if (!isSearch && !bridge) {
     const small = EN ? {
-      greet: 'Hello! Tell me the color, price range or occasion (everyday, date, interview) you have in mind.',
+      greet: 'Hello! Tell me the color, feel or price range you have in mind.',
       thanks: 'Let me know if you need anything else.',
       bye: 'Have a lovely day!',
-      identity: "I'm Took, took's AI assistant. I'm not a person, and I'm not an external AI: I find matching lip products from the registered list using set rules.",
+      identity: "I'm Took, an AI assistant that helps you find lip colors. I'm not a person. I pick matching lips from the registered products using set rules.",
       help: 'For example: "a glossy coral under 20,000 won", "lips for an interview", "cool tone lips", "my lips are dry". After that, try "the cheapest of those", "tell me about the second one", "show more" or "no matte".',
       like: 'I can also find other colors or price ranges.',
-      dislike: 'Oh, not quite right? Tell me what fell short (color, price or finish) and I will pick again.',
+      dislike: 'Oh, not quite right? Tell me what fell short, like the color, price or finish, and I will pick again.',
     }[c.small] : {
-      greet: '안녕하세요. 찾는 색, 가격대, 바를 자리(데일리·데이트·면접)를 말씀해 주세요.',
+      greet: '안녕하세요. 찾는 색이나 원하는 느낌, 가격대를 말씀해 주세요.',
       thanks: '더 필요한 게 있으면 말씀해 주세요.',
       bye: '좋은 하루 보내세요.',
-      identity: 'took AI 도우미 툭이에요. 사람이 아니고, 외부 AI 가 아니라 등록된 립 제품에서 조건에 맞는 걸 정해진 규칙으로 찾아요.',
-      help: '예: "2만원 이하 글로시한 코랄", "면접 립", "쿨톤 립", "입술이 건조해". 추천 뒤엔 "그중 제일 싼 거", "두 번째 거 자세히", "더 보여 줘", "매트 말고"도 돼요.',
+      identity: '립 색을 같이 찾아 드리는 AI 도우미 툭이에요. 사람이 아니고, 외부 AI 없이 등록된 립 제품 중에서 정해진 규칙으로 조건에 맞는 걸 찾아 드려요.',
+      help: '예: "2만원 이하 글로시한 코랄", "면접 립", "쿨톤 립", "입술이 건조해". 추천 뒤엔 "그중 제일 싼 거", "두 번째 거 자세히", "더 보여 줘", "매트 말고"처럼 물어봐도 돼요.',
       like: '다른 색이나 가격대도 찾아 드릴 수 있어요.',
       dislike: '앗, 마음에 안 드셨군요. 색, 가격, 제형 중 어떤 게 아쉬웠는지 말씀해 주시면 다시 골라 볼게요.',
     }[c.small];
@@ -944,28 +950,24 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
     reply = EN
       ? `No products match ${summary ? `"${summary}"` : 'that'}. ${hint ? hint.text : 'Try asking with fewer conditions.'}`
       : `${summary ? `'${summary}' 조건에 ` : ''}맞는 제품이 없어요. ${hint ? hint.text : '조건을 줄여서 다시 물어봐 주세요.'}`;
-    suggestions = [hint?.phrase, ...L(['데일리로 바를 립 추천해 줘', '2만원 이하 추천해 줘'], ['Recommend an everyday lip', 'Under 20,000 won'])].filter(Boolean);
+    suggestions = [hint?.phrase, ...L(['데일리 립 추천해 줘', '2만원 이하로'], ['Recommend an everyday lip', 'Under 20,000 won'])].filter(Boolean);
   } else {
     // 말투: 인사·감탄과 "몇 개 찾았어요" 같은 보고 없이, 첫 문장에 가장 추천하는 제품과 핵심 정보(제형·가격·유사도)를 둔다.
     // 이유는 한 문장만. 개수는 목록과 '더 보여 줘'가 대신 보여 준다
     const top = page[0];
+    // 말풍선엔 괄호를 쓰지 않는다 (2026-11-11): 제형·가격은 제품 카드에 있고, 유사도만 한 문장으로 덧붙인다. 가격을 물으면 따로 답한다
     reply = (EN
-      ? `My top pick is ${shortOf(top)} (${top.finish ? `${finL(top.finish)} · ` : ''}${won(top.price)}`
-        + (top.similarity !== undefined ? ` · ${top.similarity}% similar to ${base ? 'the base product' : 'your color'}).` : ').')
-      : `${josa(shortOf(top), '을', '를')} 가장 추천해요 (${top.finish ? `${finL(top.finish)} · ` : ''}${won(top.price)}`
-        + (top.similarity !== undefined ? ` · ${base ? '기준 제품' : '고른 색'}과 ${top.similarity}% 비슷).` : ').'))
+      ? `My top pick is ${shortOf(top)}.` + (top.similarity !== undefined ? ` It's ${top.similarity}% similar to ${base ? 'the base product' : 'your color'}.` : '')
+      : `가장 추천하는 건 ${josa(shortOf(top), '이에요', '예요')}.` + (top.similarity !== undefined ? ` ${base ? '기준 제품' : '고른 색'}과 ${top.similarity}% 비슷해요.` : ''))
       + (r.reasons.length ? ' ' + r.reasons[0] : '')
       + (r.tips.length ? ' ' + r.tips[0] : '')
       + (r.notes.length ? ' ' + r.notes.join(' ') : '');
-    suggestions = resultSuggestions(page, query, total > limit);
-    // 여는 말·마무리 말: 되묻는 이음말(bridge)이 없을 때만. 이유·팁·안내가 붙은 답은 이미 길어서 마무리 말은 생략 (휴대폰 한 화면 2~3문장)
+    suggestions = resultSuggestions(page, query, total > limit, !!env.ref);
+    // 여는 말: 되묻는 이음말(bridge)이 없을 때만.
+    // 마무리 말("더 밝은 쪽도 볼까요?" 등)은 2026-11-11 뺐다: 같은 제안을 빠른 답장 버튼이 하므로 글만 길어졌다 (closerFor 는 남겨 둔다)
     if (!bridge) {
       const open = openerFor(q, env, ctx, !!(c.mine && toneHint));
       if (open) { reply = `${open} ${reply}`; nextCtx.lastOpener = open; }
-      if (!r.reasons.length && !r.tips.length && !r.notes.length && total > 1) {
-        const close = closerFor(query, ctx);
-        if (close) { reply = `${reply} ${EN ? close.en : close.ko}`; nextCtx.lastCloser = close.ko; }
-      }
     }
   }
   if (bridge) reply = `${bridge.ack} ${reply}`;

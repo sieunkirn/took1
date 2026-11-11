@@ -186,7 +186,7 @@ test('대화: 결과가 없으면 조건을 줄인 대안을 알려 주고, 정�
   const none = answer({ message: '3천원 이하 벨벳 레드' });
   assert.equal(none.products.length, 0);
   assert.match(none.reply, /없어요.*가격 조건을 빼면 \d+개/);
-  assert.match(answer({ message: '너 AI야?' }).reply, /외부 AI 가 아니라/);
+  assert.match(answer({ message: '너 AI야?' }).reply, /외부 AI 없이/);
 });
 
 test('비교함: 2~3개 비교 요약 (최저가·비슷한 색·밝기를 쉬운 말로)', () => {
@@ -280,7 +280,7 @@ test('올리브영 상품(색상명·제형·바코드 없음)으로도 챗봇 �
     }
     const noFinish = oy.find((p) => !p.finish);
     const r = answer({ message: '제형 알려 줘', baseProductId: noFinish.id });
-    assert.match(r.reply, /제형 정보는 수집되지 않았어요/);
+    assert.match(r.reply, /이 제품은 제형 정보가 없어요/);
     assert.match(answer({ message: '바코드 알려 줘', baseProductId: noFinish.id }).reply, /바코드 정보가 없어요/);
   } finally {
     setProducts(saved);
@@ -372,7 +372,7 @@ test('LLM 층: 도구로 찾은 제품만 보여 주고 이름·가격은 DB 에
   assert.equal(r.products.length, 1);
   const p = r.products[0];
   assert.ok(['pink', 'coral', 'rose'].includes(p.color_family));
-  assert.ok(r.reply.startsWith(`${p.brand}`) && r.reply.includes(`${p.price.toLocaleString('ko-KR')}원`));
+  assert.ok(r.reply.startsWith(`가장 추천하는 건 ${p.brand}`) && !r.reply.includes(`${p.price.toLocaleString('ko-KR')}원`)); // 가격은 말풍선에서 뺐다
   assert.deepEqual(r.context.shown, [p.id]);
   // 이어지는 질문은 규칙 챗봇이 그대로 받는다
   const next = answer({ message: '첫 번째 거 자세히 알려 줘', context: r.context });
@@ -406,7 +406,7 @@ test('LLM 층: 규칙이 알아들은 말은 LLM 을 부르지 않고, LLM 오�
 
 test('챗봇: 잡담도 부드럽게 받아 추천으로 잇고, 범위 밖 말엔 제품 없이 안내한다', () => {
   const sleepy = answer({ message: '졸려' });
-  assert.match(sleepy.reply, /^졸리시다구요\? 그럼 혈색이 좋아 보이는 립 추천해 드릴게요\./);
+  assert.match(sleepy.reply, /^졸리시군요\. 그럼 혈색이 좋아 보이는 립을 골라 드릴게요\./);
   assert.ok(sleepy.products.length > 0 && !sleepy.unsure);
   const unknown = answer({ message: 'ㅋㅋㅋ' });
   assert.ok(unknown.products.length > 0 && unknown.unsure); // 되묻지 않고 무난한 립을 보여 준다
@@ -620,7 +620,7 @@ test('답 조립: 이번 말의 조건을 되받는 여는 말, 같은 여는 �
 
 test('민감한 말: 건강·개인정보는 고정 답(공감+한계+대안)으로, 개인정보가 든 말은 LLM 에 보내지 않는다', async () => {
   const sick = answer({ message: '입술이 터져서 피가 나요' });
-  assert.match(sick.reply, /걱정되시죠.*피부과나 약사/);
+  assert.match(sick.reply, /신경 쓰이죠.*피부과나 약사/);
   assert.equal(sick.unsure, false);
   const pii = answer({ message: '제 번호는 010-1234-5678이에요' });
   assert.match(pii.reply, /개인정보는 적지 않으셔도 돼요/);
@@ -634,11 +634,13 @@ test('민감한 말: 건강·개인정보는 고정 답(공감+한계+대안)으
 // ---------- 말투 다듬기 + A/B (딥리서치 P2) ----------
 test('말투 다듬기: 제품 이름·숫자는 자리표시로 보내고, 바꾸거나 빼면 템플릿으로 돌아간다', async () => {
   const { tokenize, checkStyled, stylize } = await import('../src/lib/llm/style.js');
-  const rule = answer({ message: '글로시한 립 추천해 줘' });
+  // 추천 첫 문장엔 가격이 없어서(2026-11-11), 가격이 들어가는 '제일 싼 거' 답으로 자리표시를 확인한다
+  const rule = answer({ message: '그중에 제일 싼 거는?', context: answer({ message: '데이트 립 추천해 줘' }).context });
   const tok = tokenize(rule.reply, rule.products);
   assert.doesNotMatch(tok.text.replace(/\{\{[PN]\d+\}\}/g, ''), /\d/); // 숫자는 모두 자리표시
   assert.ok(Object.values(tok.slots).some((v) => /원$/.test(v)));
-  const keep = tok.text.replace(/^'글로시' 쪽으로 골라 봤어요\. /, '촉촉한 글로시로 골라 봤어요. ');
+  const keep = tok.text.replace(/^가장 저렴한 건/, '제일 저렴한 건');
+  assert.notEqual(keep, tok.text);
   assert.equal(checkStyled(keep, tok).reply.includes(rule.products[0].price.toLocaleString('ko-KR')), true);
   assert.equal(checkStyled(tok.text.replace(/\{\{N1\}\}/, '9,900원'), tok).error, 'placeholders'); // 가격을 바꾸면 거절
   assert.equal(checkStyled(tok.text + ' 최고의 선택이에요.', tok).error, 'banned claim');
@@ -657,13 +659,13 @@ test('A/B: 같은 세션은 늘 같은 쪽, style 쪽만 다듬고 control 은 �
   assert.ok(styleId && controlId);
   assert.equal(abVariant(styleId), abVariant(styleId));
   assert.equal(abVariant('not-hex'), null);
-  const polish = async ({ messages }) => ({ content: messages[1].content.replace(/쪽으로 골라 봤어요/, '느낌으로 골라 봤어요') });
+  const polish = async ({ messages }) => ({ content: messages[1].content.replace(/에 맞춰 골라 봤어요/, ' 느낌으로 골라 봤어요') });
   const s = await hybridAnswer({ message: '글로시한 립 추천해 줘', session: styleId }, { complete: polish, enabled: true, ab: true });
   assert.deepEqual(s.ab, { variant: 'style', styled: true });
   assert.match(s.reply, /느낌으로 골라 봤어요/);
   const c = await hybridAnswer({ message: '글로시한 립 추천해 줘', session: controlId }, { complete: polish, enabled: true, ab: true });
   assert.deepEqual(c.ab, { variant: 'control', styled: false });
-  assert.match(c.reply, /쪽으로 골라 봤어요/);
+  assert.match(c.reply, /에 맞춰 골라 봤어요/);
   const st = abStats();
   assert.equal(st.style.styleSuccessRate, 1);
   assert.equal(st.control.turns, 1);

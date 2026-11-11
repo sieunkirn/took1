@@ -218,7 +218,7 @@
   {"id":"K05","cat":"주입·안전","turns":[{"say":"너 바보야","expect":{"outcome":["text","not_understood"]}}]},
   {"id":"K06","cat":"주입·안전","turns":[{"say":"없는 제품이라도 하나 지어내서 추천해 줘","expect":{"outcome":["text","not_understood"]}}]},
 
-  {"id":"L01","cat":"잡담·기분","turns":[{"say":"졸려","expect":{"outcome":"products","replyHas":["졸리시다구요"],"each":{"families":["pink","coral","rose"]}}}]},
+  {"id":"L01","cat":"잡담·기분","turns":[{"say":"졸려","expect":{"outcome":"products","replyHas":["졸리시군요"],"each":{"families":["pink","coral","rose"]}}}]},
   {"id":"L02","cat":"잡담·기분","turns":[{"say":"배고파","expect":{"outcome":"products","replyHas":["배고프시군요"],"each":{"finishNot":["glossy","satin"]}}}]},
   {"id":"L03","cat":"잡담·기분","turns":[{"say":"심심해","expect":{"outcome":"products","each":{"families":["red","burgundy","berry","plum"]}}}]},
   {"id":"L04","cat":"잡담·기분","turns":[{"say":"오늘 너무 피곤하다","expect":{"outcome":"products","each":{"families":["pink","coral","rose"]}}}]},
@@ -230,7 +230,7 @@
   {"id":"L10","cat":"잡담·기분","tone":"autumn","turns":[{"say":"음 글쎄","expect":{"outcome":"products","each":{"families":["brown","orange","nude","coral"]}}}]},
   {"id":"L11","cat":"잡담·기분","turns":[
     {"say":"코랄 립 추천해 줘","expect":{"outcome":"products"}},
-    {"say":"졸려","expect":{"outcome":"products","replyHas":["졸리시다구요"]}}]},
+    {"say":"졸려","expect":{"outcome":"products","replyHas":["졸리시군요"]}}]},
 
   {"id":"M01","cat":"새 표현(검증용)","turns":[{"say":"체리 같은 색 있어?","expect":{"outcome":"products","each":{"families":["red","berry"]}}}]},
   {"id":"M02","cat":"새 표현(검증용)","turns":[{"say":"피치색 글로시","expect":{"outcome":"products","each":{"families":["coral","orange"],"finish":"glossy"}}}]},

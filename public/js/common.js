@@ -1,6 +1,7 @@
 // 공통 모듈: API 호출, 페이지 간 상태(sessionStorage), 제품 카드 렌더링, 공통 네비게이션
 import { FINISH_LABELS, FAMILY_LABELS, finishLabel } from '../lib/constants.js';
 import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
+import { shelfAction } from './shelf.js'; // 추천 카드의 '매대 위치' (테스트 매대 데이터)
 import { toast, skeletonCards } from './motion.js'; // 화면 움직임(모든 화면 공통)
 import { t, isEn, languageMenu, themeToggle, applyI18n, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js'; // 화면 언어
 
@@ -255,9 +256,7 @@ export function productCard(product, { extraActions = [] } = {}) {
   const rows = [
     [t('card.brand'), brandOf(product)],
     [t('card.name'), nameOf(product)],
-    // 색상값 옆에 실제 색 견본 (무채색 규칙의 예외: 제품 색 표시)
-    [t('card.color'), [el('span', { class: 'color-dot', style: `background:${product.color_hex}`, 'aria-hidden': 'true' }), product.color_hex]],
-    [t('card.finish'), finishName(product.finish)],
+    // 색상값·제형 줄은 2026-11-11 카드에서 뺐다 (색은 제품 사진, 자세한 값은 제품 상세에서 본다)
     // 가격 숫자는 카드가 나타날 때 0에서 올라간다 (motion.js)
     [t('card.price'), Number.isFinite(Number(product.price)) && product.price !== null
       ? [el('span', { 'data-count': String(product.price), text: won(product.price) })]
@@ -276,7 +275,7 @@ export function productCard(product, { extraActions = [] } = {}) {
     image,
     el('dl', {}, rows.flatMap(([k, v]) => [el('dt', { text: k }), Array.isArray(v) ? el('dd', {}, ...v) : el('dd', { text: v })])),
     el('div', { class: 'actions' },
-      storeLink(product),
+      shelfAction(product), // '올리브영에서 보기' 대신 매대 위치 (2026-11-11, js/shelf.js)
       ...extraActions),
   );
 }

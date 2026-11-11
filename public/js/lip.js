@@ -228,7 +228,7 @@ function applyLook() {
   for (const b of $('textures').children) b.setAttribute('aria-pressed', String(b.dataset.texture === state.texture));
   $('intensity').value = state.intensity;
   $('intensity-out').textContent = state.intensity + '%';
-  $('color-name').textContent = tr('lip.selected', { hex: state.hex, texture: tr('texture.' + state.texture) });
+  // 선택한 컬러(색상값·텍스처) 문구는 2026-11-11 화면에서 뺐다
   store.set('lipDisplay', { texture: state.texture, intensity: state.intensity });
   syncMixSliders();
   window.tookLipHex = state.hex; // 합본 화면에서 챗봇이 늦게 로드돼도 현재 색을 알 수 있게
@@ -325,7 +325,7 @@ function finishMatch() {
     + tr(PALETTE ? 'lip.matchPalette' : 'lip.matchApplied');
   // 측정값: 기준값 조정에 쓸 수 있도록 그대로 보여준다
   const m = tone.metrics, T = TONE_THRESHOLDS;
-  $('match-metrics').textContent = [
+  if ($('match-metrics')) $('match-metrics').textContent = [
     tr('lip.mHue', { v: m.hue.toFixed(1), t: T.warmHue }),
     tr('lip.mLight', { v: m.L.toFixed(1), t: T.lightL }),
     m.contrast === null ? tr('lip.mNoContrast') : tr('lip.mContrast', { v: m.contrast.toFixed(1), t: T.contrast }),
@@ -339,7 +339,7 @@ function finishMatch() {
 
 $('match')?.addEventListener('click', () => {
   $('match-result').textContent = '';
-  $('match-metrics').textContent = '';
+  if ($('match-metrics')) $('match-metrics').textContent = '';
   state.analyze = { samples: [], started: performance.now() };
   $('match').disabled = true;
 });
@@ -410,7 +410,7 @@ if ($('match-result') && savedMatch?.picks?.length) {
   showMatchPicks(savedMatch.picks);
 }
 applyLook();
-setPlaceholder(false, tr('lip.chooseMode'));
+setPlaceholder(false, ''); // 테스트 방식 안내 문구는 뺐다 (위 두 버튼으로 고른다)
 setGuide('');
 // 제품 상세에서 돌아오면 보던 추천 목록을 다시 연다
 const savedInline = INLINE && store.get('lipInlineRec');
