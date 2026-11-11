@@ -22,8 +22,9 @@ mkdirSync(join(out, 'lib'));
 for (const f of BROWSER_LIBS) cpSync(join(root, 'src/lib', f), join(out, 'lib', f));
 mkdirSync(join(out, 'data'));
 // 서버와 같은 데이터(기본: 올리브영, TOOK_DATA=virtual 이면 가상)를 정적 버전에 넣는다
-const { dataFile } = await import('../src/lib/repository.js');
+const { dataFile, DEMO_FILE } = await import('../src/lib/repository.js');
 cpSync(fileURLToPath(dataFile()), join(out, 'data/products.json'));
+cpSync(fileURLToPath(DEMO_FILE), join(out, 'data/products.demo.json'));
 
 // 모델(.task)은 정적 호스팅에서 제공되지 않는 형식이라 base64 텍스트로 바꿔 넣는다
 const model = join(out, 'vendor/mediapipe/face_landmarker.task');

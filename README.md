@@ -75,6 +75,7 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 |---|---|---|---|
 | 올리브영 수집 데이터 (기본) | `src/data/products.oliveyoung.json` | 285 (크롤링c, 전부 대표 색상값·이미지 있음) | 서버·정적 버전 |
 | 시연·테스트용 가상 데이터 | `src/data/products.json` | 27 (바코드 있음) | 단위·e2e 테스트, `TOOK_DATA=virtual` 로 서버를 켜면 화면에서도 사용 |
+| 시연용 호수·재고 데이터 | `src/data/products.demo.json` | 42 (가상 제품 11종, 호수·바코드·재고·다른 매장) | 호수 안내(`shades.html`). 화면에 '테스트 데이터'로 표시. 이름·바코드로 찾지만 추천 목록에는 섞이지 않음 |
 
 올리브영 데이터 변환 규칙 (`scripts/import-oliveyoung.js`, 수집하지 않은 정보는 지어내지 않음)
 - 브랜드: 상품명 첫 단어 / 제품명: 홍보 문구([NEW/…], (+…증정), 단품/기획, N colors 등)를 뺀 이름 / `color_options`: "12 colors" 의 색상 수
@@ -118,8 +119,15 @@ public/css/wireframe.css 무채색 토스풍 스타일 (회색 바탕·흰 카�
 | GET | `/api/products?finish=` | 전체 제품 |
 | GET | `/api/products/:id` | 제품 상세 (없으면 404) |
 | GET | `/api/products/barcode/:code` | 바코드 검색 → `{found, product}` (형식 오류 400) |
+| GET | `/api/demo-products` | 시연용 호수·재고 데이터 |
 | GET | `/api/recommend?hex=&finish=&limit=&exclude=` | 색차(ΔE2000) 오름차순 추천 |
 | POST | `/api/chat` `{message, baseProductId?, selectedHex?}` | 규칙 기반 응답 + 제품 목록 |
+
+## 호수 안내 (`shades.html`)
+챗봇에 제품 이름을 말하면 그 제품 카드에 '색상 보기'가 붙는다 → 호수 동그라미 전체 → 누르면 호수·색 이름·설명 → '발라 보기'로 입술에 입히고 다른 색을 눌러 비교 → 고른 호수의 재고 수량이 함께 보인다(매대 위치 안내는 2026-11-11 삭제). 호수 데이터가 있는 시연용 제품만 열린다.
+
+## 바코드로 찾기
+2026-11-11 삭제(화면 `find.html`·메뉴). 복구는 git 기록에서.
 
 ## 합본 화면 (`studio.html`, 상단 탭 '합본')
 왼쪽에는 립 매핑 카메라가 항상 켜져 있고, 오른쪽 탭에서 **색 조제 · 챗봇 · 추천 · 바코드**를 한 화면에서 쓴다.

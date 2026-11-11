@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>took(툭) - 호수 안내</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<script>
+  try { if (localStorage.getItem('took.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* 저장 불가 환경 */ }
+</script>
+</head>
+<!-- 호수 안내: 한 제품의 모든 호수를 색 동그라미로 펼치고(shades.js), 누르면 설명, '발라 보기'를 누르면 입술에 입힌다(lip.js).
+     처음에는 카메라 구역을 숨기고, 발라 보기를 누른 뒤에 연다 -->
+<body data-layout="shades" class="sh-body">
+<main class="sh-page" id="sh-page">
+  <div id="sh-head" class="sh-head"></div>
+
+  <section class="sh-try hidden" id="sh-try" aria-label="입술에 발라 보기">
+    <div class="stage">
+      <div class="placeholder loading" id="placeholder" style="position:absolute;inset:0"><div class="spinner" aria-hidden="true"></div><p id="placeholder-text"></p></div>
+      <canvas id="view" class="hidden"></canvas>
+      <video id="video" class="hidden" playsinline muted></video>
+    </div>
+    <p id="guide" class="muted small" aria-live="polite"></p>
+    <div id="error" class="msg hidden" role="alert"></div>
+    <div class="row"><button type="button" id="cam-retry" class="hidden">카메라 다시 연결</button></div>
+    <!-- lip.js 가 쓰는 텍스처·농도. 텍스처는 제품 제형을 따르므로 손님에게 보여 주지 않는다 -->
+    <div class="hidden">
+      <div id="textures"></div>
+      <input type="range" id="intensity" min="0" max="100" step="1" aria-label="농도"><output id="intensity-out"></output>
+    </div>
+  </section>
+
+  <div id="sh-grid" class="sh-grid" role="group"></div>
+  <div id="sh-detail" class="sh-detail hidden" aria-live="polite"></div>
+</main>
+<script type="module" src="js/lip.js"></script>
+<script type="module" src="js/shades.js"></script>
+</body>
+</html>

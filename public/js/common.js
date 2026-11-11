@@ -1,7 +1,6 @@
 // 공통 모듈: API 호출, 페이지 간 상태(sessionStorage), 제품 카드 렌더링, 공통 네비게이션
 import { FINISH_LABELS, FAMILY_LABELS, finishLabel } from '../lib/constants.js';
 import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
-import { shelfAction } from './shelf.js'; // 추천 카드의 '매대 위치' (테스트 매대 데이터)
 import { toast, skeletonCards } from './motion.js'; // 화면 움직임(모든 화면 공통)
 import { t, isEn, languageMenu, themeToggle, applyI18n, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js'; // 화면 언어
 
@@ -25,73 +24,61 @@ export function storeLink(p, text = t('card.store')) {
 // 빌드 스크립트(scripts/build-static.js)가 <meta name="took-mode" content="static"> 을 넣는다.
 export const STATIC = !!document.querySelector('meta[name="took-mode"][content="static"]');
 
-// ---------- 노트북·가로 화면: 갤럭시탭 세로 크기 틀로만 보기 ----------
-// 키오스크는 갤럭시탭 S10 FE+ 를 세워 쓴다. 노트북처럼 넓은 가로 화면에서 열면 화면을 가로로 꽉 채우지 않고,
-// 세로 미리보기(portrait.html)의 탭 크기 틀(800×1280 을 창 높이에 맞춤) 안에 지금 화면을 띄운다.
-// - 상단 '가로로 보기' 버튼(ORIENT_BUTTON, 지금은 숨김)을 누르면 이번 탭 세션 동안은 가로로 (sessionStorage took.landscape, 자동 초기화 때 지워진다)
-// - 휴대폰용·직원 도구 화면과 자동 테스트(navigator.webdriver)는 그대로
-// 손님 휴대폰: 팔레트의 '휴대폰으로 가져가기' QR(?take=1)로 연 화면. 키오스크가 아니므로
-//   자동 초기화를 하지 않고, 상단 메뉴는 로고·다크 모드·언어만 남긴 휴대폰용으로 그린다 (html.phone-mode, css 휴대폰 챗봇).
-//   표시는 창 이름(window.name = 'took-phone')에 둔다: 그 탭(창)에서 새로고침·이동해도 유지되고, 노트북 미리보기(portrait.html)의
-//   스마트폰 프레임(<iframe name="took-phone">)도 같은 표시가 된다. 저장값은 tookPhone.* 로 따로 둬서
-//   같은 브라우저 탭 안의 태블릿 화면(took.*, 자동 초기화로 지워짐)과 섞이지 않는다
-// 주소 값: ?쿼리 → 없으면 #조각. 팔레트 QR 은 결과(색·제형·농도·톤·제품 ID)를 #조각에 담는다:
-// #조각은 서버로 보내지지 않아 서버 기록·Referer 에 남지 않는다 (개인정보 최소화, 딥리서치 P0)
+// ---------- 노트북·PC: 갤럭시탭 세로 크기 틀로 보기 ----------
+// 키오스크는 스탠드형 동그란 거울 안에 갤럭시탭 S10 FE+ 를 세로로 넣어 쓴다(2026-11-11 가로에서 다시 세로로). 노트북·PC(마우스 화면)에서 열면
+// 창을 꽉 채우지 않고 세로 미리보기(preview.html)의 탭 크기 틀(800×1280 을 창에 맞춤) 안에 지금 화면을 띄운다.
+// - 터치 화면(실제 탭, pointer: coarse)·?device=tablet 으로 고정한 기기·직원 도구 화면·자동 테스트(navigator.webdriver)는 그대로
+// 주소 값: ?쿼리 → 없으면 #조각
 const HASH_PARAMS = (() => { try { return new URLSearchParams(location.hash.replace(/^#/, '')); } catch { return new URLSearchParams(); } })();
 export function urlParam(name) {
   const v = new URLSearchParams(location.search).get(name);
   return v !== null ? v : HASH_PARAMS.get(name);
 }
-// 기기 모드 (노트북 미리보기 portrait.html 의 '이 기기를 태블릿으로'·'이 기기를 휴대폰으로' 버튼, localStorage took.deviceMode):
-//   tablet = 이 기기는 매장 태블릿 화면만 (모든 화면은 세로 전용: 세로로 세우면 그대로, 가로면 세로 틀 하나만) / phone = 손님 휴대폰 화면만.
-//   주소 뒤 ?device=tablet|phone 으로도 정하고, ?device=auto 로 해제한다
+// 기기 모드 (주소 뒤 ?device=tablet, localStorage took.deviceMode):
+//   tablet = 이 기기는 매장 태블릿 그 자체 (미리보기 틀 없이 화면을 바로 그린다. 모든 화면은 세로 기준).
+//   주소 뒤 ?device=tablet 으로도 정하고, ?device=auto 로 해제한다. 손님 휴대폰 모드는 2026-11-11 없앴다
 export const DEVICE_MODE = (() => {
   try {
     const want = new URLSearchParams(location.search).get('device');
-    if (want === 'tablet' || want === 'phone') localStorage.setItem('took.deviceMode', want);
+    if (want === 'tablet') localStorage.setItem('took.deviceMode', want);
     else if (want === 'auto') localStorage.removeItem('took.deviceMode');
     const v = localStorage.getItem('took.deviceMode');
-    return v === 'tablet' || v === 'phone' ? v : null;
+    if (v && v !== 'tablet') localStorage.removeItem('took.deviceMode'); // 예전 휴대폰 모드 설정은 지운다
+    return v === 'tablet' ? v : null;
   } catch { return null; }
 })();
-export const PHONE = (() => {
-  try {
-    if (urlParam('take') === '1') window.name = 'took-phone';
-    if (DEVICE_MODE === 'phone' && window.top === window) return true; // 미리보기 틀 안의 태블릿 화면은 제외
-    return window.name === 'took-phone';
-  } catch { return false; }
-})();
-const SKEY = PHONE ? 'tookPhone.' : 'took.';
-if (PHONE) document.documentElement.classList.add('phone-mode');
+// 예전 손님 휴대폰 표시(창 이름 took-phone)와 저장값(tookPhone.*)이 남아 있으면 지운다
+try {
+  if (window.name === 'took-phone') window.name = '';
+  Object.keys(localStorage).filter((k) => k.startsWith('tookPhone.')).forEach((k) => localStorage.removeItem(k));
+} catch { /* 저장 불가 환경 */ }
+const SKEY = 'took.';
 export const TAB_FRAME = true;
 /** 이 화면을 탭 크기 틀로 옮기는 중이면 true (곧 다시 열리므로 화면마다 한 번만 할 일은 건너뛴다) */
 export let MOVING_TO_TAB_FRAME = false;
-const TAB_FRAME_SKIP = ['portrait.html', 'nfc-phone.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
-// 새로고침(F5·새로고침 버튼)하면 처음 상태로: 기기 설정(태블릿·휴대폰 고정)을 풀고, 저장한 상태(took.*·tookPhone.*)를 비우고
-// 첫 화면(시작 화면, 노트북이면 태블릿+스마트폰 미리보기)으로. 단 QR 로 들어온 손님 휴대폰(기기 고정 없이 ?take=1)은 대화를 지키려고 그대로 새로고침한다.
-// 직원 도구 화면은 그대로. 미리보기(portrait.html)는 그 화면 스크립트가 같은 일을 한다
+const TAB_FRAME_SKIP = ['preview.html', 'nfc-phone.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
+// 새로고침(F5·새로고침 버튼)하면 처음 상태로: 기기 설정(태블릿 고정)을 풀고, 저장한 상태(took.*)를 비우고
+// 첫 화면(시작 화면, 노트북이면 태블릿 미리보기)으로.
+// 직원 도구 화면은 그대로. 미리보기(preview.html)는 그 화면 스크립트가 같은 일을 한다
 (function reloadToStart() {
   const page = location.pathname.split('/').pop() || 'index.html';
   if (TAB_FRAME_SKIP.includes(page)) return;
   const nav = performance.getEntriesByType?.('navigation')?.[0];
   if (nav?.type !== 'reload') return;
-  if (window.top !== window) return; // 미리보기 틀 안의 화면은 틀(portrait.html)이 처음 상태로 되돌린다
-  if (PHONE && !DEVICE_MODE) return; // QR 손님 휴대폰
+  if (window.top !== window) return; // 미리보기 틀 안의 화면은 틀(preview.html)이 처음 상태로 되돌린다
   try { localStorage.removeItem('took.deviceMode'); } catch { /* 저장 불가 환경 */ }
   try { window.name = ''; } catch { /* 없음 */ }
-  try { Object.keys(sessionStorage).filter((k) => k.startsWith('took.') || k.startsWith('tookPhone.')).forEach((k) => sessionStorage.removeItem(k)); } catch { /* 저장 불가 환경 */ }
-  try { Object.keys(localStorage).filter((k) => k.startsWith('tookPhone.')).forEach((k) => localStorage.removeItem(k)); } catch { /* 저장 불가 환경 */ }
+  try { Object.keys(sessionStorage).filter((k) => k.startsWith('took.')).forEach((k) => sessionStorage.removeItem(k)); } catch { /* 저장 불가 환경 */ }
   if (page === 'index.html' && !DEVICE_MODE) return; // 이미 첫 화면 (아래 틀 옮기기는 그대로)
   MOVING_TO_TAB_FRAME = true; // 곧 다른 화면으로 가므로 화면마다 한 번만 할 일은 건너뛴다
   location.replace('index.html');
 })();
 (function openInTabFrame() {
   const page = location.pathname.split('/').pop() || 'index.html';
-  if (!TAB_FRAME || PHONE || window.top !== window || navigator.webdriver || TAB_FRAME_SKIP.includes(page)) return;
-  if (!matchMedia('(orientation: landscape) and (min-width: 960px)').matches) return;
-  try { if (sessionStorage.getItem('took.landscape') === '1') return; } catch { /* 저장소를 못 쓰면 틀로 */ }
+  if (!TAB_FRAME || window.top !== window || navigator.webdriver || TAB_FRAME_SKIP.includes(page) || DEVICE_MODE) return;
+  if (matchMedia('(pointer: coarse)').matches || !matchMedia('(min-width: 700px)').matches) return; // 실제 탭(터치)·작은 화면은 그대로
   MOVING_TO_TAB_FRAME = true;
-  location.replace('portrait.html?auto=1&page=' + encodeURIComponent(page + location.search));
+  location.replace('preview.html?page=' + encodeURIComponent(page + location.search));
 })();
 
 let localApi = null;
@@ -102,6 +89,7 @@ async function getLocalApi() {
         import('../lib/catalog.js'), import('../lib/recommend.js'), import('../lib/chat.js'), import('../lib/color.js'),
       ]);
       catalog.setProducts(await (await fetch(new URL('../data/products.json', import.meta.url))).json());
+      catalog.setDemoProducts(await (await fetch(new URL('../data/products.demo.json', import.meta.url))).json());
       return { catalog, rec, chat, color };
     })();
   }
@@ -119,6 +107,7 @@ async function staticApi(path, options) {
     const finish = q.get('finish');
     return ok({ products: catalog.allProducts().filter((p) => !finish || p.finish === finish) });
   }
+  if (url.pathname === '/api/demo-products') return ok({ products: catalog.allDemoProducts() });
   let m = url.pathname.match(/^\/api\/products\/barcode\/([^/]*)$/);
   if (m) {
     const code = catalog.normalizeBarcode(decodeURIComponent(m[1]));
@@ -158,19 +147,7 @@ export async function api(path, options = {}) {
 }
 
 // 페이지 이동 후에도 데이터가 유지되도록 sessionStorage 에 저장한다 (탭을 닫으면 초기화).
-// 저장 위치: 매장 태블릿은 탭 저장소(sessionStorage, 탭을 닫거나 자동 초기화하면 사라짐).
-// 손님 휴대폰은 이 기기 저장소(localStorage, 탭을 닫아도 다시 열면 이어서 대화) — 서버로는 보내지 않고, 30일이 지나면 지운다.
-// 챗봇 홈의 '이 기기에서 대화 지우기'로 바로 지울 수 있다 (딥리서치 P2 결과 저장)
-const BACKEND = () => (PHONE ? localStorage : sessionStorage);
-const PHONE_KEEP_DAYS = 30;
-if (PHONE) {
-  try {
-    const at = Number(localStorage.getItem('tookPhone.savedAt'));
-    if (at && Date.now() - at > PHONE_KEEP_DAYS * 86400000) {
-      Object.keys(localStorage).filter((k) => k.startsWith('tookPhone.')).forEach((k) => localStorage.removeItem(k));
-    }
-  } catch { /* 저장 불가 환경 */ }
-}
+const BACKEND = () => sessionStorage;
 export const store = {
   get(key, fallback = null) {
     try {
@@ -181,7 +158,6 @@ export const store = {
   set(key, value) {
     try {
       BACKEND().setItem(SKEY + key, JSON.stringify(value));
-      if (PHONE) localStorage.setItem('tookPhone.savedAt', String(Date.now()));
     } catch { /* 저장 불가 환경 */ }
   },
   remove(key) {
@@ -275,7 +251,6 @@ export function productCard(product, { extraActions = [] } = {}) {
     image,
     el('dl', {}, rows.flatMap(([k, v]) => [el('dt', { text: k }), Array.isArray(v) ? el('dd', {}, ...v) : el('dd', { text: v })])),
     el('div', { class: 'actions' },
-      shelfAction(product), // '올리브영에서 보기' 대신 매대 위치 (2026-11-11, js/shelf.js)
       ...extraActions),
   );
 }
@@ -339,8 +314,8 @@ function goHomeWithMotion(e) {
   setTimeout(() => { location.href = 'index.html'; }, HOME_FX_MS + 120);
 }
 
-// '기기 선택 해제': 이 기기를 태블릿·휴대폰으로 고정한 경우(DEVICE_MODE)에만 상단 메뉴에 보인다.
-// 누르면 고정을 풀고 처음 상태(노트북이면 태블릿+스마트폰 미리보기)로 돌아간다. 미리보기 틀 안이면 틀 밖(최상위 창)을 옮긴다
+// '기기 선택 해제': 이 기기를 태블릿으로 고정한 경우(DEVICE_MODE)에만 상단 메뉴에 보인다.
+// 누르면 고정을 풀고 처음 상태(노트북이면 태블릿 미리보기)로 돌아간다. 미리보기 틀 안이면 틀 밖(최상위 창)을 옮긴다
 function deviceResetButton() {
   if (!DEVICE_MODE) return null;
   return el('button', {
@@ -361,42 +336,17 @@ function deviceResetButton() {
  */
 export function renderNav(opts = {}) {
   if (document.querySelector('header.nav')) return; // 합본 화면처럼 스크립트 두 개가 함께 부르면 한 번만 그린다
-  if (PHONE) {
-    // 손님 휴대폰: 로고(챗봇 홈으로) + 다크 모드 + 언어만. 매장 화면(팔레트 등)으로 가는 메뉴·직원용 버튼은 없다
-    document.body.prepend(el('header', { class: 'nav phone-nav' },
-      // 로고: 누르면 챗봇 홈(chat-home.html: 매장에서 만든 색·최근 대화·추천 제품·질문 예시)
-      el('strong', {}, Object.assign(el('a', { href: 'chat-home.html', class: 'nav-logo', 'aria-label': t('nav.chatHome'), title: t('nav.chatHome'), 'aria-current': HERE === 'chat-home.html' ? 'page' : null }), { innerHTML: logoSvg() })),
-      el('div', { class: 'nav-lang' }, themeToggle(), languageMenu(), deviceResetButton())));
-    applyI18n();
-    return;
-  }
   const nav = el('header', { class: 'nav' },
     // 로고(TOOK 그림): 누르면 저장된 상태를 모두 지우고 홈(대기 화면)으로. 읽어 주는 이름은 'took(초기화)'
     el('strong', {}, Object.assign(el('a', { href: 'index.html', id: 'nav-reset', class: 'nav-logo', 'aria-label': t('nav.reset'), title: t('nav.reset'), onclick: goHomeWithMotion }), { innerHTML: logoSvg() })),
-    // 상단 '홈'·'팔레트'·'AI 뷰티 챗봇' 메뉴는 2026-11-09 뺐다: 태블릿은 팔레트만 쓰고(로고 = 시작 화면), 챗봇은 손님 휴대폰(QR)에서만
+    // 상단 '홈'·'팔레트' 메뉴는 2026-11-09 뺐다 (로고 = 시작 화면)
     // 오른쪽 끝: 다크 모드 켜기/끄기 + 언어 전환
+    // AI 뷰티 챗봇 (2026-11-11 손님 휴대폰을 없애고 태블릿으로 합침)
+    freshLink('chat.html', t('nav.chat')),
     el('div', { class: 'nav-lang' }, themeToggle(), languageMenu()),
   );
   document.body.prepend(nav);
   applyI18n();
-  // 가로·세로 바꿔 보기 (테스트 단계, 직원용): 가로 화면에서는 '세로로 보기' → 세로 미리보기(portrait.html)로 지금 화면을 연다.
-  // 세로 미리보기 안에서는 '가로로 보기' → 미리보기를 닫고 지금 화면으로 돌아간다. 실제로 세워 둔 iPad 에서는 버튼을 숨긴다
-  if (ORIENT_BUTTON) {
-    const page = location.pathname.split('/').pop() || 'index.html';
-    const inPreview = window.top !== window && /portrait\.html$/.test(window.top.location.pathname);
-    if (inPreview || matchMedia('(orientation: landscape)').matches) {
-      nav.append(el('button', {
-        type: 'button', class: 'nav-orient', text: t(inPreview ? 'nav.landscape' : 'nav.portrait'), title: t(inPreview ? 'nav.landscapeTitle' : 'nav.portraitTitle'),
-        onclick: () => {
-          if (inPreview) {
-            try { sessionStorage.setItem('took.landscape', '1'); } catch { /* 저장 불가 환경 */ }
-            window.top.location.href = page;
-          }
-          else location.href = 'portrait.html?page=' + encodeURIComponent(page);
-        },
-      }));
-    }
-  }
   const idle = setupIdleReset(opts.idle);
   // 테스트 단계: 90초를 기다리지 않고 자동 초기화 안내를 바로 띄워 본다 (오른쪽 끝). 배포 때는 IDLE_TEST_BUTTON 을 false 로
   if (IDLE_TEST_BUTTON && idle) {
@@ -408,7 +358,6 @@ export function renderNav(opts = {}) {
 
 const IDLE_TEST_BUTTON = true;
 export const NFC_TEST_MENU = true; // 팔레트 화면의 휴대폰 NFC 읽기 줄 (테스트 단계. 상단 'NFC 테스트' 메뉴·화면은 2026-11-09 삭제)
-const ORIENT_BUTTON = false; // 상단 '가로로 보기'·'세로로 보기' 버튼 (사용자 요청으로 숨김. 다시 쓰려면 true)
 
 // ---------- 키오스크 자동 초기화 ----------
 // 손님이 떠난 뒤 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않게, 한동안 조작이 없으면 안내 후 지우고 홈으로 간다.
@@ -441,7 +390,6 @@ function hasSessionState() {
 
 function setupIdleReset(custom = {}) {
   if (document.body.dataset.idleReset === 'off') return;
-  if (PHONE) return; // 손님 휴대폰은 키오스크가 아니므로 자동 초기화를 하지 않는다
   const onHome = /(^|\/)(index\.html)?$/.test(location.pathname);
   let timer = null;
   let dialog = null;

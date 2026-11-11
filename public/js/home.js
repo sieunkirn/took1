@@ -2,10 +2,8 @@
 // 화면 아무 곳이나 누르면(키보드도) 바로 팔레트로 간다. 오른쪽 아래 다크 모드·언어 버튼은 눌러도 넘어가지 않는다.
 // 라이트·다크 모드에 따라 흰 바탕+검정 선 / 검정 바탕+흰 선 (색은 wireframe.css 의 --paper·--ink)
 import { t, languageMenu, themeToggle } from './i18n.js';
-import { store, logoSvg, PHONE } from './common.js';
+import { store, logoSvg } from './common.js';
 
-// 손님 휴대폰(휴대폰 모드로 고른 기기)은 매장 시작 화면 대신 바로 챗봇
-if (PHONE) location.replace('chat.html');
 
 try { sessionStorage.removeItem('took.homeSkipIntro'); } catch { /* 저장 불가 환경 */ } // 옛 인트로 건너뛰기 표시 (지금은 쓰지 않음)
 

@@ -5,14 +5,16 @@
 // - oliveyoung (기본): 올리브영에서 수집한 실제 립틴트 (scripts/import-oliveyoung.js 로 변환)
 // - virtual: 시연·테스트용 가상 제품 27개 (바코드 있음). 테스트는 결과가 바뀌지 않도록 이 데이터를 쓴다 (TOOK_DATA=virtual)
 import { readFileSync, existsSync } from 'node:fs';
-import { setProducts } from './catalog.js';
+import { setProducts, setDemoProducts } from './catalog.js';
 
-export { allProducts, findById, findByBarcode, normalizeBarcode } from './catalog.js';
+export { allProducts, allDemoProducts, findById, findByBarcode, normalizeBarcode } from './catalog.js';
 
 const FILES = {
   oliveyoung: new URL('../data/products.oliveyoung.json', import.meta.url),
   virtual: new URL('../data/products.json', import.meta.url),
 };
+// 시연용 호수·바코드·재고 데이터 (실제 제품 아님, 화면에 '테스트 데이터'로 표시). 어느 데이터 출처든 함께 쓴다
+export const DEMO_FILE = new URL('../data/products.demo.json', import.meta.url);
 
 export function dataSource() {
   if (process.env.TOOK_DATA === 'virtual') return 'virtual';
@@ -34,3 +36,4 @@ export function loadProducts(file = dataFile()) {
 }
 
 loadProducts();
+setDemoProducts(JSON.parse(readFileSync(DEMO_FILE, 'utf8')));

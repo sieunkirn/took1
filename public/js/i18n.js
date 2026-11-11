@@ -33,7 +33,6 @@ export function setLang(next, { skipIntro = true } = {}) {
 const STRINGS = {
   ko: {
     'nav.reset': 'took(초기화)', 'nav.home': '홈', 'nav.palette': '팔레트', 'nav.chat': 'AI 뷰티 챗봇',
-    'nav.portrait': '세로로 보기', 'nav.portraitTitle': 'iPad 를 세웠을 때 화면으로 바꿔 봅니다', 'nav.landscape': '가로로 보기', 'nav.landscapeTitle': 'iPad 를 눕혔을 때 화면으로 돌아갑니다',
     'nav.idleTest': '자동 초기화 테스트', 'nav.idleTestTitle': '조작이 없을 때 뜨는 안내를 바로 띄웁니다',
     'idle.title': '계속 이용하시나요?', 'idle.desc': '{n}초 뒤 처음 화면으로 돌아가요. 지금까지의 대화와 고른 색은 지워져요.',
     'idle.keep': '계속', 'idle.keepAria': '계속 이용하기', 'idle.home': '처음으로', 'idle.homeAria': '처음 화면으로',
@@ -75,7 +74,7 @@ const STRINGS = {
     'pal.nfcPairNoServer': '휴대폰 연결은 서버(npm start)를 켠 https 주소에서만 돼요', 'pal.nfcPairHttp': '주의: http 주소라 휴대폰 NFC 가 막혀요. https(터널) 주소로 이 화면을 열어 주세요',
     'pal.nfcPairEnded': '휴대폰 연결이 끝났어요. 다시 눌러 주세요', 'pal.nfcClose': '닫기', 'pal.nfcNewCode': '번호 바꾸기', 'pal.nfcCodeHelp': '휴대폰 Chrome 에서 아래 주소를 열고 네 자리 번호를 입력하세요. QR 을 찍어도 돼요. 휴대폰은 번호를 기억해서 다음부터는 주소만 열면 돼요.', 'pal.nfcReconnected': '서버가 다시 켜져서 같은 번호로 다시 연결했어요',
     'pal.intensity': '농도', 'pal.find': '이 색과 비슷한 제품 추천', 'pal.result': '추천 제품', 'pal.backMix': '← 다시 섞기',
-    'pal.dropAria': '{name} 물감 한 방울 떨어뜨리기', 'pal.maxDrops': '한 번에 {n}방울까지 섞을 수 있어요', 'pal.drops': '{n}방울',
+    'pal.dropAria': '{name} 물감 한 방울 떨어뜨리기', 'pal.drops': '{n}방울',
     'pal.resetDone': '색을 초기화했어요', 'pal.mixed': '조제한 색 {hex}', 'pal.searching': '{hex} 와 비슷한 제품을 찾는 중...',
     'pal.found': '조제한 색 {hex} 와 비슷한 제품 {n}개 (색이 가까운 순)',
     // 립 카메라·톤 측정 (팔레트 화면이 쓴다)
@@ -150,7 +149,6 @@ const STRINGS = {
   },
   en: {
     'nav.reset': 'took (reset)', 'nav.home': 'Home', 'nav.palette': 'Palette', 'nav.chat': 'AI Beauty Chat',
-    'nav.portrait': 'Portrait view', 'nav.portraitTitle': 'Preview the screen with the iPad upright', 'nav.landscape': 'Landscape view', 'nav.landscapeTitle': 'Back to the screen with the iPad lying flat',
     'nav.idleTest': 'Test auto reset', 'nav.idleTestTitle': 'Show the idle notice now',
     'idle.title': 'Still there?', 'idle.desc': 'Going back to the start in {n} seconds. Your chat and chosen colors will be cleared.',
     'idle.keep': 'Continue', 'idle.keepAria': 'Keep using', 'idle.home': 'Start over', 'idle.homeAria': 'Back to the start screen',
@@ -192,7 +190,7 @@ const STRINGS = {
     'pal.nfcPairNoServer': 'Phone pairing only works on an https address with the server running (npm start)', 'pal.nfcPairHttp': 'Note: phone NFC is blocked on http. Open this page through an https (tunnel) address',
     'pal.nfcPairEnded': 'The phone connection ended. Tap again', 'pal.nfcClose': 'Close', 'pal.nfcNewCode': 'New number', 'pal.nfcCodeHelp': 'On the phone, open this address in Chrome and enter the 4-digit number, or scan the QR. The phone remembers the number, so next time just open the address.', 'pal.nfcReconnected': 'The server restarted, so we reconnected with the same number',
     'pal.intensity': 'Intensity', 'pal.find': 'Find products in this color', 'pal.result': 'Recommended products', 'pal.backMix': '← Mix again',
-    'pal.dropAria': 'Drop one drop of {name}', 'pal.maxDrops': 'You can mix up to {n} drops at a time', 'pal.drops': '{n} drops',
+    'pal.dropAria': 'Drop one drop of {name}', 'pal.drops': '{n} drops',
     'pal.resetDone': 'Colors reset', 'pal.mixed': 'Mixed color {hex}', 'pal.searching': 'Finding products similar to {hex}...',
     'pal.found': '{n} products similar to mixed color {hex} (closest first)',
     // Lip camera & tone
@@ -307,27 +305,19 @@ STRINGS.ko['lang.menu'] = '언어 선택';
 STRINGS.en['lang.menu'] = 'Choose language';
 // 팔레트 → 휴대폰으로 가져가기 (palette.js openTake, chat.js 의 from=palette)
 Object.assign(STRINGS.ko, {
-  'pal.take': '휴대폰으로 가져가기', 'pal.takeTitle': '휴대폰으로 이어서 상담하기',
-  'pal.takeHelp': '휴대폰 카메라로 QR 을 찍으면 이 결과로 챗봇과 이어서 대화해요. 사진·영상은 보내지 않아요.',
-  'pal.takeSummary': '{hex} · {texture} · 농도 {n}%', 'pal.takeClose': '닫기', 'pal.takeQrAria': '휴대폰 챗봇 연결 QR 코드',
-  'pal.takeNoQr': 'QR 을 그리지 못했어요. 아래 주소를 휴대폰에서 열어 주세요.',
+  'pal.take': '챗봇과 이어서 상담',
 });
 Object.assign(STRINGS.en, {
-  'pal.take': 'Take it to my phone', 'pal.takeTitle': 'Continue on your phone',
-  'pal.takeHelp': 'Scan the QR with your phone camera to keep chatting about this result. No photos or video are sent.',
-  'pal.takeSummary': '{hex} · {texture} · intensity {n}%', 'pal.takeClose': 'Close', 'pal.takeQrAria': 'QR code to continue the chat on your phone',
-  'pal.takeNoQr': "Couldn't draw the QR. Open the address below on your phone.",
+  'pal.take': 'Continue in the chat',
 });
 // 기기 선택 해제 (common.js deviceResetButton)
 Object.assign(STRINGS.ko, {
-  'nav.chatHome': '챗봇 홈',
-  'nav.deviceReset': '기기 선택 해제', 'nav.deviceResetTitle': '태블릿·휴대폰 고정을 풀고 처음 상태로 돌아가요',
-  'nav.deviceResetConfirm': '이 기기의 태블릿·휴대폰 고정을 풀고 처음 상태로 돌아갈까요?',
+  'nav.deviceReset': '기기 선택 해제', 'nav.deviceResetTitle': '태블릿 고정을 풀고 처음 상태로 돌아가요',
+  'nav.deviceResetConfirm': '이 기기의 태블릿 고정을 풀고 처음 상태로 돌아갈까요?',
 });
 Object.assign(STRINGS.en, {
-  'nav.chatHome': 'Chat home',
-  'nav.deviceReset': 'Reset device', 'nav.deviceResetTitle': 'Unpin tablet/phone mode and go back to the start',
-  'nav.deviceResetConfirm': 'Unpin the tablet/phone mode on this device and go back to the start?',
+  'nav.deviceReset': 'Reset device', 'nav.deviceResetTitle': 'Unpin tablet mode and go back to the start',
+  'nav.deviceResetConfirm': 'Unpin the tablet mode on this device and go back to the start?',
 });
 STRINGS.ko['theme.dark'] = '다크 모드'; STRINGS.ko['theme.light'] = '라이트 모드';
 STRINGS.en['theme.dark'] = 'Dark mode'; STRINGS.en['theme.light'] = 'Light mode';

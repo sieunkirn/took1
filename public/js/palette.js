@@ -2,14 +2,13 @@
 //  - 물감·섞는 칸(떨어뜨리기·젓기·OKLab 혼합)은 js/palette-mixer.js 
 //  - 섞는 칸 색이 바뀌는 동안 같은 색을 took:apply 이벤트로 보내 왼쪽 카메라 입술(lip.js)에 바로 입힌다
 //  - 초기화: 팔레트를 비우고 입술 색을 기본 컬러로 되돌린다
-import { renderNav, store, api, el, productCard, toast, skeletonCards, shortName, NFC_TEST_MENU } from './common.js';
+import { renderNav, store, api, el, go, productCard, toast, skeletonCards, shortName, NFC_TEST_MENU } from './common.js';
 import { listenNfc, resolveTag, resolveReading, cardProduct } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
 import { startWebNfc, webNfcSupport, makeDedupe } from './nfc-test.js'; // 휴대폰 NFC (Web NFC)
 import { pairPhoneForNfc } from './nfc-relay.js'; // 휴대폰으로 읽고 이 화면에 띄우기
 import { loadZXing } from './barcode-scan.js'; // QR 그리기
 import { createMixer, ALL_PAINTS, PAINT } from './palette-mixer.js'; // 물감·섞는 칸
-import { t as tr, isEn } from './i18n.js'; // 화면 문구 (한국어/영어)
-import { setShelfTake } from './shelf.js'; // 매대 위치 시트의 '휴대폰으로 가져가기'
+import { t as tr } from './i18n.js'; // 화면 문구 (한국어/영어)
 
 renderNav();
 
@@ -37,7 +36,7 @@ const paintBtns = mixer.paintBtns;
 const result = { hex: null, recs: [] };
 function render() {
   const hex = mixer.hex();
-  $('mix-empty').classList.toggle('hidden', !!hex);
+  $('mix-empty').classList.toggle('is-gone', !!hex); // 물감이 떨어지면 안내 문구가 흐려지며 사라진다
   $('undo').disabled = !mixer.count();
   $('find').disabled = !hex;
   $('reset').disabled = !hex;
@@ -102,22 +101,9 @@ $('find').addEventListener('click', async () => {
   })));
 });
 
-// ---------- 휴대폰으로 가져가기: 지금 결과를 QR 로 넘겨 손님 휴대폰에서 챗봇과 이어서 대화 ----------
-// QR 에는 숫자·글자 값만 담는다 (서버에 저장하지 않고, 카메라 사진·영상은 넘기지 않는다):
-//   chat.html#from=palette&hex=색&fin=텍스처&int=농도&tone=내 톤&recs=추천 제품 ID(최대 3개)&take=1&lang=en
-//   결과는 #조각에 담는다: 서버로 보내지지 않아 서버 기록·Referer 에 남지 않는다
-//   take=1: 손님 휴대폰이라 키오스크 자동 초기화를 하지 않는다 (common.js)
-// QR 주소: 공개 주소로 띄웠으면 지금 주소, localhost 면 서버가 알려 주는 같은 와이파이 PC 주소 (휴대폰은 localhost 를 열 수 없다)
-let phoneBaseCache;
-async function phoneBase() {
-  const here = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '');
-  if (!/^(localhost|127\.|\[::1\])/.test(location.hostname)) return here;
-  if (phoneBaseCache === undefined) {
-    const r = await api('api/phone-base').catch(() => null);
-    phoneBaseCache = r?.ok && r.body.base ? r.body.base : null;
-  }
-  return phoneBaseCache || here;
-}
+// ---------- 챗봇과 이어서 상담: 지금 결과(색·텍스처·농도·내 톤·추천 제품)를 이 태블릿의 챗봇으로 넘긴다 ----------
+//   chat.html?from=palette&hex=색&fin=텍스처&int=농도&tone=내 톤&recs=추천 제품 ID(최대 3개)
+//   챗봇(chat.js paletteHandoff)이 이 값으로 첫인사를 하고 기준 색으로 쓴다. (2026-11-11 손님 휴대폰 QR 대신)
 function takeData() {
   const showing = !!document.querySelector('.palette.show-result');
   const hex = showing && result.hex ? result.hex : mixer.hex();
@@ -130,46 +116,13 @@ function takeData() {
     recs: hex && hex === result.hex ? result.recs : [],
   };
 }
-// loc: 매대 위치 시트에서 열면 그 제품 ID (휴대폰 챗봇이 첫 말풍선에 위치 카드를 보여 준다). 버튼 클릭으로 열면 이벤트가 들어오므로 문자열만 쓴다
-async function openTake(opts) {
-  const loc = typeof opts?.loc === "string" ? opts.loc : null;
+function openTake() {
   const d = takeData();
   if (!d.hex) return;
-  const q = new URLSearchParams({ from: 'palette', hex: d.hex, fin: d.fin, int: String(d.int) });
-  if (d.tone) q.set('tone', d.tone);
-  if (d.recs.length) q.set('recs', d.recs.join(','));
-  if (loc) q.set('loc', loc);
-  q.set('take', '1');
-  if (isEn()) q.set('lang', 'en');
-  const dlg = $('take-dialog');
-  $('take-swatch').style.background = d.hex;
-  $('take-summary').textContent = tr('pal.takeSummary', { hex: d.hex, texture: tr('texture.' + d.fin), n: d.int })
-    + (d.tone ? ' · ' + tr('season.' + d.tone) : '');
-  $('take-qr').replaceChildren();
-  delete $('take-qr').dataset.url;
-  $('take-url').textContent = '';
-  dlg.showModal();
-  const url = (await phoneBase()) + 'chat.html#' + q;
-  if (!dlg.open) return;
-  $('take-qr').dataset.url = url;
-  // 노트북 미리보기(portrait.html)면 옆 스마트폰 프레임이 이 QR 을 '찍을' 수 있게 알린다
-  try { if (window.top !== window) window.top.postMessage({ type: 'took:qr', url }, location.origin); } catch { /* 다른 주소의 틀 */ }
-  $('take-url').textContent = url.replace(/^https?:\/\//, '').replace(/[?#].*$/, '');
-  const ZXing = await loadZXing().catch(() => null);
-  if (ZXing) {
-    const qr = new ZXing.BrowserQRCodeSvgWriter().write(url, 240, 240);
-    qr.setAttribute('shape-rendering', 'crispEdges'); // 칸 경계를 흐리지 않아 휴대폰 카메라가 잘 읽는다
-    $('take-qr').replaceChildren(qr);
-  } else {
-    $('take-qr').replaceChildren(el('p', { class: 'small', text: tr('pal.takeNoQr') }));
-    $('take-url').textContent = url; // QR 을 그릴 수 없으면 전체 주소를 그대로
-  }
+  go('chat.html', { from: 'palette', hex: d.hex, fin: d.fin, int: String(d.int), tone: d.tone, recs: d.recs.length ? d.recs.join(',') : null });
 }
 $('take-phone').addEventListener('click', openTake);
 $('take-phone-res').addEventListener('click', openTake);
-setShelfTake((p) => openTake({ loc: p.id }));
-$('take-close').addEventListener('click', () => $('take-dialog').close());
-$('take-dialog').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); }); // 바깥(어두운 곳)을 누르면 닫기
 
 // ---------- NFC 태그: 립 제품을 리더기에 올리면 그 제품 색을 바로 입술에 바른다 (js/nfc.js) ----------
 const nfcHint = $('nfc-hint');
@@ -199,7 +152,7 @@ async function showNfcProduct(id, masked = null) {
     extraActions: [el('button', { type: 'button', text: tr('lip.tryOn'), onclick: () => toLips(p.color_hex, { finish: p.finish, quiet: false, source: shortName(p) }) })],
   }));
 }
-listenNfc((code) => showNfcProduct(resolveTag(code)));
+listenNfc((code) => showNfcProduct(resolveTag(code))); // 바코드로 찾기 화면은 2026-11-11 삭제
 
 // ---------- 휴대폰 NFC (테스트 단계, 상단 메뉴의 NFC 테스트와 같은 기준) ----------
 // 같은 카드를 2.5초 안에 다시 읽으면 다시 처리하지 않는다. 읽지 못한 카드는 다시 대 보라고 알린다

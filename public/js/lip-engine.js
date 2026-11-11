@@ -79,6 +79,7 @@ function labToRgbFast(L, a, b, out) {
   return out;
 }
 
+const INTENSITY_SCALE = 0.5; // 농도 슬라이더 100% 일 때 실제로 덮는 비율 배수
 const REF_SKIN = { L: 65, a: 14, b: 18 }; // 조명 보정 기준: 고른 백색광 아래의 평균적인 피부색(근사값)
 
 // 랜드마크 윤곽으로 입술을 채우고(가장자리만 살짝 블러), Lab 공간에서 원래 입술의 명암(L)은 살리고 색(a, b)만 바꾼다.
@@ -130,7 +131,8 @@ export function applyLipColor(ctx, lips, w, h, mirror, look) {
     tLab[1] += Math.max(-8, Math.min(8, (skinA / skinN - REF_SKIN.a) * 0.35));
     tLab[2] += Math.max(-8, Math.min(8, (skinB / skinN - REF_SKIN.b) * 0.35));
   }
-  const strength = tex.opacity * (look.intensity / 100);
+  // 농도 100% = 예전 50% 발색 (2026-11-11 '발색이 너무 강하다' → 절반으로)
+  const strength = tex.opacity * (look.intensity / 100) * INTENSITY_SCALE;
   const rgb = [0, 0, 0];
 
   for (let y = 0, i = 0; y < bh; y++) {

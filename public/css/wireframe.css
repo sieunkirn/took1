@@ -335,7 +335,7 @@ main { animation: took-fade 0.35s var(--ease) backwards; }
 
 /* 상단 메뉴: 반투명 흰 바, 지금 화면은 회색 알약 */
 header.nav { background: rgba(255, 255, 255, 0.86); backdrop-filter: saturate(1.2) blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(0, 0, 0, 0.04); gap: 4px 6px; }
-header.nav a { border: 0; padding: 7px 12px; border-radius: 10px; color: var(--mute); font-weight: 600; transition: background 0.2s var(--ease), color 0.2s var(--ease); }
+header.nav a { border: 0; padding: 7px 12px; border-radius: 10px; color: var(--mute); font-weight: 600; white-space: nowrap; transition: background 0.2s var(--ease), color 0.2s var(--ease); }
 header.nav a:hover { background: var(--soft); color: var(--ink); }
 header.nav a[aria-current="page"] { background: var(--soft); color: var(--ink); font-weight: 700; }
 header.nav strong { margin-right: 14px; }
@@ -443,7 +443,7 @@ table th, table td { border-bottom-color: var(--line); }
 .chat-log .user .suggest button { color: var(--ink); }
 .chat-log .suggest button:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
 /* 자동 초기화 테스트 버튼: 상단 메뉴 오른쪽 끝 (테스트 단계에만) */
-header.nav .nav-idle-test, header.nav .nav-orient { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+header.nav .nav-idle-test, header.nav .nav-orient { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 /* 언어 전환 버튼: 메뉴 오른쪽으로 밀고, 눈에 띄게 테두리 */
 header.nav .nav-lang { margin-left: auto; }
 /* 언어 선택 메뉴 (i18n.js languageMenu): 🌐 Language ▾ 를 누르면 아래에 말풍선처럼 목록이 열린다 */
@@ -667,9 +667,6 @@ html.intro-go body { overflow: auto; }
 .mix-wrap canvas.stirring { cursor: grabbing; }
 .mix-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; color: var(--faint); font-size: 13px; font-weight: 600; pointer-events: none; }
 .pal-tools { display: flex; flex-direction: column; gap: 8px; }
-.fly-drop { position: fixed; left: 0; top: 0; z-index: 60; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; background: var(--c); pointer-events: none;
-  box-shadow: inset -3px -4px 6px rgba(0, 0, 0, 0.2), inset 3px 3px 5px rgba(255, 255, 255, 0.5), 0 6px 14px rgba(0, 0, 0, 0.18); }
-.fly-drop.dragging { width: 32px; height: 32px; margin: -16px 0 0 -16px; }
 /* ① 내 톤 찾기: 버튼과 추천 컬러 3개를 한 줄에, 측정값·안내는 접어 둔다 */
 .pal-match { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; }
 .pal-match .label { margin: 0; }
@@ -719,7 +716,8 @@ html.intro-go body { overflow: auto; }
 .palette-page .pal-cam > .label { margin-bottom: 4px; }
 .palette-page button:disabled:not(.btn-dark) { color: #6e6e6e; opacity: 1; }
 .palette-page .stage .placeholder { font-size: 16px; line-height: 1.6; color: var(--ink-2); }
-.palette-page .mix-empty { color: #6e6e6e; font-size: 14px; }
+.palette-page .mix-empty { color: #6e6e6e; font-size: 14px; transition: opacity 0.25s var(--ease); }
+.mix-empty.is-gone { opacity: 0; }
 .palette-page .pal-match .muted { color: #6e6e6e; }
 .pal-board .paint-name { font-size: 12px; }
 @media (orientation: landscape) and (min-width: 960px) {
@@ -882,6 +880,11 @@ html.intro-go body { overflow: auto; }
 @media (orientation: landscape) and (min-width: 960px) {
   .palette-page .palette.show-result .pal-result { overflow: hidden; gap: 10px; }
   .palette-page .palette.show-result #rec-status { display: none; }
+  /* '챗봇과 이어서 상담'은 머리 줄 오른쪽으로 올려 카드 줄 높이를 지킨다 (가로 키오스크) */
+  .palette-page .palette.show-result .pal-result { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); column-gap: 10px; }
+  .palette-page .palette.show-result .pal-result > .pal-board-head { grid-column: 1; grid-row: 1; }
+  .palette-page .palette.show-result #take-phone-res { grid-column: 2; grid-row: 1; width: auto; margin: 0; min-height: 40px; padding: 4px 18px; background: var(--ink); color: var(--paper); }
+  .palette-page .palette.show-result .pal-rec { grid-column: 1 / -1; grid-row: 2; }
   .palette-page .palette.show-result .pal-rec { flex: 1 1 auto; min-height: 0; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 300px; gap: 12px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-bottom: 6px; }
   .palette-page .palette.show-result .pal-rec > * { scroll-snap-align: start; }
   /* 서랍 높이에 맞춘 작은 카드: 왼쪽 사진, 오른쪽 브랜드·제품명·색상값·가격, 아래 두 버튼 */
@@ -1008,89 +1011,18 @@ header.nav .nav-logo svg { display: block; width: auto; height: 22px; }
 html.enter-fx header.nav { border-bottom-color: transparent; transition: border-color 0.6s 0.4s; }
 html.enter-fx header.nav > :not(strong) { animation: took-enter-fade 0.5s ease-out 0.15s both; }
 html.enter-fx main { animation: took-enter 0.7s cubic-bezier(.2, .8, .2, 1) 0.1s both; }
-/* 휴대폰으로 가져가기 (palette.html #take-dialog): QR 은 다크 모드에서도 흰 바탕 위 검정이어야 휴대폰 카메라가 읽는다 */
+/* 챗봇과 이어서 상담 (palette.html #take-phone) */
 .take-phone { width: 100%; margin-top: 8px; }
-.take-dialog { text-align: center; }
-.take-dialog .row { justify-content: center; margin-top: 8px; }
-.take-sum { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0 4px; font-size: 15px; }
-.take-sum .color-dot { width: 20px; height: 20px; border-radius: 50%; margin: 0; }
-.take-qr { display: inline-grid; place-items: center; min-width: 264px; min-height: 264px; margin: 8px auto 4px; padding: 12px; border-radius: 16px; background: #fff; color: #000; }
-.take-qr svg { display: block; }
-.take-url { margin: 0; overflow-wrap: anywhere; font-weight: 700; }
 :root[data-theme="dark"] .pal-nfc-dialog { border: 1px solid var(--line-2); }
 :root[data-theme="dark"] .pal-nfc-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
 
-/* ================= 손님 휴대폰 챗봇 (html.phone-mode: 팔레트 QR ?take=1 로 연 화면, common.js PHONE) =================
-   스마트폰 한 화면: 위 얇은 메뉴(로고·다크 모드·언어) / 대화(혼자 스크롤) / 아래 입력줄(마이크·입력칸·보내기).
-   매장용 요소(메뉴 링크·자동 초기화 테스트·소리 읽기·바코드·NFC 안내·추천 패널·설명 줄)는 없다 */
-html.phone-mode, html.phone-mode body { height: 100%; overflow: hidden; }
-html.phone-mode body { background: var(--paper); }
-html.phone-mode header.phone-nav { position: sticky; top: 0; min-height: 52px; padding: 0 max(12px, env(safe-area-inset-left)) 0 max(16px, env(safe-area-inset-left)); gap: 8px; flex-wrap: nowrap; background: var(--paper); border-bottom: 1px solid var(--line); backdrop-filter: none; }
-html.phone-mode header.phone-nav strong { margin: 0; }
-html.phone-mode header.phone-nav .nav-logo { display: inline-flex; align-items: center; color: var(--ink); }
-html.phone-mode header.phone-nav .nav-logo svg { display: block; height: 20px; width: auto; }
-html.phone-mode header.phone-nav .nav-lang { margin-left: auto; gap: 2px; }
-html.phone-mode .theme-toggle span { display: none; } /* 휴대폰은 해·달 그림만 */
-html.phone-mode .theme-toggle, html.phone-mode .lang-menu .lang-trigger { min-height: 40px; padding: 4px 8px; font-size: 14px; }
-html.phone-mode .lang-pop { min-width: 220px; }
-html.phone-mode main.fit.chat-user, html.phone-mode main.chat-user { display: flex; flex-direction: column; max-width: none; height: calc(var(--vvh, 100dvh) - 52px); /* --vvh: 아이폰 키보드가 열렸을 때 보이는 높이 (chat.js) */ margin: 0; padding: 0; overflow: hidden; }
-html.phone-mode .chat-user .chat-side { display: none !important; }
-html.phone-mode .chat-user .chat-shell { flex: 1; height: auto; min-height: 0; margin: 0; padding: 10px 12px max(10px, env(safe-area-inset-bottom)); gap: 8px; border: 0; border-radius: 0; box-shadow: none; background: var(--paper); }
-html.phone-mode .chat-head { flex-wrap: nowrap; }
-html.phone-mode .chat-head strong { font-size: 17px; }
-html.phone-mode .chat-head .muted { display: none; } /* '등록 제품 기반 추천 · 규칙 기반' 설명 줄 */
-html.phone-mode .chat-head #chat-reset { min-height: 36px; padding: 4px 12px; font-size: 14px; }
-html.phone-mode .chat-user .chat-shell .chat-log { flex: 1; height: auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 /* 제품 카드: 답변 아래 한 줄로 늘어놓고 옆으로 밀어 본다 (쪽 넘김 버튼 없음) */
-html.phone-mode .chat-user .chat-shell .mini-list, html.phone-mode .chat-user .chat-shell .mini-list.pc { display: flex; flex-direction: row; gap: 10px; margin-top: 8px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; padding-bottom: 4px; touch-action: auto; }
-html.phone-mode .chat-user .chat-shell .mini-list > .card { flex: 0 0 min(62%, 220px); min-width: 0; scroll-snap-align: start; visibility: visible; pointer-events: auto; }
-html.phone-mode .chat-user .chat-shell .mini-list .card-img { max-height: 140px; }
-html.phone-mode .chat-user .chat-shell .pc-nav, html.phone-mode .chat-user .mini-names { display: none; }
 /* 빠른 답장: 오른쪽 정렬로 줄바꿈 */
-html.phone-mode .quick-replies { justify-content: flex-end; gap: 6px; }
-html.phone-mode .quick-replies button { min-height: 38px; padding: 6px 12px; font-size: 14px; }
 /* 입력줄: [마이크][입력칸][보내기]. 입력칸 글자 16px (iPhone 이 확대하지 않게) */
-html.phone-mode .chat-input { display: flex; gap: 6px; padding: 4px; border-radius: 999px; }
-html.phone-mode .chat-input #chat-input { flex: 1; min-width: 0; min-height: 44px; padding: 0 8px; font-size: 16px; text-align: left; }
-html.phone-mode .chat-input #voice { flex: none; width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
-html.phone-mode .chat-input #voice svg { width: 22px; height: 22px; }
-html.phone-mode .chat-input #chat-send { flex: none; width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
-html.phone-mode #voice-status { margin: 0; font-size: 13px; text-align: center; }
-html.phone-mode #voice-status:empty { display: none; }
-/* 휴대폰은 손가락으로 밀어 보므로 스크롤 막대를 숨긴다 (노트북 미리보기의 스마트폰 프레임에서 막대가 버튼을 가리지 않게) */
-html.phone-mode .chat-log, html.phone-mode .chat-log .mini-list { scrollbar-width: none; }
-html.phone-mode .chat-log::-webkit-scrollbar, html.phone-mode .chat-log .mini-list::-webkit-scrollbar { display: none; }
-/* 모든 화면은 세로 전용: 휴대폰 모드를 넓은(가로) 화면에서 열어도 휴대폰 폭으로 가운데 */
-html.phone-mode body { max-width: 480px; margin: 0 auto; box-shadow: 0 0 0 1px var(--line); }
-/* 기기 선택 해제 (태블릿·휴대폰으로 고정한 기기에서만, common.js deviceResetButton) */
+/* 기기 선택 해제 (태블릿으로 고정한 기기에서만, common.js deviceResetButton) */
 header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
-html.phone-mode header.nav .nav-device-reset { min-height: 34px; padding: 4px 8px; font-size: 12px; }
 
-/* ================= 챗봇 홈 (손님 휴대폰, chat-home.html · js/chat-home.js) =================
-   한눈에: 인사 한 줄 → 매장에서 만든 색 카드(버튼 하나) → 바로 물어보기 칩 3개 → 한 줄 고지. 맨 아래 고정 '물어보기' 줄.
-   무채색, 색 견본만 실제 색 */
-html.phone-mode:has(body.ph-home-page), html.phone-mode body.ph-home-page { height: auto; min-height: 100%; overflow-y: auto; }
-.ph-home { display: flex; flex-direction: column; gap: 22px; max-width: 480px; margin: 0 auto; padding: 28px 20px calc(110px + env(safe-area-inset-bottom)); }
-.ph-eyebrow { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--mute); }
-.ph-hello h1 { margin: 0; font-size: 26px; line-height: 1.35; font-weight: 800; letter-spacing: -0.03em; word-break: keep-all; }
-.ph-card { display: flex; flex-direction: column; gap: 18px; padding: 20px; border-radius: 24px; background: var(--soft); }
-.ph-card-row { display: flex; align-items: center; gap: 16px; }
-.ph-swatch { flex: none; width: 72px; height: 72px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08), 0 6px 18px rgba(0, 0, 0, 0.14); }
-.ph-card-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.ph-card-label { font-size: 13px; font-weight: 600; color: var(--mute); }
-.ph-card-facts { font-size: 18px; font-weight: 800; line-height: 1.35; word-break: keep-all; }
-.ph-primary, .ph-primary:visited { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px; padding: 0 20px; border-radius: 16px; background: var(--ink); color: var(--paper); font-size: 16px; font-weight: 700; text-decoration: none; }
-.ph-arrow { font-size: 20px; line-height: 1; }
-.ph-label { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--mute); }
-.ph-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.ph-chip, .ph-chip:visited { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 15px; font-weight: 600; text-decoration: none; box-shadow: 0 0 0 1px var(--line-2); }
-.ph-primary:active, .ph-chip:active, .ph-askbar:active { transform: scale(0.98); }
-.ph-foot { margin: 0; font-size: 12px; line-height: 1.6; color: var(--mute); word-break: keep-all; }
 /* 맨 아래 고정 '물어보기' 줄: 누르면 챗봇 입력칸으로 */
-.ph-askbar, .ph-askbar:visited { position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); translate: -50% 0; z-index: 20; display: flex; align-items: center; gap: 8px; width: min(440px, calc(100% - 40px)); min-height: 58px; padding: 6px 6px 6px 22px; border-radius: 999px; background: var(--paper); color: var(--mute); font-size: 16px; text-decoration: none; box-shadow: 0 0 0 1px var(--line-2), var(--shadow-up); }
-.ph-askbar-text { flex: 1; }
-.ph-askbar-go { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: var(--paper); }
-html.phone-mode header.phone-nav a.nav-logo, html.phone-mode header.phone-nav a.nav-logo[aria-current="page"] { padding: 0; border-bottom: 0; color: var(--ink); text-decoration: none; }
 /* 팔레트 상단 로고 → 시작 화면 전환 (common.js goHomeWithMotion, home.js hs-arrive) */
 .home-veil { position: fixed; inset: 0; z-index: 9998; background: var(--paper); opacity: 0; pointer-events: none; }
 .home-fly { position: fixed; z-index: 9999; color: var(--ink); transform-origin: 0 0; pointer-events: none; }
@@ -1103,119 +1035,105 @@ html.phone-mode header.phone-nav a.nav-logo, html.phone-mode header.phone-nav a.
 .home-standby.hs-arrive .intro-lang { animation-delay: 0.5s; }
 @keyframes hs-face-in { from { opacity: 0; scale: 0.92; } to { opacity: 0.9; scale: 1; } }
 @keyframes hs-rise { from { opacity: 0; transform: translateY(12px); } }
-html.phone-mode:has(body.ph-home-page) { background: var(--paper); }
-html.phone-mode body.ph-home-page { min-height: 100dvh; }
-/* QR 첫인사의 색 견본 카드 (chat.js swatchCard): 색상값 글자 대신 견본(실제 색) */
+/* 팔레트에서 넘어온 첫인사의 색 견본 카드 (chat.js swatchCard): 색상값 글자 대신 견본(실제 색) */
 .handoff-card { display: flex; align-items: center; gap: 12px; margin: 6px 0 10px; padding: 10px 12px; border-radius: 14px; background: var(--paper); box-shadow: 0 0 0 1px var(--line); }
 .handoff-dot { flex: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
 .handoff-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
 .handoff-label { font-size: 12px; color: var(--mute); }
 .handoff-text strong { font-size: 15px; }
-/* 휴대폰 챗봇: AI 고지 한 줄은 늘 보인다 (chat.js PHONE, .ai-note) */
-html.phone-mode .chat-head .muted.ai-note { display: block; margin-top: 2px; font-size: 12px; }
-/* 챗봇 홈: 결과 저장·지우기 (작은 글자 버튼) */
-.ph-tools { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: -8px; }
-.ph-link, .ph-link:hover:not(:disabled) { min-height: 36px; padding: 4px 0; border: 0; background: transparent; color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-.ph-foot a, .ph-foot a:visited { color: var(--ink-2); }
-/* 개인정보 안내 (privacy.html · js/privacy.js): 휴대폰에서 읽기 좋은 한 단 문서 */
-html.phone-mode:has(body.privacy-page), html.phone-mode body.privacy-page { height: auto; min-height: 100%; overflow-y: auto; background: var(--paper); }
-.pv-doc { max-width: 560px; margin: 0 auto; padding: 24px 20px calc(40px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 18px; }
-.pv-doc h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
-.pv-lead { margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); word-break: keep-all; }
-.pv-sec { padding: 16px; border-radius: 18px; background: var(--soft); }
-.pv-sec h2 { margin: 0 0 10px; font-size: 15px; font-weight: 800; }
-.pv-sec p { margin: 0; font-size: 14px; line-height: 1.65; color: var(--ink-2); word-break: keep-all; }
-.pv-points { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.5; }
-.pv-list { margin: 0; display: flex; flex-direction: column; gap: 12px; }
-.pv-row dt { font-size: 13px; font-weight: 700; color: var(--ink); }
-.pv-row dd { margin: 2px 0 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); word-break: keep-all; }
-.pv-draft { margin: 0; font-size: 12px; color: var(--mute); }
-/* 챗봇 시작 화면 (chat-home.html, 2026-11-11 ChatGPT·Gemini 식): 가운데 큰 인사 → 아래쪽 추천 질문 카드 2×2 → 맨 아래 고정 입력줄.
-   무채색, 매장 색 견본만 실제 색. 움직임은 처음 한 번 부드럽게 나타나기뿐 */
-.ph-home { padding-bottom: calc(128px + env(safe-area-inset-bottom)); gap: 16px; }
-.ph-start { min-height: calc(100dvh - 52px - 28px - 128px - env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; animation: ph-in 0.5s ease-out both; }
-@keyframes ph-in { from { opacity: 0; transform: translateY(8px); } }
-@media (prefers-reduced-motion: reduce) { .ph-start { animation: none; } }
-.ph-greet { margin: auto 0; padding: 24px 4px; }
-.ph-greet h1 { margin: 0; display: flex; flex-direction: column; gap: 4px; font-size: 30px; line-height: 1.3; font-weight: 800; letter-spacing: -0.03em; word-break: keep-all; }
-.ph-greet .ph-hi { color: var(--mute); }
-.ph-row, .ph-row:visited { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: var(--soft); color: var(--ink); text-decoration: none; }
-.ph-row .ph-swatch { width: 40px; height: 40px; }
-.ph-row-text { flex: 1; display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
-.ph-row-label { font-size: 12px; color: var(--mute); }
-.ph-row-text strong { font-size: 15px; }
-.ph-sugs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.ph-sug, .ph-sug:hover:not(:disabled) { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 66px; padding: 12px 14px; border: 0; border-radius: 16px; background: var(--paper); box-shadow: 0 0 0 1px var(--line-2); color: var(--ink); text-align: left; }
-.ph-sug:hover:not(:disabled) { background: var(--soft); }
-.ph-sug strong { font-size: 15px; font-weight: 700; }
-.ph-sug span { font-size: 13px; color: var(--mute); word-break: keep-all; }
-.ph-row:active, .ph-sug:active { transform: scale(0.98); }
-.ph-tools { justify-content: center; margin-top: 0; }
-.ph-home:has(.ph-tools) .ph-start { min-height: calc(100dvh - 52px - 28px - 128px - 52px - env(safe-area-inset-bottom)); } /* 저장·지우기 줄까지 한 화면에 */
-/* 맨 아래 고정 입력줄: 모양은 chat.html 입력줄(.chat-input)과 같다 */
-.ph-composer { position: fixed; left: 50%; bottom: 0; translate: -50% 0; z-index: 20; width: min(480px, 100%); padding: 8px 16px max(10px, env(safe-area-inset-bottom)); background: var(--paper); }
-.ph-composer .chat-input { border-radius: 26px; }
-.ph-voice-status:empty { display: none; }
-.ph-voice-status { margin: 0 4px 6px; font-size: 13px; color: var(--ink-2); }
-.ph-note { margin: 6px 0 0; text-align: center; font-size: 11px; color: var(--mute); }
 
-/* ================= 제품 위치 시트 (js/shelf.js, 2026-11-11) =================
-   추천 카드 '매대 위치' → 아래에서 올라오는 시트: 제품 줄 → 큰 위치 문장 → 찾아가는 순서 3단계 → 립 매대 정면 그림 → 휴대폰으로 가져가기·닫기.
-   매대 그림도 무채색(변수)이라 다크 모드에서 같이 뒤집힌다. 실제 색은 제품 색 견본뿐 */
-.shelf-sheet { position: fixed; inset: auto 0 0 0; width: min(720px, 100%); max-width: 100%; max-height: 92dvh; margin: 0 auto; padding: 0 0 max(16px, env(safe-area-inset-bottom)); border: 0; border-radius: 24px 24px 0 0; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-up); overflow-y: auto; }
-.shelf-sheet[open] { animation: shelf-up 0.35s var(--ease) both; }
-.shelf-sheet::backdrop { background: rgba(0, 0, 0, 0.4); }
-@keyframes shelf-up { from { transform: translateY(100%); } }
-@media (prefers-reduced-motion: reduce) { .shelf-sheet[open] { animation: none; } }
-.shelf-grip { width: 44px; height: 5px; border-radius: 3px; background: var(--line-2); margin: 10px auto 4px; }
-.shelf-head { display: flex; align-items: center; gap: 12px; padding: 6px 20px 14px; border-bottom: 1px solid var(--line); }
-.shelf-dot { flex: none; width: 44px; height: 44px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
-.shelf-prod { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
-.shelf-meta { font-size: 13px; color: var(--mute); }
-.shelf-prod strong { font-size: 16px; word-break: keep-all; }
-.shelf-x { flex: none; font-size: 24px; line-height: 1; background: var(--soft); }
-.shelf-body { padding: 16px 20px 0; }
-.shelf-where { margin: 0 0 2px; font-size: 13px; color: var(--mute); }
-.shelf-title { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; word-break: keep-all; }
-.shelf-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; padding: 0; list-style: none; counter-reset: shelf-step; }
-.shelf-steps li { counter-increment: shelf-step; display: flex; align-items: center; gap: 6px; padding: 7px 12px 7px 8px; border-radius: 999px; background: var(--soft); font-size: 14px; font-weight: 600; }
-.shelf-steps li::before { content: counter(shelf-step); display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 11px; }
-.shelf-pic { padding: 0 16px; }
-.shelf-svg { display: block; width: 100%; height: auto; border-radius: 14px; }
-.shelf-note { display: flex; justify-content: space-between; gap: 8px; padding: 10px 20px 0; font-size: 12px; color: var(--mute); }
-.shelf-actions { display: flex; gap: 8px; padding: 12px 20px 0; }
-.shelf-actions button { flex: 1; min-height: 52px; font-size: 16px; }
-.shelf-actions .btn-dark { flex: 2; }
-.shelf-svg .s-bg { fill: var(--soft-2); }
-.shelf-svg .s-frame { fill: var(--soft); stroke: var(--line-2); }
-.shelf-svg .s-board-row { fill: var(--paper); stroke: var(--line-2); }
-.shelf-svg .s-board { fill: var(--soft); stroke: var(--line-2); }
-.shelf-svg .s-board.on { fill: var(--ink); stroke: var(--ink); }
-.shelf-svg .s-name { font-size: 11px; font-weight: 700; fill: var(--ink-2); }
-.shelf-svg .s-name.on { fill: var(--paper); }
-.shelf-svg .s-div, .shelf-svg .s-ledge { fill: var(--line-2); }
-.shelf-svg .s-tube, .shelf-svg .s-handle { fill: var(--faint); }
-.shelf-svg .s-cap { fill: var(--ink-2); }
-.shelf-svg .s-cap.alt { fill: var(--mute); }
-.shelf-svg .s-tag { fill: var(--paper); stroke: var(--line-2); stroke-width: 0.6; }
-.shelf-svg .s-tier { font-size: 9px; font-weight: 700; fill: var(--mute); }
-.shelf-svg .s-base { fill: var(--soft-2); }
-.shelf-svg .s-drawer { fill: var(--soft); stroke: var(--line-2); }
-.shelf-svg .s-dim { fill: #000; opacity: 0.45; }
-.shelf-svg .s-hit { fill: none; stroke: var(--ink); stroke-width: 3; }
-.shelf-svg .s-corner { fill: none; stroke: var(--paper); stroke-width: 2.5; }
-.shelf-svg .s-pin { fill: var(--ink); }
-.shelf-svg .s-pin-text { font-size: 11px; font-weight: 700; fill: var(--paper); }
-/* 추천 카드: 매대 정보가 없는 브랜드 (눌리지 않는 글자) */
-.shelf-none { align-self: center; padding: 0 4px; font-size: 13px; color: var(--mute); }
-/* 휴대폰 챗봇 위치 카드 (chat.js) */
-.shelf-card { margin: 6px 0 10px; padding: 10px; border-radius: 14px; background: var(--paper); box-shadow: 0 0 0 1px var(--line); }
-.shelf-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; }
-.shelf-card-head .shelf-dot { width: 22px; height: 22px; }
-.shelf-card-head span:last-child { margin-left: auto; color: var(--mute); font-size: 13px; }
-/* 위치 시트: 립 매대 칸 줄 (A B C …, 찾는 칸만 검게) */
-.shelf-bays { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 10px; padding: 0; list-style: none; }
-.shelf-bays li { display: grid; place-items: center; min-width: 28px; height: 28px; padding: 0 4px; border-radius: 8px; background: var(--soft); color: var(--mute); font-size: 13px; font-weight: 700; }
-.shelf-bays li.on { background: var(--ink); color: var(--paper); }
 /* 챗봇 답: 문장마다 줄을 바꾸고(chat.js asLines) 줄 사이를 살짝 띄워 읽기 쉽게 (2026-11-11) */
 .chat-log .bubble.bot .btext { white-space: pre-line; line-height: 1.6; }
+
+/* ================= 호수 안내 (shades.html) =================
+   세로 화면 기준. 호수 색 동그라미만 실제 색이고 나머지는 무채색. 품절·재고는 색이 아니라 글자로 알린다 */
+.sh-body { background: var(--paper); }
+.sh-page { max-width: 720px; margin: 0 auto; padding: 16px 16px max(24px, env(safe-area-inset-bottom)); }
+.sh-page { display: flex; flex-direction: column; gap: 14px; min-height: calc(100dvh - var(--nav-h)); }
+.sh-head { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.sh-back { min-height: 44px; }
+.sh-brand, .sh-count { color: var(--ink-2); font-size: 14px; }
+.sh-title h1 { margin: 2px 0; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; word-break: keep-all; }
+.sh-count { margin: 0; }
+.sh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.sh-shade { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 116px; padding: 10px 4px; background: var(--paper); border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); line-height: 1.25; }
+.sh-shade[aria-pressed="true"], .sh-shade[aria-pressed="true"]:hover { background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); }
+.sh-dot { width: 48px; height: 48px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); margin-bottom: 4px; }
+.sh-no { font-size: 14px; font-weight: 800; }
+.sh-name { font-size: 13px; color: var(--ink-2); word-break: keep-all; text-align: center; }
+.sh-out { font-size: 12px; font-weight: 700; color: var(--paper); background: var(--ink-2); border-radius: 6px; padding: 1px 6px; margin-top: 2px; }
+.sh-detail { position: sticky; bottom: 0; margin-top: auto; padding: 16px; border-radius: var(--r); background: var(--paper); box-shadow: 0 0 0 1px var(--line), var(--shadow-up); }
+.sh-detail-top { display: flex; align-items: center; gap: 14px; }
+.sh-big-dot { flex: none; width: 64px; height: 64px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
+.sh-detail-name { display: flex; flex-direction: column; line-height: 1.25; }
+.sh-detail-no { font-size: 15px; font-weight: 700; color: var(--ink-2); }
+.sh-detail-name strong { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; word-break: keep-all; }
+.sh-desc { margin: 10px 0 0; font-size: 16px; line-height: 1.5; word-break: keep-all; }
+.sh-facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.sh-facts li { padding: 4px 10px; border-radius: 999px; background: var(--soft); font-size: 13px; font-weight: 600; }
+.sh-actions { display: flex; gap: 8px; margin-top: 14px; }
+.sh-actions button { flex: 1; min-height: 52px; font-size: 16px; }
+.sh-try { display: flex; flex-direction: column; gap: 6px; }
+.sh-try .stage { aspect-ratio: auto; height: 40dvh; }
+@media (min-width: 700px) { .sh-try .stage { height: 54dvh; } }
+.sh-try .source-row { flex-wrap: nowrap; }
+.sh-try #guide:empty { display: none; }
+.sh-try > .row:not(.source-row):not(:has(button:not(.hidden))) { display: none; }
+/* 발라 보는 중: 제품 이름을 줄이고 동그라미를 한 줄로 */
+.sh-page.trying .sh-title h1 { font-size: 18px; }
+.sh-page.trying .sh-count, .sh-page.trying .sh-back { display: none; }
+.sh-page.trying .sh-grid { display: flex; overflow-x: auto; padding: 2px; scrollbar-width: none; }
+.sh-page.trying .sh-shade { flex: 0 0 84px; min-height: 0; padding: 8px 2px; }
+.sh-page.trying .sh-name { display: none; }
+.sh-page.trying .sh-desc, .sh-page.trying .sh-facts { display: none; }
+.sh-page.trying .sh-big-dot { width: 44px; height: 44px; }
+.sh-page.trying .sh-detail-name strong { font-size: 20px; }
+.sh-page.trying .sh-actions { margin-top: 10px; }
+.shade-open { min-height: 36px; }
+.shelf-stock { margin: 6px 0 0; font-size: 18px; font-weight: 800; }
+
+
+/* ---------- 화면 터치 키보드 (js/touch-keyboard.js): 챗봇 입력줄 아래에 열리는 한/영 키보드 ---------- */
+.tkb { flex: none; margin-top: 4px; padding: 4px 4px 6px; border-radius: 16px; background: var(--soft-2); user-select: none; -webkit-user-select: none; touch-action: manipulation; animation: took-fade 0.2s var(--ease) backwards; }
+.tkb-top { display: flex; justify-content: flex-end; }
+.tkb-hide { min-height: 28px; width: 48px; padding: 0; display: grid; place-items: center; background: transparent; box-shadow: none; color: var(--ink-2); }
+.tkb-rows { display: flex; flex-direction: column; gap: 6px; max-width: 760px; margin: 0 auto; }
+.tkb-row { display: flex; gap: 5px; justify-content: center; }
+.tkb-row-mid { padding: 0 4.5%; }
+.tkb-key { flex: 1 1 0; min-width: 0; min-height: 46px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: var(--paper); color: var(--ink); font-size: 19px; font-weight: 500; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12); }
+.tkb-key:active { background: var(--line-2); }
+.tkb-fn { flex: 1.4 1 0; background: var(--line-2); font-size: 14px; font-weight: 600; }
+.tkb-fn:active { background: var(--faint); }
+.tkb-shift[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tkb-row-bottom .tkb-fn { flex: 1.3 1 0; }
+.tkb-space { flex: 4 1 0; font-size: 14px; color: var(--mute); }
+.tkb-enter { flex: 2 1 0; background: var(--ink); color: var(--paper); font-size: 15px; font-weight: 700; }
+.tkb-enter:active { background: var(--ink-2); }
+:root[data-theme="dark"] .tkb { background: #2a2a2a; }
+:root[data-theme="dark"] .tkb-key { background: #3d3d3d; color: #fff; box-shadow: none; }
+:root[data-theme="dark"] .tkb-fn { background: #1f1f1f; }
+:root[data-theme="dark"] .tkb-enter, :root[data-theme="dark"] .tkb-shift[aria-pressed="true"] { background: #fff; color: #111; }
+
+/* ================= 가로 키오스크 (스탠드형 동그란 거울 + 갤럭시탭 S10 FE+ 가로, 1280×800 기준, 2026-11-11) ================= */
+@media (orientation: landscape) and (min-width: 960px) {
+  /* 챗봇: 터치 키보드가 열리면 큰 마이크를 입력줄 오른쪽 작은 버튼으로 줄여 대화창 높이를 지킨다 */
+  .chat-shell:has(> .tkb:not(.hidden)) .chat-input.voice-only { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "heard mic"; column-gap: 10px; }
+  .chat-shell:has(> .tkb:not(.hidden)) .chat-input.voice-only #voice { width: 48px; height: 48px; min-height: 48px; }
+  .chat-shell:has(> .tkb:not(.hidden)) .chat-input.voice-only #voice svg { width: 22px; height: 22px; }
+  .chat-shell:has(> .tkb:not(.hidden)) .nfc-hint, .chat-shell:has(> .tkb:not(.hidden)) #voice-status:empty { display: none; }
+  /* 대화 속 추천 카드: 가로 화면은 높이가 귀하므로 사진을 낮게 */
+  .chat-user .chat-shell .mini-list .card-img { max-height: 104px; }
+}
+/* 호수 안내 (shades.html): 가로 키오스크는 [호수 동그라미 | 제품·고른 호수], 발라 보기 중에는 [카메라 | 제품·호수 한 줄·고른 호수] */
+@media (orientation: landscape) and (min-width: 960px) {
+  .sh-page { max-width: 1240px; height: calc(100dvh - var(--nav-h)); min-height: 0; padding: 20px 28px; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 28px; row-gap: 14px; overflow: hidden; }
+  .sh-head { grid-column: 2; grid-row: 1; }
+  .sh-grid { grid-column: 1; grid-row: 1 / -1; align-content: start; overflow-y: auto; padding: 2px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  .sh-detail { grid-column: 2; grid-row: 2; position: static; align-self: start; margin: 0; }
+  /* 발라 보기: 왼쪽은 카메라가 화면 높이를 다 쓰고, 호수는 오른쪽에 한 줄 */
+  .sh-page.trying { grid-template-rows: auto auto minmax(0, 1fr); }
+  .sh-page.trying .sh-try { grid-column: 1; grid-row: 1 / -1; min-height: 0; }
+  .sh-page.trying .sh-try .stage { flex: 1 1 auto; height: auto; min-height: 0; }
+  .sh-page.trying .sh-grid { grid-column: 2; grid-row: 2; overflow-y: hidden; }
+  .sh-page.trying .sh-detail { grid-row: 3; }
+}

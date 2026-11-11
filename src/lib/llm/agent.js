@@ -14,7 +14,7 @@ import { abEnabled, abVariant, recordTurn } from '../ab.js';
 
 const MAX_STEPS = 4;
 
-// 상담 프롬프트 (2026-11-09 개편): 매장 팔레트 결과를 QR 로 이어받은 손님 휴대폰에서도, 매장 태블릿에서도 쓰는 친근한 립 컬러 상담원.
+// 상담 프롬프트 (2026-11-09 개편): 매장 태블릿에서 쓰는 친근한 립 컬러 상담원.
 // 답 형식(JSON)·제품 이름과 가격은 서버가 채운다는 규칙은 그대로다 (validateFinal 이 검사). 지금 상황(기기·언어·매장 결과)은 contextNote 가 붙인다.
 const SYSTEM = `# 너는 누구인가
 너는 립 컬러 서비스 'took(툭)'의 AI 도우미 "툭"이다. 손님이 매장 팔레트에서 직접 섞어 본 색을 함께 들여다보고,
@@ -24,7 +24,7 @@ const SYSTEM = `# 너는 누구인가
 
 # 말투
 - 한국어는 부드러운 해요체 존댓말. 호칭은 쓰지 않거나 "손님"까지만(이름·나이·성별을 짐작하지 않는다).
-- 짧게: 1~2문장, 휴대폰 한 화면에 들어가게. 같은 말로 시작하지 말고 손님 말을 한 번 받아 준 뒤 핵심으로 간다.
+- 짧게: 1~2문장, 한 화면에 들어가게. 같은 말로 시작하지 말고 손님 말을 한 번 받아 준 뒤 핵심으로 간다.
   예) "촉촉한 느낌 좋죠." / "데이트 날이면 살짝 생기 있게 가 볼까요?"
 - 괄호로 덧붙이지 않는다. 덧붙일 말은 문장으로 쓴다. 예) "벨벳(매트)" 대신 "보송한 벨벳 제형이에요."
 - 감탄사·느낌표는 한 답에 하나까지. 이모지는 쓰지 않는다(화면이 무채색이고, 매장에선 답을 소리로 읽는다).
@@ -64,17 +64,15 @@ const brandRe = (b) => new RegExp(`(^|[^가-힣A-Za-z])${b.replace(/[.*+?^${}()|
 
 const TEXTURE_NAMES = { matte: '매트', satin: '새틴', glossy: '글로시', sheer: '시어', shimmer: '쉬머' };
 
-function contextNote({ base, tone, selectedHex, shown, channel, lang, handoff }) {
+function contextNote({ base, tone, selectedHex, shown, lang, handoff }) {
   const lines = [];
-  lines.push(channel === 'phone'
-    ? '기기: 손님 휴대폰 (매장 팔레트 QR 로 이어서 상담 중, 글로 읽음)'
-    : '기기: 매장 태블릿 (답을 소리로도 읽어 줌)');
+  lines.push('기기: 매장 태블릿 (답을 소리로도 읽어 줌)');
   if (lang === 'en') lines.push('답 언어: 영어 (say 를 영어로)');
   if (base) lines.push(`기준 제품: ${JSON.stringify(brief(base))}`);
   if (selectedHex) {
     const h = handoff && typeof handoff === 'object' ? handoff : {};
     const extra = [TEXTURE_NAMES[h.finish] && `제형 ${TEXTURE_NAMES[h.finish]}`, Number.isFinite(h.intensity) && `농도 ${h.intensity}%`].filter(Boolean).join(', ');
-    lines.push(`${channel === 'phone' ? '매장 팔레트에서 만든 색' : '팔레트에서 고른 색'}: ${selectedHex}${extra ? ` (${extra})` : ''}`);
+    lines.push(`팔레트에서 고른 색: ${selectedHex}${extra ? ` (${extra})` : ''}`);
   }
   if (tone) lines.push(`카메라로 추정한 퍼스널 톤(참고값): ${tone}`);
   if (shown.length) lines.push(`방금 보여 준 제품(순서대로): ${JSON.stringify(shown.map(brief))}`);
@@ -115,13 +113,13 @@ export function validateFinal(text, allowed) {
  * @param {{ complete?: Function }} [opts] complete: LLM 호출 함수 (테스트에서 가짜로 바꾼다)
  */
 export async function llmAnswer(input, { complete = chatCompletion, limit = 5 } = {}) {
-  const { message, baseProductId = null, selectedHex = null, context = null, tone = null, channel = 'kiosk', lang = 'ko', handoff = null } = input;
+  const { message, baseProductId = null, selectedHex = null, context = null, tone = null, lang = 'ko', handoff = null } = input;
   const ctx = context && typeof context === 'object' ? context : {};
   const shown = (ctx.shown || []).map(findById).filter(Boolean);
   const base = baseProductId ? findById(baseProductId) : null;
   const state = { seen: new Map(shown.map((p) => [p.id, p])), lastSearch: null };
   const messages = [
-    { role: 'system', content: SYSTEM + contextNote({ base, tone, selectedHex, shown, channel, lang, handoff }) },
+    { role: 'system', content: SYSTEM + contextNote({ base, tone, selectedHex, shown, lang, handoff }) },
     { role: 'user', content: message },
   ];
   let retried = false;

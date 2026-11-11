@@ -87,8 +87,8 @@
       <div class="row seg" id="textures" role="group" aria-label="텍스처" data-i18n-aria="pal.textures"></div>
       <div class="slider"><label for="intensity" data-i18n="pal.intensity">농도</label><input type="range" id="intensity" min="0" max="100" step="1"><output id="intensity-out"></output></div>
       <button type="button" id="find" class="btn-dark" disabled data-i18n="pal.find">이 색과 비슷한 제품 추천</button>
-      <!-- 지금 결과(색·텍스처·농도·내 톤·추천 제품)를 QR 로 손님 휴대폰에 넘겨 챗봇과 이어서 대화 (js/palette.js openTake) -->
-      <button type="button" id="take-phone" class="take-phone" disabled data-i18n="pal.take">휴대폰으로 가져가기</button>
+      <!-- 지금 결과(색·텍스처·농도·내 톤·추천 제품)를 이 태블릿의 챗봇으로 넘겨 이어서 대화 (js/palette.js openTake) -->
+      <button type="button" id="take-phone" class="take-phone" disabled data-i18n="pal.take">챗봇과 이어서 상담</button>
     </section>
 
     <!-- ④ 추천 결과 (추천을 받은 뒤에만) -->
@@ -99,7 +99,7 @@
       </div>
       <p id="rec-status" class="muted small" aria-live="polite"></p>
       <div id="rec-list" class="pal-rec"></div>
-      <button type="button" id="take-phone-res" class="take-phone" data-i18n="pal.take">휴대폰으로 가져가기</button>
+      <button type="button" id="take-phone-res" class="take-phone" data-i18n="pal.take">챗봇과 이어서 상담</button>
     </section>
   </div>
 
@@ -114,17 +114,6 @@
   <div class="row">
     <button type="button" id="pal-nfc-close" data-i18n="pal.nfcClose">닫기</button>
     <button type="button" id="pal-nfc-newcode" data-i18n="pal.nfcNewCode">번호 바꾸기</button>
-  </div>
-</dialog>
-<!-- 휴대폰으로 가져가기: QR 을 찍으면 손님 휴대폰의 챗봇(chat.html?from=palette…)이 이 결과로 대화를 시작한다 -->
-<dialog id="take-dialog" class="pal-nfc-dialog take-dialog" aria-labelledby="take-title">
-  <h2 id="take-title" data-i18n="pal.takeTitle">휴대폰으로 이어서 상담하기</h2>
-  <p class="muted small" data-i18n="pal.takeHelp">휴대폰 카메라로 QR 을 찍으면 이 결과로 챗봇과 이어서 대화해요. 사진·영상은 보내지 않아요.</p>
-  <div class="take-sum"><span id="take-swatch" class="color-dot" aria-hidden="true"></span><strong id="take-summary"></strong></div>
-  <div id="take-qr" class="take-qr" role="img" aria-label="휴대폰 챗봇 연결 QR 코드" data-i18n-aria="pal.takeQrAria"></div>
-  <p id="take-url" class="small take-url"></p>
-  <div class="row">
-    <button type="button" id="take-close" class="btn-dark" data-i18n="pal.takeClose">닫기</button>
   </div>
 </dialog>
 <script type="module" src="js/lip.js"></script>

@@ -3,7 +3,7 @@
 // 직전 대화(context)를 받아 "그중에 제일 싼 거", "두 번째 거 자세히", "더 보여 줘", "매트 말고" 같은 이어지는 질문에도 답한다.
 import { FINISH_LABELS, FAMILY_LABELS } from './constants.js';
 import { hexToLab, deltaE2000, normalizeHex } from './color.js';
-import { allProducts, findById, fullName, shortName } from './catalog.js';
+import { allProducts, findById, findNamedProduct, shadesOf, fullName, shortName } from './catalog.js';
 import { withSimilarity } from './recommend.js';
 import { normalizeSpoken } from './spoken.js';
 import { SITUATIONS } from './situations.js';
@@ -801,6 +801,25 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
       suggestions: (EN
         ? [shown.length >= 2 ? `Compare the first and ${ord(i === 0 ? 1 : i)}` : null, 'Which is the cheapest of those?', 'Show more']
         : [`${ord(i)} 거 기준으로 골라 줘`, shown.length >= 2 ? `첫 번째랑 ${ord(i === 0 ? 1 : i)} 비교해 줘` : null, '다른 거 더 보여 줘']).filter(Boolean),
+    });
+  }
+
+  // ---------- 제품 이름을 부른 말 ("페리페라 잉크 더 에어리 벨벳 틴트") → 그 제품 하나를 보여 준다 ----------
+  const named = findNamedProduct(spoken.text);
+  if (named) {
+    const shades = shadesOf(named);
+    // 호수가 있는 제품은 카드에 '색상 보기'가 붙는다. 제품 하나를 가리키므로 호수 이름은 뺀다
+    const card = shades.length ? { ...named, shade_name: null, shade_count: shades.length } : named;
+    const name = shortOf(card);
+    const reply = shades.length
+      ? L(`${josa(name, '을', '를')} 찾았어요. 색이 ${shades.length}가지 있어요. '색상 보기'를 누르면 호수와 색 이름을 한 화면에서 볼 수 있어요.`,
+        `Found ${name}. It comes in ${shades.length} shades. Tap "See shades" to view every shade number and name on one screen.`)
+      : L(`${josa(name, '을', '를')} 찾았어요.${named.color_options ? ` 색은 ${named.color_options}가지예요.` : ''} 호수별 색 정보는 아직 등록되지 않았어요.`,
+        `Found ${name}.${named.color_options ? ` It comes in ${named.color_options} shades.` : ''} Individual shade info isn't registered yet.`);
+    return out({
+      reply, products: [card],
+      context: { ...ctx, shown: [card.id], offset: 0 },
+      suggestions: L(['첫 번째 거 자세히 알려 줘', '데일리 립 추천해 줘'], ['Tell me more about the first one', 'Recommend an everyday lip']),
     });
   }
 

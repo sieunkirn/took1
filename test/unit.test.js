@@ -670,3 +670,30 @@ test('A/B: 같은 세션은 늘 같은 쪽, style 쪽만 다듬고 control 은 �
   assert.equal(st.style.styleSuccessRate, 1);
   assert.equal(st.control.turns, 1);
 });
+
+// ---------- 호수 안내·바코드 찾기 (시연용 호수 데이터) ----------
+test('시연용 호수 데이터: 바코드·ID 로 찾고, 같은 제품의 호수를 모으며, 추천 목록에는 섞이지 않는다', async () => {
+  const { allDemoProducts, findById, findByBarcode, allProducts } = await import('../src/lib/repository.js');
+  const { shadesOf } = await import('../src/lib/catalog.js');
+  const demo = allDemoProducts();
+  assert.equal(new Set(demo.map((p) => p.barcode)).size, demo.length);
+  assert.ok(demo.every((p) => p.source === 'demo' && p.shade_no && p.shade_color && Number.isFinite(p.stock)));
+  assert.equal(findById('D101').shade_no, '01');
+  assert.equal(shadesOf(findById('D101')).length, 15);
+  assert.ok(findByBarcode(findById('D101').barcode));
+  assert.ok(!allProducts().some((p) => p.source === 'demo'));
+});
+
+test('챗봇: 제품 이름을 부르면 그 제품을 보여 주고, 조건이 붙은 말은 기존 검색으로 간다', async () => {
+  const { answer } = await import('../src/lib/chat.js');
+  const named = answer({ message: '데일리톤 컬러 플레이 틴트 색상 보여줘' });
+  assert.equal(named.products.length, 1);
+  assert.equal(named.products[0].shade_count, 15);
+  assert.equal(named.products[0].shade_name, null);
+  assert.ok(named.reply.includes('15가지'));
+  assert.deepEqual(named.context.shown, [named.products[0].id]);
+  const search = answer({ message: '모노랩 벨벳 립 무스보다 저렴한 거 추천해 줘' });
+  assert.ok(!search.products.some((p) => p.shade_count));
+  const generic = answer({ message: '벨벳 틴트' });
+  assert.ok(!generic.products.some((p) => p.shade_count));
+});
