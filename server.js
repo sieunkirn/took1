@@ -12,7 +12,7 @@ import { hybridAnswer } from './src/lib/llm/agent.js';
 import { abEnabled, abStats, recordEvent } from './src/lib/ab.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
-import { createSession, getSession, notify, poll, lanAddress, openCodeSession, joinByCode } from './src/lib/pairing.js';
+import { createSession, getSession, notify, poll, lanAddress } from './src/lib/pairing.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 // .env (LLM 주소·키 등 서버 전용 설정). 없으면 규칙 챗봇만 쓴다
@@ -45,20 +45,6 @@ async function readBody(req) {
     if (data.length > 1e5) throw new Error('요청 본문이 너무 큽니다.');
   }
   return data ? JSON.parse(data) : {};
-}
-
-// ---------- NFC 테스트: 휴대폰이 보낸 인식 결과 검사 (정해진 모양만 통과, 나머지는 버린다) ----------
-const NFC_KINDS = new Set(['ndef', 'ndef-empty', 'unreadable']);
-const NFC_STATES = new Set(['idle', 'ready', 'unsupported', 'insecure', 'denied', 'off', 'nohw', 'error']);
-export function sanitizeNfcReading(b) {
-  if (!b || !NFC_KINDS.has(b.kind)) return null;
-  const masked = typeof b.masked === 'string' && /^[0-9A-F•:]{0,64}$/.test(b.masked) ? b.masked : '';
-  const fp = typeof b.fp === 'string' && /^[0-9a-f]{16}$/.test(b.fp) ? b.fp : null;
-  const tookId = typeof b.tookId === 'string' && /^TOOK-\d{3}$/.test(b.tookId) ? b.tookId : null;
-  const records = (Array.isArray(b.records) ? b.records : []).slice(0, 8)
-    .map((r) => ({ type: String(r?.type || '').slice(0, 40), mediaType: r?.mediaType ? String(r.mediaType).slice(0, 60) : null, bytes: Math.max(0, Math.min(1e6, Number(r?.bytes) || 0)) }))
-    .filter((r) => /^[\w:./+\-]{1,40}$/.test(r.type));
-  return { kind: b.kind, masked, fp, tookId, records };
 }
 
 // 휴대폰이 열 수 있는 이 서버 주소 (끝에 /). 없으면 null
@@ -125,23 +111,11 @@ async function handleApi(req, res, url) {
   }
   // ---------- 휴대폰 ↔ PC 연결 (QR) ----------
   if (req.method === 'POST' && path === '/api/pair') {
-    const body = await readBody(req).catch(() => ({}));
-    const nfc = body.target === 'nfc'; // NFC 테스트·팔레트: 휴대폰을 NFC 리더기로 쓰고, 네 자리 번호로도 연결한다
-    const { id, code } = nfc ? openCodeSession(typeof body.code === 'string' ? body.code : null) : { id: createSession(), code: null };
+    const id = createSession();
     const base = phoneBase(req);
-    if (nfc) return sendJson(res, 200, { id, code, phoneUrl: base && `${base}nfc-phone.html?c=${code}`, phoneBase: base && `${base}nfc-phone.html` });
     return sendJson(res, 200, { id, phoneUrl: base && `${base}scan-phone.html?s=${id}` });
   }
-  // 휴대폰이 네 자리 번호로 연결 → 연결 id
-  if (req.method === 'POST' && path === '/api/pair/join') {
-    const body = await readBody(req).catch(() => ({}));
-    const who = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
-    const r = joinByCode(String(body.code || ''), who);
-    if (r.error === 'blocked') return sendJson(res, 429, { error: '번호를 여러 번 틀렸어요. 5분 뒤에 다시 해 주세요.' });
-    if (r.error) return sendJson(res, 404, { error: '맞는 번호가 없어요. 컴퓨터 화면의 네 자리 번호를 확인해 주세요.' });
-    return sendJson(res, 200, { id: r.id });
-  }
-  m = path.match(/^\/api\/pair\/([0-9a-f]{16})\/(poll|hello|code|nfc|nfcstate)$/);
+  m = path.match(/^\/api\/pair\/([0-9a-f]{16})\/(poll|hello|code)$/);
   if (m) {
     const [, id, action] = m;
     if (!getSession(id)) return sendJson(res, 404, { error: '연결이 끝났어요. PC 화면에서 QR 을 다시 띄워 주세요.' });
@@ -157,20 +131,6 @@ async function handleApi(req, res, url) {
       const p = findByBarcode(code);
       notify(id, 'code', { code });
       return sendJson(res, 200, { ok: true, code, found: !!p, name: p ? `${p.brand} ${p.name} ${p.shade_name}` : null });
-    }
-    // 휴대폰(갤럭시 S24 등)이 Web NFC 로 읽은 태그. 원래 카드 번호는 받지 않고 가린 번호·지문·테스트용 식별값만 받아 메모리에 잠깐 둔다
-    if (req.method === 'POST' && action === 'nfc') {
-      const reading = sanitizeNfcReading(await readBody(req));
-      if (!reading) return sendJson(res, 400, { error: 'NFC 인식 결과 형식이 맞지 않아요.' });
-      notify(id, 'nfc', reading);
-      return sendJson(res, 200, { ok: true });
-    }
-    // 휴대폰 쪽 NFC 상태 (대기 중·꺼짐·미지원 등)
-    if (req.method === 'POST' && action === 'nfcstate') {
-      const body = await readBody(req);
-      if (!NFC_STATES.has(body.state)) return sendJson(res, 400, { error: '알 수 없는 NFC 상태예요.' });
-      notify(id, 'nfcstate', { state: body.state });
-      return sendJson(res, 200, { ok: true });
     }
   }
   return sendJson(res, 404, { error: '알 수 없는 API 입니다.' });

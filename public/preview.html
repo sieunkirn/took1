@@ -8,9 +8,8 @@
 <style>
   /* 직원용: 노트북·PC 에서 키오스크 화면을 그대로 띄워 본다 (common.js openInTabFrame 이 자동으로 이리 보낸다).
      키오스크 = 스탠드형 동그란 거울 안에 갤럭시탭 S10 FE+ 를 세로로 넣은 것 (2026-11-11 가로 → 다시 세로).
-     탭 화면(기본 800×1280, 추정값)을 돌리지 않고 창에 맞춰 키우거나 줄인다. 보기 방식:
-     ① 거울 틀: 탭을 감싼 동그란 거울 테두리까지 (거울 지름 = 탭 대각선 + 여백)
-     ② 탭만: 검은 베젤만 둘러 화면을 가장 크게 */
+     탭 화면(기본 800×1280, 추정값)을 돌리지 않고 창에 맞춰 키우거나 줄인다.
+     보기 방식은 거울 틀(탭을 감싼 동그란 거울 테두리, 거울 지름 = 탭 대각선 + 여백) 하나 */
   html, body { height: 100%; overflow: hidden; background: #e4e4e4; }
   .pv-stage { position: fixed; inset: 0; display: grid; place-items: center; }
   .pv-mirror { position: relative; display: grid; place-items: center; border-radius: 50%; }
@@ -21,17 +20,6 @@
   .pv-standleg { display: none; position: absolute; left: 50%; top: 100%; width: 22px; translate: -50% 0; background: linear-gradient(90deg, #3a3a3a, #222); border-radius: 0 0 4px 4px; }
   .mirror-on .pv-standleg { display: block; }
   /* 설정: 왼쪽 위 작은 버튼 */
-  .pv-bar { position: fixed; top: 12px; left: 12px; z-index: 5; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 18px; background: rgba(255, 255, 255, 0.95); box-shadow: var(--shadow-up); width: 236px; }
-  .pv-bar.folded { width: auto; }
-  .pv-bar.folded > :not(#pv-fold) { display: none; }
-  #pv-fold { min-height: 40px; padding: 4px 14px; background: var(--soft); font-size: 14px; }
-  .pv-mode { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 12px 14px; text-align: left; box-shadow: inset 0 0 0 1px var(--line-2); background: var(--paper); }
-  .pv-mode b { font-size: 15px; }
-  .pv-mode span { font-size: 12px; font-weight: 500; color: var(--mute); }
-  .pv-mode[aria-pressed="true"], .pv-mode[aria-pressed="true"]:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
-  .pv-mode[aria-pressed="true"] span { color: rgba(255, 255, 255, 0.7); }
-  .pv-bar label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--mute); }
-  .pv-bar select { font-size: 14px; }
   /* 거울 필름 테스트 (2026-11-11): 거울 유리에 브라운·실버 필름을 붙였을 때 화면이 어떻게 보일지 겹쳐 본다 (근사값, 실제 필름 투과율과 다를 수 있음).
      필름 색은 시뮬레이션이라 실제 색으로 칠한다. 화면을 누르는 데 방해되지 않게 pointer-events 없음 */
   .pv-film { position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: calc(var(--bezel, 10px) + 10px); display: none; }
@@ -50,6 +38,10 @@
   .pv-films small { font-size: 11px; color: var(--mute); line-height: 1.35; }
   .pv-films p:not(:first-child) { margin-top: 8px; }
   .pv-films .pv-rotate { font-weight: 700; }
+  /* 필름 해결방안 (2026-11-11): 필름을 붙인 채 색 보정·다크 모드를 켜고 끄며 비교한다. 미리보기에서만 적용되고 실제 화면 코드는 그대로 */
+  .pv-films .pv-fix { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .pv-films .pv-fix::after { content: '끔'; font-size: 12px; font-weight: 500; color: var(--mute); }
+  .pv-films .pv-fix[aria-pressed="true"]::after { content: '켬'; color: rgba(255, 255, 255, 0.7); }
 </style>
 </head>
 <body data-idle-reset="off">
@@ -60,26 +52,20 @@
     <div class="pv-standleg" id="pv-leg" aria-hidden="true"></div>
   </div>
 </div>
+<!-- 색 보정 필터: 화면을 필름 색의 반대로 미리 기울여, 필름을 지난 뒤 눈에는 중립으로 보이게 한다 (값은 setFilm 에서 필름별로 채운다) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="pv-comp" color-interpolation-filters="sRGB"><feColorMatrix id="pv-comp-m" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/></filter></svg>
 <div class="pv-films" id="pv-films" role="group" aria-label="거울 필름 테스트">
   <p>필름 테스트</p>
   <button type="button" data-film="none" aria-pressed="true">필름 없음</button>
   <button type="button" data-film="brown" aria-pressed="false">브라운 필름</button>
   <button type="button" data-film="silver" aria-pressed="false">실버 필름</button>
   <small>근사 시뮬레이션이에요. 실제 필름과 다를 수 있어요</small>
+  <p>해결방안</p>
+  <button type="button" class="pv-fix" id="pv-fix-color" aria-pressed="false">색 보정</button>
+  <button type="button" class="pv-fix" id="pv-fix-dark" aria-pressed="false">다크 모드</button>
+  <small id="pv-fix-note">필름을 고르면 그 필름 색을 상쇄해요</small>
   <p>화면 방향</p>
   <button type="button" id="pv-rotate" class="pv-rotate" aria-label="화면 방향 바꾸기">세로 ↔ 가로</button>
-</div>
-<div class="pv-bar folded" id="pv-bar">
-  <button type="button" id="pv-fold" aria-expanded="false">설정</button>
-  <button type="button" class="pv-mode" data-mode="mirror" aria-pressed="false"><b>거울 틀</b><span>동그란 거울 안에 세로로 넣은 모습</span></button>
-  <button type="button" class="pv-mode" data-mode="tab" aria-pressed="false"><b>탭만</b><span>갤럭시탭 세로 화면을 창에 가장 크게</span></button>
-  <label>화면
-    <select id="pv-page">
-      <option value="index.html">홈(대기 화면)</option>
-      <option value="palette.html">팔레트</option>
-      <option value="chat.html">AI 뷰티 챗봇</option>
-    </select>
-  </label>
 </div>
 <script>
   const $ = (id) => document.getElementById(id);
@@ -91,8 +77,7 @@
   let DEVICE = (() => { try { return localStorage.getItem('took.previewOrient') === 'landscape' ? [1280, 800] : PORTRAIT; } catch { return PORTRAIT; } })();
   const reloaded = performance.getEntriesByType?.('navigation')?.[0]?.type === 'reload';
   const params = new URLSearchParams(location.search);
-  const saved = (() => { try { return localStorage.getItem('took.mirrorPreview'); } catch { return null; } })();
-  let mode = saved === 'tab' ? 'tab' : 'mirror';
+  const mode = 'mirror'; // 보기 방식은 거울 틀로 고정 (왼쪽 위 '설정' 버튼은 2026-11-12 삭제)
 
   const fit = () => {
     const W = innerWidth, H = innerHeight;
@@ -130,11 +115,43 @@
       fb.style.top = Math.max(12, box.top + box.height / 2 - fb.offsetHeight / 2) + 'px';
     });
   };
+  // 필름 해결방안: 색 보정 / 다크 모드 (각각 켜고 끈다, 기억해 둔다)
+  // 필름별 채널 투과율 = 1 - α + α × 필름색/255 (위 CSS 의 multiply 값과 같은 계산). 가장 낮은 채널에 맞춰 나머지를 줄이면 중립 회색이 된다
+  const FILM_RGBA = { brown: [96, 60, 32, 0.6], silver: [118, 122, 128, 0.62] };
+  const loadFix = () => { try { return JSON.parse(localStorage.getItem('took.filmFix')) || {}; } catch { return {}; } };
+  const fix = { color: !!loadFix().color, dark: !!loadFix().dark };
+  let film = 'none';
+  const applyFix = () => {
+    try { localStorage.setItem('took.filmFix', JSON.stringify(fix)); } catch { /* 저장 불가 환경 */ }
+    $('pv-fix-color').setAttribute('aria-pressed', String(fix.color));
+    $('pv-fix-dark').setAttribute('aria-pressed', String(fix.dark));
+    const c = FILM_RGBA[film];
+    if (c) {
+      const t = c.slice(0, 3).map((v) => 1 - c[3] + c[3] * v / 255);
+      const k = t.map((v) => Math.min(...t) / v);
+      $('pv-comp-m').setAttribute('values', `${k[0].toFixed(3)} 0 0 0 0  0 ${k[1].toFixed(3)} 0 0 0  0 0 ${k[2].toFixed(3)} 0 0  0 0 0 1 0`);
+    }
+    frame.style.filter = fix.color && c ? 'url(#pv-comp)' : '';
+    $('pv-fix-note').textContent = !c ? '필름을 고르면 그 필름 색을 상쇄해요' : fix.color ? '화면을 반대 색으로 미리 기울였어요' : '필름 색이 그대로 보여요';
+    // 다크 모드: 켜면 화면 안을 강제로 다크, 끄면 화면 자체 설정(언어 버튼 옆 다크 모드)으로 돌려 둔다
+    try {
+      const root = frame.contentDocument?.documentElement;
+      if (root) {
+        const own = localStorage.getItem('took.theme') === 'dark';
+        if (fix.dark || own) root.dataset.theme = 'dark'; else delete root.dataset.theme;
+      }
+    } catch { /* 다른 주소 */ }
+  };
+  $('pv-fix-color').addEventListener('click', () => { fix.color = !fix.color; applyFix(); });
+  $('pv-fix-dark').addEventListener('click', () => { fix.dark = !fix.dark; applyFix(); });
+  frame.addEventListener('load', applyFix);
   // 거울 필름 테스트: 없음 / 브라운 / 실버 (기억해 둔다)
   const setFilm = (f) => {
+    film = f;
     document.body.dataset.film = f;
     try { localStorage.setItem('took.mirrorFilm', f); } catch { /* 저장 불가 환경 */ }
     document.querySelectorAll('#pv-films button[data-film]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.film === f)));
+    applyFix();
   };
   document.querySelectorAll('#pv-films button[data-film]').forEach((b) => b.addEventListener('click', () => setFilm(b.dataset.film)));
   // 화면 방향: 세로 ↔ 가로 (탭을 돌린 크기로 다시 맞춘다. 화면 내용은 그 방향의 레이아웃으로 다시 그려진다)
@@ -150,31 +167,12 @@
   });
   showOrient();
   setFilm((() => { try { const v = localStorage.getItem('took.mirrorFilm'); return ['brown', 'silver'].includes(v) ? v : 'none'; } catch { return 'none'; } })());
-  const setMode = (m) => {
-    mode = m;
-    try { localStorage.setItem('took.mirrorPreview', m); } catch { /* 저장 불가 환경 */ }
-    document.querySelectorAll('.pv-mode').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
-    fit();
-  };
-  document.querySelectorAll('.pv-mode').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  $('pv-fold').addEventListener('click', () => {
-    const folded = $('pv-bar').classList.toggle('folded');
-    $('pv-fold').textContent = folded ? '설정' : '설정 닫기';
-    $('pv-fold').setAttribute('aria-expanded', String(!folded));
-  });
-  $('pv-page').addEventListener('change', () => { frame.src = $('pv-page').value; });
   document.addEventListener('fullscreenchange', fit);
   addEventListener('resize', fit);
-  // 자동으로 왔으면 그 화면부터 (?page=palette.html). 이 사이트 안의 .html 이면 목록에 없어도 연다
+  // 자동으로 왔으면 그 화면부터 (?page=palette.html). 이 사이트 안의 .html 만 연다
   const start = params.get('page');
   const startOk = start && /^[\w-]+\.html(\?[^#]*)?$/.test(start);
-  frame.addEventListener('load', () => {
-    try {
-      const now = frame.contentWindow.location.pathname.split('/').pop() || 'index.html';
-      if ([...$('pv-page').options].some((o) => o.value === now)) $('pv-page').value = now;
-    } catch { /* 다른 주소 */ }
-  });
-  setMode(mode);
+  fit();
   // 미리보기를 새로고침하면(F5) 상태를 비우고 시작 화면부터
   if (reloaded) {
     try { localStorage.removeItem('took.deviceMode'); } catch { /* 저장 불가 환경 */ }

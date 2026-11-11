@@ -56,7 +56,7 @@ const SKEY = 'took.';
 export const TAB_FRAME = true;
 /** 이 화면을 탭 크기 틀로 옮기는 중이면 true (곧 다시 열리므로 화면마다 한 번만 할 일은 건너뛴다) */
 export let MOVING_TO_TAB_FRAME = false;
-const TAB_FRAME_SKIP = ['preview.html', 'nfc-phone.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
+const TAB_FRAME_SKIP = ['preview.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
 // 새로고침(F5·새로고침 버튼)하면 처음 상태로: 기기 설정(태블릿 고정)을 풀고, 저장한 상태(took.*)를 비우고
 // 첫 화면(시작 화면, 노트북이면 태블릿 미리보기)으로.
 // 직원 도구 화면은 그대로. 미리보기(preview.html)는 그 화면 스크립트가 같은 일을 한다
@@ -357,7 +357,6 @@ export function renderNav(opts = {}) {
 }
 
 const IDLE_TEST_BUTTON = true;
-export const NFC_TEST_MENU = true; // 팔레트 화면의 휴대폰 NFC 읽기 줄 (테스트 단계. 상단 'NFC 테스트' 메뉴·화면은 2026-11-09 삭제)
 
 // ---------- 키오스크 자동 초기화 ----------
 // 손님이 떠난 뒤 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않게, 한동안 조작이 없으면 안내 후 지우고 홈으로 간다.

@@ -37,12 +37,6 @@
     </div>
     <p id="guide" class="muted" aria-live="polite"></p>
     <p id="nfc-hint" class="nfc-hint pal-nfc" aria-live="polite"></p>
-    <!-- 휴대폰 NFC (테스트 단계): 휴대폰에서 열면 '휴대폰 NFC 켜기', 컴퓨터·iPad 에서 열면 '휴대폰으로 NFC 읽기'(QR 연결) -->
-    <div class="row pal-nfc-row hidden" id="pal-nfc-row">
-      <button type="button" id="pal-nfc-start" class="hidden" data-i18n="pal.nfcStart">휴대폰 NFC 켜기</button>
-      <button type="button" id="pal-nfc-pair" class="hidden" data-i18n="pal.nfcPair">휴대폰으로 NFC 읽기</button>
-      <span id="pal-nfc-state" class="small muted" aria-live="polite"></span>
-    </div>
     <div id="error" class="msg hidden" role="alert"></div>
     <div class="row">
       <button type="button" id="cam-retry" class="hidden" data-i18n="pal.camRetry">카메라 다시 연결</button>
@@ -104,18 +98,6 @@
   </div>
 
 </main>
-<dialog id="pal-nfc-dialog" class="pal-nfc-dialog" aria-labelledby="pal-nfc-title">
-  <h2 id="pal-nfc-title" data-i18n="pal.nfcPairTitle">휴대폰을 NFC 리더기로</h2>
-  <p class="muted small" data-i18n="pal.nfcCodeHelp">휴대폰 Chrome 에서 아래 주소를 열고 네 자리 번호를 입력하세요. QR 을 찍어도 돼요.</p>
-  <p id="pal-nfc-url" class="small"></p>
-  <p id="pal-nfc-code" class="pal-nfc-code" aria-label="연결 번호"></p>
-  <div id="pal-nfc-qr"></div>
-  <p id="pal-nfc-pairstate" class="small" aria-live="polite"></p>
-  <div class="row">
-    <button type="button" id="pal-nfc-close" data-i18n="pal.nfcClose">닫기</button>
-    <button type="button" id="pal-nfc-newcode" data-i18n="pal.nfcNewCode">번호 바꾸기</button>
-  </div>
-</dialog>
 <script type="module" src="js/lip.js"></script>
 <script type="module" src="js/palette.js"></script>
 </body>

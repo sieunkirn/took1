@@ -472,7 +472,7 @@ test('영어 챗봇: 영어 문장을 한국어판과 같은 조건으로 알아
   assert.match(compareSummary(two), /저렴|모두/);
 });
 
-// ---------- NFC 태그 인식 테스트 (public/js/nfc-test.js, server.js) ----------
+// ---------- NFC 태그 인식 테스트 (public/js/nfc-test.js) ----------
 test('NFC 테스트: 식별값 찾기·번호 가리기·지문', async () => {
   const nfc = await import('../public/js/nfc-test.js');
   assert.equal(nfc.findTookId('TOOK-001'), 'TOOK-001');
@@ -514,16 +514,6 @@ test('NFC 테스트: NDEF 이벤트 해석, 같은 태그 중복 거르기', asy
   assert.equal(nfc.scanErrorCode({ name: 'NotAllowedError' }), 'denied');
 });
 
-test('NFC 테스트: 서버는 정해진 모양만 받고 원래 번호·레코드 내용은 버린다', async () => {
-  const { sanitizeNfcReading } = await import('../server.js');
-  const r = sanitizeNfcReading({ kind: 'ndef', masked: '04:A1:••:F6', fp: '0123456789abcdef', tookId: 'TOOK-001', uid: '04:A1:B2:F6',
-    records: [{ type: 'text', mediaType: null, bytes: 8, text: '비밀' }] });
-  assert.deepEqual(r, { kind: 'ndef', masked: '04:A1:••:F6', fp: '0123456789abcdef', tookId: 'TOOK-001', records: [{ type: 'text', mediaType: null, bytes: 8 }] });
-  assert.equal(sanitizeNfcReading({ kind: 'evil' }), null);
-  const bad = sanitizeNfcReading({ kind: 'ndef-empty', masked: '<script>', fp: 'zz', tookId: 'A0000', records: [{ type: '<x>' }] });
-  assert.deepEqual(bad, { kind: 'ndef-empty', masked: '', fp: null, tookId: null, records: [] });
-});
-
 test('NFC 테스트: 실물 테스트 카드(토스뱅크·음쓰카드)를 가린 번호로 맞춘다', async () => {
   const nfc = await import('../public/js/nfc-test.js');
   const read = async (uid) => ({ kind: 'ndef-empty', masked: nfc.maskUid(uid), fp: await nfc.uidFingerprint(uid), tookId: null });
@@ -558,22 +548,6 @@ test('NFC 팔레트: 실물 테스트 카드는 카드 이름·사진으로 보�
   assert.equal(p.image_url, 'images/nfc-test/toss-bank-card.png');
   assert.equal(`${cardProduct('52:62:••:54', base).brand} ${cardProduct('52:62:••:54', base).name}`, '음쓰 카드');
   assert.equal(cardProduct('04:11:••:66', base), base); // 테스트 카드가 아니면 그대로
-});
-
-test('휴대폰 연결: 네 자리 번호로 연결, 같은 번호로 다시 열기, 틀린 번호 여러 번이면 막기', async () => {
-  const pr = await import('../src/lib/pairing.js');
-  const a = pr.openCodeSession();
-  assert.match(a.code, /^\d{4}$/);
-  assert.deepEqual(pr.joinByCode(a.code, 'phone-1'), { id: a.id });
-  assert.equal(pr.openCodeSession(a.code).id, a.id); // 같은 화면이 다시 열면 같은 연결
-  const other = pr.openCodeSession();
-  assert.notEqual(other.code, a.code); // 다른 화면은 다른 번호
-  const wrong = a.code === '0000' ? '0001' : '0000';
-  let r;
-  for (let i = 0; i < 8; i++) r = pr.joinByCode(wrong === other.code ? '9999' : wrong, 'attacker');
-  assert.equal(r.error, 'wrong');
-  assert.equal(pr.joinByCode(a.code, 'attacker').error, 'blocked'); // 8번 틀리면 맞는 번호도 잠시 막힘
-  assert.deepEqual(pr.joinByCode(a.code, 'phone-2'), { id: a.id }); // 다른 휴대폰은 그대로
 });
 
 // ---------- 화장품 광고 금지 표현 (src/lib/claims.js, 딥리서치 P0) ----------

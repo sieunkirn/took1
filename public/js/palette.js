@@ -2,11 +2,8 @@
 //  - 물감·섞는 칸(떨어뜨리기·젓기·OKLab 혼합)은 js/palette-mixer.js 
 //  - 섞는 칸 색이 바뀌는 동안 같은 색을 took:apply 이벤트로 보내 왼쪽 카메라 입술(lip.js)에 바로 입힌다
 //  - 초기화: 팔레트를 비우고 입술 색을 기본 컬러로 되돌린다
-import { renderNav, store, api, el, go, productCard, toast, skeletonCards, shortName, NFC_TEST_MENU } from './common.js';
-import { listenNfc, resolveTag, resolveReading, cardProduct } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
-import { startWebNfc, webNfcSupport, makeDedupe } from './nfc-test.js'; // 휴대폰 NFC (Web NFC)
-import { pairPhoneForNfc } from './nfc-relay.js'; // 휴대폰으로 읽고 이 화면에 띄우기
-import { loadZXing } from './barcode-scan.js'; // QR 그리기
+import { renderNav, store, api, el, go, productCard, toast, skeletonCards, shortName } from './common.js';
+import { listenNfc, resolveTag, cardProduct } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
 import { createMixer, ALL_PAINTS, PAINT } from './palette-mixer.js'; // 물감·섞는 칸
 import { t as tr } from './i18n.js'; // 화면 문구 (한국어/영어)
 
@@ -134,7 +131,7 @@ function nfcFlash(text) {
   nfcTimer = setTimeout(() => { nfcHint.textContent = ''; nfcHint.classList.remove('hit'); }, 3000);
 }
 // 기다리는 동안의 안내 문구는 뺐다: 태그를 읽었을 때만 잠깐 알려 준다
-// 읽은 제품: 그 색을 입술에 바르고, 오른쪽 ④ 자리에 제품 카드를 띄운다 (리더기·휴대폰 NFC 공통)
+// 읽은 제품: 그 색을 입술에 바르고, 오른쪽 ④ 자리에 제품 카드를 띄운다 (NFC 리더기)
 // masked: 실물 테스트 카드면 그 가린 번호 → 제품 카드를 카드 이름·사진으로 보여 준다 (색은 연결한 제품 색)
 async function showNfcProduct(id, masked = null) {
   const found = id ? await api('api/products/' + encodeURIComponent(id)) : null;
@@ -153,89 +150,5 @@ async function showNfcProduct(id, masked = null) {
   }));
 }
 listenNfc((code) => showNfcProduct(resolveTag(code))); // 바코드로 찾기 화면은 2026-11-11 삭제
-
-// ---------- 휴대폰 NFC (테스트 단계, 상단 메뉴의 NFC 테스트와 같은 기준) ----------
-// 같은 카드를 2.5초 안에 다시 읽으면 다시 처리하지 않는다. 읽지 못한 카드는 다시 대 보라고 알린다
-const isDupReading = makeDedupe();
-function onReading(r) {
-  if (isDupReading(r)) return;
-  if (r.kind === 'unreadable') { nfcFlash(tr('pal.nfcRetry')); return; }
-  showNfcProduct(resolveReading(r), r.masked);
-}
-if (NFC_TEST_MENU) {
-  $('pal-nfc-row').classList.remove('hidden');
-  const state = (text) => { $('pal-nfc-state').textContent = text; };
-  if (webNfcSupport().ok) {
-    // 이 기기(안드로이드 Chrome)가 직접 읽는다
-    const btn = $('pal-nfc-start');
-    btn.classList.remove('hidden');
-    let stop = null;
-    let attempt = null;
-    let slow = null;
-    btn.addEventListener('click', async () => {
-      if (stop) { stop(); stop = null; btn.textContent = tr('pal.nfcStart'); state(''); return; }
-      if (attempt) attempt.abort(); // 켜지는 중에 다시 누르면 처음부터 다시
-      const ctrl = new AbortController();
-      attempt = ctrl;
-      state(tr('pal.nfcStarting'));
-      clearTimeout(slow);
-      slow = setTimeout(() => { if (attempt === ctrl) state(tr('pal.nfcSlow')); }, 6000);
-      try {
-        const stopFn = await startWebNfc({
-          signal: ctrl.signal,
-          onReading,
-          onFail: () => onReading({ kind: 'unreadable', masked: '', fp: null, tookId: null, records: [] }),
-        });
-        if (attempt !== ctrl) return;
-        attempt = null; clearTimeout(slow);
-        stop = stopFn;
-        btn.textContent = tr('pal.nfcStop');
-        state(tr('pal.nfcOn'));
-      } catch {
-        if (attempt !== ctrl) return;
-        attempt = null; clearTimeout(slow);
-        state(tr('pal.nfcFail'));
-      }
-    });
-  } else {
-    // 컴퓨터·iPad: 휴대폰을 QR 로 연결해 휴대폰이 읽은 카드를 받는다 (서버 필요)
-    const btn = $('pal-nfc-pair');
-    const dlg = $('pal-nfc-dialog');
-    const pairState = (text) => { $('pal-nfc-pairstate').textContent = text; };
-    let pairing = null;
-    btn.classList.remove('hidden');
-    $('pal-nfc-close').addEventListener('click', () => dlg.close());
-    // 번호 바꾸기: 지금 연결을 끊고 새 번호를 받는다 (번호를 아는 다른 휴대폰을 떼어 낼 때)
-    $('pal-nfc-newcode').addEventListener('click', () => { pairing?.stop(); pairing = null; connect(true); });
-    btn.addEventListener('click', () => { dlg.showModal(); if (!pairing) connect(false); });
-    async function connect(fresh) {
-      pairState(tr('pal.nfcPairWait'));
-      $('pal-nfc-code').textContent = '';
-      const res = await pairPhoneForNfc({
-        fresh,
-        onReconnect: () => state(tr('pal.nfcReconnected')),
-        onEvent: (e) => {
-          if (e.type === 'phone') { pairState(tr('pal.nfcPairOk')); state(tr('pal.nfcPairOk')); }
-          if (e.type === 'nfcstate' && e.data.state === 'ready') {
-            state(tr('pal.nfcPairPhoneOn'));
-            setTimeout(() => dlg.close(), 800); // 휴대폰 준비가 끝나면 팔레트가 보이게 닫는다
-          }
-          if (e.type === 'nfc') onReading({ ...e.data, records: e.data.records || [] });
-        },
-      });
-      if (!res.ok) { pairState(tr('pal.nfcPairNoServer')); return; }
-      pairing = res;
-      const ZXing = await loadZXing().catch(() => null);
-      if (ZXing) {
-        const qr = new ZXing.BrowserQRCodeSvgWriter().write(res.phoneUrl, 168, 168);
-        qr.setAttribute('shape-rendering', 'crispEdges');
-        $('pal-nfc-qr').replaceChildren(qr);
-      }
-      $('pal-nfc-url').textContent = res.phoneBase.replace(/^https?:\/\//, '');
-      $('pal-nfc-code').textContent = res.code;
-      if (!res.phoneUrl.startsWith('https:')) pairState(tr('pal.nfcPairHttp'));
-    }
-  }
-}
 
 mixer.start(); // 섞어 둔 색이 있으면 입술에 바로 입히고 그리기 시작

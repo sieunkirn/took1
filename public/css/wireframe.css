@@ -946,25 +946,6 @@ html.intro-go body { overflow: auto; }
 .pc-arrow:disabled { background: var(--soft) !important; color: #b0b0b0 !important; }
 .pc-count { min-width: 56px; text-align: center; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-/* 팔레트: 휴대폰 NFC (테스트 단계). 기존 무채색 토큰만 쓴다 */
-.pal-nfc-row { gap: 8px; }
-/* 카메라 다시 연결 줄(.pal-cam > .row)처럼 화면 가운데에 띄우지 않고, 카메라 아래 줄에 둔다 */
-.palette-page .pal-cam > .row.pal-nfc-row { position: static; translate: none; z-index: auto; }
-@media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
-  /* 넓은 화면(거울 전면 화면): NFC 안내 줄 바로 아래에 띄운다 */
-  .palette-page .pal-cam > .row.pal-nfc-row { position: absolute; top: calc(var(--gap) + 160px); left: var(--gap); right: auto; z-index: 2; flex-wrap: nowrap; max-width: calc(50% - var(--gap)); }
-  .palette-page .pal-cam .pal-nfc-row #pal-nfc-state { background: var(--paper); border-radius: 999px; padding: 4px 10px; }
-  .palette-page .pal-cam .pal-nfc-row #pal-nfc-state:empty { display: none; }
-}
-.pal-nfc-row button { min-height: 40px; }
-.pal-nfc-row #pal-nfc-state { overflow-wrap: anywhere; }
-.pal-nfc-dialog { border: 0; border-radius: var(--r); padding: 20px; max-width: min(360px, calc(100vw - 32px)); box-shadow: var(--shadow-up); background: var(--paper); color: var(--ink); }
-.pal-nfc-dialog::backdrop { background: rgba(0, 0, 0, 0.35); }
-.pal-nfc-dialog h2 { margin: 0 0 6px; font-size: 18px; }
-.pal-nfc-dialog #pal-nfc-qr svg { display: block; margin: 8px auto; }
-.pal-nfc-dialog #pal-nfc-url { overflow-wrap: anywhere; font-weight: 700; }
-.pal-nfc-code, .nt-code { margin: 4px 0; font-size: 44px; font-weight: 800; letter-spacing: 0.25em; font-family: ui-monospace, Consolas, monospace; text-align: center; }
-
 /* ================= 다크 모드 (언어 버튼 옆 '다크 모드', js/i18n.js themeToggle) =================
    <html data-theme="dark">: 색 변수만 검정 바탕용으로 바꾼다. 여전히 무채색.
    립 영상·색 견본·제품 사진은 실제 색 그대로 (CLAUDE.md 예외) */
@@ -1013,8 +994,6 @@ html.enter-fx header.nav > :not(strong) { animation: took-enter-fade 0.5s ease-o
 html.enter-fx main { animation: took-enter 0.7s cubic-bezier(.2, .8, .2, 1) 0.1s both; }
 /* 챗봇과 이어서 상담 (palette.html #take-phone) */
 .take-phone { width: 100%; margin-top: 8px; }
-:root[data-theme="dark"] .pal-nfc-dialog { border: 1px solid var(--line-2); }
-:root[data-theme="dark"] .pal-nfc-dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
 
 /* 제품 카드: 답변 아래 한 줄로 늘어놓고 옆으로 밀어 본다 (쪽 넘김 버튼 없음) */
 /* 빠른 답장: 오른쪽 정렬로 줄바꿈 */
