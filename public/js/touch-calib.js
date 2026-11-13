@@ -152,7 +152,7 @@
     const load = () => {
       try {
         const v = JSON.parse(ls.get(storeKey));
-        return v && Array.isArray(v.m) && v.m.length === 6 && v.m.every(Number.isFinite) ? v : null;
+        return v && Array.isArray(v.m) && v.m.length === 6 && v.m.every(Number.isFinite) && v.frame === 'screen' ? v : null; // 예전(창 안쪽 기준) 값은 버린다 → 다시 보정
       } catch { return null; }
     };
     let saved = load();
@@ -173,7 +173,13 @@
       const u = x / Wd, v = y / Hd;
       return [Wd * (0.08 + 0.85 * v), Hd * (0.1 + 0.77 * (1 - u))];
     };
-    const correct = (p) => (saved ? applyAffine(saved.m, p[0], p[1]) : p);
+    // 좌표 기준 (2026-11-13 수정): 필름은 늘 '화면 전체'에 대응되므로 원본·실제 좌표를 화면 기준(screenX/Y)으로 풀어 둔다.
+    // 창 안쪽(client) 기준으로 풀면 주소창이 보일 때 보정한 값이 전체화면에서 주소창 높이만큼 어긋난다.
+    // curOff = 지금 이벤트의 '화면 → 맨 위 창 안쪽' 차이 (screen - client). 이벤트마다 그 이벤트 값으로 다시 잰다
+    let curOff = [0, 0];
+    const toClient = (q) => [q[0] - curOff[0], q[1] - curOff[1]];
+    const applyC = (m, p) => toClient(applyAffine(m, p[0], p[1]));
+    const correct = (p) => toClient(saved ? applyAffine(saved.m, p[0], p[1]) : p);
 
     // ---------- 창(iframe) 사이 좌표 ----------
     // iframe 과 그 조상에 걸린 transform 의 선형 부분 (preview.html 의 scale, kiosk.html 의 rotate·scale)
@@ -525,10 +531,14 @@
       if (sim) return true; // 시뮬레이션: 마우스도 터치로 본다
       return !!e.sourceCapabilities?.firesTouchEvents; // 터치에서 생긴 호환 마우스 이벤트
     }
+    /** 원본 좌표(화면 기준)를 돌려주고 curOff 를 이 이벤트 값으로 맞춘다 */
     function rawRoot(e, win) {
-      let p = toRoot(win, e.clientX, e.clientY);
-      if (sim) p = simDistort(p[0], p[1]);
-      return p;
+      const c = toRoot(win, e.clientX, e.clientY);
+      if (sim) { curOff = [0, 0]; return simDistort(c[0], c[1]); } // 시뮬레이션은 창 안쪽 기준 그대로
+      const sx = e.screenX, sy = e.screenY;
+      if (!Number.isFinite(sx) || !Number.isFinite(sy)) { curOff = [0, 0]; return c; }
+      curOff = [sx - c[0], sy - c[1]];
+      return [sx, sy];
     }
     let primary = null; // 한 손가락만 (첫 손가락)
     function onRaw(e) {
@@ -613,13 +623,15 @@
         rdoc.body.append(dbg);
       }
       const r = dbg.querySelector('[data-r]'), g = dbg.querySelector('[data-g]'), t = dbg.querySelector('[data-t]');
-      r.style.left = raw[0] + 'px'; r.style.top = raw[1] + 'px';
+      const rc = toClient(raw); // 빨간 점은 창 안쪽 좌표로 그린다 (숫자는 화면 기준 원본값)
+      r.style.left = rc[0] + 'px'; r.style.top = rc[1] + 'px';
       g.style.left = q[0] + 'px'; g.style.top = q[1] + 'px';
       g.style.background = q[0] < 0 || q[1] < 0 || q[0] >= root.innerWidth || q[1] >= root.innerHeight ? '#888' : '#0a0';
       const size = `${root.innerWidth}×${root.innerHeight}`;
       const savedSize = saved?.size ? `${saved.size[0]}×${saved.size[1]}` : '-';
       t.textContent = `원본(빨강) ${raw[0].toFixed(0)}, ${raw[1].toFixed(0)}${hover ? ' (안 누름)' : ''}\n보정(초록) ${q[0].toFixed(0)}, ${q[1].toFixed(0)}\n`
-        + `보정값 ${saved ? '있음' : '없음'}${sim ? ' · 시뮬레이션' : ''} · 화면 ${size}${saved && savedSize !== size ? ` (보정 때 ${savedSize}, 다름)` : ''}`;
+        + `보정값 ${saved ? '있음' : '없음'}${sim ? ' · 시뮬레이션' : ''} · 창 ${size}${saved && savedSize !== size ? ` (보정 때 ${savedSize})` : ''} · 창 위치 ${curOff[0].toFixed(0)}, ${curOff[1].toFixed(0)}`
+        + (rdoc.fullscreenElement ? ' · 전체화면' : '');
     }
 
     // ---------- 보정 화면 ----------
@@ -700,7 +712,7 @@
         c.cur.sx += P[0]; c.cur.sy += P[1]; c.cur.n++;
         if (c.step >= 0 && c.step < TARGETS.length) q$('[data-ring]').style.background = 'rgba(0,0,0,.2)';
         if (c.result) { // 확인 화면: 손가락 위치에 점이 따라다닌다 (방금 구한 행렬로 보정)
-          const q = applyAffine(c.result.m, P[0], P[1]);
+          const q = applyC(c.result.m, P);
           const f = q$('[data-finger]');
           f.style.display = 'block'; f.style.left = q[0] + 'px'; f.style.top = q[1] + 'px';
           c.cur.q = q;
@@ -721,7 +733,7 @@
         return;
       }
       if (c.result) {
-        const q = cur.q || applyAffine(c.result.m, P[0], P[1]);
+        const q = cur.q || applyC(c.result.m, P);
         const b = btnAt(q$('[data-btns]'), q);
         if (b) calibAction(b.dataset.act);
         return;
@@ -729,7 +741,8 @@
       // 누르고 있는 동안의 좌표 평균
       const raw = [cur.sx / cur.n, cur.sy / cur.n];
       const [u, v] = TARGETS[c.step];
-      c.pts.push({ raw, real: [u * root.innerWidth, v * root.innerHeight] });
+      // 실제 좌표도 화면 기준으로 (표시 자리 + 이 터치 때의 창 위치)
+      c.pts.push({ raw, real: [u * root.innerWidth + curOff[0], v * root.innerHeight + curOff[1]], off: curOff.slice() });
       c.step++;
       if (c.step < TARGETS.length) { calibShowTarget(); return; }
       q$('[data-cross]').style.display = 'none';
@@ -743,8 +756,9 @@
       c.size = [root.innerWidth, root.innerHeight];
       // 표시와 보정된 점을 같이 보여 준다
       q$('[data-dots]').innerHTML = c.pts.map((p) => {
-        const q = applyAffine(res.m, p.raw[0], p.raw[1]);
-        return `<div style="position:absolute;left:${p.real[0]}px;top:${p.real[1]}px;width:22px;height:22px;margin:-11px;border:2px solid #111;border-radius:50%"></div>`
+        const a = applyAffine(res.m, p.raw[0], p.raw[1]);
+        const q = [a[0] - p.off[0], a[1] - p.off[1]];
+        return `<div style="position:absolute;left:${p.real[0] - p.off[0]}px;top:${p.real[1] - p.off[1]}px;width:22px;height:22px;margin:-11px;border:2px solid #111;border-radius:50%"></div>`
           + `<div style="position:absolute;left:${q[0]}px;top:${q[1]}px;width:8px;height:8px;margin:-4px;border-radius:50%;background:#111"></div>`;
       }).join('');
       q$('[data-msg]').innerHTML = `<b style="font-size:22px">확인</b><br>화면 아무 곳이나 눌러 보세요. 손가락 자리에 점이 따라오면 맞은 거예요.<br>`
@@ -756,7 +770,7 @@
       if (act === 'retry') { calibIntro(); showBtns([]); calib.step = 0; calibShowTarget(); return; }
       if (act === 'test') { closeCalib(); startTest(); return; }
       if (act === 'save' && calib.result) {
-        saved = { m: calib.result.m, rms: calib.result.rms, max: calib.result.max, size: calib.size, at: new Date().toISOString() };
+        saved = { frame: 'screen', m: calib.result.m, rms: calib.result.rms, max: calib.result.max, size: calib.size, at: new Date().toISOString() };
         const ok = ls.set(storeKey, JSON.stringify(saved));
         closeCalib();
         wins.forEach(prepareWindow);
