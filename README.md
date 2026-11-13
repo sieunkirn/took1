@@ -55,6 +55,13 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 - 휴대폰(갤럭시 S24 Web NFC)으로 읽어 PC·태블릿 화면에 띄우던 기능(`nfc-phone.html`·`nfc-relay.js`·팔레트의 '휴대폰으로 NFC 읽기'·서버의 네 자리 번호 연결 API)은 2026-11-11 삭제 (복구는 git 기록에서)
 - 태그 해석·매핑 도우미(`public/js/nfc-test.js`)와 그 단위 테스트도 삭제. 복구는 git 기록에서
 
+### 거울 유리 터치 필름 좌표 보정 (`public/js/touch-calib.js`)
+1. 갤럭시탭 Chrome 에서 사이트를 열고 메뉴 → **홈 화면에 추가** → 홈 화면 아이콘으로 실행 (전체화면·세로 고정, `manifest.webmanifest`)
+2. 주소 뒤에 `?calib=1` 을 붙여 열거나, 화면 아무 곳이나 **10초 길게 누르기** → 처음 한 번 누르고, 십자 5개를 차례로 1초씩 눌렀다 떼기
+3. 확인 화면에서 손가락 자리에 점이 따라오는지와 남은 오차(px)를 보고 **저장** (어긋나면 **다시 하기**). 보정값은 그 브라우저 localStorage 에 남는다
+4. 버튼·팔레트·슬라이더·스크롤이 누른 자리에서 동작하는지 확인. 지우기는 `?calib=reset`, 원본(빨강)·보정(초록) 좌표 보기는 `?calibdebug=1`
+- 보정은 전체화면 상태 기준이다 (주소창이 보이면 어긋난다). PC 검증은 `preview.html?calibsim=1&calib=1` (가짜 왜곡 + 마우스를 터치로, `=0` 으로 끔). 보정값이 없으면 기존 동작 그대로
+
 ### iPad(가로 화면)에서 실행
 1. PC 에서 `npm run cert` (openssl 로 자체 서명 인증서 생성, PC 의 IP 포함) → `npm start`
 2. 콘솔에 표시되는 `https://<PC IP>:3000` 을 같은 Wi-Fi 의 iPad Safari 에서 열기

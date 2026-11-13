@@ -32,6 +32,7 @@ const MIME = {
   '.task': 'application/octet-stream',
   '.svg': 'image/svg+xml', // 아바타 테스트 그림 (samples/)
   '.png': 'image/png',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
 };
 
 function sendJson(res, status, body) {

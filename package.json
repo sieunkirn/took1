@@ -11,7 +11,7 @@
     "import:oliveyoung": "node scripts/import-oliveyoung.js",
     "match:global": "node scripts/match-oliveyoung-global.js --apply",
     "start": "node server.js",
-    "test": "node --test test/unit.test.js",
+    "test": "node --test test/unit.test.js test/touch-calib.test.js",
     "e2e": "node test/e2e.mjs",
     "eval:chat": "node scripts/eval-chat.js",
     "eval:friendly": "node scripts/eval-friendly.js",
