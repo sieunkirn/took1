@@ -93,7 +93,7 @@
   const KEY = 'took.touchCalib'; // 실제 기기 보정값
   const SIM_KEY = 'took.touchCalibSim'; // 시뮬레이션 보정값 (실제 값과 섞이지 않게 따로)
   const LONG_PRESS_MS = 10000;
-  const TAP_SLOP = 15; // 이만큼 움직이면 탭(click)이 아니다 (안드로이드 터치 기준과 비슷하게)
+  const TAP_SLOP = 20; // 이만큼 움직이면 탭(click)이 아니다 (필름 좌표 흔들림을 감안해 안드로이드 기준보다 조금 넉넉하게)
   const PAN_SLOP = 8; // 이만큼 움직이면 스크롤을 시작할지 정한다
   const Z = 2147483647;
 
@@ -133,6 +133,14 @@
     return e;
   })();
   engine.addWindow(W);
+  // 공유받은 보정값 링크(?calibset=코드): 이 기기에 적용하고 주소에서는 지운다
+  if (params.get('calibset')) {
+    const ok = engine.importCode(params.get('calibset'));
+    params.delete('calibset');
+    try { history.replaceState(history.state, '', location.pathname + (params.toString() ? '?' + params : '') + location.hash); } catch { /* 없음 */ }
+    const say = () => engine.toast(ok ? '공유받은 보정값을 적용했어요' : '보정값 코드가 올바르지 않아요');
+    if (ROOT.document.body) say(); else ROOT.addEventListener('DOMContentLoaded', say, { once: true });
+  }
   if (params.get('calib') === '1') {
     // 주소에서 calib=1 은 지워 둔다 (저장한 뒤 새로고침해도 다시 열리지 않게)
     params.delete('calib');
@@ -384,6 +392,29 @@
       doc.body.append(box);
     }
 
+    // ---------- 터치 보정(가까운 버튼 찾기) ----------
+    // Chrome 은 손가락 면적 안에서 가까운 버튼을 찾아 눌러 준다(touch adjustment). 합성 이벤트에는 그게 없어서
+    // 키 사이 틈·가장자리를 누르면 버튼이 아니라 줄(div)이 눌렸다. 손가락 크기 안(반지름 18px)에서 가장 가까운 누를 수 있는 요소로 보낸다
+    const CLICKABLE = 'button, a[href], input, select, textarea, label, summary, [role="button"], [role="option"], [role="tab"], [onclick], [tabindex]:not([tabindex="-1"])';
+    const isClickable = (el) => !!el?.closest?.(CLICKABLE) && !el.closest('[disabled]');
+    function adjustedHit(X, Y) {
+      const hit = deepHit(X, Y);
+      if (!hit || isClickable(hit.el)) return hit;
+      // 손가락으로 직접 그리는 곳(팔레트 섞는 칸 canvas 등, touch-action: none)은 그 자리 그대로
+      if (hit.el.closest?.('canvas, video')) return hit;
+      const ax = allowedAxes(hit.el, hit.win);
+      if (!ax.x && !ax.y) return hit;
+      // 누를 수 있는 것이 없는 자리(틈·바탕)면 둘레를 찾아본다. 가까운 고리부터
+      for (const r of [6, 12, 18]) {
+        for (let k = 0; k < 8; k++) {
+          const a = (k / 8) * Math.PI * 2;
+          const h = deepHit(X + r * Math.cos(a), Y + r * Math.sin(a));
+          if (h && h.win === hit.win && isClickable(h.el)) return { ...hit, el: h.el }; // 좌표는 손가락 자리 그대로
+        }
+      }
+      return hit;
+    }
+
     // ---------- 보정된 터치 처리 ----------
     function down(id, P, raw) {
       cancelAnimationFrame(fling);
@@ -392,7 +423,7 @@
       debugShow(raw, q);
       // 유리의 화면 바깥 부분을 누른 경우: 이 터치 전체를 무시한다
       if (q[0] < 0 || q[1] < 0 || q[0] >= Wd || q[1] >= Hd) { gestures.set(id, { ignored: true }); return; }
-      const hit = deepHit(q[0], q[1]);
+      const hit = adjustedHit(q[0], q[1]);
       if (!hit) { gestures.set(id, { ignored: true }); return; }
       const g = { id, win: hit.win, el: hit.el, start: [hit.x, hit.y], last: [hit.x, hit.y], q0: q, mode: null, track: [[performance.now(), hit.x, hit.y]] };
       gestures.set(id, g);
@@ -479,10 +510,9 @@
       // 탭: 많이 움직이지 않았을 때만 호환 마우스 이벤트와 click (안드로이드 Chrome 순서: pointerup → touchend → mousedown → mouseup → click)
       const moved = Math.hypot(x - g.start[0], y - g.start[1]);
       if (moved > TAP_SLOP || g.noClick || te?.defaultPrevented) return;
-      const upHit = deepHit(q ? q[0] : 0, q ? q[1] : 0);
-      let target = g.el;
-      if (upHit && upHit.win === g.win) { while (target && !target.contains(upHit.el)) target = target.parentElement; }
-      if (!target || !target.isConnected) target = g.el.isConnected ? g.el : null;
+      // click 은 처음 누른 요소로 보낸다. 손가락이 살짝 미끄러져 옆 키에서 떼어도(키 사이 틈 5px) 처음 키가 눌린다.
+      // (예전에는 누른 요소와 뗀 요소의 공통 조상 = 키보드 줄로 보내서 아무 키도 안 눌렸다)
+      const target = g.el.isConnected ? g.el : null;
       if (!target) return;
       if (!g.noCompat) {
         const md = fireMouse(g, 'mousedown', target, x, y);
@@ -552,25 +582,28 @@
       e.stopImmediatePropagation();
       if (!POINTER.includes(e.type)) return;
       if (e.type === 'pointerup' && !sim) requestFull(); // 사용자 동작 안에서만 전체화면을 켤 수 있다
-      if (sim && e.type === 'pointermove' && e.buttons === 0 && primary === null) { if (debug) debugShow(rawRoot(e, win), correct(rawRoot(e, win)), true); return; }
+      if (sim && e.type === 'pointermove' && e.buttons === 0 && !gestures.has(e.pointerId)) { if (debug) debugShow(rawRoot(e, win), correct(rawRoot(e, win)), true); return; }
       const P = rawRoot(e, win);
       if (calib) { calibInput(e.type, e.pointerId, P); return; }
       if (test) { testInput(e.type, e.pointerId, P); return; }
+      // 손가락마다 따로 처리한다 (키보드를 빨리 치면 앞 손가락을 떼기 전에 다음 손가락이 닿는다. 예전처럼 첫 손가락만 받으면 그 키가 빠진다)
       if (e.type === 'pointerdown') {
-        if (primary !== null) return;
+        if (gestures.has(e.pointerId)) up(e.pointerId, null, P, true); // 짝이 안 맞은 이전 터치는 정리
         primary = e.pointerId;
         down(e.pointerId, P, P);
-      } else if (e.pointerId === primary) {
+      } else if (gestures.has(e.pointerId)) {
         if (e.type === 'pointermove') move(e.pointerId, P, P);
-        else { primary = null; up(e.pointerId, P, P, e.type === 'pointercancel'); }
+        else { if (primary === e.pointerId) primary = null; up(e.pointerId, P, P, e.type === 'pointercancel'); }
       }
     }
     // 시뮬레이션에서 마우스로 끌면 이미지·글자가 끌려가지 않게
     function onDragStart(e) { if (sim && isActive()) e.preventDefault(); }
 
     // ---------- 전체화면 ----------
-    function requestFull() {
+    // 보정이 켜져 있으면 손을 뗄 때마다 전체화면을 켠다. 직원이 '전체화면 끄기'를 눌렀으면 이 탭에서는 다시 켜지 않는다
+    function requestFull(force) {
       try {
+        if (!force && ss.get('tookCalib.noFull') === '1') return;
         if (rdoc.fullscreenElement || root.matchMedia('(display-mode: fullscreen)').matches) return;
         const p = rdoc.documentElement.requestFullscreen?.({ navigationUI: 'hide' });
         p?.catch?.(() => {});
@@ -892,7 +925,84 @@
       notify();
     }
     function status() {
-      return { sim, debug, saved: saved ? { rms: saved.rms, max: saved.max, at: saved.at } : null, lastTest: lastSummary };
+      return { sim, debug, saved: saved ? { rms: saved.rms, max: saved.max, at: saved.at } : null, lastTest: lastSummary, fullscreen: isFullscreen() };
+    }
+
+    // ---------- 전체화면 버튼 ----------
+    const isFullscreen = () => !!rdoc.fullscreenElement || root.matchMedia('(display-mode: fullscreen)').matches;
+    /** 전체화면 켜기/끄기. 버튼(사용자 동작) 안에서 불러야 켜진다 */
+    function toggleFullscreen(on = !isFullscreen()) {
+      if (on) {
+        ss.del('tookCalib.noFull');
+        requestFull(true);
+      } else {
+        ss.set('tookCalib.noFull', '1');
+        try { rdoc.exitFullscreen?.()?.catch?.(() => {}); } catch { /* 없음 */ }
+      }
+    }
+    rdoc.addEventListener('fullscreenchange', notify);
+
+    // ---------- 보정값 공유 (카톡 등) ----------
+    // 코드 = 'T1.' + base64url(JSON). 공유 글에는 이 값을 바로 적용하는 링크(calib.html?calibset=코드)를 같이 넣는다
+    const b64url = (s) => btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const unb64url = (s) => atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+    function exportCode() {
+      if (!saved) return null;
+      const o = { m: saved.m.map((v) => Number(v.toPrecision(10))), rms: Number((saved.rms || 0).toFixed(2)), max: Number((saved.max || 0).toFixed(2)), size: saved.size, at: saved.at };
+      return 'T1.' + b64url(JSON.stringify(o));
+    }
+    function importCode(text) {
+      try {
+        const m = String(text).match(/T1\.([A-Za-z0-9_-]+)/);
+        if (!m) return false;
+        const o = JSON.parse(unb64url(m[1]));
+        if (!Array.isArray(o.m) || o.m.length !== 6 || !o.m.every(Number.isFinite) || Math.abs(o.m[0] * o.m[4] - o.m[1] * o.m[3]) < 1e-6) return false;
+        saved = { frame: 'screen', m: o.m, rms: Number(o.rms) || 0, max: Number(o.max) || 0, size: o.size, at: o.at || new Date().toISOString(), imported: true };
+        ls.set(storeKey, JSON.stringify(saved));
+        lastSummary = null;
+        wins.forEach(prepareWindow);
+        notify();
+        return true;
+      } catch { return false; }
+    }
+    /** 공유 창(안드로이드 → 카카오톡 등)을 띄운다. 안 되면 클립보드에 복사, 그것도 안 되면 복사할 글을 화면에 띄운다 */
+    async function shareCode() {
+      const code = exportCode();
+      if (!code) { toast('저장된 보정값이 없어요'); return 'none'; }
+      const link = new URL('calib.html', root.location.href);
+      link.search = '?calibset=' + code;
+      const when = saved.at ? new Date(saved.at).toLocaleString('ko-KR') : '';
+      const text = `툭 터치 보정값 (${when}, 보정 오차 ${(saved.rms || 0).toFixed(1)}px)\n태블릿에서 이 링크를 열면 같은 보정값이 적용돼요:\n${link.href}\n\n보정값 코드: ${code}`;
+      try {
+        if (navigator.share) { await navigator.share({ title: '툭 터치 보정값', text }); return 'shared'; }
+      } catch (e) { if (e?.name === 'AbortError') return 'cancel'; }
+      try {
+        if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); toast('보정값을 복사했어요. 카톡에 붙여 넣어 보내세요'); return 'copied'; }
+      } catch { /* 아래로 */ }
+      // http 주소(보안 연결 아님)에서는 공유·클립보드 API 가 없다 → 예전 복사 방식, 안 되면 글을 띄워 길게 눌러 복사
+      const ta = rdoc.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;left:-9999px;top:0;';
+      rdoc.body.append(ta);
+      ta.select();
+      let ok = false;
+      try { ok = rdoc.execCommand('copy'); } catch { ok = false; }
+      ta.remove();
+      if (ok) { toast('보정값을 복사했어요. 카톡에 붙여 넣어 보내세요'); return 'copied'; }
+      showText(text);
+      return 'shown';
+    }
+    function showText(text) {
+      const ov = rdoc.createElement('div');
+      ov.style.cssText = `position:fixed;inset:0;z-index:${Z};display:grid;place-items:center;background:rgba(0,0,0,.4);font:500 16px/1.45 system-ui,sans-serif;`;
+      ov.innerHTML = `<div style="width:min(86vw,560px);padding:18px;border-radius:18px;background:#fff;color:#111;display:flex;flex-direction:column;gap:12px">
+        <b style="font-size:19px">이 글을 길게 눌러 복사해 카톡에 붙여 넣으세요</b>
+        <textarea readonly style="width:100%;height:220px;font:13px/1.4 ui-monospace,monospace;box-sizing:border-box"></textarea>
+        <button type="button" data-act="close" style="min-height:64px;font-size:19px;font-weight:700;border-radius:14px;border:0;background:#111;color:#fff">닫기</button></div>`;
+      ov.querySelector('textarea').value = text;
+      ov.querySelector('[data-act=close]').addEventListener('click', () => ov.remove());
+      rdoc.body.append(ov);
     }
     let lastSummary = null; // 마지막 정확도 테스트 결과
     function toast(text) {
@@ -914,7 +1024,8 @@
     }
 
     return {
-      addWindow, startCalib, startTest, setFlag, reset, status,
+      addWindow, startCalib, startTest, setFlag, reset, status, toast,
+      toggleFullscreen, isFullscreen, exportCode, importCode, shareCode,
       onChange(f) { listeners.add(f); return () => listeners.delete(f); },
       get saved() { return saved; }, get sim() { return sim; },
     };
