@@ -6,12 +6,12 @@
 <meta name="referrer" content="no-referrer">
 <title data-i18n="pal.pageTitle">took(툭) - 팔레트</title>
 <link rel="stylesheet" href="css/wireframe.css">
+<script src="js/theme-boot.js"></script><!-- 다크 모드를 화면이 그려지기 전에 켠다 -->
 <script>
-  // 첫 화면이 그려지기 전에: 다크 모드를 바로 켜고(밝게 깜빡이지 않게), 시작 화면에서 넘어왔으면 들어오는 움직임(.enter-fx)을 켠다
+  // 첫 화면이 그려지기 전에: 시작 화면에서 넘어왔으면 들어오는 움직임(.enter-fx)을 켠다
   (function () {
     var r = document.documentElement;
     try {
-      if (localStorage.getItem('took.theme') === 'dark') r.dataset.theme = 'dark';
       if (sessionStorage.getItem('took.enterFx')) {
         sessionStorage.removeItem('took.enterFx');
         if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {

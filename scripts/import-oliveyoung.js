@@ -47,7 +47,7 @@ export function parseName(raw) {
   return { brand, name: rest || text.slice(brand.length).trim(), colorOptions: count ? Number(count[1]) : null };
 }
 
-export const goodsNoOf = (url) => String(url || '').match(/goodsNo=([A-Z0-9]+)/)?.[1] || null;
+const goodsNoOf = (url) => String(url || '').match(/goodsNo=([A-Z0-9]+)/)?.[1] || null;
 
 // 올리브영 이미지 서버의 https 주소만 받는다
 export function cleanImageUrl(url) {

@@ -2,14 +2,15 @@
 //  - 물감·섞는 칸(떨어뜨리기·젓기·OKLab 혼합)은 js/palette-mixer.js 
 //  - 섞는 칸 색이 바뀌는 동안 같은 색을 took:apply 이벤트로 보내 왼쪽 카메라 입술(lip.js)에 바로 입힌다
 //  - 초기화: 팔레트를 비우고 입술 색을 기본 컬러로 되돌린다
-import { renderNav, store, api, el, go, productCard, toast, skeletonCards, shortName } from './common.js';
-import { listenNfc, resolveTag, cardProduct } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
+import { $, renderNav, store, api, go, tryOnCard, toast, skeletonCards, shortName } from './common.js';
+import { listenNfc, resolveTag, cardProduct, createNfcHint } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
 import { createMixer, ALL_PAINTS, PAINT } from './palette-mixer.js'; // 물감·섞는 칸
 import { t as tr } from './i18n.js'; // 화면 문구 (한국어/영어)
 
+const RECOMMEND_COUNT = 6; // 고른 색과 비슷한 제품을 몇 개 보여 줄지
+
 renderNav();
 
-const $ = (id) => document.getElementById(id);
 const DEFAULT_LOOK = { hex: '#C08A94', finish: 'matte' }; // 립 컬러 매핑 기본 컬러
 
 // 왼쪽 카메라 입술에 색을 입힌다 (quiet: 알림 없이)
@@ -80,7 +81,7 @@ $('find').addEventListener('click', async () => {
   $('res-hex').textContent = tr('pal.mixed', { hex });
   $('rec-status').textContent = tr('pal.searching', { hex });
   $('rec-list').replaceChildren(...skeletonCards(4));
-  const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, limit: 6 }));
+  const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, limit: RECOMMEND_COUNT }));
   if (!ok) {
     $('rec-status').textContent = body.error || tr('lip.recFail');
     $('rec-list').replaceChildren();
@@ -89,13 +90,7 @@ $('find').addEventListener('click', async () => {
   result.hex = hex;
   result.recs = body.products.slice(0, 3).map((p) => p.id);
   $('rec-status').textContent = tr('pal.found', { hex, n: body.products.length });
-  $('rec-list').replaceChildren(...body.products.map((p) => productCard(p, {
-    extraActions: [el('button', {
-      type: 'button',
-      text: tr('lip.tryOn'),
-      onclick: () => toLips(p.color_hex, { finish: p.finish, quiet: false, source: '추천 제품 색' }),
-    })],
-  })));
+  $('rec-list').replaceChildren(...body.products.map((product) => tryOnCard(product, (p) => toLips(p.color_hex, { finish: p.finish, quiet: false, source: '추천 제품 색' }))));
 });
 
 // ---------- 챗봇과 이어서 상담: 지금 결과(색·텍스처·농도·내 톤·추천 제품)를 이 태블릿의 챗봇으로 넘긴다 ----------
@@ -123,13 +118,7 @@ $('take-phone-res').addEventListener('click', openTake);
 
 // ---------- NFC 태그: 립 제품을 리더기에 올리면 그 제품 색을 바로 입술에 바른다 (js/nfc.js) ----------
 const nfcHint = $('nfc-hint');
-let nfcTimer = null;
-function nfcFlash(text) {
-  nfcHint.textContent = text;
-  nfcHint.classList.add('hit');
-  clearTimeout(nfcTimer);
-  nfcTimer = setTimeout(() => { nfcHint.textContent = ''; nfcHint.classList.remove('hit'); }, 3000);
-}
+const nfcFlash = createNfcHint(nfcHint, { ms: 3000 });
 // 기다리는 동안의 안내 문구는 뺐다: 태그를 읽었을 때만 잠깐 알려 준다
 // 읽은 제품: 그 색을 입술에 바르고, 오른쪽 ④ 자리에 제품 카드를 띄운다 (NFC 리더기)
 // masked: 실물 테스트 카드면 그 가린 번호 → 제품 카드를 카드 이름·사진으로 보여 준다 (색은 연결한 제품 색)
@@ -145,9 +134,7 @@ async function showNfcProduct(id, masked = null) {
   $('res-swatch').style.background = p.color_hex;
   $('res-hex').textContent = tr('pal.nfcRead');
   $('rec-status').textContent = '';
-  $('rec-list').replaceChildren(productCard(p, {
-    extraActions: [el('button', { type: 'button', text: tr('lip.tryOn'), onclick: () => toLips(p.color_hex, { finish: p.finish, quiet: false, source: shortName(p) }) })],
-  }));
+  $('rec-list').replaceChildren(tryOnCard(p, () => toLips(p.color_hex, { finish: p.finish, quiet: false, source: shortName(p) })));
 }
 listenNfc((code) => showNfcProduct(resolveTag(code))); // 바코드로 찾기 화면은 2026-11-11 삭제
 

@@ -61,13 +61,16 @@ const labF = (t) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
 const labFInv = (t) => (t > 0.206893 ? t * t * t : (t - 16 / 116) / 7.787);
 const toSrgb = (c) => 255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * Math.max(0, c) ** (1 / 2.4) - 0.055);
 
-function rgbToLabFast(r, g, b, out) {
-  const R = SRGB_TO_LINEAR[r], G = SRGB_TO_LINEAR[g], B = SRGB_TO_LINEAR[b];
+// 선형 RGB → Lab. 결과를 out[0..2] 에 써서 돌려준다 (프레임마다 새 배열을 만들지 않게)
+function linearToLabInto(R, G, B, out) {
   const fx = labF((0.4124 * R + 0.3576 * G + 0.1805 * B) / 0.95047);
   const fy = labF(0.2126 * R + 0.7152 * G + 0.0722 * B);
   const fz = labF((0.0193 * R + 0.1192 * G + 0.9505 * B) / 1.08883);
   out[0] = 116 * fy - 16; out[1] = 500 * (fx - fy); out[2] = 200 * (fy - fz);
   return out;
+}
+function rgbToLabFast(r, g, b, out) {
+  return linearToLabInto(SRGB_TO_LINEAR[r], SRGB_TO_LINEAR[g], SRGB_TO_LINEAR[b], out);
 }
 
 function labToRgbFast(L, a, b, out) {
@@ -172,7 +175,7 @@ export function smoothLips(prev, next) {
 // 2) 보정한 피부색(Lab)의 색상각으로 웜/쿨, 피부 밝기와 피부-눈썹 명도 대비로 밝은/깊은 톤을 나눠 4계절 톤으로 분류
 // 3) 톤별 대표 립 컬러(Lab 색상각·명도·채도)에 가까운 프리셋을 고른다
 // 기준값은 일반적인 퍼스널 컬러 분류를 단순화한 근사값이다. 실제 카메라 측정값을 보고 조정할 수 있도록 결과에 측정값을 함께 돌려준다.
-export const SEASONS = {
+const SEASONS = {
   spring: { label: '봄 웜', desc: '밝고 따뜻한 톤', lip: { h: 40, L: 58, C: 55 } },
   summer: { label: '여름 쿨', desc: '밝고 부드러운 쿨 톤', lip: { h: -8, L: 58, C: 35 } },
   autumn: { label: '가을 웜', desc: '깊고 따뜻한 톤', lip: { h: 38, L: 40, C: 40 } },
@@ -238,10 +241,8 @@ export function measureTone(src, w, h, tone) {
 }
 
 function linearToLab(R, G, B) {
-  const fx = labF((0.4124 * R + 0.3576 * G + 0.1805 * B) / 0.95047);
-  const fy = labF(0.2126 * R + 0.7152 * G + 0.0722 * B);
-  const fz = labF((0.0193 * R + 0.1192 * G + 0.9505 * B) / 1.08883);
-  return { L: 116 * fy - 16, a: 500 * (fx - fy), b: 200 * (fy - fz) };
+  const [L, a, b] = linearToLabInto(R, G, B, [0, 0, 0]);
+  return { L, a, b };
 }
 const toLinear = (v) => SRGB_TO_LINEAR[Math.max(0, Math.min(255, Math.round(v)))];
 

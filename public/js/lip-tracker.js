@@ -48,6 +48,13 @@ export function loadTracker() {
   return loading;
 }
 
+/** 추적기를 버리고 다음 loadTracker() 에서 새로 만든다 (GPU 컨텍스트가 끊겨 계속 오류가 날 때) */
+export function resetTracker() {
+  try { landmarker?.close(); } catch { /* 이미 망가진 상태 */ }
+  landmarker = null;
+  loading = null;
+}
+
 // 퍼스널 컬러 추정용 측정 지점
 // 피부: 양쪽 볼(50, 280, 101, 330)과 이마 중앙(151) / 눈썹(모발색 대용): 105, 66, 334, 296
 // 눈: 홍채 중심(468, 473)과 홍채 테두리(469, 474), 눈꼬리(33·133, 263·362). 흰자는 홍채와 눈꼬리 사이에서 잰다

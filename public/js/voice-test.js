@@ -3,12 +3,12 @@
 // - 글자 정확도: 띄어쓰기·문장부호를 뺀 글자 기준 1 - (편집 거리 / 읽을 문장 글자 수). 보정 전(인식 그대로)과 보정 후를 따로 잰다
 // - 뜻 일치: 읽을 문장과 들은 말을 각각 챗봇이 해석한 조건(제형·색·브랜드·가격·상황 등)이 같은가
 // 결과는 이 기기의 브라우저에만 저장되고(localStorage), 내려받기로 파일을 만든다.
-import { renderNav, api, el } from './common.js';
+import { $, renderNav, api, el } from './common.js';
 import { listenOnce, speechApi, voiceErrorMessage } from './voice.js';
 import { parseMessage, normalizeForChat } from '../lib/chat.js';
+import { editDistance } from '../lib/spoken.js';
 
 renderNav();
-const $ = (id) => document.getElementById(id);
 
 // 기본으로 읽을 문장: 브랜드·제형·가격·상황·톤·이어지는 질문처럼 챗봇이 실제로 받는 말
 const BASE_SENTENCES = [
@@ -43,14 +43,6 @@ const save = () => {
 };
 
 const plain = (s) => String(s).toLowerCase().replace(/[\s.,!?~'"·]/g, '');
-function editDistance(a, b) {
-  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...new Array(b.length).fill(0)]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  }
-  return d[a.length][b.length];
-}
 const accuracy = (target, heard) => {
   const t = plain(target), h = plain(heard);
   return t.length ? Math.max(0, Math.round((1 - editDistance(t, h) / t.length) * 1000) / 10) : 0;

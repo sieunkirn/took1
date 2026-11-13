@@ -5,13 +5,11 @@
 // 한글은 자모를 눌러 글자로 조합한다: 초성·중성·종성, 겹모음(ㅘ 등), 겹받침(ㄳ 등), 받침 넘기기(갑+ㅏ → 가바), 지우기는 자모 단위.
 import { el } from './common.js';
 import { isEn } from './i18n.js';
+import { CHO, JUNG, JONG } from '../lib/spoken.js'; // 초성·중성·종성 표
 
 const C = (ko, en) => (isEn() ? en : ko);
 
 // ---------- 한글 조합 ----------
-const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
-const JUNG = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ';
-const JONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 const VOWEL_PAIR = { 'ㅗㅏ': 'ㅘ', 'ㅗㅐ': 'ㅙ', 'ㅗㅣ': 'ㅚ', 'ㅜㅓ': 'ㅝ', 'ㅜㅔ': 'ㅞ', 'ㅜㅣ': 'ㅟ', 'ㅡㅣ': 'ㅢ' };
 const JONG_PAIR = { 'ㄱㅅ': 'ㄳ', 'ㄴㅈ': 'ㄵ', 'ㄴㅎ': 'ㄶ', 'ㄹㄱ': 'ㄺ', 'ㄹㅁ': 'ㄻ', 'ㄹㅂ': 'ㄼ', 'ㄹㅅ': 'ㄽ', 'ㄹㅌ': 'ㄾ', 'ㄹㅍ': 'ㄿ', 'ㄹㅎ': 'ㅀ', 'ㅂㅅ': 'ㅄ' };
 const JONG_SPLIT = Object.fromEntries(Object.entries(JONG_PAIR).map(([k, v]) => [v, [k[0], k[1]]]));
@@ -20,13 +18,13 @@ const isConsonant = (c) => CHO.includes(c);
 const EMPTY = () => ({ cho: '', jung: '', jong: '' });
 
 /** 조합 중인 글자 하나를 문자열로 (없으면 '') */
-export function renderSyllable(s) {
+function renderSyllable(s) {
   if (s.cho && s.jung) return String.fromCharCode(0xac00 + (CHO.indexOf(s.cho) * 21 + JUNG.indexOf(s.jung)) * 28 + JONG.indexOf(s.jong));
   return s.cho || s.jung || '';
 }
 
 /** 자모 하나를 넣는다 → { commit: 확정된 글자, state: 새 조합 상태, keys: 새 상태를 만든 자모들 } */
-export function feedJamo(state, keys, c) {
+function feedJamo(state, keys, c) {
   const s = { ...state };
   const done = (commit, next, nextKeys) => ({ commit, state: next, keys: nextKeys });
   if (isVowel(c)) {

@@ -6,7 +6,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 const W = 800, H = 600;
 
 // 각 샘플: 피부/볼터치/머리/입술/옷/배경 색과 헤어 스타일
-export const SAMPLES = [
+const SAMPLES = [
   { id: 'avatar-1', label: '아바타 1 (단발 앞머리)', skin: '#FFE3D3', shade: '#F4C4AE', blush: '#FF9DB0', hair: '#5B3A2E', lip: '#E07A8A', shirt: '#BFD8F2', bg: '#FDEFF2', style: 'bob' },
   { id: 'avatar-2', label: '아바타 2 (양쪽 똥머리)', skin: '#F6D2B8', shade: '#E2AE90', blush: '#FF8FA3', hair: '#2E2321', lip: '#D35F72', shirt: '#F7D9A8', bg: '#EEF4FB', style: 'buns' },
   { id: 'avatar-3', label: '아바타 3 (긴 생머리)', skin: '#D9A27E', shade: '#BE8460', blush: '#F07F8F', hair: '#3A2418', lip: '#B9505F', shirt: '#C9E4C5', bg: '#F6F1E8', style: 'long' },
@@ -48,7 +48,7 @@ function sample(segs, n = 6) {
   return pts;
 }
 
-export function lipsGeometry() {
+function lipsGeometry() {
   const start = { x: UPPER[0][0] / W, y: UPPER[0][1] / H };
   const outer = [start, ...sample(UPPER), ...sample(LOWER)].slice(0, -1);
   const seamTop = sample(SEAM).map((p) => ({ x: p.x, y: +(p.y - 1 / H).toFixed(4) }));
@@ -86,7 +86,7 @@ function eye(cx, flip) {
   <path d="M${cx - 20 * d},264 C${cx - 7 * d},258 ${cx + 8 * d},258 ${cx + 20 * d},263" fill="none" stroke="#2B1B17" stroke-width="4" stroke-linecap="round" opacity="0.6"/>`;
 }
 
-export function svgFor(s) {
+function svgFor(s) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <radialGradient id="skin" cx="50%" cy="40%" r="62%"><stop offset="0%" stop-color="${s.skin}"/><stop offset="82%" stop-color="${s.skin}"/><stop offset="100%" stop-color="${s.shade}"/></radialGradient>

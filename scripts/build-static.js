@@ -5,10 +5,10 @@
 import { cpSync, mkdirSync, readFileSync, writeFileSync, readdirSync, rmSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BROWSER_LIBS } from '../src/lib/browser-libs.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'dist/static');
-const BROWSER_LIBS = ['color.js', 'constants.js', 'catalog.js', 'recommend.js', 'chat.js', 'spoken.js', 'situations.js', 'aliases.js', 'chat-en.js'];
 const FOR_ARTIFACT = !process.argv.includes('--web');
 
 if (!existsSync(join(root, 'public/vendor/mediapipe/vision_bundle.js'))) {

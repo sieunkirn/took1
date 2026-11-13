@@ -5,14 +5,13 @@
 //  4) 고른 호수의 재고 수량을 설명 아래에 보여 준다 (매대 위치 안내는 2026-11-11 삭제)
 // 호수·재고는 시연용 데이터(src/data/products.demo.json)다. 화면에 '테스트 데이터'로 표시한다.
 // 주소 값: id(제품), from(돌아갈 곳: chat), try=1(이 색을 바로 발라 본다)
-import { renderNav, api, el, qs, won, toast } from './common.js';
+import { $, renderNav, api, el, qs, won, toast } from './common.js';
 import { isEn, brandOf, nameOf, finishText, t as tr } from './i18n.js';
 import { shadeLabel, stockText } from './shade-label.js';
 
 renderNav();
 
 const C = (ko, en) => (isEn() ? en : ko);
-const $ = (id) => document.getElementById(id);
 const page = $('sh-page');
 document.title = C('took(툭) - 호수 안내', 'took - Shade guide');
 $('sh-try').setAttribute('aria-label', C('입술에 발라 보기', 'Try on your lips'));

@@ -43,7 +43,7 @@ export function ean13CheckDigit(d12) {
   return String((10 - (sum % 10)) % 10);
 }
 
-export function buildProducts() {
+function buildProducts() {
   return RAW.map(([brand, name, type, shade_name, hex, finish, price, color_family, description], i) => {
     const id = i + 1;
     const color_hex = normalizeHex(hex);

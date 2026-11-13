@@ -7,7 +7,7 @@ import { shortName } from '../catalog.js';
 import { findBannedClaim } from '../claims.js';
 import { chatCompletion } from './client.js';
 
-export const STYLE_BUDGET_MS = 1000;
+const STYLE_BUDGET_MS = 1000;
 
 const SYSTEM = {
   ko: `너는 립 컬러 서비스 took 의 AI 도우미 "툭"의 말투를 다듬는 편집자야. 사용자 글은 챗봇이 이미 정한 답이다.

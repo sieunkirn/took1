@@ -81,38 +81,18 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .placeholder { border: 1px dashed var(--line-2); display: flex; align-items: center; justify-content: center; color: var(--mute); font-size: 13px; text-align: center; background: var(--soft); }
 
 /* ---------- 홈: 무채색만 쓰고 글자 크기·여백·선으로 위계를 만든다 (둥근 모서리·그림자 없음) ---------- */
-.home { max-width: 1080px; }
-.hero { padding: 40px 0 36px; border-bottom: 2px solid #000; }
 .eyebrow { margin: 0; font-size: 12px; letter-spacing: 0.2em; color: #555; }
-.hero h1 { font-size: 56px; line-height: 1.1; letter-spacing: -0.02em; margin: 10px 0 16px; }
-.hero-lead { font-size: 20px; line-height: 1.6; margin: 0; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .btn-primary, .btn-line { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border: 2px solid #000; text-decoration: none; font-weight: bold; }
 .btn-primary, .btn-primary:visited { background: #000; color: #fff; }
 .btn-primary:hover { background: #fff; color: #000; }
 .btn-line, .btn-line:visited { background: #fff; color: #000; }
 .btn-line:hover { background: #000; color: #fff; }
-.section-title { font-size: 22px; margin: 44px 0 16px; }
-.home-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.home-menu .feature { display: flex; flex-direction: column; gap: 10px; padding: 24px; border: 1px solid #000; text-decoration: none; min-height: 220px; }
-.home-menu .feature:hover { outline: 2px solid #000; outline-offset: -3px; }
-.home-menu .feature svg { width: 40px; height: 40px; }
-.home-menu .feature strong { font-size: 20px; }
-.home-menu .feature span { line-height: 1.6; color: #333; }
-.home-menu .feature .go { margin-top: auto; font-weight: bold; color: #000; }
-.home-menu .feature:hover .go { text-decoration: underline; }
 .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid #000; }
 .steps li { display: flex; flex-direction: column; gap: 6px; padding-top: 16px; }
 .steps .num { font-size: 32px; font-weight: bold; line-height: 1; }
 .steps strong { font-size: 18px; }
-.recent { border-top: 1px solid #000; }
 .recent-row { display: grid; grid-template-columns: 160px 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #ccc; }
-.recent > p { padding: 14px 0; margin: 0; }
-.home-note { margin: 40px 0 24px; }
 @media (max-width: 700px) {
-  .hero { padding: 24px 0; }
-  .hero h1 { font-size: 40px; }
-  .hero-lead { font-size: 17px; }
   .steps { grid-template-columns: 1fr; gap: 0; }
   .steps li { padding: 14px 0; border-bottom: 1px solid #ccc; }
   .recent-row { grid-template-columns: 1fr; gap: 4px; }
@@ -237,7 +217,6 @@ body.scan-open .chat-side { display: flex; flex-direction: column; gap: 6px; ord
 .chat-log .bubble.streaming .typed::after { content: ''; display: inline-block; width: 2px; height: 1em; margin-right: -2px; vertical-align: -0.15em; background: currentColor; animation: took-caret 0.8s steps(1) infinite; }
 @keyframes took-caret { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .typing-dots i { animation: none; } }
-@keyframes took-dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
 
 /* ---------- 태블릿 가로(iPad 가로 1024~1366px) / PC: 한 화면에 맞춤 ---------- */
 @media (orientation: landscape) and (min-width: 960px) {
@@ -264,9 +243,6 @@ body.scan-open .chat-side { display: flex; flex-direction: column; gap: 6px; ord
 
 @media (max-width: 900px) {
   .grid-2 { grid-template-columns: 1fr; }
-}
-@media (max-width: 600px) {
-  .home-menu { grid-template-columns: 1fr; }
 }
 
 /* 시연용 바코드 화면 */
@@ -347,7 +323,7 @@ button, .btn-primary, .btn-line, .photo-btn {
   transition: transform 0.18s var(--spring), background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 button:hover:not(:disabled), .btn-line:hover, .photo-btn:hover { background: var(--soft-2); color: var(--ink); }
-button:active:not(:disabled), .btn-primary:active, .btn-line:active, .photo-btn:active, .feature:active { transform: scale(0.96); transition-duration: 0.08s; }
+button:active:not(:disabled), .btn-primary:active, .btn-line:active, .photo-btn:active { transform: scale(0.96); transition-duration: 0.08s; }
 button:disabled { background: var(--soft); color: var(--faint); opacity: 0.7; }
 .btn-dark, button.btn-dark, .btn-primary, .btn-primary:visited, #chat-send { background: var(--ink); color: var(--paper); }
 .btn-dark:hover:not(:disabled), .btn-primary:hover, #chat-send:hover:not(:disabled) { background: #333333; color: var(--paper); }
@@ -443,7 +419,7 @@ table th, table td { border-bottom-color: var(--line); }
 .chat-log .user .suggest button { color: var(--ink); }
 .chat-log .suggest button:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
 /* 자동 초기화 테스트 버튼: 상단 메뉴 오른쪽 끝 (테스트 단계에만) */
-header.nav .nav-idle-test, header.nav .nav-orient { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+header.nav .nav-idle-test { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 /* 언어 전환 버튼: 메뉴 오른쪽으로 밀고, 눈에 띄게 테두리 */
 header.nav .nav-lang { margin-left: auto; }
 /* 언어 선택 메뉴 (i18n.js languageMenu): 🌐 Language ▾ 를 누르면 아래에 말풍선처럼 목록이 열린다 */
@@ -497,8 +473,6 @@ header.nav .nav-lang { margin-left: auto; }
 @keyframes took-listen { 50% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.12); } }
 .chat-input input[readonly] { cursor: default; pointer-events: none; }
 .chat-input:has(input[readonly]):focus-within { background: var(--soft); box-shadow: none; }
-#img-only { min-height: 40px; padding: 6px 12px; font-size: 13px; }
-#img-only[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 
 /* 비교함·비교표 */
 .compare-box { border: 0; border-radius: 16px; padding: 10px 12px; background: var(--paper); box-shadow: var(--shadow-up); }
@@ -526,95 +500,24 @@ header.nav .nav-lang { margin-left: auto; }
 .studio #rec-list .card .actions button, .studio #rec-list .card .actions a { font-size: 12.5px; }
 
 /* 홈: 큰 제목, 흰 카드 메뉴 */
-.hero { border: 0; padding: 48px 0 28px; }
 .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--mute); }
-.hero h1 { font-size: 52px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; }
-.hero-lead { font-size: 20px; color: var(--ink-2); }
-.section-title { font-size: 22px; font-weight: 800; margin: 36px 0 14px; }
-.home-menu .feature { border: 0; border-radius: 24px; padding: 28px; background: var(--paper); box-shadow: var(--shadow); color: var(--ink); transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease); }
-.home-menu .feature:hover { outline: 0; transform: translateY(-4px); box-shadow: var(--shadow-up); }
-.home-menu .feature svg { width: 44px; height: 44px; padding: 10px; border-radius: 14px; background: var(--soft); box-sizing: content-box; }
-.home-menu .feature strong { font-size: 21px; font-weight: 800; }
-.home-menu .feature span { color: var(--ink-2); }
-.home-menu .feature .go { color: var(--mute); text-decoration: none !important; }
 .steps { border: 0; gap: 14px; }
 .steps li { padding: 22px; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); }
 .steps .num { font-size: 15px; font-weight: 800; color: var(--mute); }
-.recent { border: 0; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); padding: 4px 20px; }
 .recent-row { border-bottom: 1px solid var(--line); }
 .recent-row:last-child { border-bottom: 0; }
 @media (max-width: 700px) {
-  .hero h1 { font-size: 36px; }
   .steps { gap: 10px; }
   .steps li { border-bottom: 0; padding: 18px; }
 }
 
 /* ---------- 홈 인터랙션 (js/home.js) ---------- */
 /* 커서에 반응하는 회색 점 배경: 화면 전체에 고정, 내용 뒤 */
-.home-bg { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
 body.home-page main { position: relative; z-index: 1; }
-/* 홈(옛 툭ver2 대기 화면 구성, 무채색): 제목 + 가운데 큰 동그라미 하나. 화면 높이·너비 둘 다에 맞춰 크기가 줄어든다 */
-main.home.attract { --lip: #C0646A; max-width: none; min-height: calc(100dvh - var(--nav-h)); padding: clamp(20px, 4vh, 44px) 24px clamp(16px, 3vh, 32px); display: flex; flex-direction: column; }
-.at-hero { text-align: center; }
-.at-hero h1 { font-size: clamp(44px, min(7vw, 9vh), 104px); line-height: 1.05; font-weight: 800; letter-spacing: -0.05em; margin: 0; }
-.at-hero p { font-size: clamp(17px, min(1.8vw, 2.4vh), 23px); color: var(--ink); font-weight: 500; margin-top: clamp(10px, 1.6vh, 16px); }
-/* 세로 간격: 제목↔동그라미, 동그라미↔버튼을 같은 --gap 으로 맞춘다 (둘레를 도는 점 포함) */
-.at-stage { --gap: clamp(60px, 7.5vh, 84px); display: flex; justify-content: center; align-items: flex-start; column-gap: clamp(110px, 10vw, 180px); row-gap: var(--gap); margin: var(--gap) 0 auto; }
-.tap { --d: max(180px, min(40vh, 30vw, 440px, calc(100vh - 500px))); position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--gap); color: var(--ink); text-decoration: none; }
-.tap .mirror { width: var(--d); aspect-ratio: 1; border-radius: 50%; position: relative; overflow: hidden; box-sizing: border-box; background: var(--paper); border: max(8px, calc(var(--d) * 0.035)) solid var(--soft-2); animation: breathe 2.6s ease-in-out infinite; transition: transform 0.15s var(--ease); }
 /* 숨쉬기: 그림자 대신 아주 조금 커졌다 작아진다 (테두리는 회색 면 한 단계) */
-@keyframes breathe { 0%, 100% { scale: 1; } 50% { scale: 1.015; } }
-.tap:active .mirror { transform: scale(0.96); }
-.mirror svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-#demo-lips { color: var(--lip); transform-box: fill-box; transform-origin: center; }
-#demo-lips.pop { animation: lip-pop 0.55s cubic-bezier(0.34, 1.8, 0.64, 1); }
-@keyframes lip-pop { 0% { transform: scale(0.55); } 60% { transform: scale(1.28); } 100% { transform: scale(1); } }
-#sparks path { transform-box: fill-box; transform-origin: center; opacity: 0; }
-#sparks.pop path { animation: spark 0.75s ease-out both; }
-#sparks.pop path:nth-child(2) { animation-delay: 0.06s; } #sparks.pop path:nth-child(3) { animation-delay: 0.12s; }
-#sparks.pop path:nth-child(4) { animation-delay: 0.18s; } #sparks.pop path:nth-child(5) { animation-delay: 0.1s; }
-@keyframes spark { 0% { opacity: 0; transform: scale(0) rotate(0); } 40% { opacity: 1; transform: scale(1.3) rotate(45deg); } 100% { opacity: 0; transform: scale(0.4) rotate(90deg); } }
 /* 동그라미 둘레를 천천히 도는 회색 점 */
-.orbit { --r: calc(var(--d) / 2 + 34px); position: absolute; left: 50%; top: calc(var(--d) / 2); width: 0; height: 0; animation: orbit 40s linear infinite; pointer-events: none; }
-.orbit i { position: absolute; width: 18px; height: 18px; margin: -9px; border-radius: 50%; border: 2px solid var(--paper); transform: rotate(calc(var(--k) * 45deg)) translateY(calc(var(--r) * -1)); }
-.orbit i:nth-child(1) { --k: 0; background: #2a2a2a; } .orbit i:nth-child(2) { --k: 1; background: #6e6e6e; }
-.orbit i:nth-child(3) { --k: 2; background: #444; } .orbit i:nth-child(4) { --k: 3; background: #b5b5b5; }
-.orbit i:nth-child(5) { --k: 4; background: #1c1c1c; } .orbit i:nth-child(6) { --k: 5; background: #8f8f8f; }
-.orbit i:nth-child(7) { --k: 6; background: #5a5a5a; } .orbit i:nth-child(8) { --k: 7; background: #d0d0d0; }
-@keyframes orbit { to { transform: rotate(360deg); } }
-.tap-label { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--paper); padding: clamp(12px, 1.8vh, 18px) clamp(24px, 2.6vw, 36px); border-radius: 999px; font-size: clamp(19px, 2.6vh, 26px); font-weight: 800; position: relative; z-index: 1; transition: transform 0.18s var(--spring); }
-.tap:hover .tap-label { transform: translateY(-2px); }
-.tap-label b { font-size: 1.15em; line-height: 1; }
 /* 챗봇 쪽 예시 대화: 동그라미 안에 말풍선 세 개 (회색 = 챗봇, 검정 = 나) */
-.chat-demo { display: grid; place-items: center; font-size: calc(var(--d) * 0.052); }
-.cd-msgs { width: 76%; display: flex; flex-direction: column; gap: 0.6em; }
-.cd-bubble { max-width: 88%; padding: 0.55em 0.85em; border-radius: 1.1em; line-height: 1.35; font-weight: 600; text-align: left; }
-.cd-bubble.bot { align-self: flex-start; background: var(--soft-2); color: var(--ink); border-bottom-left-radius: 0.3em; }
-.cd-bubble.me { align-self: flex-end; background: var(--ink); color: var(--paper); border-bottom-right-radius: 0.3em; }
-.cd-caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -0.15em; background: currentColor; animation: caret 1s steps(1) infinite; }
 @keyframes caret { 50% { opacity: 0; } }
-.cd-bubble.typing { display: flex; gap: 0.3em; padding: 0.7em 0.9em; }
-.cd-bubble.typing i { width: 0.45em; height: 0.45em; border-radius: 50%; background: var(--mute); animation: cd-dot 1.2s ease-in-out infinite; }
-.cd-bubble.typing i:nth-child(2) { animation-delay: 0.15s; } .cd-bubble.typing i:nth-child(3) { animation-delay: 0.3s; }
-@keyframes cd-dot { 0%, 60%, 100% { transform: none; opacity: 0.5; } 30% { transform: translateY(-0.3em); opacity: 1; } }
-/* 좁은 화면: 두 동그라미를 위아래로 */
-@media (max-width: 600px) {
-  .at-stage { --gap: 56px; flex-direction: column; align-items: center; row-gap: 72px; margin-top: 56px; }
-  .at-hero p { word-break: keep-all; }
-  .tap { --d: min(58vw, 26vh); }
-}
-/* 인트로(옛 툭ver2 시작 연출): 가운데 큰 took. → 글자는 상단 로고로, 온점은 동그라미로 통통 떨어진다.
-   home.js 가 불러와지기 전 첫 화면부터 내용을 숨겨 둔다 (깜빡임 방지). 하나씩 보여 주는 건 home.js 의 애니메이션 */
-html.intro:not(.intro-go) .at-hero, html.intro:not(.intro-go) .tap .mirror, html.intro:not(.intro-go) .tap-label, html.intro:not(.intro-go) .orbit, html.intro:not(.intro-go) #nav-reset { opacity: 0; }
-.intro-logo { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; pointer-events: none; }
-.intro-logo .in { font-weight: 800; font-size: clamp(72px, min(22vh, 26vw), 230px); letter-spacing: -0.03em; line-height: 1; color: var(--ink); display: flex; align-items: baseline; gap: 0.05em; }
-.intro-logo .w { display: inline-block; transform-origin: 0 0; }
-/* 글자 하나씩 움직인다: t·k 는 왼쪽 위 기준(로고 자리로 줄어든다), 두 o 는 가운데 기준(원으로 커진다) */
-.intro-logo .ch { display: inline-block; transform-origin: 0 0; }
-.intro-logo .ch.o { transform-origin: 50% 55%; }
-.intro-logo .d { display: inline-block; width: 0.2em; height: 0.2em; border-radius: 50%; background: var(--ink); transform-origin: 0 0; }
-/* 대기 화면: 터치할 때까지 인트로 막이 화면을 덮고, 손가락 표시가 톡톡 누르며 퍼지는 원을 그린다 (home.js waitForTouch) */
-.intro-logo.waiting { pointer-events: auto; cursor: pointer; }
 /* 홈 = 대기 화면 (옛 거울 ver4 대기 화면, js/home.js): 화면 전체에 선만. 누르면 팔레트로.
    라이트 모드는 흰 바탕 위 검정 선, 다크 모드는 검정 바탕 위 흰 선 (--paper·--ink 가 바뀐다).
    왼쪽 위 TOOK 로고, 오른쪽 위 시계, 가운데 점선 얼굴(천천히 숨 쉼), 아래 안내 두 줄, 오른쪽 아래 다크 모드·언어 */
@@ -632,12 +535,6 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 @media (prefers-reduced-motion: reduce) { .home-standby .hs-face { animation: none; opacity: 0.85; } }
 .intro-lang { position: absolute; top: max(16px, 3vh); right: max(16px, 3vw); }
 .intro-lang .lang-trigger { font-size: 17px; min-height: 46px; padding: 6px 14px; }
-/* 메뉴는 글자가 로고 자리로 날아갈 때 함께 내려온다 */
-html.intro:not(.intro-nav):not(.intro-go) header.nav { opacity: 0; transform: translateY(-100%); }
-html.intro header.nav { transition: opacity 0.5s var(--ease), transform 0.75s cubic-bezier(0.65, 0, 0.35, 1); }
-html.intro body { overflow: hidden; }
-html.intro-go body { overflow: auto; }
-
 
 /* ---------- 팔레트: 왼쪽 카메라 | 오른쪽 ① 내 톤 찾기 ② 팔레트 ③ 텍스처·추천 (추천 후엔 ④ 결과) (js/palette.js + lip.js).
    물감·섞는 칸·조제한 색은 실제 색 (CLAUDE.md 예외) ---------- */
@@ -677,13 +574,10 @@ html.intro-go body { overflow: auto; }
 .pal-match-row .swatches.hidden { display: none; }
 .pal-match-row .swatches button { width: 32px; height: 32px; min-height: 32px; }
 .pal-match #match-result:empty { display: none; }
-.pal-match-more summary { cursor: pointer; width: fit-content; }
 /* ② 팔레트 머리: 이름 + 오른쪽 위 다시하기 아이콘 */
 .pal-board-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .pal-board-head .label { margin: 0; }
 .pal-reset { width: 40px; min-height: 40px; padding: 0; border-radius: 50%; }
-.mix-hex { margin: 0; white-space: pre-line; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.4; }
-.mix-hex:empty { display: none; }
 /* ③ 마무리: 텍스처·농도·추천 버튼 */
 .pal-finish { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
 .pal-finish .seg { padding: 3px; }
@@ -704,7 +598,6 @@ html.intro-go body { overflow: auto; }
 /* 추천 결과 보기: 팔레트·텍스처·농도·추천 버튼을 숨기고 조제한 색과 추천 제품만 오른쪽 전체에 */
 /* 팔레트 박스: 남은 높이를 모두 쓰고, 섞는 칸이 그 높이에 맞춰 커진다 */
 .pal-board .paint-blob { width: 36px; height: 36px; }
-.paint-group .label { margin-bottom: 4px; }
 /* 립 컬러 매핑 컬러: 22색을 작은 방울로 두 줄에 */
 .lip-paints { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px 2px; }
 .lip-paints .paint { padding: 3px 0; }
@@ -759,14 +652,6 @@ html.intro-go body { overflow: auto; }
 @media (orientation: portrait) and (min-width: 700px) {
   header.nav { height: var(--nav-h); padding: 0 20px; flex-wrap: nowrap; }
   .wide-only { display: flex; }
-
-  /* 홈 */
-  main.home.attract { padding: clamp(24px, 4vh, 56px) 24px clamp(20px, 3vh, 40px); }
-  .at-hero h1 { font-size: clamp(48px, min(9.4vw, 6.6vh), 96px); }
-  .at-hero p { font-size: clamp(17px, min(2.5vw, 1.9vh), 24px); word-break: keep-all; }
-  .at-stage { --gap: clamp(48px, 5vh, 68px); flex-direction: column; align-items: center; row-gap: var(--gap); }
-  /* 동그라미 지름: 화면 높이에서 제목·버튼·간격(약 620px + 화면 높이의 4.5%)을 빼고 둘로 나눈 만큼 (스크롤 없이 두 개가 다 보이게) */
-  .tap { --d: max(170px, min(54vw, 420px, calc((100dvh - var(--nav-h) - 620px - 4.5vh) / 2))); }
 
   /* 팔레트 */
   main.fit.palette, main.fit.chat-user { max-width: none; height: calc(100dvh - var(--nav-h)); padding: clamp(10px, 1.2vh, 14px) 18px; overflow: hidden; }
@@ -854,7 +739,6 @@ html.intro-go body { overflow: auto; }
   .palette-page .pal-mix { display: contents; }
   .palette-page .mix-wrap { grid-column: 2; grid-row: 1 / span 2; width: auto; height: calc(var(--dock-h) - 40px); max-width: none; max-height: none; }
   .palette-page .pal-tools { grid-column: 3; grid-row: 1 / span 2; min-width: 110px; }
-  .palette-page .mix-hex { font-size: 18px; }
 
   /* 서랍 오른쪽: 텍스처 · 농도 · 추천 버튼 */
   .palette-page .pal-finish { right: var(--gap); bottom: var(--gap); width: var(--fin-w); height: var(--dock-h); padding: 20px 24px 20px 12px; border-radius: 0 28px 28px 0; justify-content: center; gap: 14px; }
@@ -1070,7 +954,6 @@ header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radiu
 .sh-page.trying .sh-actions { margin-top: 10px; }
 .shade-open { min-height: 36px; }
 .shelf-stock { margin: 6px 0 0; font-size: 18px; font-weight: 800; }
-
 
 /* ---------- 화면 터치 키보드 (js/touch-keyboard.js): 챗봇 입력줄 아래에 열리는 한/영 키보드 ---------- */
 .tkb { flex: none; margin-top: 4px; padding: 4px 4px 6px; border-radius: 16px; background: var(--soft-2); user-select: none; -webkit-user-select: none; touch-action: manipulation; animation: took-fade 0.2s var(--ease) backwards; }

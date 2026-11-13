@@ -7,7 +7,8 @@
 // 동작 줄이기(prefers-reduced-motion) 설정이면 움직임 없이 결과만 보여 준다.
 import { priceText } from './i18n.js';
 
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/** 기기의 '동작 줄이기' 설정 (켜져 있으면 움직임 없이 결과만 보여 준다) */
+export const REDUCE_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- 카드·말풍선 차례로 떠오르기 ----------
 const POP = '.card, .recent-row'; // 홈의 기능 카드·단계는 home.js 가 따로 움직인다
@@ -56,7 +57,7 @@ function animateNew(root) {
 function countUp(root) {
   for (const span of root.querySelectorAll('[data-count]')) {
     const to = Number(span.dataset.count);
-    if (!Number.isFinite(to) || reduce) continue;
+    if (!Number.isFinite(to) || REDUCE_MOTION) continue;
     const start = performance.now();
     const dur = 600;
     const tick = (now) => {
@@ -122,7 +123,7 @@ export function toast(message, { ms = 2200 } = {}) {
   while (toastWrap.children.length > 2) toastWrap.firstElementChild.remove();
   setTimeout(() => {
     t.classList.add('out');
-    setTimeout(() => t.remove(), reduce ? 0 : 250);
+    setTimeout(() => t.remove(), REDUCE_MOTION ? 0 : 250);
   }, ms);
 }
 

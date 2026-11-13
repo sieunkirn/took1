@@ -9,13 +9,14 @@
 // - 사람이 보고 정한 짝은 MANUAL 에 적는다 (null = 글로벌에 같은 상품이 없다고 확인)
 // import-oliveyoung.js 로 데이터를 다시 만들면 이 스크립트를 --apply 로 다시 돌린다
 import { readFileSync, writeFileSync } from 'node:fs';
+import { editDistance } from '../src/lib/spoken.js';
 
 const KO_FILE = new URL('../src/data/products.oliveyoung.json', import.meta.url);
 const GLOBAL_FILE = new URL('../src/data/oliveyoung.global.raw.json', import.meta.url);
 const GLOBAL_URL = (id) => `https://global.oliveyoung.com/product/detail?prdtNo=${id}`;
 
 // 한국 브랜드 → 글로벌 목록의 브랜드 표기 (글로벌에 없는 브랜드는 넣지 않는다)
-export const BRAND_EN = {
+const BRAND_EN = {
   '3CE': '3CE', 'VDL': 'VDL', '네이밍': 'NAMING.', '노노어': 'nonoer', '누즈': 'nuse', '더샘': 'THE SAEM', '더페이스샵': 'THE FACE SHOP',
   '데이지크': 'dasique', '디어달리아': 'DEAR DAHLIA', '딘토': 'Dinto', '라네즈': 'LANEIGE', '라카': 'Laka', '러브플레르': 'lovefleur',
   '롬앤': 'rom&nd', '리스키': 'RISKY', '릴리바이레드': 'lilybyred', '머지': 'MERZY', '메리몽드': 'merrymonde', '모렛': 'molette',
@@ -120,7 +121,7 @@ function score(ko, g) {
 
 // 사람이 보고 정한 짝 (한국 id → 글로벌 id, null = 글로벌 목록에서 같은 상품을 확인하지 못함). 2026-11-04 검토
 // 근거가 이름·색 수·에디션처럼 둘 이상 겹칠 때만 짝짓고, 모음전·골라담기·묶음 기획은 같은 상품으로 보지 않는다
-export const MANUAL = {
+const MANUAL = {
   // 컬러그램 '탕후루 탱글 틴트'는 글로벌에서 'Fruity Glass Tint' (딥 글레이즈 8색·밀크·미니 듀오가 이름 뒷부분까지 같다). 기본 상품은 글로벌 목록에 없다
   'OY-A000000219300': 'GA260741567', 'OY-A000000245109': 'GA260237614', 'OY-A000000201779': 'GA240322617',
   'OY-A000000188142': null, 'OY-A000000221670': null, 'OY-A000000257253': null,
@@ -207,20 +208,11 @@ if (verbose || process.argv.includes('--review')) {
   }
 }
 
-function editDistance(a, b) {
-  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...new Array(b.length).fill(0)]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  }
-  return d[a.length][b.length];
-}
-
 /**
  * 영어 상품명: 글로벌 표기에서 앞의 브랜드(오타 표기 'cologram' 포함)·홍보 문구·옵션·색 수·용량·사은품 괄호를 뺀다.
  * 브랜드는 brand_en 으로 따로 둔다. "(Glossy Gel)", "(Renewed)" 처럼 상품을 가르는 괄호는 남긴다
  */
-export function cleanEnName(name, brandEn) {
+function cleanEnName(name, brandEn) {
   let words = name.replace(/\[[^\]]*\]\s*/g, '').replace(/[’‘]/g, "'").trim().split(/\s+/);
   const brandWords = brandEn.toLowerCase().split(/\s+/);
   const head = words.slice(0, brandWords.length).map((w) => w.toLowerCase());

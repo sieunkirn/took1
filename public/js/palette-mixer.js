@@ -10,8 +10,7 @@ import { el, store } from './common.js';
 import { hexToRgb, rgbToHex } from '../lib/color.js';
 import { PRESETS } from './lip-engine.js'; // 립 컬러 매핑 탭에서 고를 수 있는 색
 import { t as tr } from './i18n.js';
-
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { REDUCE_MOTION as reduce } from './motion.js';
 
 // 물감 = 립 컬러 매핑 탭에서 고를 수 있는 컬러 (이름 대신 색상값)
 export const ALL_PAINTS = PRESETS.map((hex, i) => ({ key: 'lip' + i, name: hex, hex, lip: true }));

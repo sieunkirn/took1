@@ -111,7 +111,7 @@ export const CONCERNS_EN = {
 };
 
 // 기분·잡담 → 한마디 받고 그에 맞는 조건으로 추천 (query 는 한국어판과 같은 키)
-export const MOODS_EN = [
+const MOODS_EN = [
   { words: ['sleepy', 'tired', 'exhausted', 'worn out', 'no energy'], ack: 'Feeling tired? Let me find a lip that gives you a healthy flush.', query: { concerns: ['혈색 있는'] } },
   { words: ['hungry', 'starving', 'lunch', 'dinner', 'snack'], ack: 'Hungry? Let me pick lips that stay on even after eating.', query: { concerns: ['오래 가는'] } },
   { words: ['bored', 'boring'], ack: 'Bored? How about trying a bold color for a change?', query: { concerns: ['강렬한'] } },

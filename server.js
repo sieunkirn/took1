@@ -12,6 +12,7 @@ import { hybridAnswer } from './src/lib/llm/agent.js';
 import { abEnabled, abStats, recordEvent } from './src/lib/ab.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
+import { BROWSER_LIBS } from './src/lib/browser-libs.js';
 import { createSession, getSession, notify, poll, lanAddress } from './src/lib/pairing.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -19,7 +20,7 @@ const root = dirname(fileURLToPath(import.meta.url));
 if (existsSync(join(root, '.env'))) process.loadEnvFile(join(root, '.env'));
 const PUBLIC = join(root, 'public');
 const SHARED_LIB = join(root, 'src/lib'); // 브라우저에서 /lib/color.js 등으로 재사용
-const BROWSER_LIBS = new Set(['color.js', 'constants.js', 'catalog.js', 'recommend.js', 'chat.js', 'spoken.js', 'situations.js', 'aliases.js', 'chat-en.js']);
+const BROWSER_LIB_SET = new Set(BROWSER_LIBS);
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -140,7 +141,7 @@ async function serveStatic(res, pathname) {
   let file;
   if (pathname.startsWith('/lib/')) {
     const name = pathname.slice(5);
-    if (!BROWSER_LIBS.has(name)) return notFound(res);
+    if (!BROWSER_LIB_SET.has(name)) return notFound(res);
     file = join(SHARED_LIB, name);
   } else {
     const rel = normalize(decodeURIComponent(pathname === '/' ? '/index.html' : pathname));

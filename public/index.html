@@ -5,24 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>took(툭)</title>
 <link rel="stylesheet" href="css/wireframe.css">
-<script>
-  // 첫 화면이 그려지기 전에 다크 모드를 바로 켠다 (밝게 깜빡이지 않게)
-  try { if (localStorage.getItem('took.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) { /* 저장 불가 환경 */ }
-</script>
-<!-- (2026-11-09 사용 안 함) 옛 홈 인트로 머리 스크립트. 안쪽 주석 기호는 <!~~ ~~> 로 바꿔 두었다
-<script>
-  // 홈 인트로: 첫 화면이 그려지기 전에 숨김 상태를 켠다 (js/home.js 가 이어서 움직인다).
-  // 스크립트가 3초 안에 돌지 않으면 숨김을 풀어 내용이 항상 보이게 한다.
-  // 상단 '홈' 버튼으로 온 경우(took.homeSkipIntro)에는 인트로 없이 바로 보여 준다
-  (function () {
-    var r = document.documentElement;
-    var skip = false;
-    try { skip = !!sessionStorage.getItem('took.homeSkipIntro'); sessionStorage.removeItem('took.homeSkipIntro'); } catch (e) { /* 저장 불가 환경 */ }
-    if (!skip && !matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('motion', 'intro');
-    setTimeout(function () { if (!r.dataset.homeReady) r.classList.remove('motion', 'intro'); }, 3000);
-  })();
-</script>
--->
+<script src="js/theme-boot.js"></script><!-- 다크 모드를 화면이 그려지기 전에 켠다 -->
 </head>
 <body class="home-page">
 <!-- 홈 = 대기 화면 (옛 거울 ver4 대기 화면, js/home.js). 화면을 누르면 바로 팔레트로 간다.
@@ -30,79 +13,5 @@
 <main class="home-standby" id="home-standby"></main>
 <script type="module" src="js/home.js"></script>
 
-<!-- (2026-11-09 사용 안 함) 옛 홈 화면: 두 동그라미(팔레트·챗봇) + took. 인트로. 되살리려면 이 주석을 풀고
-     안쪽 주석 기호 <!~~ ~~> 를 원래대로 바꾼 뒤, js/home.js 아래쪽 주석의 옛 코드를 쓴다
-<!~~ 홈: 옛 툭ver2 대기 화면 구성을 무채색으로. 큰 동그라미 두 개 중 하나를 눌러 시작한다 ~~>
-<main class="home attract" id="home">
-  <div class="at-hero">
-    <h1 data-i18n="home.title">툭.</h1>
-    <p data-i18n="home.lead">AI가 내 입술을 찾아 바로 발라 보고, 찰떡 컬러의 립까지 찾아 줘요</p>
-  </div>
-  <!~~ 두 갈래: 왼쪽 팔레트(물감을 섞어 립 색 조제·카메라로 발라 보기), 오른쪽 AI 뷰티 챗봇 ~~>
-  <div class="at-stage">
-    <a class="tap" id="go-palette" href="palette.html" aria-label="팔레트에서 립 색 섞어 발라 보기" data-i18n-aria="home.paletteAria">
-      <span class="orbit" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="mirror" aria-hidden="true">
-        <!~~ 예시 그림: 무채색으로 그린 브랜드 캐릭터 (실제 카메라 영상 아님) ~~>
-        <svg viewBox="0 0 400 400">
-          <defs>
-            <linearGradient id="av-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#555"/><stop offset="1" stop-color="#333"/></linearGradient>
-            <linearGradient id="av-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafafa"/><stop offset="1" stop-color="#ececec"/></linearGradient>
-            <radialGradient id="av-blush" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#c8c8c8" stop-opacity=".6"/><stop offset="1" stop-color="#c8c8c8" stop-opacity="0"/></radialGradient>
-          </defs>
-          <path d="M200 52c-80 0-124 56-124 136 0 60 8 98 24 120h200c16-22 24-60 24-120 0-80-44-136-124-136Z" fill="url(#av-hair)"/>
-          <path d="M58 430c6-84 66-116 142-116s136 32 142 116Z" fill="#e4e4e4"/>
-          <path d="M160 316q40 22 80 0" stroke="#9a9a9a" stroke-width="8" stroke-linecap="round" fill="none"/>
-          <rect x="178" y="272" width="44" height="50" rx="22" fill="#dedede"/>
-          <ellipse cx="200" cy="196" rx="92" ry="102" fill="url(#av-skin)"/>
-          <path d="M104 186c-6-78 40-120 104-120 58 0 96 38 92 104-24-42-70-62-120-52-32 6-56 28-76 68Z" fill="url(#av-hair)"/>
-          <path d="M150 96q34-16 70-10" stroke="#777" stroke-width="7" stroke-linecap="round" fill="none" opacity=".7"/>
-          <circle cx="108" cy="226" r="6" fill="#8b8b8b"/><circle cx="292" cy="226" r="6" fill="#8b8b8b"/>
-          <path d="M146 176q14-7 28-2M226 174q14-5 28 2" stroke="#333" stroke-width="4.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="160" cy="202" rx="8" ry="10.5" fill="#191919"/><ellipse cx="240" cy="202" rx="8" ry="10.5" fill="#191919"/>
-          <circle cx="162.5" cy="198" r="2.6" fill="#fff"/><circle cx="242.5" cy="198" r="2.6" fill="#fff"/>
-          <!~~ 속눈썹: 눈 바깥쪽에 짧게 두 가닥 ~~>
-          <path d="M154 194q-2-2-3-5M153 198q-3-1-5-3M246 194q2-2 3-5M247 198q3-1 5-3" stroke="#191919" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-          <ellipse cx="138" cy="236" rx="22" ry="13" fill="url(#av-blush)"/><ellipse cx="262" cy="236" rx="22" ry="13" fill="url(#av-blush)"/>
-          <path d="M198 220q4 3 8 0" stroke="#bbb" stroke-width="3" stroke-linecap="round" fill="none"/>
-          <g id="demo-lips">
-            <path d="M180 250q10-8 20-3 10-5 20 3-20 5-40 0Z" fill="currentColor"/>
-            <path d="M180 250q20 7 40 0-5 14-20 15-15-1-20-15Z" fill="currentColor"/>
-            <path d="M180 250q10-8 20-3 10-5 20 3-20 5-40 0Z" fill="#000" opacity=".12"/>
-            <ellipse cx="207" cy="258" rx="5.5" ry="2.4" fill="#fff" opacity=".55"/>
-          </g>
-          <g id="sparks" fill="#fff">
-            <path d="M232 238l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
-            <path d="M166 242l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
-            <path d="M226 272l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
-            <path d="M174 272l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
-            <path d="M210 232l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
-          </g>
-        </svg>
-      </span>
-      <span class="tap-label"><b data-i18n="home.brandWord">툭</b> <span data-i18n="home.palette">섞어서 발라 보기</span></span>
-    </a>
-    <a class="tap" id="go-chat" href="chat.html" aria-label="AI 뷰티 챗봇에게 물어보기" data-i18n-aria="home.chatAria">
-      <span class="orbit" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="mirror chat-demo" aria-hidden="true">
-        <!~~ 예시 대화: 챗봇 첫 화면의 추천 질문이 차례로 타이핑된다 (실제 대화 아님) ~~>
-        <span class="cd-msgs">
-          <span class="cd-bubble bot" data-i18n="home.chatBot">찾는 립 컬러를 편하게 말씀해 주세요</span>
-          <span class="cd-bubble me"><span id="chat-demo-text">데이트 립 추천해 줘</span><i class="cd-caret"></i></span>
-          <span class="cd-bubble bot typing"><i></i><i></i><i></i></span>
-        </span>
-      </span>
-      <span class="tap-label"><b data-i18n="home.brandWord">툭</b> <span data-i18n="home.chat">말로 물어보기</span></span>
-    </a>
-  </div>
-</main>
-<script type="module">
-  import { renderNav, store } from './js/common.js';
-  renderNav();
-  // 홈에서 들어가는 두 갈래는 이전 전달값 없이 새로 연다
-  document.querySelectorAll('.tap').forEach((a) => a.addEventListener('click', () => store.remove('navCurrent.' + a.getAttribute('href'))));
-  await import('./js/home.js'); // 인트로·예시 입술 색·예시 대화·커서 반응 배경 (메뉴가 그려진 뒤에 불러야 로고 자리를 잰다)
-</script>
--->
 </body>
 </html>

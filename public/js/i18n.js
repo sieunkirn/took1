@@ -5,7 +5,7 @@
 // - 제품 이름: 영어일 때 글로벌 올리브영에서 짝지은 brand_en·name_en 을 쓰고, 없으면 한국어 이름을 그대로 둔다 (지어내지 않는다)
 // 아직 영어 문구가 없는 화면은 한국어로 보인다 (STRINGS.en 에 없는 키는 한국어로 대신한다)
 const KEY = 'took.lang';
-export const LANGS = ['ko', 'en'];
+const LANGS = ['ko', 'en'];
 // 휴대폰 QR 로 열면 화면 언어를 주소로 넘긴다 (?lang=en)
 try {
   const want = new URLSearchParams(location.search).get('lang') ?? new URLSearchParams(location.hash.replace(/^#/, '')).get('lang'); // 팔레트 QR 은 #조각
@@ -22,7 +22,7 @@ export function lang() {
 export const isEn = () => lang() === 'en';
 
 /** 언어를 바꾸고 지금 화면을 새 언어로 다시 연다 (홈은 인트로 없이. 인트로 대기 화면에서 바꿀 땐 skipIntro: false) */
-export function setLang(next, { skipIntro = true } = {}) {
+function setLang(next, { skipIntro = true } = {}) {
   try {
     sessionStorage.setItem(KEY, next);
     if (skipIntro && /(^|\/)(index\.html)?$/.test(location.pathname)) sessionStorage.setItem('took.homeSkipIntro', 'true');
@@ -36,9 +36,6 @@ const STRINGS = {
     'nav.idleTest': '자동 초기화 테스트', 'nav.idleTestTitle': '조작이 없을 때 뜨는 안내를 바로 띄웁니다',
     'idle.title': '계속 이용하시나요?', 'idle.desc': '{n}초 뒤 처음 화면으로 돌아가요. 지금까지의 대화와 고른 색은 지워져요.',
     'idle.keep': '계속', 'idle.keepAria': '계속 이용하기', 'idle.home': '처음으로', 'idle.homeAria': '처음 화면으로',
-    'home.brandWord': '툭', 'home.title': '툭.', 'home.lead': 'AI가 내 입술을 찾아 바로 발라 보고, 찰떡 컬러의 립까지 찾아 줘요',
-    'home.palette': '섞어서 발라 보기', 'home.paletteAria': '팔레트에서 립 색 섞어 발라 보기',
-    'home.chat': '말로 물어보기', 'home.chatAria': 'AI 뷰티 챗봇에게 물어보기', 'home.chatBot': '찾는 립 컬러를 편하게 말씀해 주세요',
     'home.touch': '화면을 눌러 시작하기', 'home.standby': '제품을 태그해보세요', 'home.standbyTouch': '또는 화면을 눌러 시작해요',
     'card.brand': '브랜드', 'card.name': '제품명', 'card.color': '색상값', 'card.finish': '제형', 'card.price': '가격',
     'card.noImage': '이미지 준비 중', 'card.store': '올리브영에서 보기', 'card.detail': '상세 보기',
@@ -62,10 +59,9 @@ const STRINGS = {
     // 팔레트
     'pal.pageTitle': 'took(툭) - 팔레트', 'pal.camArea': '가상 립 메이크업 화면', 'pal.camRetry': '카메라 다시 연결',
     'pal.match': '나에게 어울리는 컬러', 'pal.matchBtn': '내 톤으로 추천받기', 'pal.matchSwatches': '추천 컬러', 'pal.matchMore': '측정값 · 안내',
-    'pal.matchNote': '볼·이마 피부색으로 톤을 추정한 참고용 결과입니다. 조명에 따라 달라질 수 있어요.',
     'pal.board': '팔레트', 'pal.reset': '처음부터 다시 섞기', 'pal.paints': '립 컬러 물감', 'pal.mixAria': '섞는 칸 (드래그하면 저어져요)',
     'pal.mixEmpty': '물감을 눌러\n떨어뜨려요', 'pal.undo': '한 방울 빼기', 'pal.finishArea': '텍스처와 제품 추천', 'pal.textures': '텍스처',
-    'pal.nfcIdle': '립 제품을 리더기에 톡 올리면 그 색을 발라 봐요', 'pal.nfcApplied': '{name} 색을 발랐어요', 'pal.nfcUnknown': '등록되지 않은 태그예요',
+    'pal.nfcApplied': '{name} 색을 발랐어요', 'pal.nfcUnknown': '등록되지 않은 태그예요',
     'pal.nfcRead': 'NFC 로 읽은 제품',
     'pal.intensity': '농도', 'pal.find': '이 색과 비슷한 제품 추천', 'pal.result': '추천 제품', 'pal.backMix': '← 다시 섞기',
     'pal.dropAria': '{name} 물감 한 방울 떨어뜨리기', 'pal.drops': '{n}방울',
@@ -97,7 +93,6 @@ const STRINGS = {
     'lip.recNone': '비슷한 제품이 없습니다.', 'lip.tryOn': '입술에 발라보기', 'lip.applying': '입술에 적용 중: {name}{finish}',
     'lip.appliedToast': '{name} 컬러를 입술에 발랐어요', 'lip.productApplied': '추천 제품 컬러를 입술에 발랐어요',
     'lip.prevMatch': '이전에 추천받은 컬러입니다. 다시 측정하려면 버튼을 눌러 주세요.',
-    'lip.chooseMode': '아래에서 테스트 방식을 골라 주세요\n아바타 그림 또는 내 카메라로 립 컬러를 발라 볼 수 있어요',
     // 음성
     'voice.denied': '마이크 권한이 거부되었습니다. 주소창의 마이크 권한을 허용한 뒤 다시 눌러 주세요.',
     'voice.noSpeech': '말소리가 들리지 않았습니다. 버튼을 다시 누르고 말씀해 주세요.', 'voice.noMic': '마이크를 찾지 못했습니다. 마이크 연결을 확인해 주세요.',
@@ -107,7 +102,6 @@ const STRINGS = {
     // 챗봇 화면
     'chat.pageTitle': 'took(툭) - AI 뷰티 챗봇',
     'chat.title': 'took 뷰티 챗봇',
-    'chat.subtitle': '등록 제품 기반 추천 · 규칙 기반(외부 AI 미연결)',
     'chat.tts': '답변 소리로 읽어주기',
     'chat.reset': '새 대화',
     'chat.base': '기준 제품:',
@@ -146,9 +140,6 @@ const STRINGS = {
     'nav.idleTest': 'Test auto reset', 'nav.idleTestTitle': 'Show the idle notice now',
     'idle.title': 'Still there?', 'idle.desc': 'Going back to the start in {n} seconds. Your chat and chosen colors will be cleared.',
     'idle.keep': 'Continue', 'idle.keepAria': 'Keep using', 'idle.home': 'Start over', 'idle.homeAria': 'Back to the start screen',
-    'home.brandWord': 'took', 'home.title': 'took.', 'home.lead': 'AI finds your lips, tries colors on instantly, and picks the lip product that suits you',
-    'home.palette': 'Mix & try on', 'home.paletteAria': 'Mix lip colors on the palette and try them on',
-    'home.chat': 'Ask by voice', 'home.chatAria': 'Ask the AI beauty chat', 'home.chatBot': 'Tell me the lip color you are looking for',
     'home.touch': 'Tap the screen to start', 'home.standby': 'Tag a product to start', 'home.standbyTouch': 'or touch the screen to start',
     'card.brand': 'Brand', 'card.name': 'Product', 'card.color': 'Color', 'card.finish': 'Finish', 'card.price': 'Price',
     'card.noImage': 'Image coming soon', 'card.store': 'View on OLIVE YOUNG', 'card.detail': 'Details',
@@ -172,10 +163,9 @@ const STRINGS = {
     // Palette
     'pal.pageTitle': 'took - Palette', 'pal.camArea': 'Virtual lip makeup', 'pal.camRetry': 'Reconnect camera',
     'pal.match': 'Colors that suit me', 'pal.matchBtn': 'Find my tone', 'pal.matchSwatches': 'Suggested colors', 'pal.matchMore': 'Measurements · notes',
-    'pal.matchNote': 'A rough tone estimate from cheek and forehead skin color. Lighting can change the result.',
     'pal.board': 'Palette', 'pal.reset': 'Start mixing over', 'pal.paints': 'Lip color paints', 'pal.mixAria': 'Mixing well (drag to stir)',
     'pal.mixEmpty': 'Tap a paint\nto drop it in', 'pal.undo': 'Remove a drop', 'pal.finishArea': 'Texture and product picks', 'pal.textures': 'Texture',
-    'pal.nfcIdle': 'Tap a lip product on the reader to try its color', 'pal.nfcApplied': 'Trying on {name}', 'pal.nfcUnknown': 'Unregistered tag',
+    'pal.nfcApplied': 'Trying on {name}', 'pal.nfcUnknown': 'Unregistered tag',
     'pal.nfcRead': 'Product from NFC',
     'pal.intensity': 'Intensity', 'pal.find': 'Find products in this color', 'pal.result': 'Recommended products', 'pal.backMix': '← Mix again',
     'pal.dropAria': 'Drop one drop of {name}', 'pal.drops': '{n} drops',
@@ -207,7 +197,6 @@ const STRINGS = {
     'lip.recNone': 'No similar products.', 'lip.tryOn': 'Try on lips', 'lip.applying': 'On your lips: {name}{finish}',
     'lip.appliedToast': 'Applied {name} to your lips', 'lip.productApplied': 'Applied the recommended product color',
     'lip.prevMatch': 'These colors were suggested earlier. Tap the button to measure again.',
-    'lip.chooseMode': 'Choose a try-on mode below\nTry lip colors on an avatar picture or with your own camera',
     // Voice
     'voice.denied': 'Microphone access was denied. Allow the microphone in the address bar, then tap again.',
     'voice.noSpeech': "I didn't hear anything. Tap the button and speak again.", 'voice.noMic': 'No microphone found. Check the microphone connection.',
@@ -217,7 +206,6 @@ const STRINGS = {
     // Chat screen
     'chat.pageTitle': "took - AI Beauty Chat",
     'chat.title': "took beauty chat",
-    'chat.subtitle': "Recommends registered products · rule-based (no external AI)",
     'chat.tts': "Read replies aloud",
     'chat.reset': "New chat",
     'chat.base': "Base product:",
@@ -258,13 +246,6 @@ export function t(key, vars = {}) {
   const s = STRINGS[lang()][key] ?? STRINGS.ko[key] ?? key;
   return s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
 }
-
-/** 한 언어의 문구 목록 (예시 질문처럼 여러 개인 것) */
-const LISTS = {
-  ko: { 'home.questions': ['데이트 립 추천해 줘', '데일리로 바를 립 추천해 줘', '입술이 건조한데 뭐가 좋아?', '2만원 이하 글로시한 코랄 추천해 줘'] },
-  en: { 'home.questions': ['Recommend a lip for a date', 'Something for everyday wear', 'My lips are dry. What should I use?', 'A glossy coral under ₩20,000'] },
-};
-export const tList = (key) => LISTS[lang()][key] ?? LISTS.ko[key] ?? [];
 
 /** data-i18n 속성이 있는 요소의 글자·aria-label 을 지금 언어로 바꾼다 */
 export function applyI18n(root = document) {

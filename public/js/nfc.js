@@ -12,7 +12,7 @@
 
 // 태그 번호 → 제품 ID. 실제 태그를 붙이면 리더기에 대 보고 나온 번호를 여기에 적는다.
 // TEST 로 시작하는 6개는 실제 태그가 아닌 시험용 번호다 (리더기 없이 시험할 때 window.tookNfc('TEST0001') 로 흉내 낸다)
-export const NFC_TAGS = {
+const NFC_TAGS = {
   TEST0001: 'OY-A000000241210', // 시험용 · 롬앤 더 쥬시 래스팅 틴트
   TEST0002: 'OY-A000001001860', // 시험용 · 시튜에아 에어리 무스 벨벳
   TEST0003: 'OY-A000000205485', // 시험용 · 토니모리 퍼펙트 립스 쇼킹 립
@@ -39,6 +39,21 @@ export function resolveTag(raw) {
 }
 
 // 리더기 입력 듣기. 키를 칠 때마다 간격을 재서, 빠른 연속 입력 + Enter 만 태그로 본다
+/**
+ * 태그를 읽었을 때 안내 줄에 문구를 잠깐 띄웠다가 평소 문구(idleText)로 되돌리는 함수를 만든다.
+ * node 가 없는 화면에서는 아무 일도 하지 않는다.
+ */
+export function createNfcHint(node, { idleText = '', ms }) {
+  let timer = null;
+  return (text) => {
+    if (!node) return;
+    node.textContent = text;
+    node.classList.add('hit');
+    clearTimeout(timer);
+    timer = setTimeout(() => { node.textContent = idleText; node.classList.remove('hit'); }, ms);
+  };
+}
+
 export function listenNfc(onTag) {
   let buf = '';
   let last = 0;
@@ -77,7 +92,7 @@ export function listenNfc(onTag) {
 }
 
 // ---------- 휴대폰 NFC(Web NFC) 인식 결과 → 등록 제품 (팔레트) ----------
-// 실물 테스트 카드: 가린 번호(앞 2바이트·끝 1바이트, js/nfc-test.js 의 maskUid) → 올리브영 제품 ID.
+// 실물 테스트 카드: 가린 번호(앞 2바이트·끝 1바이트만 남김) → 올리브영 제품 ID.
 // 원래 카드 번호는 적지 않는다. 휴대폰 연결로 받은 결과(가린 번호만 옴)도 같은 값이다
 export const NFC_CARD_PRODUCTS = {
   '9F:93:••:47': 'OY-A000000241210', // 토스뱅크 카드 → 롬앤 더 쥬시 래스팅 틴트 (테스트용 연결)
@@ -86,7 +101,7 @@ export const NFC_CARD_PRODUCTS = {
 
 // 실물 테스트 카드를 읽었을 때 제품 카드에 보일 모습: 이름·사진·입술 색(토스뱅크 흰색, 음쓰 검정)은 카드 것으로 덮어쓴다.
 // 실제 판매 제품이 아니므로 가격·올리브영 링크는 비운다. 사진은 사용자가 준 카드 사진 (images/nfc-test/)
-export const NFC_CARD_DISPLAY = {
+const NFC_CARD_DISPLAY = {
   // 브랜드 + 이름이 이어서 '토스뱅크 카드', '음쓰 카드'로 읽힌다 (알림 문구는 브랜드와 이름을 붙여 쓴다)
   '9F:93:••:47': { id: 'TEST-CARD-TOSS', brand: '토스뱅크', brand_en: 'Toss Bank', name: '카드', name_en: 'card', image_url: 'images/nfc-test/toss-bank-card.png', color_hex: '#FFFFFF', finish: 'matte' }, // 입술: 흰색
   '52:62:••:54': { id: 'TEST-CARD-WASTE', brand: '음쓰', brand_en: 'Food waste', name: '카드', name_en: 'card', image_url: 'images/nfc-test/food-waste-card.png', color_hex: '#000000', finish: 'matte' }, // 입술: 검정색

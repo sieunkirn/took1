@@ -1,7 +1,7 @@
 // 색상 계산 유틸 (서버/브라우저 공용, 외부 의존성 없음)
 // 화면에는 색을 칠하지 않고, 이 값들은 추천 계산과 텍스트 표시에만 사용한다.
 
-export function clamp(v, min, max) {
+function clamp(v, min, max) {
   return Math.min(max, Math.max(min, v));
 }
 
@@ -26,7 +26,7 @@ export function rgbToHex({ r, g, b }) {
 }
 
 // h: 0-360, s/l: 0-100
-export function hslToRgb({ h, s, l }) {
+function hslToRgb({ h, s, l }) {
   const S = clamp(s, 0, 100) / 100;
   const L = clamp(l, 0, 100) / 100;
   const H = (((h % 360) + 360) % 360) / 60;

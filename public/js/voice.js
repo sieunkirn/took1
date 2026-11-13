@@ -32,7 +32,7 @@ function voiceErrorMessage(code) {
 }
 
 // 음성 인식 후보 중 챗봇이 가장 많은 조건을 알아듣는 문장을 고른다 (같으면 인식 신뢰도가 높은 앞 후보)
-export function bestAlternative(alternatives, brands) {
+function bestAlternative(alternatives, brands) {
   const score = (text) => {
     if (isEn()) return Object.keys(parseMessageEn(text)).length;
     const fixed = normalizeForChat(text, brands);

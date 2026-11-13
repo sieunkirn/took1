@@ -18,7 +18,7 @@ npm run e2e:static     # 정적 버전으로 같은 흐름 테스트
 
 ### 정적 버전 (claude.ai Artifact 링크)
 `dist/static` 은 서버 API 없이 같은 `src/lib` 모듈(검색·추천·챗봇)을 브라우저에서 실행합니다.
-페이지 간 전달값은 URL 쿼리 대신 sessionStorage 로 넘깁니다(`common.js` 의 `go()` / `qs()`).
+페이지 간 전달값은 URL 쿼리 대신 sessionStorage 로 넘깁니다(`public/js/store.js` 의 `go()` / `qs()`).
 - 얼굴 모델(.task)은 Artifact 가 제공하지 않는 형식이라 base64 텍스트(`face_landmarker.task.b64.txt`)로 포함합니다.
 - Artifact 페이지에서는 카메라 사용이 허용되지 않습니다. 카메라 버튼을 누르면 권한 거부 안내가 표시되며, 샘플 그림이나 사진 업로드로 체험할 수 있습니다.
 - Node 18 이상 필요 (런타임 의존성 없이 내장 `http` 사용)
@@ -53,7 +53,7 @@ cloudflared tunnel --url http://localhost:3000   # 출력되는 https://○○�
 ### NFC 태그 인식
 - 키오스크는 USB NFC 리더기로 읽는다 (`public/js/nfc.js`, 팔레트 화면에서 립 제품 태그 → 그 색을 입술에)
 - 휴대폰(갤럭시 S24 Web NFC)으로 읽어 PC·태블릿 화면에 띄우던 기능(`nfc-phone.html`·`nfc-relay.js`·팔레트의 '휴대폰으로 NFC 읽기'·서버의 네 자리 번호 연결 API)은 2026-11-11 삭제 (복구는 git 기록에서)
-- 태그 해석·매핑 도우미(`public/js/nfc-test.js`, 단위 테스트용)는 남겨 둠
+- 태그 해석·매핑 도우미(`public/js/nfc-test.js`)와 그 단위 테스트도 삭제. 복구는 git 기록에서
 
 ### iPad(가로 화면)에서 실행
 1. PC 에서 `npm run cert` (openssl 로 자체 서명 인증서 생성, PC 의 IP 포함) → `npm start`
@@ -103,9 +103,10 @@ src/lib/color.js        HEX/HSL/Lab 변환, CIEDE2000 (서버·브라우저 공�
 src/lib/repository.js   제품 저장소 (JSON → 이후 DB 교체 지점)
 src/lib/recommend.js    색상 기반 추천
 src/lib/spoken.js       말·입력 보정 (한글 금액 → 숫자, 비슷한 발음 → 챗봇 단어, 자모 단위 비교)
-src/lib/chat.js         규칙 기반 챗봇
+src/lib/chat.js         규칙 기반 챗봇의 대화 흐름(answer). 단어 사전 chat-words.js · 말 해석 chat-parse.js · 제품 찾기 chat-search.js · 답 문장 chat-reply.js · 언어·표기 chat-lang.js · 영어 chat-en.js
+src/lib/browser-libs.js 브라우저도 같이 쓰는 src/lib 파일 목록 (서버·정적 빌드 공용)
 public/*.html           index, lip-together(립 컬러 매핑), chat(AI 뷰티 챗봇), studio(합본), palette(팔레트), recommend, product, barcodes(시연용 바코드), scan-phone(휴대폰 바코드)
-public/js/              페이지 스크립트, common.js(공통 카드/네비/세션 저장), lip-tracker.js(입술 추적), lip-engine.js(립 컬러 합성 공용), motion.js(화면 움직임: 카드 등장·세그먼트 밑판·슬라이더 채우기·가격 올라가기·토스트·스켈레톤)
+public/js/              페이지 스크립트, lip.js(립 매핑 화면 시작. 상태·안내 lip-state.js · 카메라·아바타·그리기 lip-camera.js · 색 고르기·어울리는 컬러·추천 lip-look.js), chat.js(챗봇 화면: 질문 보내기·버튼 연결. 상태 chat-state.js · 그리기 chat-view.js · 음성·키보드 chat-input.js · 바코드·NFC chat-products.js), common.js(공통 모듈 입구: api.js 서버 API · store.js 세션 저장·화면 이동 · dom.js · product-view.js 제품 카드 · nav.js 상단 메뉴 · idle-reset.js 자동 초기화 · device-frame.js 미리보기 틀), lip-tracker.js(입술 추적), lip-engine.js(립 컬러 합성 공용), motion.js(화면 움직임: 카드 등장·세그먼트 밑판·슬라이더 채우기·가격 올라가기·토스트·스켈레톤)
 public/css/wireframe.css 무채색 토스풍 스타일 (회색 바탕·흰 카드·둥근 모서리·부드러운 움직임)
 ```
 
@@ -203,12 +204,12 @@ public/css/wireframe.css 무채색 토스풍 스타일 (회색 바탕·흰 카�
 
 ### 키오스크 자동 초기화
 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않도록, **90초 동안 조작이 없으면** "계속 이용하시나요?" 안내를 띄우고
-15초 안에 응답이 없으면 저장한 상태를 모두 지우고 홈으로 돌아갑니다 (`public/js/common.js` 의 `setupIdleReset`, 모든 화면 공통).
+15초 안에 응답이 없으면 저장한 상태를 모두 지우고 홈으로 돌아갑니다 (`public/js/idle-reset.js` 의 `setupIdleReset`, 모든 화면 공통).
 - '계속하기'나 안내 바깥을 누르면 그대로 이어서 씁니다. '처음으로'는 바로 초기화합니다.
 - 읽어주기·음성 듣기 중에는 기다립니다(최대 60초). 홈에 지울 것이 없으면 아무것도 하지 않습니다.
 - 기기마다 대기 시간을 바꾸려면 그 기기 브라우저 콘솔에서 `localStorage.setItem('took.idleSeconds', '120')` (10초 이상).
 - 직원용 화면(`voice-test.html`, `barcodes.html`)은 `<body data-idle-reset="off">` 로 끕니다.
-- 테스트 단계에는 상단 메뉴 오른쪽 끝 **자동 초기화 테스트** 버튼으로 안내를 바로 띄워 볼 수 있습니다. 배포 때는 `common.js` 의 `IDLE_TEST_BUTTON` 을 `false` 로.
+- 테스트 단계에는 상단 메뉴 오른쪽 끝 **자동 초기화 테스트** 버튼으로 안내를 바로 띄워 볼 수 있습니다. 배포 때는 `nav.js` 의 `IDLE_TEST_BUTTON` 을 `false` 로.
 
 ### 음성 인식 정확도 측정 (`voice-test.html`, 테스트용·메뉴에 없음)
 키오스크로 쓸 iPad 에서 `/voice-test.html` 을 열고 문장 40개를 차례로 읽으면, 챗봇과 같은 음성 인식·보정을 거쳐

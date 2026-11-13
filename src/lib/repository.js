@@ -16,7 +16,7 @@ const FILES = {
 // 시연용 호수·바코드·재고 데이터 (실제 제품 아님, 화면에 '테스트 데이터'로 표시). 어느 데이터 출처든 함께 쓴다
 export const DEMO_FILE = new URL('../data/products.demo.json', import.meta.url);
 
-export function dataSource() {
+function dataSource() {
   if (process.env.TOOK_DATA === 'virtual') return 'virtual';
   if (!existsSync(FILES.oliveyoung)) {
     console.warn('[took] products.oliveyoung.json 이 없어 가상 데이터를 씁니다. (npm run import:oliveyoung)');
@@ -29,7 +29,7 @@ export function dataFile(source = dataSource()) {
   return FILES[source];
 }
 
-export function loadProducts(file = dataFile()) {
+function loadProducts(file = dataFile()) {
   const list = JSON.parse(readFileSync(file, 'utf8'));
   setProducts(list);
   return list;

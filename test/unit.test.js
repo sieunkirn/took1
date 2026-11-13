@@ -472,62 +472,7 @@ test('영어 챗봇: 영어 문장을 한국어판과 같은 조건으로 알아
   assert.match(compareSummary(two), /저렴|모두/);
 });
 
-// ---------- NFC 태그 인식 테스트 (public/js/nfc-test.js) ----------
-test('NFC 테스트: 식별값 찾기·번호 가리기·지문', async () => {
-  const nfc = await import('../public/js/nfc-test.js');
-  assert.equal(nfc.findTookId('TOOK-001'), 'TOOK-001');
-  assert.equal(nfc.findTookId('https://took.example/p?id=took002'), 'TOOK-002');
-  assert.equal(nfc.findTookId('TOOK-0012'), null);
-  assert.equal(nfc.findTookId('04A1B2C3'), null);
-  assert.equal(nfc.normalizeUid('04:a1:b2:c3:d4:e5:f6'), '04:A1:B2:C3:D4:E5:F6');
-  assert.equal(nfc.normalizeUid('04A1B'), '');
-  assert.equal(nfc.maskUid('04:A1:B2:C3:D4:E5:F6'), '04:A1:••:••:••:••:F6');
-  assert.equal(nfc.maskUid('04:A1:B2'), '••:••:••');
-  const a = await nfc.uidFingerprint('04:a1:b2:c3');
-  assert.match(a, /^[0-9a-f]{16}$/);
-  assert.equal(a, await nfc.uidFingerprint('04A1B2C3')); // 표기가 달라도 같은 카드면 같은 지문
-  assert.notEqual(a, await nfc.uidFingerprint('04A1B2C4'));
-  assert.equal(await nfc.uidFingerprint(''), null);
-  // 매핑 테이블은 테스트용 가상 제품만 가리킨다
-  for (const [k, v] of Object.entries(nfc.NFC_TEST_MAP)) assert.ok(nfc.NFC_TEST_PRODUCTS[v], k);
-  assert.equal(nfc.NFC_TEST_PRODUCTS['TOOK-001'].name, '테스트 립스틱 A');
-});
-
-test('NFC 테스트: NDEF 이벤트 해석, 같은 태그 중복 거르기', async () => {
-  const nfc = await import('../public/js/nfc-test.js');
-  const enc = new TextEncoder();
-  const r = await nfc.fromNdefEvent({ serialNumber: '04:aa:bb:cc', message: { records: [{ recordType: 'text', encoding: 'utf-8', data: new DataView(enc.encode('TOOK-003').buffer) }] } });
-  assert.equal(r.kind, 'ndef');
-  assert.equal(r.tookId, 'TOOK-003');
-  assert.equal(r.masked, '04:AA:••:CC');
-  const empty = await nfc.fromNdefEvent({ serialNumber: '04:aa:bb:cc', message: { records: [] } });
-  assert.equal(empty.kind, 'ndef-empty');
-  assert.equal(empty.tookId, null);
-  let t = 0;
-  const isDup = nfc.makeDedupe(2500, () => t);
-  assert.equal(isDup({ tookId: 'TOOK-001' }), false);
-  t = 1000; assert.equal(isDup({ tookId: 'TOOK-001' }), true);
-  t = 1500; assert.equal(isDup({ tookId: 'TOOK-002' }), false); // 다른 태그는 바로 처리
-  t = 5000; assert.equal(isDup({ tookId: 'TOOK-002' }), false); // 시간이 지나면 다시 처리
-  assert.equal(nfc.scanErrorCode({ name: 'NotReadableError' }), 'off');
-  assert.equal(nfc.scanErrorCode({ name: 'NotSupportedError' }), 'nohw');
-  assert.equal(nfc.scanErrorCode({ name: 'NotAllowedError' }), 'denied');
-});
-
-test('NFC 테스트: 실물 테스트 카드(토스뱅크·음쓰카드)를 가린 번호로 맞춘다', async () => {
-  const nfc = await import('../public/js/nfc-test.js');
-  const read = async (uid) => ({ kind: 'ndef-empty', masked: nfc.maskUid(uid), fp: await nfc.uidFingerprint(uid), tookId: null });
-  assert.equal(nfc.resolveTestProduct(await read('9F:93:12:47')).product.name, '토스뱅크 카드');
-  assert.equal(nfc.resolveTestProduct(await read('52:62:AB:54')).product.name, '음쓰카드');
-  // 휴대폰 연결로 받은 결과(가린 번호만 있음)도 같다
-  assert.equal(nfc.resolveTestProduct({ kind: 'ndef-empty', masked: '52:62:••:54', fp: null }).product.id, 'TOOK-T02');
-  // 등록하지 않은 카드·읽기 실패는 제품을 지어내지 않는다
-  assert.equal(nfc.resolveTestProduct(await read('04:11:22:33:44:55:66')).product, null);
-  assert.equal(nfc.resolveTestProduct({ kind: 'unreadable', masked: '', fp: null }).product, null);
-  // 태그에 적힌 식별값이 가장 먼저
-  assert.equal(nfc.resolveTestProduct({ kind: 'ndef', masked: '9F:93:••:47', tookId: 'TOOK-002' }).product.id, 'TOOK-002');
-});
-
+// ---------- NFC 태그 (public/js/nfc.js) ----------
 test('NFC 팔레트: 실물 테스트 카드 → 실제 립 제품, 태그에 쓴 제품 ID 우선', async () => {
   const { resolveReading, NFC_CARD_PRODUCTS } = await import('../public/js/nfc.js');
   assert.equal(resolveReading({ masked: '9F:93:••:47' }), 'OY-A000000241210');
