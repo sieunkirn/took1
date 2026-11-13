@@ -13,7 +13,6 @@ import { abEnabled, abStats, recordEvent } from './src/lib/ab.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
 import { BROWSER_LIBS } from './src/lib/browser-libs.js';
-import { createSession, getSession, notify, poll, lanAddress } from './src/lib/pairing.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 // .env (LLM 주소·키 등 서버 전용 설정). 없으면 규칙 챗봇만 쓴다
@@ -47,18 +46,6 @@ async function readBody(req) {
     if (data.length > 1e5) throw new Error('요청 본문이 너무 큽니다.');
   }
   return data ? JSON.parse(data) : {};
-}
-
-// 휴대폰이 열 수 있는 이 서버 주소 (끝에 /). 없으면 null
-// PC 를 localhost 로 열었으면 휴대폰은 접속할 수 없으므로 같은 와이파이의 PC 주소로 안내한다.
-// 터널(cloudflared 등)로 공개 주소를 쓰면 원래 주소·https 여부는 X-Forwarded-* 헤더로 들어온다
-function phoneBase(req) {
-  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
-  const local = /^(localhost|127\.|\[::1\])/.test(host);
-  const ip = local ? lanAddress() : null;
-  const scheme = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() || (req.socket.encrypted ? 'https' : 'http');
-  const where = local ? (ip ? `${ip}:${req.socket.localPort}` : null) : host;
-  return where ? `${scheme}://${where}/` : null;
 }
 
 async function handleApi(req, res, url) {
@@ -110,30 +97,6 @@ async function handleApi(req, res, url) {
   }
   if (req.method === 'GET' && path === '/api/ab-stats') {
     return sendJson(res, 200, { enabled: abEnabled(), llm: llmEnabled(), stats: abStats() });
-  }
-  // ---------- 휴대폰 ↔ PC 연결 (QR) ----------
-  if (req.method === 'POST' && path === '/api/pair') {
-    const id = createSession();
-    const base = phoneBase(req);
-    return sendJson(res, 200, { id, phoneUrl: base && `${base}scan-phone.html?s=${id}` });
-  }
-  m = path.match(/^\/api\/pair\/([0-9a-f]{16})\/(poll|hello|code)$/);
-  if (m) {
-    const [, id, action] = m;
-    if (!getSession(id)) return sendJson(res, 404, { error: '연결이 끝났어요. PC 화면에서 QR 을 다시 띄워 주세요.' });
-    if (req.method === 'GET' && action === 'poll') return sendJson(res, 200, poll(id, Number(q.get('after')) || 0));
-    if (req.method === 'POST' && action === 'hello') {
-      notify(id, 'phone', {});
-      return sendJson(res, 200, { ok: true });
-    }
-    if (req.method === 'POST' && action === 'code') {
-      const body = await readBody(req);
-      const code = normalizeBarcode(String(body.code || '')).replace(/\D/g, '');
-      if (!/^\d{8,14}$/.test(code)) return sendJson(res, 400, { error: '바코드는 8~14자리 숫자여야 해요.' });
-      const p = findByBarcode(code);
-      notify(id, 'code', { code });
-      return sendJson(res, 200, { ok: true, code, found: !!p, name: p ? `${p.brand} ${p.name} ${p.shade_name}` : null });
-    }
   }
   return sendJson(res, 404, { error: '알 수 없는 API 입니다.' });
 }

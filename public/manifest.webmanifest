@@ -1,9 +1,9 @@
 {
   "name": "took(툭)",
   "short_name": "툭",
-  "start_url": "index.html",
+  "start_url": "kiosk.html",
   "scope": "./",
-  "display": "fullscreen",
+  "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",

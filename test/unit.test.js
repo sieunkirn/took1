@@ -207,37 +207,6 @@ test('말투: 사용자에게 보이는 답에는 기술적인 조건 표기가 
   }
 });
 
-test('시연용 바코드: EAN-13 막대 패턴(95칸, 가드 위치)과 등록 제품 바코드 전부 생성', async () => {
-  const { ean13Bits, ean13Svg } = await import('../public/js/ean13.js');
-  const bits = ean13Bits('4006381333931'); // 널리 쓰이는 EAN-13 예시
-  assert.equal(bits.length, 95);
-  assert.equal(bits.slice(0, 3), '101');
-  assert.equal(bits.slice(45, 50), '01010');
-  assert.equal(bits.slice(92), '101');
-  assert.equal(bits.slice(3, 10), '0001101'); // 첫 자리 4 → 둘째 자리 0 은 L 패턴(0001101)
-  for (const p of allProducts()) assert.match(ean13Svg(p.barcode), /^<svg[\s\S]*<\/svg>$/);
-  assert.throws(() => ean13Bits('123'));
-});
-
-test('휴대폰 연결: 연결 생성 → 휴대폰 소식을 쌓아 두고 PC 가 마지막 번호 이후만 가져간다, 없는 연결은 거절', async () => {
-  const { createSession, getSession, notify, poll } = await import('../src/lib/pairing.js');
-  const id = createSession();
-  assert.match(id, /^[0-9a-f]{16}$/);
-  assert.ok(getSession(id));
-  assert.equal(getSession('0000000000000000'), null);
-  assert.equal(notify('0000000000000000', 'code', { code: '1' }), false);
-  assert.equal(poll('0000000000000000', 0), null);
-  assert.ok(notify(id, 'phone', {}));
-  assert.ok(notify(id, 'code', { code: '8809100000017' }));
-  const first = poll(id, 0);
-  assert.deepEqual(first.events.map((e) => e.type), ['phone', 'code']);
-  assert.equal(first.events[1].data.code, '8809100000017');
-  // 이미 받은 소식은 다시 오지 않는다
-  assert.deepEqual(poll(id, first.last).events, []);
-  notify(id, 'code', { code: '8809100000024' });
-  assert.deepEqual(poll(id, first.last).events.map((e) => e.data.code), ['8809100000024']);
-});
-
 test('올리브영 변환: 상품명 정리·제형 추정·색 없는 상품 제외·추정 표시', async () => {
   const { parseName, inferFinish, convert } = await import('../scripts/import-oliveyoung.js');
   assert.deepEqual(parseName('라카 [나나PICK/이시안공동개발] 라카 퍼펙트 트윈 립 12 colors'), { brand: '라카', name: '퍼펙트 트윈 립', colorOptions: 12 });

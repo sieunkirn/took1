@@ -32,7 +32,7 @@ try {
 export const TAB_FRAME = true;
 /** 이 화면을 탭 크기 틀로 옮기는 중이면 true (곧 다시 열리므로 화면마다 한 번만 할 일은 건너뛴다) */
 export let MOVING_TO_TAB_FRAME = false;
-const TAB_FRAME_SKIP = ['preview.html', 'kiosk.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
+const TAB_FRAME_SKIP = ['preview.html', 'kiosk.html'];
 // 새로고침(F5·새로고침 버튼)하면 처음 상태로: 기기 설정(태블릿 고정)을 풀고, 저장한 상태(took.*)를 비우고
 // 첫 화면(시작 화면, 노트북이면 태블릿 미리보기)으로.
 // 직원 도구 화면은 그대로. 미리보기(preview.html)는 그 화면 스크립트가 같은 일을 한다
@@ -49,10 +49,11 @@ const TAB_FRAME_SKIP = ['preview.html', 'kiosk.html', 'scan-phone.html', 'barcod
   MOVING_TO_TAB_FRAME = true; // 곧 다른 화면으로 가므로 화면마다 한 번만 할 일은 건너뛴다
   location.replace('index.html');
 })();
-(function openInTabFrame() {
-  const page = location.pathname.split('/').pop() || 'index.html';
-  if (!TAB_FRAME || window.top !== window || navigator.webdriver || TAB_FRAME_SKIP.includes(page) || DEVICE_MODE) return;
-  if (matchMedia('(pointer: coarse)').matches || !matchMedia('(min-width: 700px)').matches) return; // 실제 탭(터치)·작은 화면은 그대로
-  MOVING_TO_TAB_FRAME = true;
-  location.replace('preview.html?page=' + encodeURIComponent(page + location.search));
-})();
+// 거울 화면 미리보기(preview.html)로 옮기기: 2026-11-13 주석 처리 (PC 에서도 화면을 틀 없이 바로 연다). 되살리려면 아래 주석을 풀면 된다
+// (function openInTabFrame() {
+//   const page = location.pathname.split('/').pop() || 'index.html';
+//   if (!TAB_FRAME || window.top !== window || navigator.webdriver || TAB_FRAME_SKIP.includes(page) || DEVICE_MODE) return;
+//   if (matchMedia('(pointer: coarse)').matches || !matchMedia('(min-width: 700px)').matches) return; // 실제 탭(터치)·작은 화면은 그대로
+//   MOVING_TO_TAB_FRAME = true;
+//   location.replace('preview.html?page=' + encodeURIComponent(page + location.search));
+// })();

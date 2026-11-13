@@ -245,31 +245,10 @@ body.scan-open .chat-side { display: flex; flex-direction: column; gap: 6px; ord
   .grid-2 { grid-template-columns: 1fr; }
 }
 
-/* 시연용 바코드 화면 */
-.barcode-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; margin-top: 12px; }
-.barcode-card { margin: 0; border: 1px solid #aaa; padding: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; break-inside: avoid; }
-.barcode-card svg { max-width: 100%; height: auto; }
 @media print { header.nav, #print { display: none; } }
 
-/* 휴대폰 바코드 찍기 화면 (QR 로 여는 화면) */
-.phone-scan { max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
-.phone-scan h1 { font-size: 32px; line-height: 1.2; margin: 4px 0; }
-.big-btn { width: 100%; justify-content: center; gap: 10px; min-height: 64px; font-size: 20px; cursor: pointer; }
-.phone-result { border: 1px solid #000; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-.phone-result img { max-width: 100%; max-height: 240px; object-fit: contain; border: 1px solid #ccc; }
-.phone-result img:not([src]) { display: none; }
-
-/* PC 챗봇: 휴대폰 연결 QR */
-.pair-box { border: 2px solid #000; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-.pair-body { display: flex; gap: 12px; align-items: center; }
-.pair-qr { width: 132px; height: 132px; flex: 0 0 auto; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; background: #fff; }
-.pair-qr svg { width: 100%; height: 100%; }
-.pair-steps { margin: 0; padding-left: 18px; }
-.pair-url { word-break: break-all; }
+/* 사진으로 바코드 읽기 버튼 (챗봇) */
 .photo-btn { min-height: 44px; padding: 0 12px; font-weight: normal; cursor: pointer; }
-/* 휴대폰 연결 QR 은 PC(넓은 화면)에서만 보인다 */
-.wide-only { display: none; }
-@media (orientation: landscape) and (min-width: 960px) { .wide-only { display: flex; } }
 
 /* 제품 카드: 색상값 옆 색 견본 (무채색 규칙의 예외, CLAUDE.md) */
 .color-dot { display: inline-block; width: 14px; height: 14px; border: 1px solid #555; vertical-align: -2px; margin-right: 6px; }
@@ -419,9 +398,10 @@ table th, table td { border-bottom-color: var(--line); }
 .chat-log .user .suggest button { color: var(--ink); }
 .chat-log .suggest button:hover { background: var(--ink); color: var(--paper); box-shadow: none; }
 /* 자동 초기화 테스트 버튼: 상단 메뉴 오른쪽 끝 (테스트 단계에만) */
-header.nav .nav-idle-test { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+header.nav .nav-fullscreen { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 /* 언어 전환 버튼: 메뉴 오른쪽으로 밀고, 눈에 띄게 테두리 */
 header.nav .nav-lang { margin-left: auto; }
+header.nav a.nav-mirror { color: var(--ink); }
 /* 언어 선택 메뉴 (i18n.js languageMenu): 🌐 Language ▾ 를 누르면 아래에 말풍선처럼 목록이 열린다 */
 .lang-menu { position: relative; display: inline-block; }
 .lang-menu .lang-trigger { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 4px 10px; border-radius: 10px; background: transparent; box-shadow: none; color: var(--ink); font-size: 15px; font-weight: 600; }
@@ -484,11 +464,7 @@ header.nav .nav-lang { margin-left: auto; }
 /* 바코드·QR */
 .scan-stage { border: 0; border-radius: var(--r); background: var(--soft); }
 .scan-guide { border-radius: 10px; }
-.pair-box { border: 0; border-radius: 16px; background: var(--soft); padding: 16px; gap: 8px; }
-.pair-qr { border: 0; border-radius: 12px; padding: 6px; background: var(--paper); }
 .scan-form { border-top: 1px solid var(--line); padding-top: 14px; }
-.phone-result { border: 0; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); padding: 16px; }
-.phone-result img { border: 0; border-radius: 12px; }
 .big-btn { border-radius: 18px; }
 .barcode-card { border: 0; border-radius: 16px; background: var(--paper); box-shadow: var(--shadow); padding: 14px; }
 
@@ -558,12 +534,17 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 /* 테스트 방식(아바타 / 카메라) 버튼: 지금 쓰는 쪽은 검게 */
 .source-row button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .paint-name { font-size: 11.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
-.pal-mix { display: flex; align-items: center; justify-content: center; gap: 16px; }
-.mix-wrap { position: relative; width: min(100%, 300px); aspect-ratio: 1 / 1; }
-.mix-wrap canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
-.mix-wrap canvas.stirring { cursor: grabbing; }
-.mix-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; margin: 0; text-align: center; color: var(--faint); font-size: 13px; font-weight: 600; pointer-events: none; }
-.pal-tools { display: flex; flex-direction: column; gap: 8px; }
+.pal-mix { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: stretch; gap: 12px; min-width: 0; }
+.mix-wrap { position: relative; width: 100%; min-width: 0; aspect-ratio: 1.55 / 1; }
+.mix-wrap canvas { width: 100%; height: 100%; display: block; border: 1px solid var(--line); border-radius: 12px; }
+.mix-summary { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; }
+.mix-summary-label { color: var(--mute); font-size: 13px; font-weight: 700; }
+.mix-summary #mix-hex { font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.mix-recipe { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; max-height: 100%; overflow: auto; }
+.mix-chip { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 4px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); font-size: 12px; }
+.mix-chip-swatch { width: 16px; height: 16px; flex: none; border: 1px solid var(--line); background: var(--chip-color); }
+.mix-chip-hex { font-variant-numeric: tabular-nums; }
+.mix-empty { color: var(--mute); font-size: 12px; }
 /* ① 내 톤 찾기: 버튼과 추천 컬러 3개를 한 줄에, 측정값·안내는 접어 둔다 */
 .pal-match { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; }
 .pal-match .label { margin: 0; }
@@ -602,6 +583,15 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 .lip-paints { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px 2px; }
 .lip-paints .paint { padding: 3px 0; }
 .pal-board .lip-paints .paint-blob { width: 30px; height: 30px; }
+/* 그라디언트 맵 (2026-11-13): 물감 22색 버튼 대신 색 계열 순서로 이은 색 띠 하나.
+   띠를 누르거나 끌다 놓으면 손잡이 자리 색이 떨어진다 (palette-mixer.js). 아래 정지점 동그라미는 뺐다 */
+.lip-paints.gmap { display: block; padding: 14px 4px 6px; min-width: 0; }
+.gmap-bar { position: relative; height: 56px; border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); cursor: pointer; touch-action: none; user-select: none; }
+.gmap-bar:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* 손잡이: 띠 위아래로 살짝 넘치는 흰 테두리 막대 */
+.gmap-handle { position: absolute; top: -4px; bottom: -4px; width: 10px; translate: -50% 0; border-radius: 6px; border: 2.5px solid #fff; background: var(--c);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); pointer-events: none; transition: left 0.15s var(--ease); }
+.gmap-bar.picking .gmap-handle { transition: none; }
 /* 팔레트 화면 다듬기 (Taste Skill 앱 화면 규칙): 판은 그림자 없이 바탕과 한 단계 다른 면으로,
    칸 이름은 읽히는 크기로, 아직 못 누르는 버튼 글자도 읽히게 (흐린 #b5b5b5 → #6e6e6e) */
 .palette-page .area { box-shadow: none; }
@@ -609,8 +599,6 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 .palette-page .pal-cam > .label { margin-bottom: 4px; }
 .palette-page button:disabled:not(.btn-dark) { color: #6e6e6e; opacity: 1; }
 .palette-page .stage .placeholder { font-size: 16px; line-height: 1.6; color: var(--ink-2); }
-.palette-page .mix-empty { color: #6e6e6e; font-size: 14px; transition: opacity 0.25s var(--ease); }
-.mix-empty.is-gone { opacity: 0; }
 .palette-page .pal-match .muted { color: #6e6e6e; }
 .pal-board .paint-name { font-size: 12px; }
 @media (orientation: landscape) and (min-width: 960px) {
@@ -651,7 +639,6 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
    휴대폰 세로(700px 미만)는 기존 좁은 화면 그대로. PC 에서는 portrait.html 로 미리 본다 */
 @media (orientation: portrait) and (min-width: 700px) {
   header.nav { height: var(--nav-h); padding: 0 20px; flex-wrap: nowrap; }
-  .wide-only { display: flex; }
 
   /* 팔레트 */
   main.fit.palette, main.fit.chat-user { max-width: none; height: calc(100dvh - var(--nav-h)); padding: clamp(10px, 1.2vh, 14px) 18px; overflow: hidden; }
@@ -671,8 +658,8 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
   .pal-board #lip-paints { grid-column: 1; grid-row: 2; align-self: center; }
   .pal-board .lip-paints .paint-blob { width: 34px; height: 34px; }
   .pal-mix { grid-column: 2; grid-row: 1 / span 2; gap: 14px; }
-  .mix-wrap { width: auto; height: clamp(140px, 15vh, 210px); max-width: none; }
-  .pal-tools { min-width: 116px; }
+  .mix-wrap { width: 100%; max-width: none; max-height: 210px; }
+  .mix-summary { gap: 6px; }
   .pal-match { grid-column: 1; grid-row: 2; }
   .pal-finish { grid-column: 2; grid-row: 2; gap: 10px; }
   .pal-finish .seg button { padding: 0 4px; }
@@ -730,15 +717,15 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
   .palette-page .pal-match > .label { display: none; }
   .palette-page .pal-match-row > button { min-height: 44px; border-radius: 999px; padding: 0 18px; }
 
-  /* 서랍 왼쪽: 팔레트 이름 + 물감 22색 | 섞는 칸 | 고른 색·한 방울 빼기 */
+  /* 서랍 왼쪽: 팔레트 이름 + 색상 띠 | 혼합색 견본과 조합 */
   .palette-page .pal-board { left: var(--gap); right: calc(var(--gap) + var(--fin-w)); bottom: var(--gap); height: var(--dock-h); padding: 20px 8px 20px 24px; border-radius: 28px 0 0 28px;
-    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto minmax(0, 1fr); column-gap: 20px; row-gap: 10px; align-items: center; }
-  .palette-page .pal-board-head { grid-column: 1; grid-row: 1; }
+    display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 16px; row-gap: 10px; align-items: center; }
+  .palette-page .pal-board-head { grid-column: 1 / -1; grid-row: 1; }
   .palette-page .pal-board #lip-paints { grid-column: 1; grid-row: 2; align-self: center; }
   .palette-page .pal-board .lip-paints .paint-blob { width: 32px; height: 32px; }
-  .palette-page .pal-mix { display: contents; }
-  .palette-page .mix-wrap { grid-column: 2; grid-row: 1 / span 2; width: auto; height: calc(var(--dock-h) - 40px); max-width: none; max-height: none; }
-  .palette-page .pal-tools { grid-column: 3; grid-row: 1 / span 2; min-width: 110px; }
+  .palette-page .pal-mix { grid-column: 2; grid-row: 2; grid-template-columns: minmax(0, 1.05fr) minmax(110px, 0.95fr); gap: 10px; height: 100%; }
+  .palette-page .mix-wrap { width: 100%; height: 100%; aspect-ratio: auto; max-width: none; max-height: none; }
+  .palette-page .mix-summary { gap: 6px; }
 
   /* 서랍 오른쪽: 텍스처 · 농도 · 추천 버튼 */
   .palette-page .pal-finish { right: var(--gap); bottom: var(--gap); width: var(--fin-w); height: var(--dock-h); padding: 20px 24px 20px 12px; border-radius: 0 28px 28px 0; justify-content: center; gap: 14px; }
@@ -752,12 +739,13 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 /* 세로: 서랍을 두 줄로 — 위 줄 물감 22색(넓게), 아래 줄 [섞는 칸 · 고른 색] | [텍스처 · 농도 · 추천] */
 @media (orientation: portrait) and (min-width: 700px) {
   .palette-page { --dock-h: 420px; --fin-w: 50%; }
-  .palette-page .pal-board { right: var(--gap); border-radius: 28px; padding: 22px 24px; grid-template-columns: auto auto minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); }
+  .palette-page .pal-board { right: var(--gap); border-radius: 28px; padding: 22px 24px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); }
   .palette-page .pal-board-head { grid-column: 1 / -1; }
   .palette-page .pal-board #lip-paints { grid-column: 1 / -1; }
   .palette-page .pal-board .lip-paints .paint-blob { width: 40px; height: 40px; }
-  .palette-page .mix-wrap { grid-column: 1; grid-row: 3; height: 200px; }
-  .palette-page .pal-tools { grid-column: 2; grid-row: 3; }
+  .palette-page .pal-mix { grid-column: 1; grid-row: 3; grid-template-columns: minmax(0, 1fr); align-content: center; gap: 6px; }
+  .palette-page .mix-wrap { width: 100%; height: clamp(100px, 14vh, 160px); aspect-ratio: auto; }
+  .palette-page .mix-summary { gap: 5px; }
   .palette-page .pal-finish { height: 248px; width: calc(50% - var(--gap)); padding: 22px 24px 22px 8px; border-radius: 0 0 28px 0; background: transparent; justify-content: flex-end; }
 }
 /* 가로: 추천 제품은 서랍 높이에 맞춰 한 줄로 늘어놓고, 넘치면 옆으로 밀어 본다 */
@@ -855,7 +843,7 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 :root[data-theme="dark"] .lang-pop, :root[data-theme="dark"] .lang-pop::before { border-color: var(--line-2); }
 :root[data-theme="dark"] .lang-pop hr { border-top-color: var(--line-2); }
 :root[data-theme="dark"] .eyebrow, :root[data-theme="dark"] .card dt, :root[data-theme="dark"] .chat-log .who, :root[data-theme="dark"] .compare-table th { color: var(--mute); }
-:root[data-theme="dark"] .palette-page button:disabled:not(.btn-dark), :root[data-theme="dark"] .palette-page .mix-empty, :root[data-theme="dark"] .palette-page .pal-match .muted { color: var(--mute); }
+:root[data-theme="dark"] .palette-page button:disabled:not(.btn-dark), :root[data-theme="dark"] .palette-page .pal-match .muted { color: var(--mute); }
 :root[data-theme="dark"] header.nav { background: rgba(0, 0, 0, 0.86); border-bottom-color: var(--line); }
 .theme-toggle span, .lang-trigger span { white-space: nowrap; }
 /* 상단 메뉴 로고 (common.js logoSvg): 글자 대신 TOOK 그림 */
@@ -1007,6 +995,10 @@ dialog.cam-settings { width: min(420px, calc(100vw - 32px)); padding: 24px; bord
 dialog.cam-settings::backdrop { background: rgba(0, 0, 0, .45); }
 .cam-settings form { display: flex; flex-direction: column; gap: 14px; }
 .cam-settings h2 { margin: 0 0 4px; font-size: 20px; }
+
+/* 스크롤은 유지하고 브라우저 스크롤바만 감춘다 */
+html, body, * { scrollbar-width: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar { display: none; }
 .cam-settings label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
 .cam-settings select { width: 100%; }
 .cam-settings .cam-check { flex-direction: row; align-items: center; gap: 8px; }

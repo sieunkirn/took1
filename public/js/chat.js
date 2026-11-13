@@ -12,7 +12,7 @@ import { spokenReply } from './voice.js';
 import { C, STUDIO, BARCODE_PANEL, showTab, log, input, START, state, base, AB_ID, track, save, loadBase, setBrands } from './chat-state.js';
 import { runCompare, renderLog, streamAt, streamReply } from './chat-view.js';
 import { speaker } from './chat-input.js';
-import { narrow, stopScan, startPairing } from './chat-products.js';
+import { stopScan } from './chat-products.js';
 
 const TYPING_MIN_MS = 700; // 답이 아무리 빨라도 타이핑 표시를 이만큼은 보여 준다
 
@@ -191,7 +191,7 @@ if (STUDIO) {
     send(C('지금 고른 색과 비슷한 제품 추천해 줘', 'Recommend products similar to my chosen color'));
   });
 }
-// 스캐너가 없을 때: '스캐너가 없을 때'를 펼치면 휴대폰 연결 QR 을 준비하고, 접으면 PC 카메라를 끈다
+// 스캐너가 없을 때: 접으면 PC 카메라를 끈다 (휴대폰 QR 연결은 2026-11-13 삭제)
 $('scan-alt')?.addEventListener('toggle', (e) => {
-  if (e.target.open) { if (!narrow()) startPairing(); } else stopScan();
+  if (!e.target.open) stopScan();
 });

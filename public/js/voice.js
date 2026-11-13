@@ -42,7 +42,7 @@ function bestAlternative(alternatives, brands) {
 }
 
 /**
- * 한 문장 듣기. 챗봇의 음성 질문과 음성 정확도 측정(voice-test.html)이 같은 설정으로 쓴다.
+ * 한 문장 듣기. 챗봇의 음성 질문이 쓴다.
  * @param {{ getBrands: () => string[], onInterim?: (text: string) => void, lang?: string }} opts
  * @returns {{ done: Promise<{ text: string, raw: string[][], candidates: number, error: string|null, ms: number }>, stop: () => void, abort: () => void }}
  *   raw: 문장 조각마다 인식 서비스가 준 후보 목록 (측정용), text: 후보 중 고른 문장

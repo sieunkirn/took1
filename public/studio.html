@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
 </head>
 <!-- 합본 화면: 왼쪽은 립 매핑 카메라(항상 켜짐, lip.js), 오른쪽은 색 조제·챗봇·추천·바코드 탭(chat.js).
      두 스크립트는 창 이벤트(took:color / took:recommend / took:apply / took:show-tab)로 주고받는다 -->
@@ -116,19 +117,6 @@
       <div id="scan-view">
         <p class="small">가지고 있는 립 제품의 바코드를 찍으면 어떤 제품인지 챗봇이 알려 드려요.</p>
         <p id="scan-note" class="msg small hidden"></p>
-        <section class="pair-box" id="pair-box" aria-label="휴대폰으로 찍기">
-          <strong>휴대폰으로 찍기 (추천)</strong>
-          <div class="pair-body">
-            <div id="pair-qr" class="pair-qr" role="img" aria-label="휴대폰 연결 QR 코드"><span class="muted small">QR 준비 중</span></div>
-            <ol class="small pair-steps">
-              <li>휴대폰 기본 카메라로 QR을 비춰요.</li>
-              <li>열린 화면에서 "바코드 사진 찍기".</li>
-              <li>제품 설명이 챗봇 탭에 떠요.</li>
-            </ol>
-          </div>
-          <p id="pair-status" class="small" aria-live="polite"></p>
-          <p id="pair-url" class="muted small pair-url"></p>
-        </section>
         <strong class="small">PC 카메라로 찍기</strong>
         <div class="scan-stage">
           <video id="scan-video" class="hidden" playsinline muted></video>

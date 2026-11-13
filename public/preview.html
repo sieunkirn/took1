@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 다음 입력에서 다시 전체화면으로 -->
 <style>
   /* 직원용: 노트북·PC 에서 키오스크 화면을 그대로 띄워 본다 (common.js openInTabFrame 이 자동으로 이리 보낸다).
      키오스크 = 스탠드형 동그란 거울 안에 갤럭시탭 S10 FE+ 를 세로로 넣은 것 (2026-11-11 가로 → 다시 세로).
@@ -47,6 +48,8 @@
 </style>
 </head>
 <body data-idle-reset="off">
+<!-- 거울 화면 미리보기: 2026-11-13 주석 처리. PC 에서 열어도 이 틀로 오지 않는다 (js/device-frame.js openInTabFrame 도 주석).
+     되살리려면 이 줄과 </body> 바로 위 끝 표시를 지우고, 안의 "--><!--" 를 "-->" 로 되돌린다
 <div class="pv-stage" id="pv-stage">
   <div class="pv-mirror" id="pv-mirror">
     <div class="pv-clip" id="pv-clip"><iframe id="pv-frame" title="키오스크 화면" allow="camera; microphone; autoplay; fullscreen"></iframe></div>
@@ -54,7 +57,7 @@
     <div class="pv-standleg" id="pv-leg" aria-hidden="true"></div>
   </div>
 </div>
-<!-- 색 보정 필터: 화면을 필름 색의 반대로 미리 기울여, 필름을 지난 뒤 눈에는 중립으로 보이게 한다 (값은 setFilm 에서 필름별로 채운다) -->
+<!-- 색 보정 필터: 화면을 필름 색의 반대로 미리 기울여, 필름을 지난 뒤 눈에는 중립으로 보이게 한다 (값은 setFilm 에서 필름별로 채운다) --><!--
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="pv-comp" color-interpolation-filters="sRGB"><feColorMatrix id="pv-comp-m" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/></filter></svg>
 <div class="pv-films" id="pv-films" role="group" aria-label="거울 필름 테스트">
   <p>필름 테스트</p>
@@ -72,7 +75,7 @@
   <small>틀 없이 창을 채워요. 노트북을 세로로 세웠으면 그 화면의 '화면 돌리기' 버튼으로 돌려요</small>
 </div>
 <!-- 터치 보정 테스트 (2026-11-13): 거울 유리 터치 필름 좌표 보정(js/touch-calib.js)을 PC 에서 버튼만으로 해 본다.
-     '필름 흉내'를 켜면 마우스 입력에 필름처럼 틀어진 가짜 왜곡이 걸린다. 이 상자는 왜곡을 받지 않는다(data-calib-exempt) -->
+     '필름 흉내'를 켜면 마우스 입력에 필름처럼 틀어진 가짜 왜곡이 걸린다. 이 상자는 왜곡을 받지 않는다(data-calib-exempt) --><!--
 <div class="pv-films pv-calib" id="pv-calib" role="group" aria-label="터치 보정 테스트" data-calib-exempt>
   <p>터치 보정</p>
   <button type="button" class="pv-fix" id="pv-calib-sim" aria-pressed="false">필름 흉내</button>
@@ -227,5 +230,6 @@
   }
   frame.src = reloaded ? 'index.html' : startOk ? start : 'index.html';
 </script>
+주석 처리 끝 -->
 </body>
 </html>

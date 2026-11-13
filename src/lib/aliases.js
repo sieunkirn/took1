@@ -2,7 +2,7 @@
 // 예) "romand" · "롬 앤" → 롬앤, "쓰리씨이" → 3CE, "warm tone" → 웜톤
 // - 브랜드 별칭은 지금 제품 데이터에 있는 브랜드만 쓴다 (chat.js 의 chatAliases 가 거른다)
 // - 영어 별칭은 단어 경계에서만, 한글 별칭은 단어 첫머리에서만 바꾼다 ("macaron" 의 mac 은 바꾸지 않는다)
-// 새 오인식이 보이면 여기에 한 줄 추가하면 된다 (음성 정확도 측정 페이지 voice-test.html 결과 참고)
+// 새 오인식이 보이면 여기에 한 줄 추가하면 된다
 export const BRAND_ALIASES = {
   '롬앤': ['romand', 'rom&nd', 'rom and', '롬 앤', '롬엔', '롬앤드'],
   '앤드바이롬앤': ['and by romand', '앤드 바이 롬앤'],

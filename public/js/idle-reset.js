@@ -8,7 +8,7 @@ import { store } from './store.js';
 // - 대기 시간 기본 90초. 기기마다 바꾸려면 그 기기 브라우저에서 localStorage['took.idleSeconds'] = '120' (10초 이상)
 // - 안내가 뜬 뒤 15초 안에 '계속하기'나 화면 아무 곳을 누르면 그대로 이어서 쓴다
 // - 읽어주기·음성 듣기 중에는 기다린다. 홈에 지울 것이 없으면 아무것도 하지 않는다
-// - 직원용 화면(음성 정확도 측정·시연용 바코드)은 <body data-idle-reset="off"> 로 끈다
+// - 직원용 화면은 <body data-idle-reset="off"> 로 끈다
 const IDLE_DEFAULT_S = 90;
 const IDLE_WARN_S = 15;
 

@@ -1,20 +1,21 @@
 // 팔레트 물감·섞는 칸 (팔레트 탭 palette.js)
-//  - 물감을 누르면 한 방울이 섞는 칸 가운데에 바로 떨어진다 (날아가는 모션·끌어다 놓기는 2026-11-11 삭제)
-//  - 가운데에서 물감이 동그랗게 퍼지고 파문(물결 고리)이 번지면서 바탕색이 새 혼합색으로 천천히 바뀐다 (Ripple Effect, 2026-11-11)
-//  - 방울 수 제한 없음 (2026-11-11, 예전 최대 40방울)
-//  - 섞는 칸을 드래그하면 저은 방향으로 줄무늬가 생긴다
-//  - 혼합색은 방울 수를 가중치로 OKLab 공간에서 평균한다 (사람 눈에 고르게 섞여 보이는 공간)
-//  - 섞는 칸 색이 바뀌는 동안 onColor(hex) 로 계속 알려 준다 (입술에 바로 입히기). 다 비우면 onColor(null)
+//  - 물감 = 그라디언트 맵 (2026-11-13): 립 컬러 22색을 색 계열 순서로 이은 색 띠 하나 (예전 물감 버튼 22개 대신).
+//    띠의 아무 곳이나 누르거나 끌다 놓으면 그 자리 색(OKLab 보간)이 한 방울 떨어진다. 띠 아래 정지점 동그라미는 뺐다
+//  - 그라디언트에서 색을 고르면 현재 조합에 추가한다
+//  - 혼합색은 선택 횟수를 가중치로 OKLab 공간에서 평균한다
+//  - 조합 결과는 단색 견본으로 표시하고 onColor(hex) 로 입술에 바로 적용한다
 // 물감·섞는 칸·조제한 색은 실제 색이다 (CLAUDE.md 예외)
 import { el, store } from './common.js';
 import { hexToRgb, rgbToHex } from '../lib/color.js';
 import { PRESETS } from './lip-engine.js'; // 립 컬러 매핑 탭에서 고를 수 있는 색
 import { t as tr } from './i18n.js';
-import { REDUCE_MOTION as reduce } from './motion.js';
 
 // 물감 = 립 컬러 매핑 탭에서 고를 수 있는 컬러 (이름 대신 색상값)
 export const ALL_PAINTS = PRESETS.map((hex, i) => ({ key: 'lip' + i, name: hex, hex, lip: true }));
 export const PAINT = Object.fromEntries(ALL_PAINTS.map((p) => [p.key, p]));
+const HEX_RE = /^#[0-9a-f]{6}$/i;
+// 방울 = 색상값. 예전에 저장한 물감 이름('lip3')도 색상값으로 바꿔 읽는다
+const toHex = (v) => (PAINT[v] ? PAINT[v].hex : HEX_RE.test(v || '') ? v.toUpperCase() : null);
 
 // ---------- 색 공간 (OKLab) ----------
 const toLin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
@@ -47,53 +48,100 @@ function okToHex([L, a, b]) {
 const lerp = (a, b, t) => a + (b - a) * t;
 const lerpOk = (p, q, t) => [lerp(p[0], q[0], t), lerp(p[1], q[1], t), lerp(p[2], q[2], t)];
 
-function mixOf(drops) {
-  if (!drops.length) return null;
-  const sum = [0, 0, 0];
-  for (const k of drops) {
-    const o = hexToOk(PAINT[k].hex);
-    sum[0] += o[0]; sum[1] += o[1]; sum[2] += o[2];
-  }
-  return sum.map((v) => v / drops.length);
+// ---------- 그라디언트 맵: 22색을 색 계열이 이어지는 순서로, 같은 간격의 정지점에 ----------
+// 왼쪽 끝 짙은 자두 → 베리 → 핑크 → 가운데 가장 밝은 누드 → 피치·코랄 → 레드 → 오른쪽 끝 짙은 와인.
+// 밝기가 가운데로 갈수록 밝아졌다가 다시 짙어지고, 색이 차가운 쪽에서 따뜻한 쪽으로 한 방향으로만 흐른다
+// (밝기만으로 줄 세우면 주황 레드와 자두색이 바로 붙어 띠가 얼룩져 보였다)
+const GRADIENT_ORDER = ['#702050', '#8E3070', '#94607A', '#A04060', '#B8457A', '#D05A9C', '#E06090', '#D06A80', '#CC88A8', '#C08A94', '#E0A0A8',
+  '#D89A78', '#E07070', '#D06A5A', '#E05050', '#D2321E', '#C8323F', '#B83A4B', '#A85A5E', '#A0202C', '#8E2E22', '#7A2635'];
+const rank = (hex) => { const i = GRADIENT_ORDER.indexOf(hex.toUpperCase()); return i < 0 ? GRADIENT_ORDER.length : i; }; // 목록에 없는 새 프리셋은 맨 뒤
+export const GRADIENT = ALL_PAINTS
+  .map((p) => ({ ...p, ok: hexToOk(p.hex) }))
+  .sort((a, b) => rank(a.hex) - rank(b.hex))
+  .map((p, i, arr) => ({ ...p, at: i / (arr.length - 1) }));
+/** 띠 위치 t(0~1)의 색 (정지점 사이는 OKLab 으로 잇는다 — 띠 그림과 같은 방식) */
+export function gradientAt(t) {
+  const n = GRADIENT.length - 1;
+  const x = Math.min(1, Math.max(0, t)) * n;
+  const i = Math.min(n - 1, Math.floor(x));
+  return okToHex(lerpOk(GRADIENT[i].ok, GRADIENT[i + 1].ok, x - i));
+}
+function gradientCss() {
+  const stops = GRADIENT.map((g) => `${g.hex} ${(g.at * 100).toFixed(2)}%`).join(', ');
+  const ok = typeof CSS !== 'undefined' && CSS.supports?.('background-image', 'linear-gradient(in oklab to right, red, blue)');
+  return `linear-gradient(${ok ? 'in oklab ' : ''}to right, ${stops})`;
 }
 
 /**
- * 팔레트 하나 만들기
+ * 팔레트 색 선택기 만들기
  * @param {object} o
- * @param {HTMLElement} o.paintsEl 물감 버튼을 넣을 칸
- * @param {HTMLCanvasElement} o.canvas 섞는 칸
- * @param {(hex: string|null) => void} [o.onColor] 섞는 칸 색이 바뀌는 동안 계속 (다 비우면 null)
- * @param {() => void} [o.onChange] 방울을 넣거나 빼거나 비웠을 때 (버튼 상태 등을 다시 그릴 때)
- * @param {string} [o.storeKey] 섞은 방울을 저장할 이름 (sessionStorage took.<이름>)
- * @param {string} [o.plate] 섞는 접시 색 (기본: 옅은 회색, 다크 모드면 어두운 회색)
+ * @param {HTMLElement} o.paintsEl 색상 선택 띠를 넣을 칸
+ * @param {HTMLCanvasElement} o.canvas 선택한 색 견본
+ * @param {(hex: string|null) => void} [o.onColor] 색 선택이 바뀔 때 호출
+ * @param {() => void} [o.onChange] 버튼 상태를 다시 그릴 때 호출
+ * @param {string} [o.storeKey] 선택한 색을 저장할 키
+ * @param {string} [o.plate] 색을 선택하기 전의 견본 바탕색
  */
 export function createMixer({ paintsEl, canvas, onColor = () => {}, onChange = () => {}, storeKey = 'paletteDrops', plate }) {
-  let drops = (store.get(storeKey, []) || []).filter((k) => PAINT[k]);
-  let mixOk = mixOf(drops);
-  let shownOk = mixOk; // 화면에 보이는 바탕색 (새 혼합색으로 천천히 따라간다)
-  let shownPr = 0; // 화면에 보이는 웅덩이 반지름 (목표 크기로 부드럽게 따라간다. 첫 방울은 0에서 자란다)
-  let lastT = 0;
-  let grow = null; // 첫 방울이 퍼지는 중이면 { t0 }
+  const saved = store.get(storeKey, []);
+  let selected = toHex(Array.isArray(saved) ? saved.at(-1) : saved);
 
-  // ---------- 물감 ----------
-  const paintButton = (p) => el('button', {
-    type: 'button', class: 'paint' + (p.lip ? ' paint-lip' : ''), 'data-key': p.key, title: p.name,
-    'aria-label': tr('pal.dropAria', { name: p.name }),
-  }, el('span', { class: 'paint-blob', style: `--c:${p.hex}` }), p.lip ? null : el('span', { class: 'paint-name', text: p.name }));
-  const paintBtns = ALL_PAINTS.map(paintButton);
-  paintsEl.replaceChildren(...paintBtns);
+  // ---------- 물감: 그라디언트 맵 ----------
+  // 색 띠 + 고르는 손잡이. 띠를 누르거나 끌다 놓으면 그 자리 색이 떨어진다
+  let pos = 0.5; // 손잡이 자리 (0~1)
+  const handle = el('span', { class: 'gmap-handle', 'aria-hidden': 'true' }); // 끌 때 손잡이 위에 뜨던 색 방울은 2026-11-13 뺐다
+  const bar = el('div', {
+    class: 'gmap-bar', role: 'slider', tabindex: '0', 'aria-label': tr('pal.gradAria'),
+    'aria-valuemin': '0', 'aria-valuemax': '100', style: `background-image:${gradientCss()}`,
+  }, handle);
+  paintsEl.classList.add('gmap');
+  paintsEl.replaceChildren(bar);
 
-  // ---------- 섞는 칸 캔버스 ----------
+  function setPos(t) {
+    pos = Math.min(1, Math.max(0, t));
+    const hex = gradientAt(pos);
+    handle.style.left = `${pos * 100}%`;
+    handle.style.setProperty('--c', hex);
+    bar.setAttribute('aria-valuenow', String(Math.round(pos * 100)));
+    bar.setAttribute('aria-valuetext', hex);
+    return hex;
+  }
+  setPos(pos);
+  const posOf = (e) => {
+    const r = bar.getBoundingClientRect();
+    return r.width ? (e.clientX - r.left) / r.width : pos;
+  };
+  let picking = false;
+  bar.addEventListener('pointerdown', (e) => {
+    picking = true;
+    bar.setPointerCapture(e.pointerId);
+    bar.classList.add('picking');
+    setPos(posOf(e));
+  });
+  bar.addEventListener('pointermove', (e) => { if (picking) setPos(posOf(e)); });
+  bar.addEventListener('pointerup', (e) => {
+    if (!picking) return;
+    picking = false;
+    bar.classList.remove('picking');
+    addPaint(setPos(posOf(e)));
+  });
+  bar.addEventListener('pointercancel', () => { picking = false; bar.classList.remove('picking'); });
+  // 키보드: 화살표로 손잡이를 옮기고 Enter·Space 로 떨어뜨린다
+  bar.addEventListener('keydown', (e) => {
+    const step = e.shiftKey ? 0.1 : 0.02;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') setPos(pos - step);
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') setPos(pos + step);
+    else if (e.key === 'Home') setPos(0);
+    else if (e.key === 'End') setPos(1);
+    else if (e.key === 'Enter' || e.key === ' ') addPaint(gradientAt(pos));
+    else return;
+    e.preventDefault();
+  });
+
+  // ---------- 선택 색 견본 ----------
   const ctx = canvas.getContext('2d');
   let W = 0;
   let H = 0;
-  let CX = 0;
-  let CY = 0;
-  let R = 0; // 섞는 칸 반지름
-  const particles = []; // 퍼지는 물감 줄무늬
-  const ripples = []; // 떨어진 자리에서 번지는 파문 { x, y, rgb, t0 }
-  let blend = null; // { from, to, t0 } 바탕색 전환
-  let lastLipSend = 0;
 
   function resize() {
     const dpr = Math.min(2, devicePixelRatio || 1);
@@ -103,254 +151,51 @@ export function createMixer({ paintsEl, canvas, onColor = () => {}, onChange = (
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    CX = W / 2;
-    CY = H / 2;
-    R = Math.min(W, H) / 2 - 10;
   }
 
-  // 물감 웅덩이 크기: 방울이 많을수록 칸을 더 채운다
-  const puddleR = () => R * (0.42 + 0.5 * Math.min(1, drops.length / 12));
-
-  // 바탕색 전환: 섞는 칸 색이 새 혼합색으로 바뀌는 동안 입술 색도 같이 따라간다
-  function stepBlend() {
-    if (!blend) return;
-    const k = Math.min(1, (performance.now() - blend.t0) / 1500);
-    const e = 1 - (1 - k) ** 3;
-    shownOk = blend.from ? lerpOk(blend.from, blend.to, e) : blend.to;
-    const now = performance.now();
-    if (k >= 1 || now - lastLipSend > 90) {
-      lastLipSend = now;
-      onColor(okToHex(k >= 1 ? blend.to : shownOk));
-    }
-    if (k >= 1) blend = null;
-  }
-
-  function frame(t) {
-    requestAnimationFrame(frame); // 그리다가 오류가 나도 다음 프레임은 이어진다
-    stepBlend();
-    // 웅덩이 크기: 첫 방울은 가운데에서 동그랗게 자라고, 방울이 늘면 조금씩 커진다 (빠르게 시작해 천천히 멈춤)
-    const target = shownOk ? puddleR() : 0;
-    const dt = Math.min(64, lastT ? t - lastT : 16);
-    lastT = t;
-    if (grow && !reduce) {
-      // 첫 방울: 가운데에 닿자마자 넓게 퍼지고, 가장자리가 살짝 넘쳤다가 제자리에 멈춘다 (액체처럼)
-      const k = Math.min(1, (t - grow.t0) / 700);
-      const c = 0.9;
-      const back = 1 + (c + 1) * (k - 1) ** 3 + c * (k - 1) ** 2;
-      shownPr = target * Math.max(0, back);
-      if (k >= 1) grow = null;
-    } else {
-      shownPr = reduce ? target : shownPr + (target - shownPr) * (1 - Math.exp(-dt / 150));
-    }
-    if (R > 4) draw(t); // 팔레트가 숨겨져 크기가 0이면 그리지 않는다
-  }
-
-  function draw(t) {
+  function draw() {
     ctx.clearRect(0, 0, W, H);
-    // 팔레트 칸: 그림자 없이 접시 하나 (그림자는 캔버스 끝에서 네모로 잘려 보였다)
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(CX, CY, R, 0, Math.PI * 2);
-    ctx.fillStyle = plate ?? (document.documentElement.dataset.theme === 'dark' ? '#1c1c1c' : '#f0f0f0'); // 다크 모드면 어두운 접시
-    ctx.fill();
-
-    if (shownOk) {
-      // 물감 웅덩이: 깔끔한 원 (출렁임은 2026-11-11 뺐다)
-      const pr = shownPr;
-      ctx.beginPath();
-      ctx.arc(CX, CY, Math.max(0.5, pr), 0, Math.PI * 2);
-      ctx.fillStyle = okToHex(shownOk);
-      ctx.fill();
-      ctx.save();
-      ctx.clip();
-
-      // 저은 결: 가운데를 도는 소용돌이 + 저은 힘
-      ctx.lineCap = 'round';
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        const dx = p.x - CX;
-        const dy = p.y - CY;
-        const dist = Math.hypot(dx, dy) || 1;
-        const swirl = 0.9 + 26 / (dist + 20);
-        p.vx += (-dy / dist) * swirl * 0.16;
-        p.vy += (dx / dist) * swirl * 0.16;
-        if (dist > pr - 6) { p.vx -= (dx / dist) * 0.6; p.vy -= (dy / dist) * 0.6; }
-        p.vx *= 0.965;
-        p.vy *= 0.965;
-        p.x += p.vx; p.y += p.vy;
-        // 지나온 자리를 꼬리로 남겨 마블 줄무늬처럼 그린다
-        p.trail.push([p.x, p.y]);
-        if (p.trail.length > 14) p.trail.shift();
-        p.life -= p.decay;
-        if (p.life <= 0) { particles.splice(i, 1); continue; }
-        ctx.globalAlpha = Math.min(1, p.life * 1.3) * 0.8;
-        ctx.strokeStyle = p.hex;
-        ctx.lineWidth = p.w * (0.35 + p.life * 0.65);
-        ctx.beginPath();
-        ctx.moveTo(p.trail[0][0], p.trail[0][1]);
-        for (let j = 1; j < p.trail.length; j++) ctx.lineTo(p.trail[j][0], p.trail[j][1]);
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-      drawRipples(pr);
-      // 납작한 물감 웅덩이처럼 (2026-11-11): 예전 동그란 흰 반사광은 공처럼 보여서 뺐다
-      // 가장자리 안쪽만 살짝 어둡게(물감 두께) + 왼쪽 위 가장자리를 따라 얇은 빛
-      if (pr > 4) {
-        const rim = ctx.createRadialGradient(CX, CY, pr * 0.72, CX, CY, pr);
-        rim.addColorStop(0, 'rgba(0,0,0,0)');
-        rim.addColorStop(1, 'rgba(0,0,0,0.14)');
-        ctx.fillStyle = rim;
-        ctx.fillRect(CX - pr, CY - pr, pr * 2, pr * 2);
-        ctx.lineCap = 'round';
-        ctx.lineWidth = Math.max(1.5, pr * 0.05);
-        ctx.strokeStyle = 'rgba(255,255,255,0.32)';
-        ctx.beginPath();
-        ctx.arc(CX, CY, pr * 0.84, Math.PI * 1.08, Math.PI * 1.38);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    ctx.restore();
+    ctx.fillStyle = selected || plate || (document.documentElement.dataset.theme === 'dark' ? '#1c1c1c' : '#f0f0f0');
+    ctx.fillRect(0, 0, W, H);
   }
 
-  // 파문 (단정하게, 2026-11-11): 가운데에서 물감이 한 번 부드럽게 퍼져 바탕에 녹아들고, 얇은 고리 하나가 같이 번진다
-  const RIPPLE_MS = 1400;
-  function drawRipples(pr) {
-    const now = performance.now();
-    for (let i = ripples.length - 1; i >= 0; i--) {
-      const rp = ripples[i];
-      const k = (now - rp.t0) / RIPPLE_MS;
-      if (k >= 1) { ripples.splice(i, 1); continue; }
-      const [r, g, b] = rp.rgb;
-      const e = 1 - (1 - k) ** 3; // 처음엔 빠르게, 끝으로 갈수록 천천히
-      const rad = Math.max(1, e * pr);
-      // 퍼지는 물감: 가장자리만 살짝 흐리게, 퍼질수록 옅어진다
-      const a = (1 - k) * 0.85;
-      const fill = ctx.createRadialGradient(rp.x, rp.y, 0, rp.x, rp.y, rad);
-      fill.addColorStop(0, `rgba(${r},${g},${b},${a})`);
-      fill.addColorStop(0.85, `rgba(${r},${g},${b},${a})`);
-      fill.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      ctx.fillStyle = fill;
-      ctx.beginPath();
-      ctx.arc(rp.x, rp.y, rad, 0, Math.PI * 2);
-      ctx.fill();
-      // 고리 하나: 물감 가장자리를 따라 얇게
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = `rgba(255,255,255,${0.45 * (1 - k)})`;
-      ctx.beginPath();
-      ctx.arc(rp.x, rp.y, rad, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    if (ripples.length > 6) ripples.splice(0, ripples.length - 6); // 연달아 많이 떨어뜨려도 가볍게
-  }
+  const save = () => store.set(storeKey, selected ? [selected] : []);
 
-  const save = () => store.set(storeKey, drops);
-
-  // ---------- 방울 떨어뜨리기 ----------
-  function dropAt(key, x, y) {
-    const before = mixOk;
-    drops.push(key);
-    mixOk = mixOf(drops);
-    blend = { from: shownOk || mixOk, to: mixOk, t0: performance.now() };
-    if (!before) { shownOk = hexToOk(PAINT[key].hex); shownPr = 0; grow = { t0: performance.now() }; } // 첫 방울: 웅덩이가 자라는 것 자체가 애니메이션 (파문 없음)
-    if (!reduce && before) {
-      const { r, g, b } = hexToRgb(PAINT[key].hex);
-      ripples.push({ x, y, rgb: [r, g, b], t0: performance.now() });
-    }
+  function addPaint(keyOrHex) {
+    const hex = toHex(keyOrHex);
+    if (!hex) return;
+    selected = hex;
     save();
+    draw();
     onChange();
+    onColor(selected);
   }
-
-  // 물감을 누르면 날아가는 모션 없이 섞는 칸 가운데에 바로 떨어져 파문이 퍼진다 (2026-11-11)
-  // fly 는 밖(palette.js 추천 컬러)에서 부르는 이름이라 남겨 둔다
-  const fly = (key) => dropAt(key, CX, CY);
-  for (const btn of paintBtns) btn.addEventListener('click', () => fly(btn.dataset.key));
-
-  // ---------- 젓기 ----------
-  let stir = null;
-  canvas.addEventListener('pointerdown', (e) => {
-    if (!mixOk) return;
-    canvas.setPointerCapture(e.pointerId);
-    const c = canvas.getBoundingClientRect();
-    stir = { x: e.clientX - c.left, y: e.clientY - c.top };
-    canvas.classList.add('stirring');
-  });
-  canvas.addEventListener('pointermove', (e) => {
-    if (!stir) return;
-    const c = canvas.getBoundingClientRect();
-    const x = e.clientX - c.left;
-    const y = e.clientY - c.top;
-    const vx = x - stir.x;
-    const vy = y - stir.y;
-    // 저은 자리 주변 줄무늬를 그 방향으로 민다
-    for (const p of particles) {
-      const d = Math.hypot(p.x - x, p.y - y);
-      if (d < 50) { p.vx += vx * 0.12 * (1 - d / 50); p.vy += vy * 0.12 * (1 - d / 50); }
-    }
-    if (Math.hypot(x - CX, y - CY) < puddleR() && Math.hypot(vx, vy) > 2) {
-      // 저으면 바탕색보다 조금 밝고 어두운 결이 생긴다
-      const [L, a, b] = mixOk;
-      const shade = okToHex([Math.min(1, L + (Math.random() > 0.5 ? 0.08 : -0.08)), a, b]);
-      particles.push({ x, y, trail: [[stir.x, stir.y], [x, y]], vx: vx * 0.4, vy: vy * 0.4, hex: shade, life: 1, decay: 0.012, w: 5 });
-    }
-    stir = { x, y };
-  });
-  const endStir = () => { stir = null; canvas.classList.remove('stirring'); };
-  canvas.addEventListener('pointerup', endStir);
-  canvas.addEventListener('pointercancel', endStir);
 
   // ---------- 밖에서 쓰는 동작 ----------
-  /** 한 방울 빼기. 다 비면 onColor(null) */
-  function undo() {
-    drops.pop();
-    const before = shownOk;
-    mixOk = mixOf(drops);
-    blend = mixOk ? { from: before, to: mixOk, t0: performance.now() } : null;
-    if (!mixOk) {
-      shownOk = null;
-      particles.length = 0;
-      ripples.length = 0;
-      onColor(null);
-    }
-    save();
-    onChange();
-  }
   /** 처음부터 다시: 비우고 onColor(null) */
   function reset() {
-    drops = [];
-    mixOk = null;
-    shownOk = null;
-    blend = null;
-    particles.length = 0;
-    ripples.length = 0;
+    selected = null;
     save();
+    draw();
     onChange();
     onColor(null);
   }
-  /** 다시 열었을 때 섞어 둔 색을 바로 알리고 그리기 시작 */
+  /** 다시 열었을 때 저장한 색을 복원한다 */
   function start() {
     resize();
-    // 화면 배치에 따라 섞는 칸 크기가 바뀌면(추천 목록이 열릴 때 등) 캔버스 해상도를 다시 맞춘다
-    new ResizeObserver(resize).observe(canvas);
-    if (mixOk) {
-      shownOk = mixOk;
-      shownPr = puddleR(); // 다시 열면 자라는 애니메이션 없이 바로
-      onColor(okToHex(mixOk)); // 다시 열면 섞어 둔 색을 입술에 바로 입힌다
-    }
+    new ResizeObserver(() => { resize(); draw(); }).observe(canvas);
+    draw();
+    if (selected) onColor(selected);
     onChange();
-    requestAnimationFrame(frame);
   }
 
   return {
-    paintBtns,
-    fly,
-    undo,
+    addColor: addPaint,
     reset,
     start,
-    /** 지금 조제한 색 (없으면 null) */
-    hex: () => (mixOk ? okToHex(mixOk) : null),
-    /** 넣은 방울 수 */
-    count: () => drops.length,
+    /** 지금 선택한 색 (없으면 null) */
+    hex: () => selected,
+    /** 현재 선택된 색을 단일 값으로 유지하므로 결과는 한 색상 배열 */
+    colors: () => (selected ? [selected] : []),
   };
 }

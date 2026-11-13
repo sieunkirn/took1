@@ -122,6 +122,24 @@ const openFresh = async (pg, path) => {
   await pg.evaluate(() => sessionStorage.clear());
   await pg.goto(BASE + path);
 };
+await step('전체화면: 모든 HTML 화면에 전체화면 유지 스크립트 포함', async () => {
+  for (const path of ['/', '/calib.html', '/chat.html', '/kiosk.html', '/lip-together.html', '/palette.html', '/preview.html', '/product.html?id=P001', '/recommend.html?hex=%23B3122E', '/shades.html', '/studio.html']) {
+    await page.goto(BASE + path);
+    assert.equal(await page.locator('script[src="js/fullscreen-keep.js"]').count(), 1, path);
+  }
+  await page.goto(BASE + '/chat.html');
+  assert.equal(await page.locator('.nav-fullscreen').count(), 1);
+  assert.equal(await page.locator('.nav-idle-test').count(), 0);
+});
+await step('스크롤바: 표시만 숨기고 스크롤 동작은 유지', async () => {
+  await page.goto(BASE + '/chat.html');
+  const styles = await page.evaluate(() => ({
+    scrollbarWidth: getComputedStyle(document.documentElement).scrollbarWidth,
+    webkitScrollbarDisplay: getComputedStyle(document.documentElement, '::-webkit-scrollbar').display,
+  }));
+  assert.equal(styles.scrollbarWidth, 'none');
+  assert.equal(styles.webkitScrollbarDisplay, 'none');
+});
 const savedLipHex = (pg) => pg.evaluate(() => JSON.parse(sessionStorage.getItem('took.lipColor') || 'null')?.hex);
 
 await step('홈: 대기 화면 → 화면을 누르면 팔레트 → 상단 메뉴로 챗봇', async () => {
@@ -133,6 +151,14 @@ await step('홈: 대기 화면 → 화면을 누르면 팔레트 → 상단 메�
   await page.waitForURL(at('palette.html'));
   await page.click('header.nav a[href="chat.html"]');
   await page.waitForURL(at('chat.html'));
+  // 챗봇 상단: 팔레트로 가는 버튼, 거울(대기) 화면으로 돌아가는 버튼
+  await page.click('header.nav a[href="palette.html"]');
+  await page.waitForURL(at('palette.html'));
+  await page.click('header.nav a[href="chat.html"]');
+  await page.waitForURL(at('chat.html'));
+  await page.click('header.nav a.nav-mirror');
+  await page.waitForURL((u) => /\/(index\.html)?$/.test(u.pathname));
+  await page.waitForSelector('#home-standby');
 });
 
 // ---------- 팔레트 (홈에서 바로 들어오는 주 화면) ----------
@@ -140,8 +166,9 @@ await step('팔레트: 아바타로 시작 → 물감 섞기 → 조제한 색�
   await page.goto(BASE + '/palette.html');
   await page.click('#use-avatar');
   await page.waitForSelector('#view:not(.hidden)');
-  await page.click('#lip-paints button >> nth=0');
-  await page.click('#lip-paints button >> nth=2');
+  // 그라디언트 맵: 띠의 두 곳을 눌러 두 방울
+  await page.click('#lip-paints .gmap-bar', { position: { x: 20, y: 20 } });
+  await page.click('#lip-paints .gmap-bar', { position: { x: 160, y: 20 } });
   await assertAchromatic(page);
   await shot('02-palette-mix');
   await page.waitForTimeout(1500); // 떨어뜨린 물감이 다 섞일 때까지
@@ -160,9 +187,9 @@ await step('팔레트: 아바타로 시작 → 물감 섞기 → 조제한 색�
 // ---------- 흐름 A: 립 컬러 매핑 ----------
 // 고른 색: 눌린 프리셋(aria-pressed)과 저장한 립 색으로 확인한다 (화면에 색상값 글자는 따로 보이지 않는다)
 const pressedSwatchHex = (pg) => pg.getAttribute('#swatches button[aria-pressed="true"]', 'data-hex');
-await step('흐름 A: 카메라로 테스트하기 → 입술 추적 준비(작업 스레드) → 얼굴 안내', async () => {
+await step('흐름 A: 카메라 자동 실행 → 입술 추적 준비(작업 스레드) → 얼굴 안내', async () => {
   await page.goto(BASE + '/lip-together.html');
-  await page.click('#use-camera');
+  await page.waitForSelector('#use-camera[aria-pressed="true"]');
   await page.waitForSelector('#view:not(.hidden)');
   // 가짜 카메라 영상에는 얼굴이 없으므로 얼굴을 맞추라는 안내가 정상
   await page.waitForFunction(() => document.getElementById('guide').textContent.includes('얼굴이 화면 가운데'), null, { timeout: 40000 });
@@ -222,7 +249,7 @@ await step('추천 화면: 유사도 순 10개, 제형 필터, 상세 → 이전
 // ---------- 카메라 오류 ----------
 for (const [name, error, message] of [
   ['카메라 권한 거부 → 안내 메시지와 다시 연결 버튼', 'NotAllowedError', /권한이 거부/],
-  ['카메라 장치 없음 → 안내 메시지', 'NotFoundError', /카메라를 찾지 못했습니다/],
+  ['카메라 장치 없음 → 꽂으면 자동 연결 안내', 'NotFoundError', /다시 꽂으면 자동으로 연결/],
 ]) {
   await step(name, async () => {
     const pg = await ctx.newPage();

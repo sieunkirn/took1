@@ -2,7 +2,7 @@
 import { $, api, el, won, fullName, shortName } from './common.js';
 import { isEn, finishText as finishName } from './i18n.js';
 import { listenNfc, normalizeTag, resolveTag, createNfcHint } from './nfc.js';
-import { createBarcodeScanner, cameraErrorMessage, decodeImageFile, loadZXing } from './barcode-scan.js';
+import { createBarcodeScanner, cameraErrorMessage, decodeImageFile } from './barcode-scan.js';
 import { C, STUDIO, BARCODE_PANEL, showTab, input, START, state, save, loadBase } from './chat-state.js';
 import { productMini, renderPanel, renderLog, streamReply } from './chat-view.js';
 import { speaker } from './chat-input.js';
@@ -125,8 +125,8 @@ async function handleBarcode(raw, source) {
   }
   $('scan-status').textContent = C(`인식했어요: ${code}`, `Recognized: ${code}`);
   flashScanner(C(`읽었어요 · ${code}`, `Read · ${code}`));
-  const said = C({ camera: `바코드 찍었어요 (${code})`, scanner: `스캐너로 바코드 찍었어요 (${code})`, phone: `휴대폰으로 바코드 찍었어요 (${code})`, photo: `바코드 사진을 올렸어요 (${code})` },
-    { camera: `Scanned a barcode (${code})`, scanner: `Scanned with the scanner (${code})`, phone: `Scanned with my phone (${code})`, photo: `Uploaded a barcode photo (${code})` });
+  const said = C({ camera: `바코드 찍었어요 (${code})`, scanner: `스캐너로 바코드 찍었어요 (${code})`, photo: `바코드 사진을 올렸어요 (${code})` },
+    { camera: `Scanned a barcode (${code})`, scanner: `Scanned with the scanner (${code})`, photo: `Uploaded a barcode photo (${code})` });
   state.messages.push({ role: 'user', text: said[source] || C(`바코드 ${code} 알려 줘`, `Look up barcode ${code}`) });
   const { ok, body } = await api('api/products/barcode/' + encodeURIComponent(code));
   let text;
@@ -178,64 +178,6 @@ if (BARCODE_PANEL) window.addEventListener('keydown', (e) => {
   }
   if (e.key !== 'Shift') scanBuf = '';
 }, true);
-
-// ---------- 휴대폰으로 찍기 (QR 연결) ----------
-// PC 가 연결을 만들고 QR 로 휴대폰 화면 주소를 보여 준다. 휴대폰이 찍은 바코드 번호는 1초마다 서버에서 가져온다
-// (실시간 스트림은 무료 터널이 늦게 보내서 어느 네트워크에서나 되는 폴링을 쓴다)
-let pairTimer = null;
-let pairId = null;
-
-export async function startPairing() {
-  if (pairId) return;
-  const status = $('pair-status');
-  const { ok, body } = await api('api/pair', { method: 'POST', body: '{}' });
-  if (!ok || !body.id) {
-    status.textContent = C('휴대폰 연결은 서버를 실행(npm start)했을 때만 쓸 수 있어요. 아래 PC 카메라나 번호 입력을 이용해 주세요.', 'Phone pairing only works with the server running (npm start). Use the PC camera or type the number below.');
-    $('pair-qr').replaceChildren();
-    return;
-  }
-  pairId = body.id;
-  if (!body.phoneUrl) {
-    status.textContent = C('PC의 와이파이 주소를 찾지 못했어요. PC가 와이파이(공유기)에 연결돼 있는지 확인해 주세요.', "Couldn't find the PC's Wi-Fi address. Check that the PC is connected to Wi-Fi.");
-    return;
-  }
-  const ZXing = await loadZXing().catch(() => null);
-  if (ZXing) {
-    const qr = new ZXing.BrowserQRCodeSvgWriter().write(body.phoneUrl, 132, 132);
-    qr.setAttribute('shape-rendering', 'crispEdges'); // 칸 경계를 흐리지 않아 휴대폰 카메라가 잘 읽는다
-    $('pair-qr').replaceChildren(qr);
-  }
-  $('pair-url').textContent = C(`QR이 안 되면 휴대폰 브라우저 주소창에 입력: ${body.phoneUrl}`, `If the QR doesn't work, enter this in your phone browser: ${body.phoneUrl}`);
-  status.textContent = C('휴대폰 연결을 기다리고 있어요. PC와 휴대폰이 같은 와이파이에 있어야 해요.', 'Waiting for your phone. The PC and phone must be on the same Wi-Fi.');
-  let after = 0;
-  let failures = 0;
-  const check = async () => {
-    const r = await api(`api/pair/${pairId}/poll?after=${after}`).catch(() => ({ ok: false, status: 0 }));
-    if (r.status === 404) {
-      // 서버를 다시 켜면 연결 정보가 사라지므로 새 QR 을 만든다
-      clearInterval(pairTimer);
-      pairId = null;
-      status.textContent = C('연결이 끝나서 새 QR을 만드는 중이에요…', 'The connection ended. Making a new QR…');
-      setTimeout(startPairing, 1500);
-      return;
-    }
-    if (!r.ok) {
-      if (++failures >= 3) status.textContent = C('서버와 연결이 잠시 끊겼어요. 다시 연결하는 중이에요…', 'Lost the server connection for a moment. Reconnecting…');
-      return;
-    }
-    failures = 0;
-    after = r.body.last;
-    for (const e of r.body.events) {
-      if (e.type === 'phone') status.textContent = C('휴대폰이 연결됐어요! 휴대폰에서 바코드를 찍어 주세요.', 'Phone connected! Scan a barcode with your phone.');
-      if (e.type === 'code') {
-        status.textContent = C(`휴대폰에서 바코드를 받았어요 (${e.data.code}).`, `Got a barcode from your phone (${e.data.code}).`);
-        handleBarcode(e.data.code, 'phone');
-      }
-    }
-  };
-  pairTimer = setInterval(check, 1000);
-}
-window.addEventListener('pagehide', () => clearInterval(pairTimer));
 
 // PC 에서도 사진 파일(휴대폰에서 옮긴 사진 등)로 바코드를 읽을 수 있다
 $('scan-photo').addEventListener('change', async (e) => {

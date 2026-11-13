@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
 <style>
   /* 직원용 터치 보정 화면 (2026-11-13): 거울 유리 터치 필름 좌표 보정(js/touch-calib.js)을 버튼으로 한다.
      보정 전에는 터치 축이 뒤바뀌어 작은 버튼을 못 누르므로 화면 전체가 버튼 하나다.
@@ -43,7 +44,6 @@
     if (!s.saved) {
       // 보정 전: 어디를 눌러도 시작 (터치가 어긋나 있어도 눌린다). 누르는 순간 전체화면을 켜서 쓸 상태 그대로 보정한다
       box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 보정 시작', '전체화면으로 바뀌어요. 십자 5개를 차례로 누르고 저장하면 바로 정확도 테스트로 넘어가요', () => {
-        calib.toggleFullscreen(true);
         calib.startCalib();
       }));
       return;

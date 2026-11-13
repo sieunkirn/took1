@@ -27,10 +27,11 @@ export const logoSvg = (cls = '') => `<svg class="${cls}" viewBox="212 36 442 12
 //  3) 시작 화면(home.js)은 로고가 이미 그 자리에 있고, 얼굴 → 안내 글 순서로 떠오른다 (sessionStorage took.homeFx)
 // 저장한 상태는 먼저 비운다(처음 상태로). 동작 줄이기 설정이면 바로 이동
 const HOME_FX_MS = 650;
-function goHomeWithMotion(e) {
-  store.clear();
+// keep: 챗봇의 '거울 화면으로' 버튼처럼 저장한 상태(대화·섞은 색)를 지우지 않고 돌아갈 때
+function goHomeWithMotion(e, { keep = false } = {}) {
+  if (!keep) store.clear();
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; // 링크 그대로
-  const svg = e.currentTarget.querySelector('svg');
+  const svg = document.querySelector('header.nav .nav-logo svg');
   if (!svg) return;
   e.preventDefault();
   try { sessionStorage.setItem('took.homeFx', '1'); } catch { /* 저장 불가 환경: 시작 화면은 그냥 나온다 */ }
@@ -69,6 +70,28 @@ function deviceResetButton() {
   });
 }
 
+function fullscreenButton() {
+  let root = window;
+  try { if (window.top !== window && window.top.document) root = window.top; } catch { /* 다른 출처 프레임 */ }
+  const button = el('button', {
+    type: 'button', class: 'nav-fullscreen', 'data-fullscreen-control': '',
+    onclick: () => {
+      const control = root.tookFullscreen;
+      if (control?.isFull()) control.exit();
+      else control?.enter();
+    },
+  });
+  const update = () => {
+    const exiting = !!root.tookFullscreen?.isFull();
+    button.textContent = t(exiting ? 'nav.fullscreenExit' : 'nav.fullscreenEnter');
+    button.title = t(exiting ? 'nav.fullscreenExitTitle' : 'nav.fullscreenEnterTitle');
+    button.setAttribute('aria-label', button.title);
+  };
+  root.addEventListener('took:fullscreenchange', update);
+  update();
+  return button;
+}
+
 /**
  * 상단 메뉴 + 키오스크 자동 초기화
  * @param {{ idle?: { seconds?: () => number, active?: () => boolean, onReset?: () => void } }} [opts]
@@ -83,17 +106,16 @@ export function renderNav(opts = {}) {
     // 오른쪽 끝: 다크 모드 켜기/끄기 + 언어 전환
     // AI 뷰티 챗봇 (2026-11-11 손님 휴대폰을 없애고 태블릿으로 합침)
     freshLink('chat.html', t('nav.chat')),
+    // 팔레트 (2026-11-13 다시 추가): 챗봇 옆에서 바로 팔레트로
+    freshLink('palette.html', t('nav.palette')),
+    // 챗봇 화면에서만: 거울 대기 화면(홈)으로 돌아가기. 로고와 달리 대화·섞은 색은 지우지 않는다
+    HERE === 'chat.html' ? el('a', { href: 'index.html', class: 'nav-mirror', text: t('nav.mirror'), onclick: (e) => goHomeWithMotion(e, { keep: true }) }) : null,
     el('div', { class: 'nav-lang' }, themeToggle(), languageMenu()),
   );
   document.body.prepend(nav);
   applyI18n();
-  const idle = setupIdleReset(opts.idle);
-  // 테스트 단계: 90초를 기다리지 않고 자동 초기화 안내를 바로 띄워 본다 (오른쪽 끝). 배포 때는 IDLE_TEST_BUTTON 을 false 로
-  if (IDLE_TEST_BUTTON && idle) {
-    nav.append(el('button', { type: 'button', class: 'nav-idle-test', text: t('nav.idleTest'), title: t('nav.idleTestTitle'), onclick: idle.warnNow }));
-  }
+  setupIdleReset(opts.idle);
   const reset = deviceResetButton();
   if (reset) nav.append(reset);
+  nav.append(fullscreenButton());
 }
-
-const IDLE_TEST_BUTTON = true;

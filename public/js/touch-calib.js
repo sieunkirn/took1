@@ -532,7 +532,8 @@
       .paint.took-press .paint-blob { transform: scale(0.9); }
       .tkb-key.took-press { background: var(--line-2); }
       .tkb-fn.took-press { background: var(--faint); }
-      .tkb-enter.took-press { background: var(--ink-2); }`;
+      .tkb-enter.took-press { background: var(--ink-2); }
+      html.took-fs-on header.nav { padding-right: 60px; } /* 오른쪽 위 전체화면 버튼 자리 */`;
     function prepareWindow(win) {
       if (!isActive() || win.__tookCalibReady) return;
       const doc = win.document;
@@ -581,7 +582,7 @@
       if (e.cancelable) e.preventDefault();
       e.stopImmediatePropagation();
       if (!POINTER.includes(e.type)) return;
-      if (e.type === 'pointerup' && !sim) requestFull(); // 사용자 동작 안에서만 전체화면을 켤 수 있다
+      if (e.type === 'pointerup' && !sim && !e.target?.closest?.('[data-fullscreen-control]')) requestFull();
       if (sim && e.type === 'pointermove' && e.buttons === 0 && !gestures.has(e.pointerId)) { if (debug) debugShow(rawRoot(e, win), correct(rawRoot(e, win)), true); return; }
       const P = rawRoot(e, win);
       if (calib) { calibInput(e.type, e.pointerId, P); return; }
@@ -600,14 +601,11 @@
     function onDragStart(e) { if (sim && isActive()) e.preventDefault(); }
 
     // ---------- 전체화면 ----------
-    // 보정이 켜져 있으면 손을 뗄 때마다 전체화면을 켠다. 직원이 '전체화면 끄기'를 눌렀으면 이 탭에서는 다시 켜지 않는다
+    // 브라우저가 허용한 사용자 동작에서 공통 전체화면 컨트롤을 통해 요청한다
     function requestFull(force) {
-      try {
-        if (!force && ss.get('tookCalib.noFull') === '1') return;
-        if (rdoc.fullscreenElement || root.matchMedia('(display-mode: fullscreen)').matches) return;
-        const p = rdoc.documentElement.requestFullscreen?.({ navigationUI: 'hide' });
-        p?.catch?.(() => {});
-      } catch { /* 지원 안 함 */ }
+      const control = root.tookFullscreen;
+      if (force) return control?.enter?.();
+      return control?.request?.();
     }
 
     // ---------- 10초 길게 누르기 → 보정 화면 ----------
@@ -932,13 +930,8 @@
     const isFullscreen = () => !!rdoc.fullscreenElement || root.matchMedia('(display-mode: fullscreen)').matches;
     /** 전체화면 켜기/끄기. 버튼(사용자 동작) 안에서 불러야 켜진다 */
     function toggleFullscreen(on = !isFullscreen()) {
-      if (on) {
-        ss.del('tookCalib.noFull');
-        requestFull(true);
-      } else {
-        ss.set('tookCalib.noFull', '1');
-        try { rdoc.exitFullscreen?.()?.catch?.(() => {}); } catch { /* 없음 */ }
-      }
+      const control = root.tookFullscreen;
+      return on ? control?.enter?.() : control?.exit?.();
     }
     rdoc.addEventListener('fullscreenchange', notify);
 

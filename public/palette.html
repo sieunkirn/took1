@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
 <script src="js/theme-boot.js"></script><!-- 다크 모드를 화면이 그려지기 전에 켠다 -->
 <script>
   // 첫 화면이 그려지기 전에: 시작 화면에서 넘어왔으면 들어오는 움직임(.enter-fx)을 켠다
@@ -45,10 +46,10 @@
     </div>
   </section>
 
-  <!-- 오른쪽: 위에서 아래로 쓰는 순서대로 ① 내 톤 찾기 → ② 팔레트(물감·섞는 칸) → ③ 텍스처·농도·제품 추천.
-       조제한 색은 섞는 칸에 그대로 보이므로 따로 보여 주지 않는다. 추천을 받으면 ①~③ 대신 ④ 추천 결과가 나온다 -->
+    <!-- 오른쪽: 위에서 아래로 쓰는 순서대로 ① 내 톤 찾기 → ② 색 선택·혼합 결과 → ③ 텍스처·농도·제품 추천.
+      추천을 받으면 ①~③ 대신 ④ 추천 결과가 나온다 -->
   <div class="pal-right">
-    <!-- ① 나에게 어울리는 컬러 (립 컬러 매핑에서 옮겨 옴): 추천 컬러를 누르면 팔레트에 한 방울 떨어진다 -->
+    <!-- ① 나에게 어울리는 컬러: 추천 컬러를 누르면 조합에 추가된다 -->
     <section class="area pal-match" aria-label="나에게 어울리는 컬러" data-i18n-aria="pal.match">
       <div class="label" data-i18n="pal.match">나에게 어울리는 컬러</div>
       <div class="pal-match-row">
@@ -58,22 +59,22 @@
       <p id="match-result" class="small" aria-live="polite"></p>
     </section>
 
-    <!-- ② 팔레트: 오른쪽 위 아이콘으로 처음부터 다시 섞는다 -->
+    <!-- ② 팔레트: 색을 고르고 조합 결과와 재료를 확인한다 -->
     <section class="area pal-board" aria-label="팔레트" data-i18n-aria="pal.board">
       <div class="pal-board-head">
         <h1 class="label" data-i18n="pal.board">팔레트</h1>
-        <button type="button" id="reset" class="icon-btn pal-reset" aria-label="처음부터 다시 섞기" title="처음부터 다시 섞기" data-i18n-aria="pal.reset" data-i18n-title="pal.reset">
+        <button type="button" id="reset" class="icon-btn pal-reset" aria-label="처음부터 다시 선택" title="처음부터 다시 선택" data-i18n-aria="pal.reset" data-i18n-title="pal.reset">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
         </button>
       </div>
-      <div id="lip-paints" class="paints lip-paints" role="group" aria-label="립 컬러 물감" data-i18n-aria="pal.paints"></div>
+      <div id="lip-paints" class="paints lip-paints" role="group" aria-label="립 컬러 팔레트" data-i18n-aria="pal.paints"></div>
       <div class="pal-mix">
         <div class="mix-wrap" id="mix-wrap">
-          <canvas id="mix-canvas" aria-label="섞는 칸 (드래그하면 저어져요)" data-i18n-aria="pal.mixAria" role="img"></canvas>
-          <p id="mix-empty" class="mix-empty" data-i18n="pal.mixEmpty">물감을 눌러<br>떨어뜨려요</p>
+          <canvas id="mix-canvas" aria-label="선택한 색 견본" data-i18n-aria="pal.mixAria" role="img"></canvas>
         </div>
-        <div class="pal-tools">
-          <button type="button" id="undo" disabled data-i18n="pal.undo">한 방울 빼기</button>
+        <div class="mix-summary">
+          <span class="mix-summary-label" data-i18n="pal.mixCurrent">현재 색상</span>
+          <strong id="mix-hex" aria-live="polite"></strong>
         </div>
       </div>
     </section>
@@ -91,7 +92,7 @@
     <section class="area pal-result" aria-label="추천 제품" data-i18n-aria="pal.result">
       <div class="pal-board-head">
         <div class="pal-result-color"><span id="res-swatch" class="color-dot" aria-hidden="true"></span><strong id="res-hex"></strong></div>
-        <button type="button" id="back-mix" data-i18n="pal.backMix">← 다시 섞기</button>
+        <button type="button" id="back-mix" data-i18n="pal.backMix">← 다시 선택</button>
       </div>
       <p id="rec-status" class="muted small" aria-live="polite"></p>
       <div id="rec-list" class="pal-rec"></div>

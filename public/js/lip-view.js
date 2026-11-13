@@ -69,18 +69,26 @@ export function stopStream(stream) {
   stream?.getTracks().forEach((t) => t.stop());
 }
 
+/**
+ * 터치 필름 보정이 켜져 있나 (touch-calib.js 엔진이 맨 위 창에 있다).
+ * 켜져 있으면 터치는 페이지 안에서만 보정된다 → Android 카메라 권한 창은 필름으로 정확히 누를 수 없다
+ */
+export function filmMode() {
+  try { return !!(window.top.__tookCalib?.saved || window.__tookCalib?.saved); } catch { return !!window.__tookCalib?.saved; }
+}
+
 /** getUserMedia 오류 → 화면 안내 문구 */
 export function cameraErrorMessage(e) {
   switch (e?.name) {
     case 'NotAllowedError':
     case 'SecurityError':
-      return tr('lip.camDenied');
+      return tr(filmMode() ? 'lip.camDeniedFilm' : 'lip.camDenied');
     case 'NotFoundError':
     case 'OverconstrainedError':
       return tr('lip.camNotFound');
     case 'NotReadableError':
       return tr('lip.camBusy');
     default:
-      return tr('lip.camFailed') + (e?.message || e);
+      return tr('lip.camFailed') + `${e?.name ? `[${e.name}] ` : ''}${e?.message || e}`;
   }
 }

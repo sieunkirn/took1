@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
 </head>
 <body>
 <main class="fit chat-user">
@@ -94,19 +95,6 @@
 
       <details class="scan-alt" id="scan-alt">
         <summary class="small" data-i18n="chat.noScanner">스캐너가 없을 때</summary>
-        <section class="pair-box wide-only" id="pair-box" aria-label="휴대폰으로 찍기" data-i18n-aria="chat.phone">
-          <strong data-i18n="chat.phone">휴대폰으로 찍기</strong>
-          <div class="pair-body">
-            <div id="pair-qr" class="pair-qr" role="img" aria-label="휴대폰 연결 QR 코드" data-i18n-aria="chat.qr"><span class="muted small" data-i18n="chat.qrWait">QR 준비 중</span></div>
-            <ol class="small pair-steps">
-              <li data-i18n="chat.step1">휴대폰 기본 카메라로 QR을 비춰요.</li>
-              <li data-i18n="chat.step2">열린 화면에서 "바코드 사진 찍기".</li>
-              <li data-i18n="chat.step3">제품 설명이 이 대화에 떠요.</li>
-            </ol>
-          </div>
-          <p id="pair-status" class="small" aria-live="polite"></p>
-          <p id="pair-url" class="muted small pair-url"></p>
-        </section>
         <strong class="small" data-i18n="chat.pcCam">PC 카메라로 찍기</strong>
         <div class="scan-stage">
           <video id="scan-video" class="hidden" playsinline muted></video>
@@ -120,7 +108,6 @@
           <input type="file" id="scan-photo" accept="image/*" capture="environment" class="hidden">
         </div>
       </details>
-      <p class="small"><a href="barcodes.html" target="_blank" rel="noopener" data-i18n="chat.demoBarcodes">시연용 바코드 보기 (새 창)</a></p>
     </div>
 
     <div id="list-view" class="hidden">
