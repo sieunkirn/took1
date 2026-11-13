@@ -71,6 +71,17 @@
   <button type="button" id="pv-fill">꽉 찬 화면</button>
   <small>틀 없이 창을 채워요. 노트북을 세로로 세웠으면 그 화면의 '화면 돌리기' 버튼으로 돌려요</small>
 </div>
+<!-- 터치 보정 테스트 (2026-11-13): 거울 유리 터치 필름 좌표 보정(js/touch-calib.js)을 PC 에서 버튼만으로 해 본다.
+     '필름 흉내'를 켜면 마우스 입력에 필름처럼 틀어진 가짜 왜곡이 걸린다. 이 상자는 왜곡을 받지 않는다(data-calib-exempt) -->
+<div class="pv-films pv-calib" id="pv-calib" role="group" aria-label="터치 보정 테스트" data-calib-exempt>
+  <p>터치 보정</p>
+  <button type="button" class="pv-fix" id="pv-calib-sim" aria-pressed="false">필름 흉내</button>
+  <button type="button" id="pv-calib-start">보정 시작</button>
+  <button type="button" id="pv-calib-test">정확도 테스트</button>
+  <button type="button" class="pv-fix" id="pv-calib-debug" aria-pressed="false">좌표 표시</button>
+  <button type="button" id="pv-calib-reset">보정 지우기</button>
+  <small id="pv-calib-note"></small>
+</div>
 <script>
   const $ = (id) => document.getElementById(id);
   const frame = $('pv-frame');
@@ -117,6 +128,10 @@
       const left = Math.min(box.right + 24, innerWidth - fb.offsetWidth - 12);
       fb.style.left = Math.max(12, left) + 'px';
       fb.style.top = Math.max(12, box.top + box.height / 2 - fb.offsetHeight / 2) + 'px';
+      // 터치 보정 상자는 거울 왼쪽 옆
+      const cb = $('pv-calib');
+      cb.style.left = Math.max(12, box.left - 24 - cb.offsetWidth) + 'px';
+      cb.style.top = Math.max(12, box.top + box.height / 2 - cb.offsetHeight / 2) + 'px';
     });
   };
   // 필름 해결방안: 색 보정 / 다크 모드 (각각 켜고 끈다, 기억해 둔다)
@@ -175,6 +190,28 @@
     try { const l = frame.contentWindow.location; page = l.pathname.split('/').pop() + l.search; } catch { /* 다른 주소 */ }
     location.href = 'kiosk.html?page=' + encodeURIComponent(page);
   });
+  // 터치 보정 테스트 버튼 (엔진 = js/touch-calib.js 가 이 창에 만든 window.__tookCalib)
+  const calib = window.__tookCalib;
+  if (calib) {
+    const showCalib = () => {
+      const s = calib.status();
+      $('pv-calib-sim').setAttribute('aria-pressed', String(s.sim));
+      $('pv-calib-debug').setAttribute('aria-pressed', String(s.debug));
+      $('pv-calib-test').disabled = !s.saved && !s.sim;
+      $('pv-calib-reset').disabled = !s.saved;
+      const t = s.lastTest;
+      $('pv-calib-note').textContent = (s.sim ? '마우스에 가짜 왜곡이 걸려 있어요. ' : '마우스는 그대로예요(실제 터치만 보정). ')
+        + (s.saved ? `보정값 있음 (오차 ${s.saved.rms.toFixed(1)}px)` : '보정값 없음')
+        + (t ? ` · 테스트 ${t.n}/${t.total} 맞음` : '');
+    };
+    $('pv-calib-sim').addEventListener('click', () => calib.setFlag('sim', !calib.status().sim));
+    $('pv-calib-debug').addEventListener('click', () => calib.setFlag('debug', !calib.status().debug));
+    $('pv-calib-start').addEventListener('click', () => calib.startCalib());
+    $('pv-calib-test').addEventListener('click', () => calib.startTest());
+    $('pv-calib-reset').addEventListener('click', () => calib.reset());
+    calib.onChange(showCalib);
+    showCalib();
+  } else $('pv-calib').style.display = 'none';
   showOrient();
   setFilm((() => { try { const v = localStorage.getItem('took.mirrorFilm'); return ['brown', 'silver'].includes(v) ? v : 'none'; } catch { return 'none'; } })());
   document.addEventListener('fullscreenchange', fit);

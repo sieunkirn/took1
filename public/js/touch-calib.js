@@ -139,6 +139,9 @@
     try { history.replaceState(history.state, '', location.pathname + (params.toString() ? '?' + params : '') + location.hash); } catch { /* 없음 */ }
     const go = () => engine.startCalib();
     if (ROOT.document.body) go(); else ROOT.addEventListener('DOMContentLoaded', go, { once: true });
+  } else if (params.get('calibtest') === '1') {
+    const go = () => engine.startTest();
+    if (ROOT.document.body) go(); else ROOT.addEventListener('DOMContentLoaded', go, { once: true });
   }
 
   function createEngine(root) {
@@ -154,12 +157,15 @@
     };
     let saved = load();
     let calib = null; // 보정 화면 상태
+    let test = null; // 정확도 테스트 화면 상태
     const syn = new WeakSet(); // 우리가 만든 이벤트 (다시 가로채지 않게)
     const wins = new Set();
     const gestures = new Map(); // pointerId → 진행 중인 터치
     let fling = 0;
+    const listeners = new Set(); // 상태가 바뀌면 알린다 (미리보기의 터치 보정 버튼 상자)
+    const notify = () => listeners.forEach((f) => { try { f(); } catch { /* 닫힌 화면 */ } });
 
-    const isActive = () => !!(saved || sim || debug || calib);
+    const isActive = () => !!(saved || sim || debug || calib || test);
 
     // 시뮬레이션: 필름이 화면에 잘못 대응된 모습을 흉내 낸다 (90° 회전 + 가로 0.85·세로 0.77 + 이동)
     const simDistort = (x, y) => {
@@ -528,6 +534,8 @@
     function onRaw(e) {
       if (syn.has(e)) return;
       const win = e.view || e.target?.ownerDocument?.defaultView || W;
+      // 시뮬레이션에서도 테스트용 버튼(미리보기의 터치 보정 상자, 보정 화면의 닫기)은 마우스가 있는 자리 그대로 눌린다
+      if (sim && !e.type.startsWith('touch') && e.pointerType !== 'touch' && e.target?.closest?.('[data-calib-exempt]')) return;
       longPress(e, win);
       if (!managed(e)) return;
       if (e.cancelable) e.preventDefault();
@@ -537,6 +545,7 @@
       if (sim && e.type === 'pointermove' && e.buttons === 0 && primary === null) { if (debug) debugShow(rawRoot(e, win), correct(rawRoot(e, win)), true); return; }
       const P = rawRoot(e, win);
       if (calib) { calibInput(e.type, e.pointerId, P); return; }
+      if (test) { testInput(e.type, e.pointerId, P); return; }
       if (e.type === 'pointerdown') {
         if (primary !== null) return;
         primary = e.pointerId;
@@ -565,7 +574,7 @@
       const t = e.type;
       const startT = (sim ? t === 'mousedown' : t === 'touchstart' && e.touches?.length === 1);
       const endT = sim ? t === 'mouseup' : (t === 'touchend' || t === 'touchcancel' || (t === 'touchstart' && e.touches?.length > 1));
-      if (startT && !calib) {
+      if (startT && !calib && !test) {
         clearLongPress();
         const t0 = performance.now();
         lp = { tick: setInterval(() => {
@@ -636,9 +645,10 @@
         <div data-btns style="position:absolute;left:50%;top:62%;translate:-50% 0;display:none;gap:14px">
           <button type="button" data-act="save" style="min-width:140px;min-height:64px;font-size:19px;font-weight:700;border-radius:14px;border:0;background:#111;color:#fff">저장</button>
           <button type="button" data-act="retry" style="min-width:140px;min-height:64px;font-size:19px;font-weight:700;border-radius:14px;border:2px solid #111;background:#fff;color:#111">다시 하기</button>
+          <button type="button" data-act="test" style="min-width:220px;min-height:64px;font-size:18px;font-weight:700;border-radius:14px;border:2px solid #111;background:#fff;color:#111">지금 보정값으로 테스트만</button>
         </div>
         <div data-finger style="position:absolute;width:30px;height:30px;margin:-15px;border-radius:50%;background:rgba(0,0,0,.25);border:2px solid #111;display:none;pointer-events:none"></div>
-        <button type="button" data-act="cancel" style="position:absolute;right:12px;bottom:12px;min-height:40px;padding:4px 14px;border-radius:10px;border:1px solid #999;background:#fff;color:#555;font-size:14px">닫기 (마우스·Esc)</button>`;
+        <button type="button" data-act="cancel" data-calib-exempt style="position:absolute;right:12px;top:12px;min-height:40px;padding:4px 14px;border-radius:10px;border:1px solid #999;background:#fff;color:#555;font-size:14px">닫기 (마우스·Esc)</button>`;
       rdoc.body.append(ov);
       calib = { ov, step: -1, pts: [], cur: null, result: null };
       wins.forEach(prepareWindow);
@@ -651,9 +661,19 @@
     }
     function calibKey(e) { if (e.key === 'Escape') { e.preventDefault(); calibAction('cancel'); } }
     const q$ = (s) => calib.ov.querySelector(s);
+    const showBtns = (acts) => {
+      q$('[data-btns]').style.display = acts.length ? 'flex' : 'none';
+      for (const b of calib.ov.querySelectorAll('[data-btns] [data-act]')) b.style.display = acts.includes(b.dataset.act) ? '' : 'none';
+    };
+    /** 보정 화면 버튼 중 맞은 것 (q = 보정된 좌표) */
+    const btnAt = (root, q) => [...root.querySelectorAll('[data-act]')].find((b) => {
+      if (b.offsetParent === null) return false;
+      const r = b.getBoundingClientRect();
+      return q[0] >= r.left && q[0] <= r.right && q[1] >= r.top && q[1] <= r.bottom;
+    });
     function calibIntro() {
       calib.step = -1; calib.pts = []; calib.result = null;
-      q$('[data-btns]').style.display = 'none';
+      showBtns(saved ? ['test'] : []); // 보정값이 있으면 그 값으로 테스트만 해 볼 수도 있다
       q$('[data-cross]').style.display = 'none';
       q$('[data-finger]').style.display = 'none';
       q$('[data-dots]').innerHTML = '';
@@ -692,6 +712,8 @@
       c.cur = null;
       if (type === 'pointercancel') { if (c.step >= 0 && !c.result) q$('[data-ring]').style.background = ''; return; }
       if (c.step === -1) { // 시작
+        if (saved) { const b = btnAt(q$('[data-btns]'), correct(P)); if (b) { calibAction(b.dataset.act); return; } }
+        showBtns([]);
         c.size = [root.innerWidth, root.innerHeight];
         c.step = 0;
         // 전체화면으로 바뀌어 크기가 달라지면 그때 첫 표시를 그린다
@@ -700,10 +722,8 @@
       }
       if (c.result) {
         const q = cur.q || applyAffine(c.result.m, P[0], P[1]);
-        for (const b of calib.ov.querySelectorAll('[data-btns] [data-act]')) {
-          const r = b.getBoundingClientRect();
-          if (q[0] >= r.left && q[0] <= r.right && q[1] >= r.top && q[1] <= r.bottom) { calibAction(b.dataset.act); return; }
-        }
+        const b = btnAt(q$('[data-btns]'), q);
+        if (b) calibAction(b.dataset.act);
         return;
       }
       // 누르고 있는 동안의 좌표 평균
@@ -728,18 +748,20 @@
           + `<div style="position:absolute;left:${q[0]}px;top:${q[1]}px;width:8px;height:8px;margin:-4px;border-radius:50%;background:#111"></div>`;
       }).join('');
       q$('[data-msg]').innerHTML = `<b style="font-size:22px">확인</b><br>화면 아무 곳이나 눌러 보세요. 손가락 자리에 점이 따라오면 맞은 거예요.<br>`
-        + `남은 오차: 평균 ${res.rms.toFixed(1)}px · 최대 ${res.max.toFixed(1)}px`;
-      q$('[data-btns]').style.display = 'flex';
+        + `남은 오차: 평균 ${res.rms.toFixed(1)}px · 최대 ${res.max.toFixed(1)}px<br><small style="color:#666">저장하면 바로 정확도 테스트(표시 9개)로 넘어가요</small>`;
+      showBtns(['save', 'retry']);
     }
     function calibAction(act) {
       if (!calib) return;
-      if (act === 'retry') { calibIntro(); calib.step = 0; calibShowTarget(); return; }
+      if (act === 'retry') { calibIntro(); showBtns([]); calib.step = 0; calibShowTarget(); return; }
+      if (act === 'test') { closeCalib(); startTest(); return; }
       if (act === 'save' && calib.result) {
         saved = { m: calib.result.m, rms: calib.result.rms, max: calib.result.max, size: calib.size, at: new Date().toISOString() };
         const ok = ls.set(storeKey, JSON.stringify(saved));
         closeCalib();
         wins.forEach(prepareWindow);
-        toast(ok ? '터치 보정을 저장했어요' : '이 브라우저는 저장이 안 돼서 이번 화면에서만 적용돼요');
+        if (!ok) toast('이 브라우저는 저장이 안 돼서 이번 화면에서만 적용돼요');
+        startTest(); // 저장하자마자 맞는지 눌러 본다
         return;
       }
       if (act === 'cancel') closeCalib();
@@ -748,7 +770,117 @@
       calib?.ov.remove();
       calib = null;
       root.removeEventListener('keydown', calibKey, true);
+      notify();
     }
+
+    // ---------- 정확도 테스트: 표시 9개를 보정된 좌표로 눌러 맞았는지 본다 ----------
+    const TEST_TARGETS = [[0.15, 0.12], [0.5, 0.12], [0.85, 0.12], [0.15, 0.5], [0.5, 0.5], [0.85, 0.5], [0.15, 0.88], [0.5, 0.88], [0.85, 0.88]];
+    const HIT_R = 30; // 이 반지름(px) 안이면 맞음 (손가락 버튼 크기 정도)
+    function startTest() {
+      if (calib || test) return;
+      if (!rdoc.body) { root.addEventListener('DOMContentLoaded', startTest, { once: true }); return; }
+      clearLongPress();
+      gestures.clear();
+      primary = null;
+      const ov = rdoc.createElement('div');
+      ov.id = 'took-calib-test';
+      ov.style.cssText = `position:fixed;inset:0;z-index:${Z};background:#fff;color:#111;font:500 17px/1.45 system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none;`;
+      ov.innerHTML = `
+        <div data-msg style="position:absolute;left:50%;top:30%;translate:-50% -50%;width:min(80%,520px);text-align:center;word-break:keep-all"></div>
+        <div data-dots style="position:absolute;inset:0;pointer-events:none"></div>
+        <div data-btns style="position:absolute;left:50%;top:62%;translate:-50% 0;display:none;gap:14px">
+          <button type="button" data-act="done" style="min-width:140px;min-height:64px;font-size:19px;font-weight:700;border-radius:14px;border:0;background:#111;color:#fff">끝내기</button>
+          <button type="button" data-act="again" style="min-width:140px;min-height:64px;font-size:19px;font-weight:700;border-radius:14px;border:2px solid #111;background:#fff;color:#111">다시 테스트</button>
+          <button type="button" data-act="recal" style="min-width:140px;min-height:64px;font-size:19px;font-weight:700;border-radius:14px;border:2px solid #111;background:#fff;color:#111">다시 보정</button>
+        </div>
+        <button type="button" data-act="done" data-calib-exempt style="position:absolute;right:12px;top:12px;min-height:40px;padding:4px 14px;border-radius:10px;border:1px solid #999;background:#fff;color:#555;font-size:14px">닫기 (마우스·Esc)</button>`;
+      rdoc.body.append(ov);
+      test = { ov, i: 0, res: [], cur: null };
+      wins.forEach(prepareWindow);
+      ov.addEventListener('click', (e) => { // 마우스로 누른 버튼
+        const act = e.target.closest?.('[data-act]')?.dataset.act;
+        if (act) testAction(act);
+      });
+      root.addEventListener('keydown', testKey, true);
+      testShow();
+      notify();
+    }
+    function testKey(e) { if (e.key === 'Escape') { e.preventDefault(); testAction('done'); } }
+    const tq = (s) => test.ov.querySelector(s);
+    const ring = (x, y, r, style) => `<div style="position:absolute;left:${x}px;top:${y}px;width:${r * 2}px;height:${r * 2}px;margin:-${r}px;border-radius:50%;${style}"></div>`;
+    function testShow() {
+      const t = test;
+      tq('[data-btns]').style.display = 'none';
+      if (t.i === 0) tq('[data-dots]').innerHTML = '';
+      const [u, v] = TEST_TARGETS[t.i];
+      const x = u * root.innerWidth, y = v * root.innerHeight;
+      t.target = [x, y];
+      tq('[data-dots]').querySelector('[data-now]')?.remove();
+      tq('[data-dots]').insertAdjacentHTML('beforeend', `<div data-now>${ring(x, y, HIT_R, 'border:3px solid #111;background:rgba(0,0,0,.08)')}${ring(x, y, 3, 'background:#111')}</div>`);
+      tq('[data-msg]').innerHTML = `<b style="font-size:22px">정확도 테스트</b><br>${t.i + 1} / ${TEST_TARGETS.length} · 동그라미 가운데를 눌러 주세요`;
+    }
+    function testInput(type, id, P) {
+      const t = test;
+      if (type === 'pointerdown') { if (!t.cur) t.cur = id; return; }
+      if (t.cur !== id || type === 'pointermove') return;
+      t.cur = null;
+      if (type === 'pointercancel') return;
+      const q = correct(P);
+      if (t.i >= TEST_TARGETS.length) { // 결과 화면: 버튼도 보정된 좌표로 누른다
+        const b = btnAt(tq('[data-btns]'), q);
+        if (b) testAction(b.dataset.act);
+        return;
+      }
+      const d = Math.hypot(q[0] - t.target[0], q[1] - t.target[1]);
+      const hit = d <= HIT_R;
+      t.res.push(d);
+      tq('[data-now]')?.remove();
+      tq('[data-dots]').insertAdjacentHTML('beforeend',
+        ring(t.target[0], t.target[1], HIT_R, `border:2px ${hit ? 'solid' : 'dashed'} #111`)
+        + ring(q[0], q[1], 6, hit ? 'background:#111' : 'background:#fff;border:2px solid #111')
+        + `<div style="position:absolute;left:${t.target[0]}px;top:${t.target[1] + HIT_R + 4}px;translate:-50% 0;font-size:13px;font-weight:700">${hit ? '맞음' : '빗나감'} ${d.toFixed(0)}px</div>`);
+      t.i++;
+      if (t.i < TEST_TARGETS.length) { testShow(); return; }
+      const n = t.res.filter((v) => v <= HIT_R).length;
+      const avg = t.res.reduce((s, v) => s + v, 0) / t.res.length;
+      const max = Math.max(...t.res);
+      t.summary = { n, total: TEST_TARGETS.length, avg, max };
+      lastSummary = t.summary;
+      tq('[data-msg]').innerHTML = `<b style="font-size:22px">${n === TEST_TARGETS.length ? '모두 맞았어요' : `${TEST_TARGETS.length}개 중 ${n}개 맞음`}</b><br>`
+        + `손가락과 눌린 자리 차이: 평균 ${avg.toFixed(0)}px · 최대 ${max.toFixed(0)}px<br><small style="color:#666">검은 점 = 실제로 눌린 자리. 빗나간 곳이 많으면 다시 보정해 주세요</small>`;
+      tq('[data-btns]').style.display = 'flex';
+      notify();
+    }
+    function testAction(act) {
+      if (!test) return;
+      if (act === 'again') { test.i = 0; test.res = []; testShow(); return; }
+      closeTest();
+      if (act === 'recal') startCalib();
+    }
+    function closeTest() {
+      test?.ov.remove();
+      test = null;
+      root.removeEventListener('keydown', testKey, true);
+      notify();
+    }
+
+    // ---------- 밖에서 쓰는 조작 (미리보기의 터치 보정 버튼 상자) ----------
+    function setFlag(name, on) {
+      const key = name === 'sim' ? 'tookCalib.sim' : 'tookCalib.debug';
+      if (on) ss.set(key, '1'); else ss.del(key);
+      root.location.reload(); // 시뮬레이션·좌표 표시는 화면을 다시 열어 적용한다
+    }
+    function reset() {
+      ls.del(storeKey);
+      saved = null;
+      lastSummary = null;
+      toast(sim ? '시뮬레이션 보정값을 지웠어요' : '터치 보정값을 지웠어요');
+      notify();
+    }
+    function status() {
+      return { sim, debug, saved: saved ? { rms: saved.rms, max: saved.max, at: saved.at } : null, lastTest: lastSummary };
+    }
+    let lastSummary = null; // 마지막 정확도 테스트 결과
     function toast(text) {
       const t = rdoc.createElement('div');
       t.textContent = text;
@@ -767,6 +899,10 @@
       else win.document.addEventListener('DOMContentLoaded', () => prepareWindow(win), { once: true });
     }
 
-    return { addWindow, startCalib, get saved() { return saved; }, get sim() { return sim; } };
+    return {
+      addWindow, startCalib, startTest, setFlag, reset, status,
+      onChange(f) { listeners.add(f); return () => listeners.delete(f); },
+      get saved() { return saved; }, get sim() { return sim; },
+    };
   }
 })(typeof window !== 'undefined' ? window : globalThis);
