@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭) - 터치 보정</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="js/touch-calib.js"></script>
+<style>
+  /* 직원용 터치 보정 화면 (2026-11-13): 거울 유리 터치 필름 좌표 보정(js/touch-calib.js)을 버튼으로 한다.
+     보정 전에는 터치 축이 뒤바뀌어 작은 버튼을 못 누르므로 화면 전체가 버튼 하나다.
+     보정 후에는 화면을 4등분한 큰 버튼(보정된 좌표로 눌린다) */
+  html, body { height: 100%; margin: 0; overflow: hidden; background: var(--paper); color: var(--ink); }
+  .cb { position: fixed; inset: 0; display: flex; flex-direction: column; gap: 12px; padding: 12px; box-sizing: border-box; }
+  .cb button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 24px; font-size: 30px; font-weight: 800; word-break: keep-all; }
+  .cb button small { font-size: 17px; font-weight: 500; color: var(--mute); }
+  .cb .primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cb .primary small { color: inherit; opacity: 0.75; }
+  .cb-status { flex: none; padding: 6px 4px 0; text-align: center; font-size: 16px; color: var(--mute); }
+</style>
+</head>
+<body data-idle-reset="off">
+<div class="cb" id="cb"></div>
+<script>
+  const calib = window.__tookCalib;
+  const box = document.getElementById('cb');
+  const btn = (cls, title, sub, onclick) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    if (cls) b.className = cls;
+    b.innerHTML = `${title}<small>${sub}</small>`;
+    b.addEventListener('click', onclick);
+    return b;
+  };
+  const render = () => {
+    const s = calib.status();
+    box.replaceChildren();
+    if (!s.saved) {
+      // 보정 전: 어디를 눌러도 시작 (터치가 어긋나 있어도 눌린다)
+      box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 보정 시작', '십자 5개를 차례로 누르고 저장하면 바로 정확도 테스트로 넘어가요', () => calib.startCalib()));
+      return;
+    }
+    const t = s.lastTest;
+    box.append(
+      btn('primary', '정확도 테스트', '동그라미 9개를 눌러 맞는지 봐요', () => calib.startTest()),
+      btn('', '다시 보정', '십자 5개를 다시 눌러요', () => calib.startCalib()),
+      btn('', '보정 지우기', '보정 전 상태로 돌아가요', () => calib.reset()),
+      btn('', '키오스크 화면으로', '보정한 채로 실제 화면을 써 봐요', () => { location.href = 'index.html'; }),
+    );
+    const st = document.createElement('div');
+    st.className = 'cb-status';
+    st.textContent = (s.saved ? `보정값 있음 · 보정 오차 ${s.saved.rms.toFixed(1)}px` : '보정값 없음')
+      + (t ? ` · 마지막 테스트 ${t.n}/${t.total} 맞음 (평균 ${t.avg.toFixed(0)}px)` : '')
+      + (s.sim ? ' · 시뮬레이션' : '');
+    box.append(st);
+  };
+  if (calib) { calib.onChange(render); render(); }
+  else box.textContent = '터치 보정 스크립트를 불러오지 못했어요';
+</script>
+</body>
+</html>
