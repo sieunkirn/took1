@@ -27,6 +27,7 @@ export const STATIC = !!document.querySelector('meta[name="took-mode"][content="
 // ---------- 노트북·PC: 갤럭시탭 세로 크기 틀로 보기 ----------
 // 키오스크는 스탠드형 동그란 거울 안에 갤럭시탭 S10 FE+ 를 세로로 넣어 쓴다(2026-11-11 가로에서 다시 세로로). 노트북·PC(마우스 화면)에서 열면
 // 창을 꽉 채우지 않고 세로 미리보기(preview.html)의 탭 크기 틀(800×1280 을 창에 맞춤) 안에 지금 화면을 띄운다.
+// - 노트북을 세로로 세워 쓰는 꽉 찬 화면(kiosk.html)은 자동으로 가지 않는다. 미리보기의 '꽉 찬 화면' 버튼으로 들어간다
 // - 터치 화면(실제 탭, pointer: coarse)·?device=tablet 으로 고정한 기기·직원 도구 화면·자동 테스트(navigator.webdriver)는 그대로
 // 주소 값: ?쿼리 → 없으면 #조각
 const HASH_PARAMS = (() => { try { return new URLSearchParams(location.hash.replace(/^#/, '')); } catch { return new URLSearchParams(); } })();
@@ -56,7 +57,7 @@ const SKEY = 'took.';
 export const TAB_FRAME = true;
 /** 이 화면을 탭 크기 틀로 옮기는 중이면 true (곧 다시 열리므로 화면마다 한 번만 할 일은 건너뛴다) */
 export let MOVING_TO_TAB_FRAME = false;
-const TAB_FRAME_SKIP = ['preview.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
+const TAB_FRAME_SKIP = ['preview.html', 'kiosk.html', 'scan-phone.html', 'barcodes.html', 'voice-test.html'];
 // 새로고침(F5·새로고침 버튼)하면 처음 상태로: 기기 설정(태블릿 고정)을 풀고, 저장한 상태(took.*)를 비우고
 // 첫 화면(시작 화면, 노트북이면 태블릿 미리보기)으로.
 // 직원 도구 화면은 그대로. 미리보기(preview.html)는 그 화면 스크립트가 같은 일을 한다

@@ -13,6 +13,7 @@ import { renderNav, store, api, el, productCard, FINISH_LABELS, fullName, shortN
 import { hexToRgb, rgbToHsl, hslToHex } from '../lib/color.js';
 import { loadTracker, detectVideo } from './lip-tracker.js';
 import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, FINISH_TO_TEXTURE } from './lip-view.js'; // 그리기·카메라 공통 (거울 모드와 함께 쓴다)
+import { getCamSettings, videoConstraints, mountCamSettings } from './camera-settings.js'; // ⚙ 웹캠 설정 (카메라·해상도·반전·회전)
 import { measureTone, classifyTone, matchPresets, SEASONS, TONE_THRESHOLDS, TEXTURES, PRESETS } from './lip-engine.js';
 import { t as tr, setText, finishText as finishName } from './i18n.js'; // 화면 문구 (한국어/영어). 이 파일엔 t 라는 지역 변수가 있어 tr 로 부른다
 
@@ -79,7 +80,8 @@ function sourceFrame() {
     const img = state.avatar?.img;
     return img ? { src: img, w: img.naturalWidth, h: img.naturalHeight, mirror: false } : null;
   }
-  return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: true };
+  const cam = getCamSettings();
+  return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: cam.mirror, rotate: cam.rotate };
 }
 
 function render() {
@@ -113,7 +115,7 @@ async function startCamera() {
   setGuide(tr('lip.camRequesting'));
   try {
     state.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 960 } },
+      video: videoConstraints(),
       audio: false,
     });
   } catch (e) {
@@ -165,6 +167,14 @@ async function loop() {
 }
 
 $('cam-retry').addEventListener('click', startCamera);
+// 카메라 화면 오른쪽 위 ⚙: 카메라·해상도를 바꾸면 카메라를 다시 켜고, 반전·회전은 다음 프레임부터 바로 적용된다
+mountCamSettings(view.closest('.stage'), {
+  onApply: (s, { restart }) => {
+    if (state.source === 'camera' && (restart || !state.stream)) startCamera();
+    else render();
+  },
+  currentDeviceId: () => state.stream?.getVideoTracks()[0]?.getSettings().deviceId || '',
+});
 window.addEventListener('pagehide', stopCamera);
 
 // ---------- 아바타 (입술 위치가 저장된 샘플 그림) ----------

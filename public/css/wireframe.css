@@ -1116,3 +1116,20 @@ header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radiu
   .sh-page.trying .sh-grid { grid-column: 2; grid-row: 2; overflow-y: hidden; }
   .sh-page.trying .sh-detail { grid-row: 3; }
 }
+
+/* ---------- 웹캠 설정 (camera-settings.js): 카메라 화면 오른쪽 위 ⚙ + 설정 창 ---------- */
+.stage .cam-gear { position: absolute; top: 10px; right: 10px; z-index: 3; width: 44px; height: 44px; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-2); background: var(--paper); color: var(--ink); }
+.stage .cam-gear:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+dialog.cam-settings { width: min(420px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--paper); color: var(--ink); }
+dialog.cam-settings::backdrop { background: rgba(0, 0, 0, .45); }
+.cam-settings form { display: flex; flex-direction: column; gap: 14px; }
+.cam-settings h2 { margin: 0 0 4px; font-size: 20px; }
+.cam-settings label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.cam-settings select { width: 100%; }
+.cam-settings .cam-check { flex-direction: row; align-items: center; gap: 8px; }
+.cam-settings fieldset { border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 12px 12px; display: flex; gap: 16px; flex-wrap: wrap; margin: 0; }
+.cam-settings fieldset label { flex-direction: row; align-items: center; gap: 6px; }
+.cam-settings .cam-note { margin: -6px 0 0; font-size: 13px; color: var(--ink-2); }
+.cam-settings .cam-refresh { align-self: flex-start; }
+.cam-settings .cam-actions { display: flex; gap: 8px; margin-top: 6px; }
+.cam-settings .cam-actions span { flex: 1; }

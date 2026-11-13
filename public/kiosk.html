@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>took(툭)</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<style>
+  /* 꽉 찬 화면 (2026-11-12): 노트북을 세로로 세워 키오스크로 쓸 때. 미리보기(preview.html)의 '꽉 찬 화면' 버튼으로 들어온다.
+     거울 테두리·베젤·필름 버튼 없이 화면을 틀(iframe) 안에 띄워 창 전체를 채운다.
+     윈도우 화면 방향은 그대로 두고, 오른쪽 위 '화면 돌리기' 버튼으로 화면을 90°씩 돌린다 (기억해 둔다).
+     화면은 800×1280(세로 탭 기준) 디자인을 짧은 쪽에 맞춰 키우고, 남는 길이만큼 화면이 늘어난다.
+     예) 1920×1080 창을 90° 돌리면 1080×1920 → 800×1422 로 그려 1.35배
+     '갤탭 크기 고정'(기본 켬, 기억해 둔다)을 켜면 늘리지 않고 갤탭 화면 800×1280 그대로 키워 가운데에 두고, 남는 곳은 검게 비운다 */
+  html, body { height: 100%; margin: 0; overflow: hidden; background: var(--paper); }
+  body.tab-lock { background: #000; }
+  #kiosk-frame { position: fixed; display: block; border: 0; transform-origin: 50% 50%; }
+  /* 화면 돌리기 버튼: 손님 화면을 가리지 않게 작고 흐리게, 마우스를 올리면 진하게 */
+  .kiosk-tools { position: fixed; top: 8px; right: 8px; z-index: 5; display: flex; gap: 6px; }
+  .kiosk-tools button { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px; border-radius: 18px; font-size: 13px; opacity: .35; background: var(--paper); transition: opacity .2s; }
+  .kiosk-tools button:hover, .kiosk-tools button:focus-visible { opacity: 1; }
+</style>
+</head>
+<body data-idle-reset="off">
+<iframe id="kiosk-frame" title="키오스크 화면" allow="camera; microphone; autoplay; fullscreen"></iframe>
+<div class="kiosk-tools">
+  <button type="button" id="kiosk-lock" title="갤럭시탭 화면 크기(800×1280) 그대로 보여 줘요">갤탭 크기 고정 <span id="kiosk-lock-state"></span></button>
+  <button type="button" id="kiosk-rotate" title="화면을 시계 방향으로 90° 돌려요">↻ 화면 돌리기 <span id="kiosk-deg"></span></button>
+</div>
+<script>
+  const frame = document.getElementById('kiosk-frame');
+  const BASE = [800, 1280]; // 세로 탭 기준 디자인 크기 (preview.html 과 같음)
+  const KEY = 'took.kioskRotate';
+  const LOCK_KEY = 'took.kioskTabLock';
+  let lock = (() => { try { return localStorage.getItem(LOCK_KEY) !== 'off'; } catch { return true; } })();
+  let rotate = (() => { try { const v = Number(localStorage.getItem(KEY)); return [0, 90, 180, 270].includes(v) ? v : 0; } catch { return 0; } })();
+  const fit = () => {
+    const W = innerWidth, H = innerHeight;
+    const side = rotate === 90 || rotate === 270;
+    const vw = side ? H : W, vh = side ? W : H; // 돌린 뒤 손님이 보는 화면 크기
+    const s = Math.min(vw / BASE[0], vh / BASE[1]); // 짧은 쪽에 맞춰 키운다
+    const fw = lock ? BASE[0] : vw / s, fh = lock ? BASE[1] : vh / s; // 고정: 갤탭 크기 그대로 / 아니면 남는 만큼 늘어난다
+    frame.style.width = fw + 'px';
+    frame.style.height = fh + 'px';
+    frame.style.left = (W - fw) / 2 + 'px'; // 가운데를 축으로 돌리고 키운다
+    frame.style.top = (H - fh) / 2 + 'px';
+    frame.style.transform = `rotate(${rotate}deg) scale(${s})`;
+    document.getElementById('kiosk-deg').textContent = rotate + '°';
+    document.getElementById('kiosk-lock-state').textContent = lock ? '켬' : '끔';
+    document.getElementById('kiosk-lock').setAttribute('aria-pressed', String(lock));
+    document.body.classList.toggle('tab-lock', lock);
+  };
+  document.getElementById('kiosk-rotate').addEventListener('click', () => {
+    rotate = (rotate + 90) % 360;
+    try { localStorage.setItem(KEY, String(rotate)); } catch { /* 저장 불가 환경: 이번에만 */ }
+    fit();
+  });
+  document.getElementById('kiosk-lock').addEventListener('click', () => {
+    lock = !lock;
+    try { localStorage.setItem(LOCK_KEY, lock ? 'on' : 'off'); } catch { /* 저장 불가 환경: 이번에만 */ }
+    fit();
+  });
+  addEventListener('resize', fit);
+  document.addEventListener('fullscreenchange', fit);
+  fit();
+  // 새로고침(F5)하면 상태를 비우고 시작 화면부터 (preview.html 과 같은 규칙. 돌린 방향은 남긴다)
+  const reloaded = performance.getEntriesByType?.('navigation')?.[0]?.type === 'reload';
+  if (reloaded) {
+    try { localStorage.removeItem('took.deviceMode'); } catch { /* 저장 불가 환경 */ }
+    try { Object.keys(sessionStorage).filter((k) => k.startsWith('took.')).forEach((k) => sessionStorage.removeItem(k)); } catch { /* 없음 */ }
+  }
+  // 미리보기에서 왔으면 그 화면부터 (?page=palette.html). 이 사이트 안의 .html 만 연다
+  const start = new URLSearchParams(location.search).get('page');
+  const startOk = start && /^[\w-]+\.html(\?[^#]*)?$/.test(start) && !/^(kiosk|preview)\.html/.test(start);
+  frame.src = reloaded || !startOk ? 'index.html' : start;
+</script>
+</body>
+</html>
