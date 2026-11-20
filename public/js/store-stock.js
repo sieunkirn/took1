@@ -6,6 +6,7 @@
 // 가장 가까운 '재고 있는' 매장에 '추천' 표시를 붙인다
 import { el } from './dom.js';
 import { isEn } from './i18n.js';
+import { demoBadge } from './demo.js';
 
 const C = (ko, en) => (isEn() ? en : ko);
 
@@ -50,7 +51,7 @@ export function openStoreStock(productId, label) {
     el('div', { class: 'store-head' },
       el('div', {},
         el('strong', { text: C('근처 매장 재고', 'Nearby store stock') }),
-        el('p', { class: 'store-sub', text: `${label} · ${C('시연용 데이터', 'Demo data')}` })),
+        el('p', { class: 'store-sub' }, label, ' ', demoBadge())),
       el('button', { type: 'button', class: 'store-close', 'aria-label': C('닫기', 'Close'), text: '✕', onclick: close })),
     best
       ? el('p', { class: 'store-pick', text: C(`가장 가까운 구매 가능 매장은 ${best.ko}이에요. 걸어서 ${best.walk}분.`, `Nearest store with stock: ${best.en}, ${best.walk} min walk.`) })

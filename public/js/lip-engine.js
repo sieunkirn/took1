@@ -247,7 +247,8 @@ function linearToLab(R, G, B) {
 const toLinear = (v) => SRGB_TO_LINEAR[Math.max(0, Math.min(255, Math.round(v)))];
 
 // 여러 프레임 측정값(중앙값)으로 톤을 추정한다
-export function classifyTone(measurements) {
+// opts.gain: 관리자 화면 '카메라 색 보정'(흰 종이)으로 구한 채널별 이득(color-calib.js). 있으면 눈 흰자 대신 이 값으로 조명을 되돌린다
+export function classifyTone(measurements, { gain: calibGain = null } = {}) {
   const median = (key) => {
     const list = measurements.map((m) => m?.[key]).filter(Boolean);
     if (!list.length) return null;
@@ -266,8 +267,10 @@ export function classifyTone(measurements) {
     const h = (Math.atan2(c.b, c.a) * 180) / Math.PI, C = Math.hypot(c.a, c.b);
     return h > 25 && h < 90 && C > 6 && C < 45 && c.L > 20 && c.L < 92;
   };
-  const wb = !!rawSclera && rawSclera.L > rawSkin.L + 5 && skinLike(fixWith(gain)(skin));
-  const fix = fixWith(wb ? gain : [1, 1, 1]);
+  const calibOk = Array.isArray(calibGain) && calibGain.length === 3 && calibGain.every((g) => Number.isFinite(g) && g > 0);
+  // 흰 종이 보정값이 있으면 그걸 쓴다('calib'). 없으면 예전처럼 눈 흰자로(true), 그것도 안 되면 보정 없이(false)
+  const wb = calibOk ? 'calib' : (!!rawSclera && rawSclera.L > rawSkin.L + 5 && skinLike(fixWith(gain)(skin)));
+  const fix = fixWith(calibOk ? calibGain : (wb ? gain : [1, 1, 1]));
 
   const s = fix(skin);
   const hue = (Math.atan2(s.b, s.a) * 180) / Math.PI;

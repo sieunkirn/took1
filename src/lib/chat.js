@@ -93,6 +93,7 @@ export function answer({ message, baseProductId = null, selectedHex = null, limi
 // ---------- 방금 보여 드린 제품을 가리키는 질문 ("두 번째 거", "1번이랑 2번 비교") ----------
 function replyAboutShownProduct(turn) {
   const { c, base, shown, out } = turn;
+  if (c.pointing && !c.ordinals && !base && shown.length) c.ordinals = [0]; // "이거 얼마야" (2026-11-20)
   if (c.ordinals) {
     if (!shown.length) {
       return out({ reply: L('아직 보여 드린 제품이 없어요. 찾는 립을 먼저 말씀해 주세요.', "I haven't shown any products yet. Tell me what lip you're looking for first."), suggestions: startSuggestions() });
@@ -140,14 +141,15 @@ function replyAboutShownProduct(turn) {
       parts.push(L(`${josa(nameOf(p), '은', '는')} ${p.finish ? `${finL(p.finish)} 제형이고, ` : ''}가격은 ${won(p.price)}이에요.`,
         `${nameOf(p)} ${p.finish ? `has a ${finL(p.finish).toLowerCase()} finish and ` : ''}costs ${won(p.price)}.`), isEn() ? '' : p.description,
         p.color_options ? L(`화면 색은 ${p.color_options}가지 색 중 대표색이에요.`, `The color shown is one of ${p.color_options} shades.`) : '');
-      if (p.similarity !== undefined) parts.push(L(`${base ? '기준 제품' : '고른 색'}과 ${p.similarity}% 비슷해요.`, `${p.similarity}% similar to ${base ? 'the base product' : 'your color'}.`));
+      // 유사도(%) 문장은 2026-11-20 사용자 요청으로 뺐다 (추천 순서는 그대로 유사도 순)
     }
     return out({
       reply: parts.filter(Boolean).join(' '),
       products: [p],
       suggestions: (isEn()
         ? [COMPARE_ON && shown.length >= 2 ? `Compare the first and ${ord(i === 0 ? 1 : i)}` : null, 'Which is the cheapest of those?', 'Show more']
-        : [`${ord(i)} 거 기준으로 골라 줘`, COMPARE_ON && shown.length >= 2 ? `첫 번째랑 ${ord(i === 0 ? 1 : i)} 비교해 줘` : '그중에 제일 싼 거는?', '다른 거 더 보여 줘']).filter(Boolean),
+        // '…기준으로 골라 줘' 버튼은 2026-11-20 뺐다
+        : [COMPARE_ON && shown.length >= 2 ? `첫 번째랑 ${ord(i === 0 ? 1 : i)} 비교해 줘` : '그중에 제일 싼 거는?', '다른 거 더 보여 줘']).filter(Boolean),
     });
   }
   return null;
@@ -188,7 +190,7 @@ function replyRankAmongShown(turn) {
       reply: L(`가장 ${c.superlative === 'cheapest' ? '저렴한' : '비싼'} 건 ${ord(i)} ${josa(shortOf(p), '이에요', '예요')}. 가격은 ${won(p.price)}이에요.`,
         `The ${c.superlative === 'cheapest' ? 'cheapest' : 'priciest'} is the ${ord(i)} one, ${shortOf(p)}, at ${won(p.price)}.`),
       products: [p],
-      suggestions: L([`${ord(i)} 거 자세히 알려 줘`, `${ord(i)} 거 기준으로 골라 줘`, '다른 거 더 보여 줘'], [`Tell me more about the ${ord(i)} one`, 'Show more']),
+      suggestions: L([`${ord(i)} 거 자세히 알려 줘`, '다른 거 더 보여 줘'], [`Tell me more about the ${ord(i)} one`, 'Show more']),
     });
   }
   return null;
@@ -262,9 +264,10 @@ function replyBaseProductInfo(turn) {
 // ---------- 나에게 어울리는 립 (퍼스널 톤을 모를 때는 되묻는다) ----------
 function askPersonalTone(turn) {
   const { c, q, toneHint, out } = turn;
-  if (c.mine && !c.tone && !toneHint && !q.families) {
+  const SKIN = ['어두운 피부', '밝은 피부', '노란 피부']; // 피부 얘기를 했으면 그걸로 찾는다 (2026-11-20)
+  if (c.mine && !c.tone && !toneHint && !q.families && !(q.concerns || []).some((x) => SKIN.includes(x))) {
     return out({
-      reply: L('퍼스널 톤을 알려 주세요. 웜톤인지 쿨톤인지 말씀하시거나, 팔레트의 "내 톤으로 추천받기"로 톤을 재 볼 수도 있어요.', 'Tell me your personal tone: warm or cool. You can also measure it with "Find my tone" on the palette.'),
+      reply: L('퍼스널 톤을 알려 주세요. 웜톤인지 쿨톤인지 말씀하시거나, 팔레트의 "내 톤으로 추천받기"로 톤을 재 볼 수도 있어요.', 'Tell me your personal tone: warm or cool. You can also measure it with "Match my tone" in the mirror\'s product sheet.'),
       suggestions: L(['웜톤이에요', '쿨톤이에요', '봄 웜', '겨울 쿨', '잘 모르겠어요'], ['I have a warm tone', 'I have a cool tone', 'Spring warm lips', 'Winter cool lips', 'Not sure']),
     });
   }
@@ -274,6 +277,14 @@ function askPersonalTone(turn) {
 // 검색 조건 없이도 바로 답하는 갈래들 (위에서부터 차례로, 답이 없으면 null)
 const DIRECT_REPLIES = [replyAboutShownProduct, replyNamedProduct, replyRankAmongShown, replyUnknownBrand, replyWhy, replyMore, replyBaseProductInfo, askPersonalTone];
 
+// MOODS 의 alone 항목: 그 말을 빼고 남는 글자(띄어쓰기·기호 빼고)가 이 수 이하일 때만 ("너가 골라봐" O, "우주 같은 느낌으로 골라 줘" X)
+const MOOD_ALONE_REST = 6;
+function restAfter(text, words) {
+  let t = String(text).toLowerCase();
+  for (const w of words) t = t.split(w).join('');
+  return t.replace(/[\s.,!?~ㅠㅜ]/g, '').length;
+}
+
 // ---------- 가벼운 대화: 되묻기보다 부드럽게 받아서 추천으로 잇는다 ----------
 // 돌려주는 값: { answer } 그대로 답하고 끝 / { bridge } 이 조건으로 대신 찾고 답 앞에 한마디(ack)를 붙인다
 function lightTalk(turn) {
@@ -282,7 +293,7 @@ function lightTalk(turn) {
   if (!isSearch) {
     const off = isEn() ? offTopicReplyEn(spoken.text) : offTopicReply(spoken.text.toLowerCase());
     if (off) return { answer: out(off) };
-    const mood = isEn() ? moodEn(spoken.text) : MOODS.find((m) => has(spoken.text, m.words));
+    const mood = isEn() ? moodEn(spoken.text) : MOODS.find((m) => has(spoken.text, m.words) && (!m.alone || restAfter(spoken.text, m.words) <= MOOD_ALONE_REST));
     if (mood) bridge = { query: mood.query, ack: mood.ack };
   }
   if (!isSearch && !bridge) {
@@ -361,10 +372,10 @@ function searchReply(turn, bridge) {
     // 말투: 인사·감탄과 "몇 개 찾았어요" 같은 보고 없이, 첫 문장에 가장 추천하는 제품과 핵심 정보(제형·가격·유사도)를 둔다.
     // 이유는 한 문장만. 개수는 목록과 '더 보여 줘'가 대신 보여 준다
     const top = page[0];
-    // 말풍선엔 괄호를 쓰지 않는다 (2026-11-11): 제형·가격은 제품 카드에 있고, 유사도만 한 문장으로 덧붙인다. 가격을 물으면 따로 답한다
+    // 말풍선엔 괄호를 쓰지 않는다 (2026-11-11): 제형·가격은 제품 카드에 있다. 가격을 물으면 따로 답한다
     reply = (isEn()
-      ? `My top pick is ${shortOf(top)}.` + (top.similarity !== undefined ? ` It's ${top.similarity}% similar to ${base ? 'the base product' : 'your color'}.` : '')
-      : `가장 추천하는 건 ${josa(shortOf(top), '이에요', '예요')}.` + (top.similarity !== undefined ? ` ${base ? '기준 제품' : '고른 색'}과 ${top.similarity}% 비슷해요.` : ''))
+      ? `My top pick is ${shortOf(top)}.`
+      : `가장 추천하는 건 ${josa(shortOf(top), '이에요', '예요')}.`) // 유사도(%) 문장은 2026-11-20 뺐다
       + (r.reasons.length ? ' ' + r.reasons[0] : '')
       + (r.tips.length ? ' ' + r.tips[0] : '')
       + (r.notes.length ? ' ' + r.notes.join(' ') : '');

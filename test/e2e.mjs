@@ -124,7 +124,7 @@ const openFresh = async (pg, path) => {
   await pg.goto(BASE + path);
 };
 await step('전체화면: 모든 HTML 화면에 전체화면 유지 스크립트 포함', async () => {
-  for (const path of ['/', '/calib.html', '/chat.html', '/kiosk.html', '/lip-together.html', '/palette.html', '/preview.html', '/product.html?id=P001', '/recommend.html?hex=%23B3122E', '/shades.html', '/studio.html']) {
+  for (const path of ['/', '/calib.html', '/chat.html', '/kiosk.html', '/lip-together.html', '/palette.html', '/product.html?id=P001', '/recommend.html?hex=%23B3122E', '/shades.html', '/studio.html']) {
     await page.goto(BASE + path);
     assert.equal(await page.locator('script[src="js/fullscreen-keep.js"]').count(), 1, path);
   }
@@ -144,19 +144,20 @@ await step('스크롤바: 표시만 숨기고 스크롤 동작은 유지', async
 const savedLipHex = (pg) => pg.evaluate(() => JSON.parse(sessionStorage.getItem('took.lipColor') || 'null')?.hex);
 
 // 홈·팔레트는 2026-11-16 TOOK_prototype 디자인(컬러)으로 바뀌어 무채색 검사를 하지 않는다
-await step('홈: 대기 마크 → 로고 → 시작 버튼(누르는 3단계) → 팔레트 / 음성 쪽은 챗봇', async () => {
+// 2026-11-18~20: 1 제품 장면 → 2 입술 장면 → 3 'Tap The Screen'(처음부터 3초) → 누르면 바로 팔레트. 시작 버튼(알약)은 ?step=4 로만
+await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen → 누르면 팔레트 / ?step=4 음성 쪽은 챗봇', async () => {
   await page.goto(BASE + '/');
   assert.equal(await page.getAttribute('#stage', 'data-step'), '1');
   await page.click('#stage');
   assert.equal(await page.getAttribute('#stage', 'data-step'), '2');
   await page.waitForFunction(() => document.getElementById('stage').dataset.step === '3', null, { timeout: 4000 });
   await shot('01-home');
-  const scan = await page.locator('.hs-opt-scan').boundingBox();
-  await page.mouse.move(scan.x + scan.width / 2, scan.y + scan.height / 2);
-  await page.mouse.down();
-  assert.equal(await page.getAttribute('.hs-start', 'data-state'), 'b');
-  await page.mouse.up();
-  assert.equal(await page.getAttribute('.hs-start', 'data-state'), 'c');
+  // 처음부터 기다리기만 해도 3초쯤에 3번 (2026-11-20 사용자 요청)
+  await page.goto(BASE + '/');
+  const t0 = Date.now();
+  await page.waitForFunction(() => document.getElementById('stage').dataset.step === '3', null, { timeout: 6000 });
+  assert.ok(Date.now() - t0 < 4500, `Tap The Screen 은 3초쯤 (${Date.now() - t0}ms)`);
+  await page.click('#stage');
   await page.waitForURL(at('palette.html'));
   await page.goto(BASE + '/index.html?step=4');
   await page.click('.hs-opt-voice');
@@ -181,9 +182,10 @@ await step('팔레트: 원형 다이얼 돌리기 → 칸 톡 누르기 → 질�
   // 다이얼을 오른쪽으로 끌면 색 띠가 손가락을 따라 돌고(손잡이는 제자리) 놓으면 칸에 멈춘다
   const s0 = await seg();
   const c0 = await chosen();
-  await page.mouse.move(...sp(300, 1300));
+  // 링 위(가운데 450,1577.47 에서 반지름 ~414)를 잡는다. 링 안쪽(흰 점 줄)은 2026-11-20부터 농도 바
+  await page.mouse.move(...sp(300, 1192));
   await page.mouse.down();
-  for (let i = 1; i <= 8; i++) await page.mouse.move(...sp(300 + i * 12, 1300));
+  for (let i = 1; i <= 8; i++) await page.mouse.move(...sp(300 + i * 12, 1192));
   await page.mouse.up();
   await page.waitForTimeout(900); // 손가락 속도만큼 조금 더 돌다 칸에 멈출 때까지
   assert.equal(await page.getAttribute('#stage', 'data-mode'), 'arc', '5~9번 상태는 없다: 끌어도 4번 그대로');
@@ -196,12 +198,25 @@ await step('팔레트: 원형 다이얼 돌리기 → 칸 톡 누르기 → 질�
   assert.ok(famStops.includes(turned), '다이얼을 놓으면 DB 색 칸에 멈춘다');
   // 손잡이 오른쪽 2칸 자리를 톡 누르면 그 칸이 손잡이 아래로 돌아온다
   const a = (2 * (360 / 28) * Math.PI) / 180;
-  await page.mouse.click(...sp(449.5 + 412 * Math.sin(a), 1608.5 - 412 * Math.cos(a)));
+  await page.mouse.click(...sp(450 + 414 * Math.sin(a), 1577.47 - 414 * Math.cos(a)));
   await settle(s1 + 2);
   assert.equal(await seg(), s1 + 2, `누른 칸이 손잡이 아래로 온다 (${await seg()})`);
   const picked = await chosen();
   assert.equal(picked, await page.evaluate(() => window.tookFind.segHex(-window.tookFind.rot() / window.tookFind.SEG)));
   await page.waitForFunction((h) => window.tookLipHex === h, picked);
+  // 농도 바 (2026-11-20): 링 안쪽 흰 점 줄을 끌면 농도(0~100)가 바뀌고 색 칸은 그대로
+  const dose = () => page.textContent('#fc-dose');
+  const dotAt = (deg) => { const t = ((deg - 90) * Math.PI) / 180; return sp(450 + 360 * Math.cos(t), 1577.47 + 360 * Math.sin(t)); };
+  await page.mouse.move(...dotAt(0));
+  await page.mouse.down();
+  assert.equal(await dose(), '50', '가운데 점 = 농도 50');
+  await page.mouse.move(...dotAt(46.35), { steps: 4 });
+  assert.equal(await dose(), '100', '오른쪽 끝 점 = 농도 100');
+  await page.mouse.move(...dotAt(-23.2), { steps: 4 });
+  await page.mouse.up();
+  assert.equal(await dose(), '25');
+  assert.equal(await seg(), s1 + 2, '농도를 바꿔도 색 다이얼은 그대로');
+  assert.equal(await chosen(), picked);
   // 질감 동그라미: 가운데(matte)에서 왼쪽으로 밀면 다음 질감, 옆 동그라미를 톡 누르면 그게 가운데로. 다이얼은 그대로
   const texName = () => page.textContent('#fc-tex-name');
   await page.evaluate(() => window.tookFind.setTexture('matte'));
@@ -227,7 +242,7 @@ await step('팔레트: 원형 다이얼 돌리기 → 칸 톡 누르기 → 질�
   assert.equal(await page.locator('#find, #intensity:visible').count(), 0, '시트에 농도·제품 찾기 버튼은 없다');
   await page.waitForSelector('#rec-list .card[data-product-id]');
   const ids = await page.$$eval('#rec-list .card', (cs) => cs.map((c) => c.dataset.productId));
-  assert.deepEqual(ids, recommendByColor(picked, { limit: 6 }).map((p) => p.id), `고른 색 ${picked} 의 추천 순서`);
+  assert.deepEqual(ids, recommendByColor(picked, { limit: 6 }).map((p) => p.id), `고른 색 ${picked} 의 추천 순서 (화면: ${ids.join(' ')} / 기대: ${recommendByColor(picked, { limit: 6 }).map((p) => p.id).join(' ')})`);
   await shot('03-palette-recommend');
   await page.click('#rec-list .card >> nth=0 >> text=입술에 발라보기');
   await page.click('#fc-sbtn');
@@ -244,7 +259,7 @@ await step('세로 키오스크: 홈/팔레트/챗봇/호수 안내가 스크롤
       ['/', ['#stage']],
       ['/palette.html', ['.fc-camarea', '.fc-wheel', '#fc-swatches', '#fc-sbtn', '.fc-logo']],
       // 대화가 없으면 시작 화면(예시 질문·입력창·키보드, 2026-11-17): 대화 칸은 첫 질문 뒤에 보인다. 마이크는 2026-11-15 뺐다
-      ['/chat.html', ['#cs-top', '#chat-input', '#chat-send', '#cm-menu']],
+      ['/chat.html', ['#cs-top', '#chat-input', '#chat-send', '#chat-back']], // 왼쪽 위 뒤로 동그라미 (TOOK AI 줄은 대화가 시작된 뒤에만, 2026-11-20 사용자 디자인)
       ['/shades.html', ['#sh-page']],
     ]) {
       await pg.goto(BASE + path);
@@ -273,8 +288,8 @@ await step('세로 키오스크: 홈/팔레트/챗봇/호수 안내가 스크롤
   await pg.close();
 });
 
-// 챗봇 시작 화면 (2026-11-19): '답하며 고르기' 단계형이 기본 (js/chat-start.js START_GUIDE, js/chat-guide.js)
-await step('챗봇 시작 화면: 단계형(자리→질감 카드→진하기·가격 슬라이더)으로 고르면 조건 문장으로 대화 시작 / 키보드는 입력창을 누를 때만 / 빠른 답장 줄·밑줄 단어', async () => {
+// 챗봇 시작 화면 (2026-11-20 다시): 예시 질문이 2초마다 바뀌고, 누르면 입력창에 써 넣는다 (js/chat-start.js START_GUIDE = false)
+await step('챗봇 시작 화면: 예시 질문이 2초마다 바뀌고 누르면 입력창에 써 넣어 보내기 / 키보드는 입력창을 누를 때만 / 빠른 답장 줄·밑줄 단어', async () => {
   const pg = await ctx.newPage();
   watch(pg, 'chat-start');
   await pg.setViewportSize(KIOSK);
@@ -289,26 +304,32 @@ await step('챗봇 시작 화면: 단계형(자리→질감 카드→진하기·
   assert.ok(!(await pg.locator('#chat-send').isDisabled()));
   await pg.click('.tkb-back');
   assert.ok(await pg.locator('#chat-send').isDisabled());
-  // 단계형: 1 자리(면접) → 2 질감 카드(매트) → 3 진하기 슬라이더(연하게) → 4 가격 슬라이더(2만원 이하) → 찾기
-  await pg.click('#cs-top .gd-q'); // 키보드 밖을 누르면 닫힌다
+  // 예시 질문: 지금 예시가 2초쯤 뒤 다음 예시로 바뀐다
+  await pg.click('#cs-top .cs-ask'); // 키보드 밖을 누르면 닫힌다
   assert.ok(await pg.locator('.tkb').isHidden(), '키보드 밖을 누르면 닫힌다');
-  await pg.click('#cs-top .gd-pill:has-text("면접")');
-  await pg.click('#cs-top .gd-card:has-text("매트")');
-  await pg.locator('#cs-top .gd-ticks button').first().click();
-  await pg.click('#cs-top .gd-cta');
-  await pg.locator('#cs-top .gd-ticks button').nth(1).click();
-  await pg.click('#cs-top .gd-cta');
+  assert.ok(await pg.locator('#cs-top .cs-line').count() >= 2, '예시 질문 여러 개');
+  const first = await pg.locator('#cs-top .cs-line[data-pos="cur"]').textContent();
+  await pg.waitForFunction((t) => document.querySelector('#cs-top .cs-line[data-pos="cur"]')?.textContent !== t, first, { timeout: 3500 });
+  // ↵ 를 누르면 그 예시를 입력창에 한 글자씩 써 넣고(보내지는 않음), 보내기를 누르면 대화가 시작된다
+  await pg.click('#cs-top .cs-use');
+  await pg.waitForFunction(() => document.getElementById('chat-input').value.length > 10 && !document.getElementById('chat-send').disabled, null, { timeout: 5000 });
+  await pg.waitForTimeout(1500); // 다 써 넣을 때까지
+  const asked = (await pg.inputValue('#chat-input')).trim();
+  await pg.click('#chat-send');
   await pg.waitForSelector('.chat-log .bubble.user');
-  assert.equal((await pg.locator('.chat-log .bubble.user .btext').first().textContent()).trim(), '면접 때 바를 연한(진하기 0) 매트 립 20,000원 이하로 추천해 줘');
+  assert.equal((await pg.locator('.chat-log .bubble.user .btext').first().textContent()).trim(), asked);
   assert.ok(await pg.evaluate(() => !document.body.classList.contains('cs-on')), '첫 질문 뒤에는 대화 화면');
   // 답변이 다 나오면: 입력창 위 고정 줄(맨 앞 '답하며 고르기') + 답변 속 밑줄 단어
   await pg.waitForSelector('#qr-bar .qr-chip:not(.qr-guide)', { timeout: 10000 });
   assert.equal(await pg.locator('#qr-bar .qr-chip').first().textContent(), '답하며 고르기');
-  assert.ok(await pg.locator('.chat-log .bt-link').count() > 0, '답변 속 제품 이름·색 계열에 밑줄');
+  assert.equal(await pg.locator('.chat-log .bt-link').count(), 0, '답변 속 밑줄 단어는 없다 (2026-11-20 뺐다)');
   assert.ok(await pg.locator('.tkb').isHidden(), '보낸 뒤 키보드는 닫혀 있다');
   // 상황별 빠른 답장 (2026-11-19 1차, js/chat-quick.js): A 추천 직후 → '질감 바꾸기'(카드 한 단계) → 그 말로 이어 묻기
   assert.ok(await pg.locator('#qr-bar .qr-pick:has-text("질감 바꾸기")').count(), 'A: 질감 바꾸기');
-  assert.ok(await pg.locator('#qr-bar .qr-act:has-text("입술에 발라 보기")').count(), 'A: 입술에 발라 보기');
+  // '1번 입술에 발라 보기' 빠른 답장은 2026-11-20 뺐다: 말풍선 제품 카드마다 '바르러 가기', 카드에 호수 고르기는 없다
+  assert.equal(await pg.locator('#qr-bar .qr-act:has-text("입술에 발라 보기")').count(), 0, 'A: 입술에 발라 보기 빠른 답장 없음');
+  assert.ok(await pg.locator('.chat-log .card.mini .wear-btn').count() > 0, '카드의 바르러 가기');
+  assert.equal(await pg.locator('.chat-log .card.mini .opt-head').count(), 0, '챗봇 카드에 호수 고르기 없음');
   await pg.click('#qr-bar .qr-pick:has-text("질감 바꾸기")');
   await pg.click('.gd-mini .gd-card:has-text("벨벳")');
   await pg.waitForFunction(() => [...document.querySelectorAll('.bubble.user .btext')].at(-1)?.textContent.trim() === '벨벳으로 바꿔 줘');

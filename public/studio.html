@@ -31,15 +31,12 @@
   </section>
 
   <!-- 오른쪽: 탭 -->
-  <aside class="area studio-side" id="rec-panel" aria-label="색 조제·챗봇·추천·바코드">
+  <aside class="area studio-side" id="rec-panel" aria-label="색 조제·챗봇·추천">
     <div class="studio-tabs" role="tablist" aria-label="기능">
       <button type="button" role="tab" data-tab="mix" aria-selected="true">색 조제</button>
       <button type="button" role="tab" data-tab="chat" aria-selected="false">챗봇</button>
       <button type="button" role="tab" data-tab="rec" aria-selected="false">추천</button>
-      <button type="button" role="tab" data-tab="scan" aria-selected="false">바코드</button>
     </div>
-    <!-- 챗봇 패널 전환용 요소 (합본에서는 탭을 쓰므로 숨김) -->
-    <div class="hidden"><span id="panel-label"></span><button type="button" id="panel-toggle"></button><button type="button" id="scan-close"></button></div>
 
     <!-- 색 조제 -->
     <div class="studio-panel" id="tab-mix" role="tabpanel">
@@ -95,7 +92,6 @@
         <button type="button" id="voice" class="icon-btn" aria-pressed="false" aria-label="음성으로 질문" title="음성으로 질문">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg>
         </button>
-        <button type="button" id="scan-open" class="hidden"></button>
         <label for="chat-input" class="hidden">메시지</label>
         <input type="text" id="chat-input" placeholder="예: 데이트 립 추천해 줘">
         <button type="submit" id="chat-send" class="icon-btn" aria-label="보내기" title="보내기">
@@ -110,35 +106,6 @@
       <div id="list-view">
         <p id="rec-status" class="muted small" aria-live="polite"></p>
         <div id="rec-list" class="mini-list"></div>
-      </div>
-    </div>
-
-    <!-- 바코드 -->
-    <div class="studio-panel hidden" id="tab-scan" role="tabpanel">
-      <div id="scan-view">
-        <p class="small">가지고 있는 립 제품의 바코드를 찍으면 어떤 제품인지 챗봇이 알려 드려요.</p>
-        <p id="scan-note" class="msg small hidden"></p>
-        <strong class="small">PC 카메라로 찍기</strong>
-        <div class="scan-stage">
-          <video id="scan-video" class="hidden" playsinline muted></video>
-          <div class="placeholder" id="scan-placeholder" style="position:absolute;inset:0">카메라가 꺼져 있어요</div>
-          <div class="scan-guide hidden" id="scan-guide" aria-hidden="true"></div>
-        </div>
-        <div class="row">
-          <button type="button" id="scan-start" class="btn-dark">카메라로 바코드 찍기</button>
-          <button type="button" id="scan-stop" class="hidden">카메라 끄기</button>
-          <label for="scan-photo" class="btn-line photo-btn">사진으로 찍기</label>
-          <input type="file" id="scan-photo" accept="image/*" capture="environment" class="hidden">
-        </div>
-        <p id="scan-status" class="muted small" aria-live="polite">밝은 곳에서 바코드가 가운데 네모를 가득 채우게 비춰 주세요.</p>
-        <div id="scan-result"></div>
-        <form id="scan-form" class="scan-form" autocomplete="off">
-          <label for="scan-input" class="small">카메라가 안 되면 번호로 입력</label>
-          <div class="row">
-            <input type="text" id="scan-input" inputmode="numeric" placeholder="예: 8809100000017">
-            <button type="submit">확인</button>
-          </div>
-        </form>
       </div>
     </div>
   </aside>

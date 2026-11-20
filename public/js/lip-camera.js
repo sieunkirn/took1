@@ -3,8 +3,9 @@ import { $, el } from './common.js';
 import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
 import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
 import { getCamSettings, videoConstraints } from './camera-settings.js';
+import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
-import { video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
+import { PALETTE, video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
 import { collectSkin } from './lip-look.js';
 
 // ---------- 그리기 ----------
@@ -194,6 +195,8 @@ async function startCamera({ auto = false } = {}) {
     console.warn('[took] 웹캠 연결이 끊겼습니다. 다시 꽂히면 자동으로 연결합니다');
     waitForCamera();
   });
+  // 관리자 '카메라 색 보정'에서 웹캠 자동 색·밝기를 고정해 뒀으면 같은 값으로 고정한다 (지원 안 하는 웹캠이면 그냥 넘어간다)
+  applyCameraLock(stream.getVideoTracks()[0]);
   state.lips = null;
   video.srcObject = stream;
   try {
@@ -313,7 +316,8 @@ async function loop(gen = state.gen) {
     if (video.readyState >= 2) {
       render();
       setGuide(guideText());
-      if ($('match')) $('match').disabled = !state.lips || !!state.analyze;
+      // 거울(팔레트)은 시트를 열면 늘 누를 수 있게 둔다: 얼굴이 없으면 재는 쪽(palette.js)이 안내한다 (2026-11-20)
+      if ($('match')) $('match').disabled = PALETTE ? !!state.analyze : (!state.lips || !!state.analyze);
     }
   } catch (e) {
     console.warn('[took] 카메라 프레임 처리 오류:', e);

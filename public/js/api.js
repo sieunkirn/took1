@@ -1,6 +1,8 @@
 // 서버 API 호출. 정적 모드(서버 없음)에서는 같은 응답을 브라우저에서 만든다.
 // 정적 모드: 서버 없이(예: claude.ai Artifact 링크) 같은 추천/검색/챗봇 로직을 브라우저에서 실행한다.
 // 빌드 스크립트(scripts/build-static.js)가 <meta name="took-mode" content="static"> 을 넣는다.
+import { realOnly } from './demo.js'; // 실데이터만 보기 설정 (정적 모드는 demo.js 가 catalog 에 직접 알린다)
+
 export const STATIC = !!document.querySelector('meta[name="took-mode"][content="static"]');
 
 let localApi = null;
@@ -67,7 +69,7 @@ export async function api(path, options = {}) {
   if (STATIC) return staticApi(path, options);
   const res = await fetch(path, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    headers: { 'Content-Type': 'application/json', ...(realOnly() ? { 'X-Took-Real-Only': '1' } : {}), ...(options.headers || {}) },
   });
   const body = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, body };

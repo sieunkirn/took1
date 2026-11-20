@@ -153,3 +153,30 @@ test('NFC 테스트 카드: 리더기 번호(띄어쓰기 포함)로 찾고, 블
   assert.equal(matchTag('04 A1 B2 C3 D4 E5 F6'), null); // 다른 태그
   assert.equal(matchTag('322490'), null); // 너무 짧으면 맞추지 않는다
 });
+
+test('실데이터만 보기: 켜면 시연용 제품·호수가 목록·찾기·바코드·이름 부르기에서 빠지고, 끄면 돌아온다', async () => {
+  const catalog = await import('../src/lib/catalog.js');
+  const { answer } = await import('../src/lib/chat.js');
+  const demo = repo.allDemoProducts()[0];
+  assert.ok(demo && catalog.isDemo(demo), '시연용 제품이 있어야 한다');
+  assert.equal(catalog.isDemo(repo.allProducts()[0]), false, '올리브영 제품은 실데이터');
+  let on = false;
+  catalog.setRealOnlyGetter(() => on);
+  try {
+    assert.equal(repo.findById(demo.id)?.id, demo.id);
+    on = true;
+    assert.equal(repo.allDemoProducts().length, 0);
+    assert.equal(repo.findById(demo.id), null);
+    assert.equal(repo.findByBarcode(demo.barcode), null);
+    assert.deepEqual(repo.shadesOf(demo), []);
+    assert.ok(repo.allProducts().length > 0 && repo.allProducts().every((p) => !catalog.isDemo(p)));
+    assert.ok(recommendByColor('#C8102E', { limit: 30 }).every((p) => !catalog.isDemo(p)));
+    // 시연용 제품 이름을 불러도 그 제품을 지어내지 않는다
+    const r = answer({ message: `${demo.brand} ${demo.name} 보여줘` });
+    assert.ok((r.products || []).every((p) => !catalog.isDemo(p)), JSON.stringify((r.products || []).map((p) => p.id)));
+    on = false;
+    assert.equal(repo.findById(demo.id)?.id, demo.id);
+  } finally {
+    catalog.setRealOnlyGetter(null);
+  }
+});

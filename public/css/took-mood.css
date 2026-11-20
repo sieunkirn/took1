@@ -38,14 +38,10 @@ body.tui-mood .chat-head .icon-btn { width: 52px; min-height: 52px; padding: 0; 
 body.tui-mood .chat-head .icon-btn, body.tui-mood .chat-head .icon-btn[aria-pressed="true"], body.tui-mood .chat-head .icon-btn:hover:not(:disabled) {
   color: #fff; background: linear-gradient(#171717, #171717) padding-box, var(--glass-edge) border-box; }
 body.tui-mood .chat-head .icon-btn[aria-pressed="false"] { color: var(--c-mute); }
-body.tui-mood #chat-to-palette { min-height: 52px; padding: 0 22px; font-size: 17px; font-weight: 600;
-  background: var(--pink-pill) padding-box, var(--glass-edge) border-box;
-  box-shadow: 0 0 14px 1px rgba(232, 24, 111, 0.55), inset 0 2px 5px rgba(255, 255, 255, 0.22); }
 body.tui-mood .chat-head button:hover:not(:disabled), body.tui-mood .chat-log .suggest button:hover:not(:disabled),
 body.tui-mood .chat-log .quick-replies button:hover:not(:disabled), body.tui-mood #base-clear:hover:not(:disabled),
 body.tui-mood #compare-run:hover:not(:disabled), body.tui-mood #compare-clear:hover:not(:disabled) {
   color: #fff; background: linear-gradient(#262626, #262626) padding-box, var(--glass-edge) border-box; }
-body.tui-mood #chat-to-palette:hover:not(:disabled) { background: var(--pink-pill) padding-box, var(--glass-edge) border-box; }
 
 /* ---------- 대화 ---------- */
 body.tui-mood .chat-log { background: transparent; border: 0; padding: 18px 2px 4px; color: #fff;
@@ -113,29 +109,14 @@ body.tui-mood .tkb-enter:active { background: var(--c-pink-deep); }
 body.tui-mood .tkb-hide { color: var(--c-mute); }
 body.tui-mood .nfc-hint { background: var(--c-surface); color: var(--c-mute); border: 1px solid var(--c-line); }
 
-/* 바코드 패널(넓은 화면에서만)·토스트 */
+/* 추천 패널(넓은 화면에서만)·토스트 */
 body.tui-mood .chat-side.area { background: var(--c-surface); color: #fff; border: 1px solid var(--c-line); box-shadow: none; }
-body.tui-mood .scanner-state { background: #000; color: #fff; }
 body.tui-mood .toast { background: #fff; color: #000; }
-
-/* 바코드 비추기 카메라 창 (미러 챗봇, 2026-11-18): 화면 위에 어둡게 깔고 가운데 카메라 + 안내 네모 + 닫기 */
-body.tui-mood .cam-sheet { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 40px; box-sizing: border-box;
-  background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(6px); }
-body.tui-mood .cam-sheet[hidden] { display: none; }
-body.tui-mood .cam-sheet-box { width: 100%; max-width: 760px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 28px;
-  border-radius: 28px; background: var(--c-surface); border: 1px solid var(--c-line); border-top-color: rgba(255, 255, 255, 0.3); color: #fff; }
-body.tui-mood .cam-sheet-title { font-size: 24px; font-weight: 600; text-align: center; word-break: keep-all; }
-body.tui-mood .cam-sheet-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 20px; background: #000; }
-body.tui-mood .cam-sheet-stage video { width: 100%; height: 100%; object-fit: cover; display: block; }
-body.tui-mood .cam-sheet-guide { position: absolute; left: 12%; right: 12%; top: 30%; bottom: 30%; border: 3px solid rgba(255, 255, 255, 0.85); border-radius: 16px;
-  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.35); pointer-events: none; }
-body.tui-mood .cam-sheet-status { margin: 0; min-height: 1.6em; font-size: 18px; color: var(--c-mute); text-align: center; word-break: keep-all; }
-body.tui-mood .cam-sheet #cam-close { min-width: 200px; min-height: 60px; font-size: 20px; }
 
 /* ---------- 전체 화면 챗봇 (2026-11-19 Figma GP · 추천 멘트 03, 900×1440 좌표) ----------
    왼쪽 위 뒤로 동그라미(48,56) · 위 가운데 로고 · 'Beauty Chat'(Inter Semi Bold 36, y 164) · 부제(24, y 222)
    → 예시 질문(#cs-top, y 239~838, chat-start.css) → 입력창(x 28, y 838, 844×82) → 키보드(y 941, 844×414) → 리더기 안내(y 1370).
-   읽어 주기·'립 다시 바르기' 버튼은 디자인에 없어 숨긴다(읽어 주기는 저장된 켜짐/꺼짐 그대로). 모달 안 챗봇은 예전 그대로 */
+   읽어 주기 버튼은 디자인에 없어 숨긴다(읽어 주기는 저장된 켜짐/꺼짐 그대로). 모달 안 챗봇은 예전 그대로 */
 html:not(.in-chat-modal) body.tui-mood header.nav .nav-logo { left: 354.33px; top: 66.31px; }
 html:not(.in-chat-modal) body.tui-mood main.fit.chat-user { padding: 164px 28px 27px; } /* 아래 27: 키보드가 열렸을 때 입력창 y 838 · 안내 y 1370 (Figma) */
 html:not(.in-chat-modal) body.tui-mood .chat-shell.area { gap: 0; }
@@ -218,32 +199,13 @@ body.tui-mood .placeholder { background: #1c1c1c; color: var(--c-mute); }
 
 /* ---------- 전체 화면 챗봇을 거울 화면 무드로 (2026-11-19 사용자 요청 "챗봇 화면을 거울 화면과 비슷한 무드로 재배치") ----------
    거울(palette.html, took-ui.css)과 같은 것: 위 가운데 로고 · 제목 Inter Semi Bold 28(y 160) · 부제 Light 20(y 205.7) · 왼쪽 세로 유리 메뉴(x 28, y 604).
-   왼쪽 위 뒤로 동그라미는 메뉴의 스캔(거울로) 버튼이 대신한다. 메뉴와 겹치지 않게 시작 화면·대화는 왼쪽을 90px 비운다(입력창·키보드는 메뉴 아래라 그대로).
+   왼쪽 세로 메뉴는 2026-11-20 사용자 요청으로 뺐고, 오른쪽 위 X(닫기 → 거울)가 대신한다 (took-flat.css .cs-close).
    모달 안 챗봇(html.in-chat-modal)은 거울 메뉴가 뒤에 이미 있어 그대로 둔다 */
-.cm-menu { display: none; }
-html:not(.in-chat-modal) body.tui-mood .cm-menu { display: block; position: fixed; left: 28.1px; top: 604.52px; width: 61.91px; height: 230.97px; z-index: 6; box-sizing: border-box; border-radius: 200px;
-  background: rgba(255, 255, 255, 0.37); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -1px 1px rgba(0, 0, 0, 0.08); }
-.cm-menu > * { position: absolute; box-sizing: border-box; border-radius: 50%; }
-.cm-pair { left: 3.15px; top: 3.03px; width: 55.6px; height: 106.88px; border-radius: 200px; background: rgba(255, 255, 255, 0.48); }
-.cm-knob { left: 7.53px; top: 57px; width: 46.83px; height: 46.83px; background: rgba(255, 255, 255, 0.44); /* 손잡이 = 음성(챗봇) 쪽 */
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.6); }
-.cm-menu .cm-mb { display: block; color: #fff; text-decoration: none; -webkit-tap-highlight-color: transparent; }
-.cm-menu .cm-mb:link, .cm-menu .cm-mb:visited { color: #fff; }
-.cm-menu .cm-mb svg { display: block; width: 100%; height: 100%; }
-.cm-scan { left: 8.01px; top: 6.6px; width: 46.83px; height: 46.83px; }
-.cm-voice { left: 7.53px; top: 57px; width: 46.83px; height: 46.83px; }
-.cm-menu .cm-voice { color: #000; } /* 손잡이 위 아이콘 = 검정 */
-.cm-grid { left: 3.49px; top: 113.5px; width: 54.93px; height: 54.93px; background: #000; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.34), 0 4px 4px rgba(0, 0, 0, 0.25); }
-.cm-home { left: 3.49px; top: 172.16px; width: 54.93px; height: 54.93px; background: rgba(255, 255, 255, 0.44); box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25); }
-.cm-menu .cm-mb:active { transform: scale(.94); }
-.cm-menu .cm-mb:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 html:not(.in-chat-modal) body.tui-mood .chat-head .cs-back { display: none; }
 /* 제목·부제 = 거울의 Find Your Color 와 같은 글꼴·크기·자리 (본문이 y 164 에서 시작하므로 제목은 -4px) */
 html:not(.in-chat-modal) body.tui-mood .chat-head strong { margin-top: -4px; font-size: 28px; line-height: 40px; font-weight: 600; }
 html:not(.in-chat-modal) body.tui-mood .chat-head .chat-sub { margin-top: 5.7px; font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; font-size: 20px; line-height: 26px; font-weight: 300; color: #fff; }
 html:not(.in-chat-modal) body.tui-mood .chat-head { height: 75px; }
-html:not(.in-chat-modal) body.tui-mood :is(#cs-top, .chat-log, .qr-bar) { margin-left: 90px; }
 /* 거울처럼 위·아래가 살짝 어둡고 가운데가 트인 바탕: 아래쪽에 다이얼 자리처럼 분홍 빛이 은은하게 */
 html:not(.in-chat-modal) body.tui-mood main.fit.chat-user { background: radial-gradient(120% 55% at 50% 108%, rgba(232, 24, 111, 0.22), rgba(232, 24, 111, 0) 60%), #000; }
 /* 소리(답변 읽어 주기) 버튼은 2026-11-20 사용자 요청으로 숨긴다. 읽어 주기 자체는 저장된 켜짐/꺼짐 그대로(기본 켜짐, js/chat-input.js) */

@@ -84,6 +84,8 @@ export function inspectProduct(raw, review = {}) {
     let status, pick = null;
     if (manual) { status = 'manual'; pick = manual.decision.hex ? { ...manual, hex: manual.decision.hex.toUpperCase() } : manual; }
     else if (list.some((o) => o.decision === 'exclude')) status = 'excluded';
+    // 'hold' = 사람이 다시 보려고 검수 대기로 돌려 놓음 (2026-11-20, 튀는 색 모음). 넣기·빼기를 누르면 풀린다
+    else if (list.some((o) => o.decision === 'hold')) status = 'pending';
     else if ((pick = list.filter((o) => o.verdict === 'ok').sort(byWhite)[0])) status = 'auto';
     else status = list.some((o) => o.verdict === 'review') ? 'pending' : 'bad';
     const label = list[0].no ? `${list[0].no} ${list[0].name}` : key;
@@ -101,7 +103,8 @@ export function buildProduct(raw, review = {}) {
     const { key, label, status, options: list } = g;
     const pick = g.pick;
     if (status === 'pending') {
-      pending.push(...list.filter((o) => o.verdict === 'review').sort((a, b) => a.white - b.white)
+      const held = list.some((o) => o.decision === 'hold');
+      pending.push(...list.filter((o) => held || o.verdict === 'review').sort((a, b) => a.white - b.white)
         .map((o) => ({ key: o.key, goodsNo: raw.goodsNo, shade: key, alt: o.alt, hex: o.hex, img: o.img, white: o.white, grey: o.grey })));
     }
     if (!pick) { skipped.push(label); continue; }

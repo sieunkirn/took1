@@ -60,11 +60,6 @@ body.tui-mood #chat-form #chat-send.cs-send { flex: none; width: 60px; height: 6
 body.tui-mood #chat-form #chat-send.cs-send img { display: block; width: 28px; height: 28px; filter: brightness(0) invert(1); }
 body.tui-mood #chat-form #chat-send.cs-send:disabled { background: transparent; box-shadow: none; cursor: default; }
 body.tui-mood #chat-form #chat-send.cs-send:disabled img { filter: none; }
-/* 바코드 비추기 (미러 챗봇, 2026-11-18): 보내기 왼쪽 60px 어두운 네모 (#242424, 테두리 #555). 누르면 카메라 창 (js/chat-products.js) */
-body.tui-mood #chat-form #scan-open { order: 1; flex: none; box-sizing: border-box; width: 60px; height: 60px; min-height: 60px; padding: 0; display: grid; place-items: center;
-  border-radius: 12px; border: 1px solid #555; background: #242424; box-shadow: none; }
-body.tui-mood #chat-form #scan-open img { display: block; width: 28px; height: 28px; }
-body.tui-mood #chat-form #scan-open:active { background: #333; }
 body.tui-mood #chat-form #chat-send { order: 2; }
 
 @media (prefers-reduced-motion: reduce) {

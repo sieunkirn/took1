@@ -5,8 +5,9 @@
 // 제품 사실(이름·가격·제형)은 늘 DB 에서 나오고, 영어 제품명은 글로벌 올리브영에서 짝지은 name_en 을 쓴다
 
 const FINISH_WORDS = {
-  glossy: ['glossy', 'gloss', 'shiny', 'shine', 'glassy', 'glass', 'juicy', 'wet look', 'dewy', 'moist', 'moisturizing', 'hydrating', 'watery', 'jelly'],
-  matte: ['matte', 'matt', 'powdery', 'blur', 'blurry', 'blurring', 'soft focus', 'soft-focus'],
+  glossy: ['glossy', 'gloss', 'shiny', 'shine', 'glassy', 'glass', 'juicy', 'wet look', 'dewy', 'moist', 'moisturizing', 'hydrating', 'watery', 'jelly',
+    'lip oil', 'glow', 'glowy', 'glowing', 'tanghulu', 'candy coated', 'plush shine'], // 2026-11-20
+  matte: ['matte', 'matt', 'powdery', 'blur', 'blurry', 'blurring', 'blurred', 'soft focus', 'soft-focus'],
   satin: ['satin', 'semi-matte', 'semi matte'],
   velvet: ['velvet', 'velvety'],
 };
@@ -33,6 +34,12 @@ const COLOR_NAMES = [
   { words: ['mauve'], families: ['rose', 'plum'] },
   { words: ['dried rose', 'rosewood'], families: ['rose', 'brown'] },
   { words: ['chocolate', 'caramel', 'mocha', 'cinnamon'], families: ['brown'] },
+  // 2026-11-20
+  { words: ['raspberry', 'blueberry'], families: ['berry'] },
+  { words: ['magenta'], families: ['pink', 'berry'] },
+  { words: ['plum color', 'grape'], families: ['berry', 'plum'] },
+  { words: ['tangerine', 'mandarin', 'grapefruit'], families: ['orange', 'coral'] },
+  { words: ['watermelon'], families: ['pink', 'red'] },
 ];
 const AVOID_FINISHES = [
   { words: ['sticky', 'greasy', 'oily', 'too shiny'], finishes: ['glossy'] },
@@ -51,7 +58,7 @@ export const SITUATIONS_EN = {
   '상견례': { words: ['meeting the parents', 'meet the parents', 'meet my parents', 'in-laws', 'in laws'], label: 'Meeting the family',
     reason: 'Rose and coral shades look bright yet polite when meeting the family.',
     tip: 'A healthy flush of color works better than a very deep shade.' },
-  '데이트': { words: ['date', 'blind date', 'anniversary', 'romantic', 'dating'], label: 'Date',
+  '데이트': { words: ['date', 'first date', 'blind date', 'anniversary', 'romantic', 'dating', 'valentine', "valentine's"], label: 'Date',
     reason: 'For a date, pink, rose and coral with a glossy finish look lively.' },
   '내 결혼식': { words: ['my wedding', 'bride', 'bridal', 'wedding photoshoot', 'wedding shoot', 'wedding photos'], label: 'My wedding',
     reason: 'Rose and pink shades that photograph clearly are popular on the wedding day.',
@@ -87,20 +94,20 @@ export const SITUATIONS_EN = {
 };
 
 export const TONES_EN = {
-  spring: { words: ['spring warm', 'warm spring', 'spring tone'], label: 'Spring Warm', reason: 'Clear coral, peach and orange shades suit spring warm tones.' },
-  summer: { words: ['summer cool', 'cool summer', 'summer tone'], label: 'Summer Cool', reason: 'Soft pink, rose and light berry shades suit summer cool tones.' },
-  autumn: { words: ['autumn warm', 'fall warm', 'warm autumn', 'autumn tone', 'fall tone'], label: 'Autumn Warm', reason: 'Deep, warm brick, brown and terracotta shades suit autumn warm tones.' },
-  winter: { words: ['winter cool', 'cool winter', 'winter tone'], label: 'Winter Cool', reason: 'Vivid red, berry and plum shades suit winter cool tones.' },
+  spring: { words: ['spring warm', 'warm spring', 'spring tone', 'spring bright', 'bright spring', 'spring light', 'light spring'], label: 'Spring Warm', reason: 'Clear coral, peach and orange shades suit spring warm tones.' },
+  summer: { words: ['summer cool', 'cool summer', 'summer tone', 'summer light', 'light summer', 'summer mute', 'soft summer'], label: 'Summer Cool', reason: 'Soft pink, rose and light berry shades suit summer cool tones.' },
+  autumn: { words: ['autumn warm', 'fall warm', 'warm autumn', 'autumn tone', 'fall tone', 'autumn deep', 'deep autumn', 'autumn mute', 'soft autumn'], label: 'Autumn Warm', reason: 'Deep, warm brick, brown and terracotta shades suit autumn warm tones.' },
+  winter: { words: ['winter cool', 'cool winter', 'winter tone', 'winter deep', 'deep winter', 'winter bright', 'bright winter'], label: 'Winter Cool', reason: 'Vivid red, berry and plum shades suit winter cool tones.' },
   warm: { words: ['warm tone', 'warm undertone', 'warm skin', 'warm toned', "i'm warm", 'i am warm'], label: 'Warm tone', reason: 'Coral, orange and brown shades with a yellow base suit warm tones.' },
   cool: { words: ['cool tone', 'cool undertone', 'cool skin', 'cool toned', "i'm cool", 'i am cool'], label: 'Cool tone', reason: 'Pink, rose and berry shades with a blue base suit cool tones.' },
 };
 
 export const CONCERNS_EN = {
-  '건조한 입술': { words: ['dry', 'flaky', 'chapped', 'peeling', 'cracked'], label: 'Dry lips', reason: 'Glossy or satin finishes hide dry patches better than matte.' },
-  '오래 가는': { words: ['long-lasting', 'long lasting', 'lasts long', 'last long', 'all day', 'transfer-proof', 'transfer proof', 'smudge-proof', 'smudge proof', "won't come off", 'kiss-proof', 'mask', 'stays on'], label: 'Long-lasting', reason: 'Matte and velvet finishes tend to last longer.' },
-  '자연스러운': { words: ['natural', 'subtle', 'no-makeup', 'no makeup', 'effortless', 'lively'], label: 'Natural', reason: 'Nude, rose and coral shades close to your lip color look natural.' },
-  '강렬한': { words: ['bold', 'statement', 'intense', 'striking', 'strong color', 'sexy'], label: 'Bold', reason: 'Vivid red, burgundy and berry shades make a statement.' },
-  '화사한': { words: ['bright', 'cute', 'lovely', 'youthful', 'fresh', 'playful', 'juicy look'], label: 'Bright', reason: 'Pink and coral shades give a bright, lovely look.' },
+  '건조한 입술': { words: ['dry', 'flaky', 'chapped', 'peeling', 'cracked', 'lip wrinkles', 'lines on my lips', 'fine lines'], label: 'Dry lips', reason: 'Glossy or satin finishes hide dry patches better than matte.' },
+  '오래 가는': { words: ['long-lasting', 'long lasting', 'lasts long', 'last long', 'all day', 'transfer-proof', 'transfer proof', 'smudge-proof', 'smudge proof', "won't come off", 'kiss-proof', 'mask', 'stays on', "won't transfer", 'no transfer', 'cup', 'stains well', 'long stain'], label: 'Long-lasting', reason: 'Matte and velvet finishes tend to last longer.' },
+  '자연스러운': { words: ['natural', 'subtle', 'no-makeup', 'no makeup', 'effortless', 'lively', 'bare face', 'bare-faced', 'little color', 'hint of color', 'sheer wash', 'barely-there'], label: 'Natural', reason: 'Nude, rose and coral shades close to your lip color look natural.' },
+  '강렬한': { words: ['bold', 'statement', 'intense', 'striking', 'strong color', 'sexy', 'sultry', 'seductive', 'chic', 'fierce'], label: 'Bold', reason: 'Vivid red, burgundy and berry shades make a statement.' },
+  '화사한': { words: ['bright', 'cute', 'lovely', 'youthful', 'fresh', 'playful', 'juicy look', 'look younger', 'look young'], label: 'Bright', reason: 'Pink and coral shades give a bright, lovely look.' },
   '선물': { words: ['gift', 'present'], label: 'Gift', reason: 'Easy-to-wear nude, rose and coral shades are a safe gift.' },
   '혈색 있는': { words: ['healthy glow', 'flush', 'pale', 'washed out', 'look tired', 'sickly', 'color to my face'], label: 'Healthy flush', reason: 'Pink, coral and rose shades bring life to your face.' },
   '입술색 같은': { words: ['my lip color', 'my natural lip', 'like my lips', 'barely there', 'my own lips'], label: 'Like your lips', reason: 'Nude, rose and soft pink look like your own lips.' },
@@ -108,6 +115,23 @@ export const CONCERNS_EN = {
   '발색 좋은': { words: ['pigmented', 'vivid', 'color payoff', 'one swipe', 'opaque'], label: 'Pigmented', reason: 'Deep red, burgundy and berry shades show up in one swipe.' },
   '사진에 잘 나오는': { words: ['photo', 'photos', 'selfie', 'selfies', 'camera', 'pictures'], label: 'Photogenic', reason: 'Saturated red, berry and pink shades make lips pop in photos.' },
   '호감 가는': { words: ['boyfriend', 'girlfriend', 'crush', 'likable', 'innocent', 'first impression'], label: 'Likable', reason: 'Soft pink, rose and coral give a friendly impression.' },
+  // 2026-11-20: 피부·나이·입술 모양·착색 (한국어판 chat-words.js 와 같은 키)
+  '어두운 피부': { words: ['dark skin', 'darker skin', 'deep skin', 'tan skin', 'tanned skin', 'tanned', 'olive skin', 'brown skin', 'skin is dark', 'skin is tan'], label: 'Deeper skin',
+    reason: 'Deep brick, brown and berry shades show up clearly on deeper skin.' },
+  '밝은 피부': { words: ['fair skin', 'light skin', 'skin is fair', 'skin is light', 'porcelain skin', 'very fair', 'really fair', 'fair-skinned', 'fair complexion'], label: 'Fair skin',
+    reason: 'Clear pink, rose and coral shades bring out a pretty flush on fair skin.' },
+  '노란 피부': { words: ['yellow undertone', 'yellow undertones', 'yellowish skin', 'sallow', 'golden undertone'], label: 'Yellow undertone',
+    reason: 'Warm coral, orange and brown shades suit a yellow undertone.' },
+  '학생': { words: ['teenager', 'teen', 'teens', 'high school', 'middle school', 'student', 'students'], label: 'Student',
+    reason: 'Light pink and coral shades look fresh and natural for students.' },
+  '우아한': { words: ['in her 40s', 'in her 50s', 'in her 60s', 'my 40s', 'my 50s', 'middle-aged', 'mature skin', 'elegant', 'sophisticated', 'look old', 'look older', 'for my mom', 'for mom', 'my mother'], label: 'Elegant',
+    reason: 'Rose, nude and coral with a moist finish look elegant and soften the lip texture.' },
+  '도톰해 보이는': { words: ['thin lips', 'lips are thin', 'fuller', 'plump', 'plumper', 'plumping', 'volume', 'bigger lips', 'small lips'], label: 'Fuller-looking',
+    reason: 'A glossy finish catches the light and makes lips look fuller.' },
+  '칙칙한 입술': { words: ['dull', 'dark lips', 'lips are dark', 'lip pigmentation', 'discolored', 'uneven lip color'], label: 'Dull lips',
+    reason: 'Pigmented coral and pink shades layered once more brighten dull or dark lips.' },
+  '착색 걱정': { words: ["doesn't stain", "don't stain", 'no stain', 'non-staining', 'not stain', 'without staining', 'no staining'], label: 'No staining',
+    reason: 'Glossy and satin finishes tend to leave less stain than water tints.' },
 };
 
 // 기분·잡담 → 한마디 받고 그에 맞는 조건으로 추천 (query 는 한국어판과 같은 키)
@@ -122,6 +146,11 @@ const MOODS_EN = [
   { words: ['raining', 'rainy', 'rain'], ack: 'Calm colors look lovely on rainy days.', query: { concerns: ['차분한'] } },
   { words: ['busy', 'in a hurry', 'no time', 'rushing'], ack: 'When you are busy, a lip that shows up in one swipe is handy.', query: { concerns: ['발색 좋은'] } },
   { words: ['look pretty', 'look prettier', 'look good'], ack: 'You already look great, but here are colors that brighten your face.', query: { concerns: ['호감 가는'] } },
+  // 2026-11-20: 막연하게 골라 달라는 말 (그 말만 했을 때만, alone), 취향, 웃음
+  { words: ['just pick', 'pick something', 'pick one', 'pick for me', 'choose for me', 'you choose', 'you pick', 'surprise me', 'anything is fine', 'anything works', 'whatever', 'no idea', "don't know what"],
+    ack: "Sure, I'll pick first. Here are easy-to-wear colors that suit almost anyone.", query: { situations: ['데일리'] }, alone: true },
+  { words: ['your favorite', 'your favourite', 'what do you like'], ack: "I can't see colors myself, but rose and coral are easy picks many people love.", query: { families: ['rose', 'coral'] } },
+  { words: ['lol', 'haha', 'hehe', 'lmao'], ack: 'Sounds like a fun day! Bright colors suit a good mood.', query: { concerns: ['화사한'] } },
 ];
 export const GENERIC_ACKS_EN = [
   "I didn't quite catch that. For now, here is a lip that is nice to wear today.",
@@ -182,7 +211,10 @@ const ORD_WORDS = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seve
 const ORD_NUM = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'];
 function parseOrdinalsEn(text) {
   const found = [];
-  ORD_WORDS.forEach((w, i) => { const m = text.search(wordRe(w)); if (m >= 0) found.push({ i, at: m }); });
+  const notOrd = /(first|second)\s+(date|day|time|impression|anniversary|job|interview|meeting)/; // "first date" 는 순번이 아니다 (2026-11-20)
+  ORD_WORDS.forEach((w, i) => { const m = text.search(wordRe(w)); if (m >= 0 && !notOrd.test(text.slice(m, m + 30))) found.push({ i, at: m }); });
+  // "the previous one", "go back to that one" → 첫 번째(가장 추천한) 제품 (한국어판 '아까 그거'와 같다)
+  { const m = text.search(/previous one|the one before|go back to (that|the) one/); if (m >= 0) found.push({ i: 0, at: m }); }
   ORD_NUM.forEach((w, i) => { const m = text.search(wordRe(w)); if (m >= 0) found.push({ i, at: m }); });
   const last = text.search(/(^|[^a-z])last(?![a-z])/);
   if (last >= 0) found.push({ i: -1, at: last });
@@ -234,7 +266,7 @@ export function parseMessageEn(message, brandIndex = [], { situations = [] } = {
   // 가격: '가장 싼' 이 먼저, 그다음 '싼/비싼'
   if (has(text, ['cheapest', 'least expensive', 'lowest price', 'most affordable'])) c.superlative = 'cheapest';
   else if (has(text, ['most expensive', 'priciest', 'highest price', 'most luxurious'])) c.superlative = 'priciest';
-  else if (has(text, ['expensive', 'pricier', 'luxury', 'luxurious', 'premium', 'high-end', 'high end', 'fancy'])) c.price = 'pricier';
+  else if (has(text, ['expensive', 'pricier', 'luxury', 'luxurious', 'premium', 'high-end', 'high end', 'fancy', 'designer'])) c.price = 'pricier';
   else if (has(text, ['cheap', 'cheaper', 'affordable', 'budget', 'inexpensive', 'low price', 'lower price', 'less expensive', 'good value'])) c.price = 'cheaper';
   Object.assign(c, parsePriceEn(text));
   if (has(text, ['similar', 'like this', 'same color', 'close to this', 'look alike', 'dupe']) && !namedColor && !has(text, ['my lips', 'my lip color'])) c.similar = true;
@@ -262,14 +294,15 @@ export function parseMessageEn(message, brandIndex = [], { situations = [] } = {
   if (sit.length && !(tone && sit.every((s) => ['봄', '여름', '가을', '겨울'].includes(s)))) c.situations = sit;
   const concerns = Object.entries(CONCERNS_EN).filter(([, x]) => has(text, x.words)).map(([k]) => k);
   if (concerns.length) c.concerns = concerns;
-  if (has(text, ['suits me', 'suit me', 'for me', 'my tone', 'my skin tone', 'match me', 'matches me', 'flatters me', 'fit me'])) c.mine = true;
+  if (has(text, ['suits me', 'suit me', 'for me', 'my tone', 'my skin tone', 'match me', 'matches me', 'flatters me', 'fit me',
+    'personal color', 'my color type', "don't know my tone", 'what tone am i', 'which tone am i'])) c.mine = true;
 
   const ordinals = parseOrdinalsEn(text);
   if (ordinals.length) c.ordinals = ordinals;
   if (has(text, ['of those', 'of these', 'among them', 'among those', 'from these', 'from those', 'out of those', 'out of these', 'of them'])) c.among = true;
   if (has(text, ['compare', 'difference', 'vs', 'versus'])) c.compare = true;
   if (has(text, ['set as base', 'use this as', 'use it as', 'as my base', 'pick this', 'choose this', 'save this'])) c.pickBase = true;
-  if (has(text, ['more', 'show more', 'others', 'other ones', 'another', 'next ones', 'any other', 'anything else'])) c.more = true;
+  if (has(text, ['more', 'show more', 'others', 'other ones', 'another', 'next ones', 'any other', 'anything else', 'something else', 'not this one', 'different one'])) c.more = true;
   if (has(text, ['why', 'reason', 'how did you pick', 'how did you choose'])) c.why = true;
   if (has(text, ['instead', 'rather', 'change to', 'switch to', 'make it', 'only', 'but'])) c.refine = true;
 
@@ -278,8 +311,10 @@ export function parseMessageEn(message, brandIndex = [], { situations = [] } = {
   if (has(text, ['finish', 'texture'])) c.askFinish = true;
   if (has(text, ['barcode'])) c.askBarcode = true;
   if (has(text, ['info', 'information', 'details', 'detail', 'tell me about', 'what is it', 'about it', 'describe'])) c.askInfo = true;
+  if ((c.askPrice || c.askInfo || c.askFinish) && !c.ordinals && !c.finish && !c.families && !c.brand && !c.price && !c.concerns && !c.situations
+    && has(text, ['this', 'that', 'it', 'this one', 'that one'])) c.pointing = true;
 
-  if (has(text, ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'])) c.small = 'greet';
+  if (has(text, ['hello', 'hi', 'hey', 'yo', 'hiya', 'sup', 'good morning', 'good afternoon', 'good evening'])) c.small = 'greet';
   else if (has(text, ['thanks', 'thank you', 'thx', 'appreciate'])) c.small = 'thanks';
   else if (has(text, ['bye', 'goodbye', 'see you', 'see ya'])) c.small = 'bye';
   else if (has(text, ['who are you', 'what are you', 'are you ai', 'are you a robot', 'are you human', 'your name', 'chatgpt', 'gpt'])) c.small = 'identity';
@@ -298,6 +333,24 @@ export function offTopicReplyEn(message) {
   }
   if (has(text, ['stupid', 'idiot', 'dumb', 'useless', 'worst'])) {
     return reply('Oh, not quite right? Tell me the color or feel you want and I will pick again.', ['Recommend a brighter color', 'Something cheaper', 'Recommend an everyday lip']);
+  }
+  if (has(text, ['trending', 'trend', 'trendy', 'new arrival', 'new arrivals', 'new release', 'latest', 'popular right now', 'hot right now', "what's popular", 'whats popular'])) {
+    return reply("I don't have trend or new-release rankings. But I can pick by the feel people often look for, like a juicy glossy lip or a my-lips-but-better nude.", ['Recommend a glossy lip', 'Recommend an MLBB lip', 'Recommend an everyday lip']);
+  }
+  if (has(text, ['fragrance free', 'fragrance-free', 'unscented', 'scent', 'fragrance', 'vegan', 'cruelty free', 'sensitive'])) {
+    return reply("Scent, ingredients and vegan info aren't in my data. Please check the ingredient list or ask a staff member. I can find colors and finishes right away.", ['Recommend a moisturizing lip', 'Recommend a natural color', 'Recommend an everyday lip']);
+  }
+  if (has(text, ['try it on', 'try on', 'try them on', 'put it on', 'put on my lips', 'on my lips', 'test it', 'swatch'])) {
+    return reply('Tap "Try it on" under a recommended product to see it on your lips in the mirror. Tell me the feel you want first.', ['Recommend an everyday lip', 'Recommend a lip for a date', 'Lips that suit me']);
+  }
+  if (has(text, ['where can i buy', 'where to buy', 'buy it', "i'll take it", 'i will take it', 'purchase', 'checkout', 'pay'])) {
+    return reply('If you like one, tap "Take it home" in the mirror. It shows nearby stores and a QR code to open the product page on your phone.', ['Show other colors', 'Recommend an everyday lip']);
+  }
+  if (has(text, ['restroom', 'bathroom', 'toilet', 'what time do you close', 'opening hours', 'business hours', 'when do you close', 'parking', 'staff'])) {
+    return reply("For store info, please ask a staff member nearby. I'm here to help you pick a lip color.");
+  }
+  if (has(text, ['how much', 'price']) && has(text, ['this', 'it', 'that'])) {
+    return reply('Which product would you like the price of? After I recommend some, ask like "how much is the first one". I can also search by price range.', ['Under 20,000 won', 'Cheapest lip', 'Recommend an everyday lip']);
   }
   if (has(text, ['best seller', 'bestseller', 'best-selling', 'best selling', 'most popular', 'top seller', 'ranking'])) {
     return reply("I don't have sales rankings. Tell me the color or mood you want and I'll find the closest match.", ['Recommend an everyday lip', 'Recommend a lip for a date']);
@@ -329,9 +382,11 @@ export function offTopicReplyEn(message) {
 }
 
 /** 기분·잡담 찾기 */
+// alone 항목: 그 말을 빼고 남는 글자(띄어쓰기·기호 빼고)가 적을 때만 ("surprise me" O, "surprise me with a galaxy-like vibe" X)
+const aloneRest = (text, words) => { let t = text; for (const w of words) t = t.split(w).join(''); return t.replace(/[^a-z0-9]/g, '').length; };
 export const moodEn = (message) => {
   const text = ' ' + String(message || '').toLowerCase() + ' ';
-  return MOODS_EN.find((m) => has(text, m.words)) || null;
+  return MOODS_EN.find((m) => has(text, m.words) && (!m.alone || aloneRest(text, m.words) <= 12)) || null;
 };
 
 export const ordinalEn = (i) => ORD_WORDS[i] || `#${i + 1}`;

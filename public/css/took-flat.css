@@ -17,16 +17,12 @@ body.tui-mood .chat-head button, body.tui-mood .chat-head button:hover:not(:disa
 body.tui-mood .chat-modal-close, body.tui-mood .chat-modal-close:hover:not(:disabled) {
   background: var(--f-surface); border: 1px solid var(--f-line); box-shadow: none; filter: none; color: #fff; }
 body.tui-mood main button:not(.tkb-key):not(.pc-arrow):not(.cm-mb):active { background: var(--f-press); }
-/* '립 다시 바르기'도 보통 버튼 (분홍 그라데이션·빛 번짐 뺌) */
-body.tui-mood #chat-to-palette, body.tui-mood #chat-to-palette:hover:not(:disabled) { background: var(--f-surface); border: 1px solid var(--f-line); box-shadow: none; }
 
 /* 말풍선: 봇 = 면, 손님 = 강조 한 가지. 테두리·흐림·빛 없음 */
 body.tui-mood .chat-log .bubble { background: var(--f-surface); border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 20px 20px 20px 6px; }
 body.tui-mood .chat-log .bubble.user { background: var(--f-accent); border: 0; box-shadow: none; border-radius: 20px 20px 6px 20px; }
 body.tui-mood .chat-log .who { color: var(--f-mute); }
 body.tui-mood .chat-log .user .who { color: rgba(255, 255, 255, 0.7); }
-#chat-log .bt-link { text-decoration-color: var(--f-accent-ink); }
-#chat-log .bt-link:active { background: var(--cs-hl); }
 
 /* 제품 카드 */
 body.tui-mood .card, body.tui-mood .card.mini { background: #161618; border: 1px solid var(--f-line); box-shadow: none; }
@@ -60,7 +56,6 @@ body.tui-mood #chat-form.chat-input { border: 1px solid var(--f-line); backgroun
 body.tui-mood #chat-form.chat-input:focus-within { border-color: #55555c; background: var(--f-surface); box-shadow: none; }
 body.tui-mood #chat-form #chat-send.cs-send { background: var(--f-accent); box-shadow: none; }
 body.tui-mood #chat-form #chat-send.cs-send:disabled { background: transparent; }
-body.tui-mood #chat-form #scan-open, body.tui-mood #chat-form #scan-open:hover:not(:disabled) { background: var(--f-press); border: 0; }
 
 /* 화면 키보드 */
 body.tui-mood .tkb-enter, html:not(.in-chat-modal) body.tui-mood .chat-user .tkb-row-bottom .tkb-enter { background: var(--f-accent); border-color: var(--f-accent); box-shadow: none; }
@@ -70,3 +65,27 @@ body.tui-mood .tkb-enter:active { background: var(--f-accent-press); }
 body.tui-mood .msg { border-left-color: var(--f-accent-ink); }
 body.tui-mood .chat-fab-badge { background: var(--f-accent); }
 body.tui-mood ::selection { background: var(--f-accent); }
+
+/* 챗봇 말풍선 제품 카드의 '바르러 가기' (2026-11-20, js/chat-view.js productMini): 카드 아래 꽉 찬 핑크 단색 버튼.
+   위의 어두운 공통 버튼 규칙(body.tui-mood main button:not(...))을 이기도록 같은 세기로 쓰고 뒤에 둔다 */
+body.tui-mood main .card.mini button.wear-btn, .card.mini .wear-btn { margin-top: auto; /* 카드 맨 아래에 붙여 한 줄의 버튼 높이를 맞춘다 (2026-11-20) */ width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 12px;
+  background: var(--f-accent, #ff007b); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+body.tui-mood main .card.mini button.wear-btn:hover:not(:disabled) { background: var(--f-accent, #ff007b); color: #fff; }
+body.tui-mood main .card.mini button.wear-btn:active:not(:disabled), .card.mini .wear-btn:active { background: var(--f-accent-press, #d60067); }
+
+/* ---------- 전체 화면 챗봇 상단 (2026-11-20 사용자 디자인) ----------
+   왼쪽 위 뒤로 동그라미(64px, x 49 · y 54) · 가운데 로고 · 'Beauty Chat' · 회색 부제 · 그 아래 한 줄: 왼쪽 분홍 'TOOK AI' / 오른쪽 회색 'BEAUTY ASSISTANT'.
+   id 로 써서 위의 공통 버튼 규칙과 took-mood.css 의 '.cs-back 숨김'보다 앞선다. 모달 안 챗봇은 모달 머리를 쓰므로 그대로 숨긴다 */
+html:not(.in-chat-modal) body.tui-mood #chat-back { position: fixed; left: 49px; top: 54px; z-index: 30; display: grid; place-items: center;
+  width: 64px; height: 64px; min-height: 0; padding: 0; border-radius: 50%; border: 1px solid var(--f-line); background: #121212; box-shadow: none; cursor: pointer; }
+html:not(.in-chat-modal) body.tui-mood #chat-back:active { background: var(--f-press); }
+html:not(.in-chat-modal) body.tui-mood #chat-back img { width: 28px; height: 28px; }
+html:not(.in-chat-modal) body.tui-mood .chat-head { height: auto; }
+html:not(.in-chat-modal) body.tui-mood .chat-head strong { margin-top: 4px; font-size: 32px; line-height: 44px; font-weight: 700; }
+html:not(.in-chat-modal) body.tui-mood .chat-head .chat-sub { margin-top: 14px; font-size: 21px; color: #b4b4ba; }
+.chat-tag { display: none; }
+html:not(.in-chat-modal) body.tui-mood .chat-tag { display: flex; justify-content: space-between; align-items: baseline; margin: 50px 26px 18px 38px; }
+/* 첫 화면(대화 전, body.cs-on)에는 없다: 부제 바로 아래 "어떤 이야기를 나눠볼까요?" (2026-11-20 사용자 디자인). 대화가 시작되면 보인다 */
+html:not(.in-chat-modal) body.tui-mood.cs-on .chat-tag { display: none; }
+.chat-tag .ct-ai { color: var(--f-accent, #ff007b); font-size: 19px; font-weight: 700; letter-spacing: 0.02em; }
+.chat-tag .ct-sub { color: #b4b4ba; font-size: 16px; font-weight: 400; letter-spacing: 0.04em; }

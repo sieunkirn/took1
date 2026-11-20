@@ -2,6 +2,7 @@
 import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
 import { t, isEn, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js';
 import { el } from './dom.js';
+import { isDemo, demoBadgeFor } from './demo.js';
 import { go } from './store.js';
 import { api } from './api.js';
 import { hasPick, togglePick } from './chat-picks.js';
@@ -186,6 +187,7 @@ export function productCard(product, { extraActions = [], from = null, onShade =
     : noImage();
   return el('div', { class: 'card', 'data-product-id': product.id },
     image,
+    demoBadgeFor(product), // 시연용 제품이면 '시연용' 배지 (demo.js)
     el('dl', {}, rows.flatMap(([k, v]) => [el('dt', { text: k }), Array.isArray(v) ? el('dd', {}, ...v) : el('dd', { text: v })])),
     picker,
     el('div', { class: 'actions' },
@@ -195,7 +197,7 @@ export function productCard(product, { extraActions = [], from = null, onShade =
 
 export function productDetailTable(p) {
   const rows = [
-    ['ID', p.id], [t('detail.source'), p.source === 'oliveyoung' ? t('detail.sourceOy') : t('detail.sourceVirtual')],
+    ['ID', p.id], [t('detail.source'), isDemo(p) ? t('detail.sourceVirtual') : t('detail.sourceOy')],
     [t('detail.barcode'), p.barcode || t('detail.none')], [t('card.brand'), brandOf(p)], [t('card.name'), nameOf(p)], [t('detail.type'), t('type.' + p.type)],
     [t('detail.shade'), shadeText(p)], [t('detail.hex'), p.color_hex],
     ...(p.color_source === 'oliveyoung_color_chip' ? [[t('detail.colorSource'), t('detail.colorChip')]] : []),

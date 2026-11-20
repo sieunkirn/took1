@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>took(툭) - 카메라 색 보정</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
+<script src="js/theme-boot.js"></script>
+<style>
+  /* 카메라 색 보정 (2026-11-20): 직원용 화면. 관리자 화면의 '카메라 색 보정'으로 온다 (터치 범위 조정처럼 설치할 때 한 번).
+     흰 종이를 네모 안에 대고 측정 → 카메라가 어떤 색 쪽으로 틀어져 찍는지 재서 되돌릴 값을 저장한다 (js/color-calib.js).
+     저장한 값은 '내 톤 추천'이 피부색을 잴 때 쓴다. 웹캠이 지원하면 자동 색·밝기도 고정한다.
+     무채색 화면. 예외: 카메라 영상과 측정한 종이 색 견본은 실제 색 */
+  html, body { background: var(--bg); }
+  .cc { max-width: 900px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; font-size: 17px; }
+  .cc-head { display: flex; gap: 14px; align-items: center; }
+  .cc-head h1, .cc-head p { margin: 0; }
+  .cc-head button { flex: none; min-height: 52px; border-radius: var(--r-s); }
+  .cc-box { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+  .cc-steps { margin: 6px 0 0; padding-left: 22px; line-height: 1.6; }
+  /* 카메라 화면 + 가운데 네모(여기에 흰 종이) */
+  .cc-cam { position: relative; aspect-ratio: 4 / 3; background: #000; border-radius: var(--r); overflow: hidden; }
+  .cc-cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cc-cam video.mirror { transform: scaleX(-1); }
+  .cc-cam video.fx { filter: url(#cc-fx); }
+  .cc-guide { position: absolute; left: 50%; top: 50%; width: 36%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 4px dashed #fff; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35); pointer-events: none; }
+  .cc-guide span { position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); text-align: center; color: #fff; font-weight: 700; font-size: 18px; }
+  .cc-tag { position: absolute; left: 12px; top: 12px; padding: 6px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 15px; font-weight: 700; }
+  .cc-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; color: #fff; font-size: 20px; }
+  /* 실시간 측정 줄 */
+  .cc-live { display: flex; gap: 14px; align-items: center; }
+  .cc-dot { width: 56px; height: 56px; border-radius: 12px; border: 1px solid var(--line-2); flex: none; }
+  .cc-live p { margin: 0; }
+  .cc-big { font-size: 22px; font-weight: 800; }
+  .cc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cc-actions button { min-height: 72px; border-radius: var(--r-s); font-size: 20px; font-weight: 800; }
+  .cc-actions .primary { grid-column: 1 / -1; min-height: 96px; font-size: 26px; background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cc-actions button:disabled { opacity: 0.45; }
+  .cc-check { display: flex; gap: 10px; align-items: center; font-size: 18px; }
+  .cc-check input { width: 26px; height: 26px; }
+  .cc-result.bad { border-width: 3px; border-color: var(--ink); }
+  .cc-code textarea { width: 100%; height: 70px; box-sizing: border-box; padding: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--soft); color: var(--ink); font: 13px/1.4 ui-monospace, monospace; resize: none; }
+</style>
+</head>
+<body data-idle-reset="off">
+<!-- 보정 전/후 미리보기: 선형 RGB 에서 채널별로 곱한다 (내 톤 추천이 피부색에 하는 계산과 같다) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="cc-fx" color-interpolation-filters="linearRGB">
+    <feComponentTransfer>
+      <feFuncR id="cc-r" type="linear" slope="1"/>
+      <feFuncG id="cc-g" type="linear" slope="1"/>
+      <feFuncB id="cc-b" type="linear" slope="1"/>
+    </feComponentTransfer>
+  </filter>
+</svg>
+<main class="cc">
+  <header class="cc-head">
+    <button type="button" id="cc-back">← 관리자</button>
+    <div>
+      <h1>카메라 색 보정</h1>
+      <p class="muted small">직원용 화면 · 설치할 때, 또는 매장 조명을 바꿨을 때 한 번 해 주세요</p>
+    </div>
+  </header>
+
+  <section class="cc-box">
+    <strong>이렇게 해 주세요</strong>
+    <ol class="cc-steps">
+      <li>매장 조명을 손님이 쓸 때처럼 켜 주세요</li>
+      <li>흰 종이(A4 복사 용지)를 거울 앞, 얼굴이 올 자리쯤에 들고 아래 네모 안이 종이로 가득 차게 해 주세요</li>
+      <li><b>측정하기</b>를 누르고 1초 동안 가만히 있어 주세요 → 결과를 보고 <b>저장</b></li>
+    </ol>
+  </section>
+
+  <div class="cc-cam">
+    <video id="cc-video" autoplay playsinline muted></video>
+    <div class="cc-guide"><span>여기에 흰 종이</span></div>
+    <div class="cc-tag" id="cc-tag">보정 전</div>
+    <div class="cc-msg" id="cc-msg">카메라를 켜는 중…</div>
+  </div>
+
+  <section class="cc-box cc-live" aria-live="polite">
+    <div class="cc-dot" id="cc-dot"></div>
+    <div>
+      <p class="cc-big" id="cc-live">네모 안 색을 읽는 중…</p>
+      <p class="muted small" id="cc-live-sub"></p>
+    </div>
+  </section>
+
+  <label class="cc-box cc-check"><input type="checkbox" id="cc-lock" checked> <span id="cc-lock-text">웹캠 자동 색·밝기 고정</span></label>
+
+  <section class="cc-box cc-result" id="cc-result" aria-live="polite" hidden></section>
+
+  <div class="cc-actions">
+    <button type="button" class="primary" id="cc-measure" disabled>측정하기</button>
+    <button type="button" id="cc-save" disabled>저장</button>
+    <button type="button" id="cc-view" disabled>보정 후 화면 보기</button>
+    <button type="button" id="cc-copy">보정값 복사</button>
+    <button type="button" id="cc-reset">보정값 초기화</button>
+  </div>
+
+  <section class="cc-box cc-code">
+    <p class="muted small" id="cc-status" style="margin:0 0 6px"></p>
+    <textarea id="cc-code" readonly aria-label="복사할 보정값"></textarea>
+  </section>
+</main>
+
+<script type="module">
+  import { getCamSettings, videoConstraints } from './js/camera-settings.js';
+  import {
+    computeGain, checkSample, describeCast, encodeCode, getColorCalib, builtInCalib, saveColorCalib, clearColorCalib,
+    lockSupport, lockCamera, applyCameraLock, unlockCamera,
+  } from './js/color-calib.js';
+
+  const $ = (id) => document.getElementById(id);
+  const video = $('cc-video');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  let stream = null, track = null;
+  let pending = null; // 측정했지만 아직 저장 안 한 값
+  let showFx = false;
+
+  const fmt = (g) => g.map((v) => '×' + v.toFixed(2)).join(' · ');
+  const when = (iso) => (iso ? new Date(iso).toLocaleString('ko-KR') : '');
+  const REASON = {
+    dark: '너무 어두워요. 조명을 켜거나 종이를 빛 쪽으로 돌려 주세요',
+    bright: '종이가 하얗게 날아갔어요. 종이를 조금 비스듬히 들어 반사를 줄여 주세요',
+    uneven: '네모 안에 종이가 아닌 게 섞였거나 그림자가 졌어요. 네모가 종이로 가득 차게 해 주세요',
+    colored: '흰 종이가 아닌 것 같아요. 흰 종이를 대 주세요',
+  };
+
+  // 가운데 네모(화면 너비 36%)의 픽셀을 읽는다. 거울 반전은 가운데라 상관없다
+  function readBox() {
+    const w = video.videoWidth, h = video.videoHeight;
+    if (!w || !h) return null;
+    // 화면은 4:3 으로 잘라(cover) 보여 주므로, 보이는 영역 기준 네모를 원본 좌표로 바꾼다
+    const viewAR = 4 / 3, srcAR = w / h;
+    const vw = srcAR > viewAR ? h * viewAR : w; // 보이는 원본 너비
+    const side = Math.round(vw * 0.36 * 0.85); // 테두리 안쪽만
+    const x = Math.round((w - side) / 2), y = Math.round((h - side) / 2);
+    const n = 64;
+    canvas.width = canvas.height = n;
+    ctx.drawImage(video, x, y, side, side, 0, 0, n, n);
+    const d = ctx.getImageData(0, 0, n, n).data;
+    const sum = [0, 0, 0];
+    const ys = [];
+    let clipped = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      sum[0] += d[i]; sum[1] += d[i + 1]; sum[2] += d[i + 2];
+      ys.push(0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]);
+      if (d[i] > 250 && d[i + 1] > 250 && d[i + 2] > 250) clipped++;
+    }
+    const cnt = d.length / 4;
+    const mean = sum.map((s) => s / cnt);
+    const my = ys.reduce((a, b) => a + b, 0) / cnt;
+    const std = Math.sqrt(ys.reduce((a, b) => a + (b - my) ** 2, 0) / cnt);
+    return { mean, std, clipped: clipped / cnt };
+  }
+
+  // 실시간: 네모 안 색과 틀어짐을 계속 보여 준다
+  function liveLoop() {
+    const s = readBox();
+    if (s) {
+      const [r, g, b] = s.mean.map(Math.round);
+      $('cc-dot').style.background = `rgb(${r},${g},${b})`;
+      const bad = checkSample(s);
+      $('cc-live').textContent = bad ? REASON[bad] : describeCast(computeGain(s.mean));
+      $('cc-live-sub').textContent = `네모 안 평균 R ${r} · G ${g} · B ${b} · 고르기 ${s.std.toFixed(0)} (낮을수록 고름)`;
+    }
+    setTimeout(liveLoop, 250);
+  }
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const median = (arr) => [0, 1, 2].map((k) => arr.map((m) => m[k]).sort((a, b) => a - b)[Math.floor(arr.length / 2)]);
+
+  async function measure() {
+    $('cc-measure').disabled = true;
+    $('cc-measure').textContent = '측정 중… 가만히 있어 주세요';
+    const res = $('cc-result');
+    res.hidden = true;
+    let lock = null;
+    try {
+      // 고정: 먼저 자동으로 되돌려 이 조명에 다시 맞추게 한 뒤, 맞춘 값 그대로 고정한다
+      if ($('cc-lock').checked && track) {
+        await unlockCamera(track);
+        await sleep(1500);
+        lock = await lockCamera(track);
+        await sleep(500);
+      }
+      const samples = [];
+      let last = null;
+      for (let i = 0; i < 20; i++) {
+        const s = readBox();
+        if (s) { samples.push(s.mean); last = s; }
+        await sleep(50);
+      }
+      if (!samples.length) throw new Error('카메라 화면을 읽지 못했어요');
+      const mean = median(samples);
+      const bad = checkSample({ mean, std: last.std, clipped: last.clipped });
+      if (bad) {
+        pending = null;
+        showResult(true, `측정 실패: ${REASON[bad]}`);
+      } else {
+        const exposureLocked = !!lock?.exposure;
+        const gain = computeGain(mean, { exposureLocked });
+        pending = { gain, exposureLocked, lock, raw: mean, at: new Date().toISOString() };
+        showResult(false, `${describeCast(gain)}<br>되돌릴 값: 빨강 ${gain[0].toFixed(2)} · 초록 ${gain[1].toFixed(2)} · 파랑 ${gain[2].toFixed(2)} 배`
+          + `<br><span class="muted small">${lock ? `웹캠 고정: ${[lock.wb && '색', lock.exposure && '밝기'].filter(Boolean).join('·')}` : '웹캠 고정 안 함'}`
+          + `${exposureLocked ? ' · 밝기도 맞춤' : ' · 밝기는 웹캠 자동에 맡김(색만 맞춤)'}</span>`
+          + '<br><b>저장</b>을 눌러야 적용돼요. <b>보정 후 화면 보기</b>로 종이가 하얗게 보이는지 확인해 보세요');
+        setFx(pending.gain, true);
+      }
+    } catch (e) {
+      pending = null;
+      showResult(true, `측정 실패: ${e.message || e}`);
+    }
+    $('cc-measure').disabled = false;
+    $('cc-measure').textContent = '다시 측정하기';
+    $('cc-save').disabled = !pending;
+  }
+
+  function showResult(bad, html) {
+    const res = $('cc-result');
+    res.hidden = false;
+    res.classList.toggle('bad', bad);
+    res.innerHTML = html;
+  }
+
+  // 보정 전/후 화면: 보여 줄 이득을 필터에 넣고 켜거나 끈다
+  function setFx(gain, on) {
+    if (gain) ['r', 'g', 'b'].forEach((c, i) => $('cc-' + c).setAttribute('slope', String(gain[i])));
+    showFx = !!on && !!gain;
+    video.classList.toggle('fx', showFx);
+    $('cc-tag').textContent = showFx ? '보정 후' : '보정 전';
+    $('cc-view').textContent = showFx ? '보정 전 화면 보기' : '보정 후 화면 보기';
+    $('cc-view').disabled = !gain;
+  }
+  const fxGain = () => pending?.gain || getColorCalib()?.gain || null;
+
+  function renderStatus() {
+    const c = getColorCalib();
+    const built = builtInCalib();
+    $('cc-status').textContent = !c ? '저장된 보정값 없음 → 내 톤 추천은 눈 흰자로 조명을 맞춰요'
+      : (c.source === 'builtin' ? '웹에 고정한 값 사용 중' : '이 기기에 저장한 값 사용 중' + (built ? '' : ' (아직 웹에 고정 안 됨 → 복사해서 Claude 에게 붙여 넣으세요)'))
+        + ` · ${when(c.at)} · ${fmt(c.gain)}` + (c.lock ? ' · 웹캠 고정' : '');
+    const code = c ? encodeCode(c) : null;
+    $('cc-code').value = code ? `[툭 카메라 색 보정값] 이 값을 웹에 고정 적용해 줘 (${when(c.at)}, ${fmt(c.gain)})\n${code}` : '';
+    $('cc-copy').disabled = !code;
+    $('cc-reset').disabled = !c || c.source === 'builtin';
+    $('cc-reset').textContent = c?.source === 'builtin' ? '초기화할 값 없음(웹 고정값)' : '보정값 초기화';
+  }
+
+  async function copy() {
+    const ta = $('cc-code');
+    try { await navigator.clipboard.writeText(ta.value); alertLine('복사했어요. Claude 에게 붙여 넣어 주세요'); return; } catch { /* 아래로 */ }
+    ta.focus(); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    alertLine(ok ? '복사했어요. Claude 에게 붙여 넣어 주세요' : '아래 글을 길게 눌러 복사해 주세요');
+  }
+  const alertLine = (t) => { const tt = window.__tookCalib?.toast; if (tt) tt(t); else $('cc-status').textContent = t; };
+
+  async function start() {
+    if (!navigator.mediaDevices?.getUserMedia) { $('cc-msg').textContent = '이 브라우저에서는 카메라를 쓸 수 없어요 (https 또는 localhost 에서 열어 주세요)'; return; }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints(), audio: false });
+    } catch (e) {
+      $('cc-msg').textContent = `카메라를 열지 못했어요 (${e.name}). 웹캠 연결과 카메라 권한을 확인해 주세요`;
+      return;
+    }
+    track = stream.getVideoTracks()[0];
+    video.classList.toggle('mirror', getCamSettings().mirror !== false);
+    video.srcObject = stream;
+    try { await video.play(); } catch { /* autoplay */ }
+    $('cc-msg').hidden = true;
+    $('cc-measure').disabled = false;
+    const sup = lockSupport(track);
+    const can = [sup.wb && '색', sup.exposure && '밝기'].filter(Boolean);
+    $('cc-lock-text').textContent = can.length
+      ? `웹캠 자동 ${can.join('·')} 고정 (이 웹캠은 ${can.join('·')} 고정이 돼요)`
+      : '웹캠 자동 색·밝기 고정 (이 웹캠은 지원하지 않아요 → 색만 맞춰요. 조명을 고정해 두면 더 정확해요)';
+    $('cc-lock').disabled = !can.length;
+    if (!can.length) $('cc-lock').checked = false;
+    // 이미 고정값이 저장돼 있으면 그 상태로 보여 준다 (손님 화면과 같은 조건)
+    applyCameraLock(track);
+    setFx(fxGain(), false);
+    liveLoop();
+  }
+
+  $('cc-back').addEventListener('click', () => { location.href = 'admin.html'; });
+  $('cc-measure').addEventListener('click', measure);
+  $('cc-save').addEventListener('click', () => {
+    if (!pending || !saveColorCalib(pending)) { alertLine('저장하지 못했어요'); return; }
+    pending = null;
+    $('cc-save').disabled = true;
+    showResult(false, '저장했어요. 이제 <b>내 톤 추천</b>이 이 값으로 조명을 맞춰요');
+    renderStatus();
+    setFx(fxGain(), showFx);
+  });
+  $('cc-view').addEventListener('click', () => setFx(fxGain(), !showFx));
+  $('cc-copy').addEventListener('click', copy);
+  $('cc-reset').addEventListener('click', async () => {
+    clearColorCalib();
+    pending = null;
+    $('cc-save').disabled = true;
+    $('cc-result').hidden = true;
+    if (track && !getColorCalib()?.lock) await unlockCamera(track);
+    renderStatus();
+    setFx(fxGain(), false);
+    alertLine('보정값을 지웠어요');
+  });
+  addEventListener('pagehide', () => stream?.getTracks().forEach((t) => t.stop()));
+
+  renderStatus();
+  start();
+</script>
+</body>
+</html>

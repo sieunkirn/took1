@@ -18,16 +18,6 @@ copyFileSync(join(src, 'vision_bundle.mjs'), join(dest, 'vision_bundle.js')); //
 for (const f of readdirSync(join(src, 'wasm'))) copyFileSync(join(src, 'wasm', f), join(dest, 'wasm', f));
 console.log('MediaPipe 런타임 복사 완료');
 
-// 바코드 인식(ZXing): 윈도우 크롬에는 브라우저 내장 BarcodeDetector 가 없어 라이브러리를 로컬로 제공한다
-const zxing = join(root, 'node_modules/@zxing/library/umd/index.min.js');
-if (existsSync(zxing)) {
-  mkdirSync(join(root, 'public/vendor/zxing'), { recursive: true });
-  copyFileSync(zxing, join(root, 'public/vendor/zxing/zxing.min.js'));
-  console.log('ZXing 바코드 인식 라이브러리 복사 완료');
-} else {
-  console.error('node_modules/@zxing/library 가 없습니다. 카메라 바코드 인식 없이 번호 입력만 동작합니다.');
-}
-
 const modelPath = join(dest, 'face_landmarker.task');
 if (existsSync(modelPath)) {
   console.log('모델 파일이 이미 있습니다.');

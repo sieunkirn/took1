@@ -1,5 +1,5 @@
 /* 챗봇 빠른 답장 (2026-11-19 사용자 선택 2·4·5·6·7번)
-   2번 입력창 위 고정 줄(#qr-bar, js/chat-view.js) · 6번 단계형 도우미(.gd, js/chat-guide.js) 안에 4번 질감 카드 · 5번 슬라이더 · 7번 답변 속 밑줄 단어(.bt-link).
+   2번 입력창 위 고정 줄(#qr-bar, js/chat-view.js) · 6번 단계형 도우미(.gd, js/chat-guide.js) 안에 4번 질감 카드 · 5번 슬라이더. (7번 답변 속 밑줄 단어는 2026-11-20 뺐다)
    took-mood.css 의 'main 안 버튼 = 유리 알약' 규칙을 이기도록 아이디(#qr-bar·#chat-log)로 시작한다 */
 
 /* ---------- 2번: 입력창 위 고정 줄 (옆으로 밀기) ---------- */
@@ -16,13 +16,6 @@ body.cs-on #qr-bar, #qr-bar[hidden] { display: none; }
 #qr-bar .qr-ico { width: 22px; height: 22px; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 7 2 2 4-4M4 17l2 2 4-4M14 7h6M14 17h6'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 7 2 2 4-4M4 17l2 2 4-4M14 7h6M14 17h6'/%3E%3C/svg%3E") center / contain no-repeat; }
-
-/* ---------- 7번: 답변 속 제품 이름·색 계열·질감 → 분홍 밑줄, 누르면 이어서 묻기 ---------- */
-#chat-log .bt-link { display: inline; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; color: #fff;
-  font: inherit; line-height: inherit; letter-spacing: inherit; vertical-align: baseline; cursor: pointer;
-  text-decoration: underline; text-decoration-color: #fc54a5; text-decoration-thickness: 2px; text-underline-offset: 5px; }
-#chat-log .bt-link:hover:not(:disabled) { background: none; color: #ffd1e6; }
-#chat-log .bt-link:active { background: rgba(252, 84, 165, 0.25); }
 
 /* ---------- 6번: 단계형 도우미 카드 (챗봇 말풍선 안) ---------- */
 #chat-log .bubble.bot:has(> .gd:not(.gd-off)) { width: 88%; max-width: 88%; box-sizing: border-box; } /* 단계마다 말풍선 폭이 바뀌지 않게 */

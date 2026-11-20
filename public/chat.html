@@ -21,30 +21,21 @@
 </head>
 <body class="tui-mood">
 <main class="fit chat-user">
-  <!-- 왼쪽 세로 메뉴 (2026-11-19 사용자 요청 "챗봇 화면을 거울 화면과 비슷한 무드로"): 거울 화면과 같은 유리 알약·같은 자리(x 28, y 604).
-       여기서는 손잡이가 음성(챗봇) 쪽. 스캔 = 거울로, 9점 = 거울의 추천 제품, 집 = 처음으로(저장값 지움, js/chat-start.js). 전체 화면 챗봇만 (모달 안에서는 거울 메뉴가 이미 있다) -->
-  <nav class="cm-menu" id="cm-menu" aria-label="메뉴" data-i18n-aria="fc.menu">
-    <span class="cm-pair" aria-hidden="true"></span>
-    <span class="cm-knob" aria-hidden="true"></span>
-    <a class="cm-mb cm-scan" href="palette.html" data-i18n-aria="chat.toMirror" aria-label="거울로 (컬러 찾기)"><svg viewBox="0 0 46.83 46.83" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M14.66 18.75Q14.66 15.09 18.71 15.09"/><path d="M31.22 18.75Q31.22 15.09 27.17 15.09"/><path d="M14.66 28.08Q14.66 31.75 18.71 31.75"/><path d="M31.22 28.08Q31.22 31.75 27.17 31.75"/></g></svg></a>
-    <span class="cm-mb cm-voice" aria-current="page" role="img" data-i18n-aria="chat.here" aria-label="AI 뷰티 챗봇 (지금 화면)"><svg viewBox="0 0 46.83 46.83" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="21.27" y="16.68" width="3.37" height="13.48" rx="1.68"/><rect x="15.79" y="18.34" width="3.37" height="10.16" rx="1.68"/><rect x="26.75" y="18.34" width="3.37" height="10.16" rx="1.68"/><rect x="32.23" y="20.22" width="3.37" height="6.39" rx="1.68"/><ellipse cx="12.37" cy="23.42" rx="1.3" ry="1.82"/></g></svg></span>
-    <a class="cm-mb cm-grid" href="palette.html?mode=recs" data-i18n-aria="fc.sheet" aria-label="추천 제품 보기"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="currentColor"><circle cx="20.36" cy="19.49" r="2.09"/><circle cx="27.94" cy="19.49" r="2.09"/><circle cx="35.53" cy="19.49" r="2.09"/><circle cx="20.36" cy="27.46" r="2.09"/><circle cx="27.94" cy="27.46" r="2.09"/><circle cx="35.53" cy="27.46" r="2.09"/><circle cx="20.36" cy="35.44" r="2.09"/><circle cx="27.94" cy="35.44" r="2.09"/><circle cx="35.53" cy="35.44" r="2.09"/></g></svg></a>
-    <a class="cm-mb cm-home" id="cm-home" href="index.html" data-i18n-aria="nav.reset" aria-label="took(초기화)"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.99 26.89L27.46 18.99L36.94 26.89"/><path d="M20.62 24.88V35.94H34.31V24.88"/><path d="M24.83 35.94V29.62H30.1V35.94"/></g></svg></a>
-  </nav>
   <section class="area chat-shell">
     <div class="chat-head">
       <div>
         <strong data-i18n="chat.title">Beauty Chat</strong>
         <span class="chat-sub" data-i18n="chat.subtitle">나에게 어울리는 뷰티, 함께 찾아봐요</span>
       </div>
+      <!-- 2026-11-20 사용자 디자인: 제목 아래 한 줄, 왼쪽 분홍 'TOOK AI' · 오른쪽 회색 'BEAUTY ASSISTANT' (전체 화면 챗봇만) -->
+      <div class="chat-tag" aria-hidden="true"><span class="ct-ai">TOOK AI</span><span class="ct-sub">BEAUTY ASSISTANT</span></div>
       <div class="row">
         <button type="button" id="tts" class="icon-btn" aria-pressed="true" aria-label="답변 소리로 읽어주기" title="답변 소리로 읽어주기" data-i18n-aria="chat.tts" data-i18n-title="chat.tts">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="tts-wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="tts-mute" d="m22 9-6 6m0-6 6 6"/></svg>
         </button>
-        <!-- 립 다시 바르기: 팔레트 거울 화면으로. 대화·섞은 색·바른 립은 그대로 둔다 (초기화 없음) -->
-        <button type="button" id="chat-to-palette" onclick="location.href='palette.html'" data-i18n="chat.toPalette">립 다시 바르기</button>
+        <!-- '립 다시 바르기' 버튼은 2026-11-20 사용자 요청으로 뺐다 (거울로 가기는 제품 카드의 '바르러 가기'·닫기 X) -->
       </div>
-      <!-- 뒤로 (2026-11-19 Figma 디자인, 전체 화면 챗봇만): 왼쪽 위 동그라미. 이전 화면으로, 없으면 팔레트(거울)로. 대화는 그대로 둔다 (js/chat-start.js) -->
+      <!-- 뒤로 (2026-11-19 Figma · 2026-11-20 사용자 디자인으로 다시 켬, 전체 화면 챗봇만): 왼쪽 위 동그라미. 이전 화면으로, 없으면 팔레트(거울)로. 대화는 그대로 둔다 (js/chat-start.js) -->
       <button type="button" id="chat-back" class="cs-back" aria-label="뒤로" title="뒤로" data-i18n-aria="chat.back" data-i18n-title="chat.back"><img src="images/chat/back.svg" width="28" height="28" alt=""></button>
     </div>
 
@@ -76,81 +67,16 @@
       <button type="submit" id="chat-send" class="cs-send" disabled aria-label="보내기" title="보내기" data-i18n-aria="chat.send" data-i18n-title="chat.send">
         <img src="images/chat/send.svg" width="28" height="28" alt="">
       </button>
-      <button type="button" id="scan-open" class="icon-btn narrow-only" aria-label="바코드로 제품 알아보기" title="바코드로 제품 알아보기" data-i18n-aria="chat.scanOpen" data-i18n-title="chat.scanOpen">
-        <img src="images/chat/barcode.svg" width="28" height="28" alt="">
-      </button>
     </form>
     <p id="nfc-hint" class="nfc-hint" aria-live="polite"></p>
-
-    <!-- 바코드 비추기 (미러 챗봇, 2026-11-18): 입력줄의 바코드 버튼을 누르면 뜬다. 바코드 스캐너 없이 카메라로 읽는다.
-         팔레트 위에 뜬 챗봇이면 팔레트의 입술 카메라 영상을 같이 쓰고(카메라를 새로 열지 않음), 아니면 카메라를 연다 (js/chat-products.js) -->
-    <section id="cam-sheet" class="cam-sheet" hidden aria-label="바코드 비추기" data-i18n-aria="chat.camSheet">
-      <div class="cam-sheet-box">
-        <strong class="cam-sheet-title" data-i18n="chat.camSheetTitle">립 제품 바코드를 네모 안에 비춰 주세요</strong>
-        <div class="cam-sheet-stage">
-          <video id="cam-video" playsinline muted></video>
-          <div class="cam-sheet-guide" aria-hidden="true"></div>
-        </div>
-        <p id="cam-status" class="cam-sheet-status" aria-live="polite"></p>
-        <button type="button" id="cam-close" data-i18n="chat.close">닫기</button>
-      </div>
-    </section>
   </section>
 
-  <aside class="area chat-side" id="rec-panel" aria-label="바코드 찾기와 추천 제품" data-i18n-aria="chat.side">
+  <aside class="area chat-side" id="rec-panel" aria-label="추천 제품" data-i18n-aria="chat.side">
     <div class="panel-head">
-      <div class="label" id="panel-label">바코드로 제품 알아보기</div>
-      <div class="row">
-        <button type="button" id="panel-toggle" class="hidden"></button>
-        <button type="button" id="scan-close" class="narrow-only" data-i18n="chat.close">닫기</button>
-      </div>
+      <div class="label" id="panel-label">추천 제품</div>
     </div>
 
-    <!-- 바코드: USB·블루투스 바코드 스캐너가 연결돼 있다고 보고 구성한다.
-         스캐너는 키보드처럼 번호를 치므로 화면 어디에 커서가 있든 찍으면 바로 대화로 설명한다 (chat.js).
-         스캐너가 없을 때 쓰는 휴대폰·PC 카메라·사진은 맨 아래에 접어 둔다 -->
-    <div id="scan-view">
-      <section class="scanner-ready" aria-label="바코드 스캐너" data-i18n-aria="chat.scanner">
-        <svg class="scanner-art" viewBox="0 0 120 80" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 18h40l10 18-6 6H40l-8 30H18l6-30H14z"/>
-          <path class="beam" d="M66 30l40-14M66 36h42M66 42l40 14" stroke-width="2"/>
-          <path d="M96 12v56M102 12v56M108 12v56" stroke-width="2" opacity=".35"/>
-        </svg>
-        <strong class="scanner-title" data-i18n="chat.scannerTitle">스캐너로 립 제품의 바코드를 찍어 주세요</strong>
-        <p class="muted small" data-i18n="chat.scannerDesc">찍으면 어떤 제품인지 바로 대화로 설명하고, 그 제품을 기준으로 비슷한 색·더 저렴한 제품을 찾아 드려요.</p>
-        <span class="scanner-state" id="scanner-state"><i aria-hidden="true"></i><span data-i18n="chat.scannerReady">스캐너 대기 중</span></span>
-      </section>
-      <p id="scan-note" class="msg small hidden"></p>
-
-      <p id="scan-status" class="small" aria-live="polite"></p>
-      <div id="scan-result"></div>
-
-      <form id="scan-form" class="scan-form" autocomplete="off">
-        <label for="scan-input" class="small" data-i18n="chat.typeNumber">스캐너가 못 읽으면 번호로 입력</label>
-        <div class="row">
-          <input type="text" id="scan-input" inputmode="numeric" placeholder="예: 8809100000017">
-          <button type="submit" data-i18n="chat.ok">확인</button>
-        </div>
-      </form>
-
-      <details class="scan-alt" id="scan-alt">
-        <summary class="small" data-i18n="chat.noScanner">스캐너가 없을 때</summary>
-        <strong class="small" data-i18n="chat.pcCam">PC 카메라로 찍기</strong>
-        <div class="scan-stage">
-          <video id="scan-video" class="hidden" playsinline muted></video>
-          <div class="placeholder" id="scan-placeholder" style="position:absolute;inset:0" data-i18n="chat.camOff">카메라가 꺼져 있어요</div>
-          <div class="scan-guide hidden" id="scan-guide" aria-hidden="true"></div>
-        </div>
-        <div class="row">
-          <button type="button" id="scan-start" data-i18n="chat.camStart">카메라로 바코드 찍기</button>
-          <button type="button" id="scan-stop" class="hidden" data-i18n="chat.camStop">카메라 끄기</button>
-          <label for="scan-photo" class="btn-line photo-btn" data-i18n="chat.photo">사진으로 찍기</label>
-          <input type="file" id="scan-photo" accept="image/*" capture="environment" class="hidden">
-        </div>
-      </details>
-    </div>
-
-    <div id="list-view" class="hidden">
+    <div id="list-view">
       <p id="rec-status" class="muted small" aria-live="polite"></p>
       <div id="rec-list" class="mini-list"></div>
     </div>

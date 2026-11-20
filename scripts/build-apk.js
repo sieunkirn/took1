@@ -71,8 +71,9 @@ const calibSrc = readFileSync(calibFile, 'utf8');
 const calibOff = calibSrc.replace(/const BUILT_IN_CODE = '[^']*';/, "const BUILT_IN_CODE = ''; // 앱: 보정값 없음");
 if (calibOff === calibSrc && !/const BUILT_IN_CODE = '';/.test(calibSrc)) fail('touch-calib.js 에서 BUILT_IN_CODE 를 찾지 못했습니다.');
 writeFileSync(calibFile, calibOff);
-mkdirSync(w('res', 'mipmap-xxxhdpi'), { recursive: true });
-copyFileSync(join(root, 'public', 'images', 'icons', 'icon-192.png'), w('res', 'mipmap-xxxhdpi', 'ic_launcher.png'));
+// 앱 아이콘 (2026-11-20): TOOK 로고 마크. android/res 는 npm run icon:apk 가 android/icon/mark.svg 로 만든다 (적응형 + 안드로이드 7용)
+if (!existsSync(join(root, 'android', 'res', 'mipmap-anydpi-v26', 'ic_launcher.xml'))) fail('앱 아이콘이 없습니다. 먼저 npm run icon:apk 를 실행하세요.');
+cpSync(join(root, 'android', 'res'), w('res'), { recursive: true });
 copyFileSync(join(root, 'android', 'AndroidManifest.xml'), w('AndroidManifest.xml'));
 const now = new Date();
 const versionCode = Math.floor(now.getTime() / 60000); // 분 단위: 새로 만들수록 커져서 덮어 설치된다

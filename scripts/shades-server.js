@@ -220,7 +220,7 @@ createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/decision') {
       const { key, value, hex, clear = [] } = await readBody(req);
       const okKey = (k) => /^A\d{9,}:\d+$/.test(k || '');
-      if (!okKey(key) || !['ok', 'exclude', 'reset'].includes(value) || !Array.isArray(clear) || !clear.every(okKey)) return send(res, 400, { error: '잘못된 값' });
+      if (!okKey(key) || !['ok', 'exclude', 'reset', 'hold'].includes(value) || !Array.isArray(clear) || !clear.every(okKey)) return send(res, 400, { error: '잘못된 값' });
       if (hex != null && !/^#[0-9A-F]{6}$/i.test(hex)) return send(res, 400, { error: '색상코드는 #RRGGBB 형식이어야 해요' });
       const review = loadReview();
       // 같은 호수의 다른 옵션에 남은 결정은 지운다 (한 호수에 결정은 하나). reset 은 자동 판정으로 되돌리기

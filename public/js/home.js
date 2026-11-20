@@ -2,7 +2,8 @@
 // 2026-11-18 시안: 1~3번은 로고 자리가 똑같다 (가로 가운데, 로고 세로 중심 = 화면 50%). 화면마다 바뀌는 건 배경과 문구뿐
 // 배경 영상은 기존 videos/home.mp4 하나 (2026-11-19 사용자 요청: 따로 만든 입술 영상은 빼고 기존 영상만).
 // 0~4.95초 제품 클로즈업 → 그 뒤 원래 영상의 입술 장면. 2·3번 동안은 입술 장면(4.95초~끝)만 되풀이한다
-//  1 제품 장면 + 가운데 로고. home.mp4 가 입술 장면(4.95초)에 닿으면(또는 누르면) 2로
+// 2026-11-20 사용자 요청 "Tap The Screen 3초만에": 영상을 3.45초부터 틀어 제품 장면은 끝 1.5초만 보여 주고, 입술 장면 1.5초 뒤 3번 = 처음부터 3초
+//  1 제품 장면(3.45~4.95초) + 가운데 로고. 1.5초 뒤(또는 누르면) 2로
 //  2 입술 영상 + 같은 로고. 1.5초 뒤(또는 누르면) 3으로
 //  3 2번 + 로고 아래 "Tap The Screen". 입술 영상 반복. 누르면 바로 팔레트로 (2026-11-18 사용자 요청)
 //  4 (지금은 평소 흐름에 없음, ?step=4 로만) 시작: 로고가 위로 올라가며 빛나고 알약 버튼이 나온다. 로고·버튼은 한 덩어리로 화면 가운데쯤, 버튼은 원본보다 1.2배 크게 + 아래 이름표 (2026-11-16 사용자 요청 "버튼 배치 더 예쁘게")
@@ -54,8 +55,15 @@ stage.querySelector('#hs-help').textContent = t('home.tapToStart');
 
 // ---------- 1 → 2 → 3 (배경 영상 장면에 맞춘다) ----------
 const LIPS_AT = 4.95; // home.mp4 에서 제품 장면이 끝나고 입술 장면이 시작하는 시각(초)
-const PRODUCT_MAX_MS = 6000; // 영상이 안 나와도(자동 재생 막힘 등) 이 시간이 지나면 2로
-const LIPS_MS = 1500; // 2번 화면을 보여 주는 시간 (3번은 누를 때까지 기다린다)
+const PRODUCT_MS = 1500; // 1번(제품 장면)을 보여 주는 시간: 영상을 LIPS_AT 보다 이만큼 앞에서 튼다 (2026-11-20, 예전엔 4.95초 전부)
+const LIPS_MS = 1500; // 2번 화면을 보여 주는 시간 (3번은 누를 때까지 기다린다) → Tap The Screen = PRODUCT_MS + LIPS_MS = 3초
+const PRODUCT_FROM = LIPS_AT - PRODUCT_MS / 1000; // 1번에서 영상을 틀기 시작하는 시각(초)
+// 1번 시작: 영상을 제품 장면 끝 1.5초 앞으로 (영상 정보가 오기 전이면 온 뒤에)
+function seekProduct() {
+  const seek = () => { if (step === 1 && video.currentTime < PRODUCT_FROM) video.currentTime = PRODUCT_FROM; };
+  if (video.readyState >= 1) seek();
+  else video.addEventListener('loadedmetadata', seek, { once: true });
+}
 let step = 0;
 let autoTimer = null;
 function toLips() {
@@ -76,7 +84,8 @@ function go(n, { instant = false } = {}) {
   stage.classList.toggle('hs-instant', instant || reduce);
   stage.dataset.step = String(n);
   if (instant || reduce) requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('hs-instant')));
-  if (n === 1) { autoTimer = setTimeout(() => go(2), PRODUCT_MAX_MS); watchCut(); }
+  // 1 → 2 는 타이머로 정확히 1.5초 (영상이 늦게 나와도 Tap The Screen 은 3초). 영상이 먼저 입술 장면에 닿아도 2로
+  if (n === 1) { seekProduct(); autoTimer = setTimeout(() => go(2), PRODUCT_MS); watchCut(); }
   if (n >= 2) toLips(); // 2번부터는 입술 장면 (누르거나 ?step= 으로 건너뛴 경우 영상도 그 장면으로)
   if (n === 2) autoTimer = setTimeout(() => go(3), LIPS_MS);
 }

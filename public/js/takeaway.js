@@ -8,6 +8,7 @@ import { store, el, won, shortName, shadeLabelOf } from './common.js';
 import { t, isEn, brandOf, nameOf, finishText } from './i18n.js';
 import { nearbyStock, openStoreStock } from './store-stock.js';
 import { qrSvg } from './qr.js';
+import { realOnly, demoBadge, demoBadgeFor } from './demo.js';
 
 const C = (ko, en) => (isEn() ? en : ko);
 const CLOSE_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
@@ -56,7 +57,8 @@ export function createTakeaway({ stage, onClose = () => {} }) {
     shade.replaceChildren(...(label ? [el('i', { style: `background:${p.color_hex}` }), label] : []));
     meta.textContent = [p.finish ? finishText(p.finish) : null, p.price ? won(p.price) : null].filter(Boolean).join(' · '); // 제형을 모르면 빼고
 
-    // 매장에서 사기 (시연용 재고)
+    // 매장에서 사기 (시연용 재고). 실데이터만 보기에서는 가짜 재고라 칸째 숨긴다
+    storeBox.hidden = realOnly();
     const rows = nearbyStock(p.id);
     const best = rows.find((s) => s.best);
     storeBox.replaceChildren(
@@ -69,7 +71,7 @@ export function createTakeaway({ stage, onClose = () => {} }) {
         : el('span', { class: 'tk-store-sub', text: C('근처 매장 모두 품절이에요. 폰으로 온라인 주문을 이용해 주세요.', 'Sold out nearby. Please order online on your phone.') }),
       el('button', { type: 'button', class: 'tk-link', text: C('근처 매장 모두 보기', 'See all nearby stores'),
         onclick: () => openStoreStock(p.id, `${shortName(p)}${label ? ' · ' + label : ''}`) }),
-      el('span', { class: 'tk-demo', text: C('재고는 시연용 데이터예요', 'Stock is demo data') }));
+      el('span', { class: 'tk-demo' }, demoBadge(), ' ', C('재고는 만든 값이에요', 'Stock values are made up')));
 
     // 폰으로 가져가기 (QR)
     const url = takeUrl(p);
@@ -81,7 +83,8 @@ export function createTakeaway({ stage, onClose = () => {} }) {
       svg ? code : null,
       el('span', { class: 'tk-store-sub', text: svg
         ? C('폰 카메라로 찍으면 올리브영 상품 페이지가 열려요', 'Scan with your phone camera to open the Olive Young page')
-        : C('이 제품은 연결할 상품 페이지가 없어요 (시연용 제품)', 'No product page for this item (demo product)') }));
+        : C('이 제품은 연결할 상품 페이지가 없어요', 'No product page for this item') }),
+      svg ? null : demoBadgeFor(p));
   }
 
   const api = {

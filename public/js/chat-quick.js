@@ -1,11 +1,12 @@
 // 챗봇 빠른 답장 1차 (2026-11-19 기획 A·B·C·D): 마지막 챗봇 답이 어떤 상황인지 보고 입력창 위 줄에 놓을 버튼을 고른다.
 // 버튼 종류 (줄에서 앞 아이콘으로 구분, css/chat-quick.css):
 //   say  = 그 말을 바로 보낸다 (지금까지의 빠른 답장)
-//   act  = 화면을 바로 움직인다 (입술에 발라 보기 · 호수 보기 · 이 제품 기준으로 찾기)
+//   act  = 화면을 바로 움직인다 (이 제품 기준으로 찾기)
 //   pick = 말풍선 안에 고르기 한 단계를 띄운다 (질감 카드 · 가격 슬라이더, js/chat-guide.js startMini)
 // 맨 앞은 늘 '답하며 고르기'. 보내는 말은 모두 규칙 챗봇(src/lib/chat.js)이 한/영으로 알아듣는 것을 확인했다.
-//  A 추천 결과 직후: (기준 색이 있으면 더 밝은/진한 색) · 질감 바꾸기 · 가격대 바꾸기 · 다른 거 더 보여 줘(더 없으면 그중에 제일 싼 거는?) · 1번 입술에 발라 보기
-//  B 제품 하나 자세히: 호수 보기(호수가 있을 때) · 이거랑 비슷한 색 · 이거보다 저렴한 거 · 입술에 발라 보기 · 다른 거 더 보여 줘
+//  A 추천 결과 직후: (기준 색이 있으면 더 밝은/진한 색) · 질감 바꾸기 · 가격대 바꾸기 · 다른 거 더 보여 줘(더 없으면 그중에 제일 싼 거는?)
+//  B 제품 하나 자세히: 이거랑 비슷한 색 · 이거보다 저렴한 거 · 다른 거 더 보여 줘
+//  입술에 바르기는 2026-11-20부터 말풍선 제품 카드의 '바르러 가기' 버튼 (chat-view.js productMini → wearOnLips)
 //  C 결과 0개: 붙인 조건마다 "'매트' 빼고 찾기" (챗봇이 빼라고 한 조건을 앞에) — 나머지 조건으로 다시 묻는다
 //  D 못 알아들음 2번 연속: '답하며 고르기'를 크게 + 시작 예시 3개
 import { C, START, state, loadBase, track } from './chat-state.js';
@@ -29,14 +30,6 @@ export function wearOnLips(p) {
     } catch { /* 다른 창이면 아래로 */ }
   }
   location.href = 'palette.html?wear=' + encodeURIComponent(p.id);
-}
-
-/** 대화 속 그 제품 카드의 호수 고르기를 펼친다 */
-function openShades(p) {
-  const card = [...document.querySelectorAll(`#chat-log [data-product-id="${CSS.escape(p.id)}"]`)].at(-1);
-  const head = card?.querySelector('.opt-head');
-  card?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  if (head && head.getAttribute('aria-expanded') !== 'true') head.click();
 }
 
 /** 그 제품을 기준 제품으로 정하고 이어서 묻는다 ("비슷한 색", "더 저렴한 거"는 기준 제품이 있어야 정확하다) */
@@ -80,10 +73,9 @@ export function quickChips(m) {
   if (products.length === 1 && m.total == null && m.kind !== 'compare') {
     const p = products[0];
     return { chips: [
-      p.shade_count > 1 ? act(C('이 제품 호수 보기', 'See its shades'), () => openShades(p)) : null,
+      // '이 제품 호수 보기'·'입술에 발라 보기'는 2026-11-20 뺐다: 카드에 호수 고르기가 없고, 바르기는 카드의 '바르러 가기' 버튼으로 한다
       act(C('이거랑 비슷한 색', 'Similar colors'), () => askWithBase(p, C('비슷한 색 찾아 줘', 'Find similar colors'))),
       act(C('이거보다 저렴한 거', 'Something cheaper'), () => askWithBase(p, C('이거보다 저렴한 거', 'Something cheaper'))),
-      act(C('입술에 발라 보기', 'Try it on'), () => wearOnLips(p)),
       say(C('다른 거 더 보여 줘', 'Show more')),
     ].filter(Boolean) };
   }
@@ -95,7 +87,7 @@ export function quickChips(m) {
       pick(C('질감 바꾸기', 'Change finish'), 'finish'),
       pick(C('가격대 바꾸기', 'Change price'), 'price'),
       say(sugg.some(isMore) ? C('다른 거 더 보여 줘', 'Show more') : C('그중에 제일 싼 거는?', 'Which is the cheapest of those?')),
-      act(C('1번 입술에 발라 보기', 'Try #1 on'), () => wearOnLips(products[0])),
+      // '1번 입술에 발라 보기'는 2026-11-20 사용자 요청으로 뺐다 (카드마다 '바르러 가기' 버튼)
     ] };
   }
   // 그 밖(인사·잡담·안내 등): 챗봇이 준 다음 질문

@@ -24,6 +24,7 @@
   .ad { position: fixed; left: 50%; top: 50%; width: 900px; height: 1440px; transform: translate(-50%, -50%) scale(var(--k, 1)); background: var(--paper); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 12px; padding: 12px; box-sizing: border-box; }
   .ad.empty { grid-template-rows: auto minmax(0, 1fr) minmax(0, 0.3fr) auto auto; }
   .ad .tool { grid-column: 1 / -1; min-height: 120px; font-size: 24px; }
+  .ad .tool.half { grid-column: auto; } /* NFC 테스트·카메라 색 보정 한 줄에 둘 (2026-11-20) */
   .ad .wide { grid-column: 1 / -1; }
   .ad button.off { opacity: 0.45; }
   .ad h1 { grid-column: 1 / -1; margin: 4px 4px 0; font-size: 22px; }
@@ -59,9 +60,12 @@
   const SHADES_REVIEW = 'http://localhost:8766/all';
   const shadesBtn = (cls = '') => btn(cls, '호수 검수', '모든 제품·호수를 보고 넣기/빼기/색 고치기 · 이 컴퓨터에서 npm run shades:server 가 켜져 있어야 열려요 (새 탭)',
     () => { const w = window.open(SHADES_REVIEW, '_blank'); if (!w) location.href = SHADES_REVIEW; });
-  // NFC 테스트 (2026-11-18 사용자 요청: 바코드 카메라 테스트 버튼 자리를 바꿈. barcode-test.html 파일은 남아 있어 주소로는 열린다)
-  const nfcTestBtn = () => btn('tool', 'NFC 테스트', '리더기에 카드를 대면 몇 번 카드인지, 읽은 번호와 찾은 제품을 크게 보여 줘요',
+  // NFC 테스트 (2026-11-18 사용자 요청. 바코드 카메라 테스트 화면은 2026-11-20 바코드 기능과 함께 삭제)
+  const nfcTestBtn = () => btn('tool half', 'NFC 테스트', '리더기에 카드를 대면 몇 번 카드인지, 읽은 번호와 찾은 제품을 크게 보여 줘요',
     () => { location.href = 'nfc-test.html'; });
+  // 카메라 색 보정 (2026-11-20): 터치 범위 조정처럼 설치할 때 한 번. 흰 종이로 카메라 색 틀어짐을 재서 내 톤 추천에 쓴다 (color-calib.html)
+  const colorCalibBtn = () => btn('tool half', '카메라 색 보정', '흰 종이를 대고 측정해 카메라 색 틀어짐을 맞춰요 · 내 톤 추천에 쓰여요',
+    () => { location.href = 'color-calib.html'; });
   // 개발 쪽(Claude)에 그대로 붙여 넣을 글
   const copyText = () => {
     const code = calib.exportCode();
@@ -89,7 +93,7 @@
     box.classList.toggle('empty', !s.saved);
     if (!s.saved) {
       // 조정 전: 터치가 어긋나 있어도 눌리도록 화면 전체가 시작 버튼
-      box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 범위 조정 시작', '정전식 필름을 꽂은 뒤 눌러 주세요. 십자 5개를 차례로 누르고 저장하면 정확도 테스트로 넘어가요', () => calib.startCalib()), shadesBtn('wide'), nfcTestBtn());
+      box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 범위 조정 시작', '정전식 필름을 꽂은 뒤 눌러 주세요. 십자 5개를 차례로 누르고 저장하면 정확도 테스트로 넘어가요', () => calib.startCalib()), shadesBtn('wide'), nfcTestBtn(), colorCalibBtn());
     } else {
       // 조정값 초기화: 이 기기에 저장한 값을 지운다 (웹에 고정한 값이 있으면 그 값으로). 웹 고정값을 쓰는 중이면 지울 값이 없다
       const local = s.saved.source !== 'builtin';
@@ -103,6 +107,7 @@
         btn('', '스마트 미러 화면으로', '조정한 채로 실제 화면을 써 봐요', () => { location.href = 'index.html'; }),
         shadesBtn(),
         nfcTestBtn(),
+        colorCalibBtn(),
       );
     }
     const info = document.createElement('div');

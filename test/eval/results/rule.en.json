@@ -1,9 +1,9 @@
 {
   "provider": "rule",
-  "products": 285,
-  "cases": 54,
-  "passed": 54,
-  "passRate": 100,
+  "products": 199,
+  "cases": 74,
+  "passed": 73,
+  "passRate": 98.6,
   "groundingViolations": 0,
   "byCategory": {
     "Conditions": {
@@ -29,7 +29,7 @@
     "Follow-ups": {
       "key": "E",
       "total": 7,
-      "pass": 7
+      "pass": 6
     },
     "Out of scope": {
       "key": "I",
@@ -40,6 +40,11 @@
       "key": "J",
       "total": 6,
       "pass": 6
+    },
+    "New phrases 2": {
+      "key": "N",
+      "total": 20,
+      "pass": 20
     }
   },
   "results": [
@@ -51,7 +56,7 @@
       "turns": [
         {
           "say": "Recommend a glossy lip",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900).",
+          "reply": "Here are picks for \"Glossy\". My top pick is rom&nd Glasting Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -59,11 +64,11 @@
             "OY-A000000152764",
             "OY-A000000158893",
             "OY-A000000164124",
-            "OY-A000000170395"
+            "OY-A000000178944"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 29.3
+          "ms": 51.6
         }
       ]
     },
@@ -75,7 +80,7 @@
       "turns": [
         {
           "say": "Show me matte tints",
-          "reply": "My top pick is 3CE Blur Water Tint (Matte · ₩19,000).",
+          "reply": "Here are picks for \"Matte\". My top pick is 3CE Blur Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -87,7 +92,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 8.6
+          "ms": 23.8
         }
       ]
     },
@@ -99,7 +104,7 @@
       "turns": [
         {
           "say": "Any velvet lips?",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900).",
+          "reply": "Here are picks for \"Velvet\". My top pick is rom&nd Zero Velvet Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -111,7 +116,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 2.4
+          "ms": 5.3
         }
       ]
     },
@@ -123,7 +128,7 @@
       "turns": [
         {
           "say": "I want a coral lip",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000).",
+          "reply": "Here are picks for \"Coral\". My top pick is peripera Ink Airy Velvet.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -135,7 +140,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 3
+          "ms": 6.1
         }
       ]
     },
@@ -147,19 +152,19 @@
       "turns": [
         {
           "say": "Find me a red lipstick",
-          "reply": "My top pick is peripera Ink the Velvet (Velvet · ₩10,000).",
+          "reply": "Here are picks for \"Red\". My top pick is peripera Ink the Velvet.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000128184",
-            "OY-A000000187713",
             "OY-A000000188931",
             "OY-A000000209309",
-            "OY-A000000246909"
+            "OY-A000000251569",
+            "OY-A000000260282"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.8
+          "ms": 3.1
         }
       ]
     },
@@ -171,7 +176,7 @@
       "turns": [
         {
           "say": "Something nude please",
-          "reply": "My top pick is rom&nd Dewyful Water Tint (Glossy · ₩13,000).",
+          "reply": "Here are picks for \"Nude\". My top pick is rom&nd Dewyful Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -183,7 +188,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.9
+          "ms": 5.7
         }
       ]
     },
@@ -195,19 +200,19 @@
       "turns": [
         {
           "say": "Lips under 20,000 won",
-          "reply": "My top pick is THE FACE SHOP Water Fit Tint (Glossy · ₩6,500).",
+          "reply": "Here are picks for \"up to ₩20,000\". My top pick is THE FACE SHOP Water Fit Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000210382",
-            "OY-A000000225219",
-            "OY-A000000225039",
             "OY-A000000246318",
-            "OY-A000000268671"
+            "OY-A000000268671",
+            "OY-A000000246597",
+            "OY-A000000219707"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 14.8
         }
       ]
     },
@@ -219,19 +224,18 @@
       "turns": [
         {
           "say": "A glossy coral under 20,000 won",
-          "reply": "My top pick is Laka Jelling Nude Gloss Mini (Glossy · ₩9,000).",
+          "reply": "My top pick is Laka Jelling Nude Gloss Mini.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000232483",
             "OY-A000000254445",
             "OY-A000000152764",
-            "OY-A000000229116",
             "OY-A000000179692"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.2
+          "ms": 4.3
         }
       ]
     },
@@ -243,18 +247,15 @@
       "turns": [
         {
           "say": "Anything over 30000 won?",
-          "reply": "My top pick is Dinto Glowing Time To Kiss & Blush (Matte · ₩32,000).",
+          "reply": "Here are picks for \"over ₩30,000\". My top pick is HERA Sensual Powder Matte Liquid.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
-            "OY-A000000229359",
-            "OY-A000000202425",
-            "OY-A000000265823",
-            "OY-A000000187445"
+            "OY-A000000202425"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 4.4
         }
       ]
     },
@@ -266,7 +267,7 @@
       "turns": [
         {
           "say": "rom&nd lips",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900).",
+          "reply": "Here are picks for \"rom&nd\". My top pick is rom&nd Zero Velvet Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -274,11 +275,11 @@
             "OY-A000000136343",
             "OY-A000000158893",
             "OY-A000000158896",
-            "OY-A000000210451"
+            "OY-A000000219477"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 2.3
         }
       ]
     },
@@ -290,7 +291,7 @@
       "turns": [
         {
           "say": "romand glossy tint",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900).",
+          "reply": "Here are picks for \"Glossy · rom&nd\". My top pick is rom&nd Glasting Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -301,7 +302,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 2.3
         }
       ]
     },
@@ -313,16 +314,15 @@
       "turns": [
         {
           "say": "peripera pink",
-          "reply": "My top pick is peripera Water Bare Tint (Glossy · ₩12,000).",
+          "reply": "Here are picks for \"Pink · peripera\". My top pick is peripera Water Bare Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
-            "OY-A000000179969",
-            "OY-A000000243123"
+            "OY-A000000179969"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 1.8
         }
       ]
     },
@@ -334,19 +334,19 @@
       "turns": [
         {
           "say": "What's the cheapest lip?",
-          "reply": "My top pick is THE FACE SHOP Water Fit Tint (Glossy · ₩6,500).",
+          "reply": "Here are picks for \"cheapest first\". My top pick is THE FACE SHOP Water Fit Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000210382",
-            "OY-A000000225219",
-            "OY-A000000225039",
             "OY-A000000246318",
-            "OY-A000000268671"
+            "OY-A000000268671",
+            "OY-A000000246597",
+            "OY-A000000219707"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.3
+          "ms": 2.2
         }
       ]
     },
@@ -358,19 +358,19 @@
       "turns": [
         {
           "say": "No matte, something red",
-          "reply": "My top pick is peripera Ink the Velvet (Velvet · ₩10,000).",
+          "reply": "Here are picks for \"Red · no Matte\". My top pick is peripera Ink the Velvet.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000128184",
-            "OY-A000000187713",
             "OY-A000000188931",
             "OY-A000000209309",
-            "OY-A000000246909"
+            "OY-A000000251569",
+            "OY-A000000260282"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.9
+          "ms": 2.5
         }
       ]
     },
@@ -382,7 +382,7 @@
       "turns": [
         {
           "say": "Anything but red",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900).",
+          "reply": "Here are picks for \"no Red\". My top pick is rom&nd Zero Velvet Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -394,7 +394,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.8
+          "ms": 1.8
         }
       ]
     },
@@ -406,13 +406,13 @@
       "turns": [
         {
           "say": "Matte velvet under 5000 won",
-          "reply": "No products match \"Matte · up to ₩5,000\". Without the price limit, there are 43.",
+          "reply": "No products match \"Matte · up to ₩5,000\". Without the price limit, there are 31.",
           "engine": "rule-based",
           "outcome": "no_match",
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 2.6
         }
       ]
     },
@@ -424,7 +424,7 @@
       "turns": [
         {
           "say": "An everyday lip please",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
+          "reply": "Here are picks for \"Everyday\". My top pick is peripera Ink Airy Velvet. For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -436,7 +436,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 1.9
         }
       ]
     },
@@ -448,7 +448,7 @@
       "turns": [
         {
           "say": "Lips for a job interview",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900). For an interview, nude, rose or coral shades that add just a hint of color look neat. Apply a thin layer so it does not look shiny, and clean up the lip line.",
+          "reply": "Here are picks for \"Interview\". My top pick is rom&nd Zero Velvet Tint. For an interview, nude, rose or coral shades that add just a hint of color look neat. Apply a thin layer so it does not look shiny, and clean up the lip line.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -460,7 +460,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.9
+          "ms": 1.9
         }
       ]
     },
@@ -472,19 +472,19 @@
       "turns": [
         {
           "say": "I have a date tonight",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900). For a date, pink, rose and coral with a glossy finish look lively.",
+          "reply": "Here are picks for \"Date\". My top pick is rom&nd Glasting Water Tint. For a date, pink, rose and coral with a glossy finish look lively.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000136343",
             "OY-A000000152764",
-            "OY-A000000170395",
             "OY-A000000178944",
-            "OY-A000000179692"
+            "OY-A000000179692",
+            "OY-A000000179969"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 1.7
         }
       ]
     },
@@ -496,19 +496,19 @@
       "turns": [
         {
           "say": "What should a wedding guest wear on her lips?",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900). As a wedding guest, rose, pink and coral are pretty without being too much. Skip deep reds so you do not stand out more than the bride.",
+          "reply": "Here are picks for \"Wedding guest\". My top pick is rom&nd Glasting Water Tint. As a wedding guest, rose, pink and coral are pretty without being too much. Skip deep reds so you do not stand out more than the bride.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000136343",
             "OY-A000000152764",
-            "OY-A000000170395",
             "OY-A000000178944",
-            "OY-A000000179692"
+            "OY-A000000179692",
+            "OY-A000000179969"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 2.1
         }
       ]
     },
@@ -520,7 +520,7 @@
       "turns": [
         {
           "say": "Lips for my wedding as a bride",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). Rose and pink shades that photograph clearly are popular on the wedding day. Pick a long-lasting formula and keep one with you for touch-ups.",
+          "reply": "Here are picks for \"My wedding\". My top pick is peripera Ink Airy Velvet. Rose and pink shades that photograph clearly are popular on the wedding day. Pick a long-lasting formula and keep one with you for touch-ups.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -532,7 +532,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 1.9
         }
       ]
     },
@@ -544,7 +544,7 @@
       "turns": [
         {
           "say": "I'm going to a funeral",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900). For a funeral, keep it very calm with nude or brown close to your lip color. A thin, non-shiny layer that is barely visible is enough.",
+          "reply": "Here are picks for \"Funeral\". My top pick is rom&nd Zero Velvet Tint. For a funeral, keep it very calm with nude or brown close to your lip color. A thin, non-shiny layer that is barely visible is enough.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -552,11 +552,11 @@
             "OY-A000000148591",
             "OY-A000000192940",
             "OY-A000000200378",
-            "OY-A000000200585"
+            "OY-A000000201123"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.7
+          "ms": 2.3
         }
       ]
     },
@@ -568,19 +568,19 @@
       "turns": [
         {
           "say": "Beach vacation lip",
-          "reply": "My top pick is Holika Holika Water Vibe Tint (Glossy · ₩12,000). Bright coral and orange shades look radiant on a trip.",
+          "reply": "Here are picks for \"Travel\". My top pick is Holika Holika Water Vibe Tint. Bright coral and orange shades look radiant on a trip.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000152764",
             "OY-A000000179692",
             "OY-A000000179969",
-            "OY-A000000184327",
-            "OY-A000000187445"
+            "OY-A000000197490",
+            "OY-A000000210382"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.3
+          "ms": 1.6
         }
       ]
     },
@@ -592,7 +592,7 @@
       "turns": [
         {
           "say": "Lip for my ID photo",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). Rose and coral with clear color work well for ID and profile photos. Color looks lighter on camera, so go one shade deeper than usual.",
+          "reply": "My top pick is peripera Ink Airy Velvet. Rose and coral with clear color work well for ID and profile photos. Color looks lighter on camera, so go one shade deeper than usual.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -604,7 +604,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 1.6
         }
       ]
     },
@@ -616,7 +616,7 @@
       "turns": [
         {
           "say": "I have a cool tone",
-          "reply": "My top pick is peripera Ink the Velvet (Velvet · ₩10,000). Pink, rose and berry shades with a blue base suit cool tones.",
+          "reply": "Here are picks for \"Cool tone\". My top pick is peripera Ink the Velvet. Pink, rose and berry shades with a blue base suit cool tones.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -628,7 +628,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 1.4
         }
       ]
     },
@@ -640,7 +640,7 @@
       "turns": [
         {
           "say": "Warm tone lips please",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900). Coral, orange and brown shades with a yellow base suit warm tones.",
+          "reply": "Here are picks for \"Warm tone\". My top pick is rom&nd Zero Velvet Tint. Coral, orange and brown shades with a yellow base suit warm tones.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -652,7 +652,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 1.3
         }
       ]
     },
@@ -664,7 +664,7 @@
       "turns": [
         {
           "say": "Spring warm lip",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). Clear coral, peach and orange shades suit spring warm tones.",
+          "reply": "Here are picks for \"Spring Warm\". My top pick is peripera Ink Airy Velvet. Clear coral, peach and orange shades suit spring warm tones.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -676,7 +676,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 2.2
+          "ms": 1.3
         }
       ]
     },
@@ -688,13 +688,13 @@
       "turns": [
         {
           "say": "Which lip suits me?",
-          "reply": "Tell me your personal tone: warm or cool. You can also measure it with \"Find my tone\" on the palette.",
+          "reply": "Tell me your personal tone: warm or cool. You can also measure it with \"Match my tone\" in the mirror's product sheet.",
           "engine": "rule-based",
           "outcome": "text",
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 1.3
         }
       ]
     },
@@ -706,19 +706,19 @@
       "turns": [
         {
           "say": "Which lip suits me?",
-          "reply": "My top pick is peripera Ink the Velvet (Velvet · ₩10,000). Vivid red, berry and plum shades suit winter cool tones.",
+          "reply": "I picked these to suit your measured tone. My top pick is peripera Ink the Velvet. Vivid red, berry and plum shades suit winter cool tones.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000128184",
-            "OY-A000000174069",
-            "OY-A000000181619",
-            "OY-A000000187713",
-            "OY-A000000188931"
+            "OY-A000000188931",
+            "OY-A000000209309",
+            "OY-A000000212223",
+            "OY-A000000238220"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.8
+          "ms": 2.7
         }
       ]
     },
@@ -730,7 +730,7 @@
       "turns": [
         {
           "say": "My lips are dry",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900). Glossy or satin finishes hide dry patches better than matte.",
+          "reply": "Dry lips can be bothersome. My top pick is rom&nd Glasting Water Tint. Glossy or satin finishes hide dry patches better than matte.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -738,11 +738,11 @@
             "OY-A000000152764",
             "OY-A000000158893",
             "OY-A000000164124",
-            "OY-A000000170395"
+            "OY-A000000178944"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 1.9
         }
       ]
     },
@@ -754,7 +754,7 @@
       "turns": [
         {
           "say": "Something long-lasting",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900). Matte and velvet finishes tend to last longer.",
+          "reply": "Staying power matters. My top pick is rom&nd Zero Velvet Tint. Matte and velvet finishes tend to last longer.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -766,7 +766,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 1.4
         }
       ]
     },
@@ -778,19 +778,19 @@
       "turns": [
         {
           "say": "I look pale, I need a healthy glow",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). Pink, coral and rose shades bring life to your face.",
+          "reply": "Here are picks for \"Healthy flush · Glossy\". My top pick is rom&nd Glasting Water Tint. Pink, coral and rose shades bring life to your face.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
-            "OY-A000000121562",
             "OY-A000000136343",
-            "OY-A000000148591",
-            "OY-A000000148663",
-            "OY-A000000152764"
+            "OY-A000000152764",
+            "OY-A000000178944",
+            "OY-A000000179692",
+            "OY-A000000179969"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 2.2
         }
       ]
     },
@@ -802,19 +802,19 @@
       "turns": [
         {
           "say": "A brick colored lip",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900).",
+          "reply": "Here are picks for \"Brown/Orange/Red\". My top pick is rom&nd Zero Velvet Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000120880",
             "OY-A000000128184",
             "OY-A000000185529",
-            "OY-A000000187713",
-            "OY-A000000188340"
+            "OY-A000000188340",
+            "OY-A000000188931"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 1.6
+          "ms": 2
         }
       ]
     },
@@ -826,7 +826,7 @@
       "turns": [
         {
           "say": "I don't want anything sticky",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900).",
+          "reply": "Here are picks for \"no Glossy\". My top pick is rom&nd Zero Velvet Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -838,7 +838,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 2.1
         }
       ]
     },
@@ -850,7 +850,7 @@
       "turns": [
         {
           "say": "Recommend a glossy lip",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900).",
+          "reply": "Here are picks for \"Glossy\". My top pick is rom&nd Glasting Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -858,15 +858,15 @@
             "OY-A000000152764",
             "OY-A000000158893",
             "OY-A000000164124",
-            "OY-A000000170395"
+            "OY-A000000178944"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 1.7
         },
         {
           "say": "Which is the cheapest of those?",
-          "reply": "The cheapest is the first one, rom&nd Glasting Water Tint (Glossy · ₩10,900).",
+          "reply": "The cheapest is the first one, rom&nd Glasting Water Tint, at ₩10,900.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -874,7 +874,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 1.9
         }
       ]
     },
@@ -886,7 +886,7 @@
       "turns": [
         {
           "say": "Coral lips please",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000).",
+          "reply": "Here are picks for \"Coral\". My top pick is peripera Ink Airy Velvet.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -898,11 +898,11 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 2
         },
         {
           "say": "Tell me more about the second one",
-          "reply": "FORENCOS Tattoo Clair Velvet Tint · Velvet · ₩14,900.",
+          "reply": "FORENCOS Tattoo Clair Velvet Tint has a velvet finish and costs ₩14,900.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -910,19 +910,19 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.9
+          "ms": 2.2
         }
       ]
     },
     {
       "id": "E03",
       "cat": "Follow-ups",
-      "pass": true,
+      "pass": false,
       "groundingIssues": [],
       "turns": [
         {
           "say": "Everyday lips",
-          "reply": "My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
+          "reply": "Here are picks for \"Everyday\". My top pick is peripera Ink Airy Velvet. For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -934,20 +934,22 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 1.4
         },
         {
           "say": "Compare the first and second",
-          "reply": "The cheapest is peripera Ink Airy Velvet (₩10,000) and the priciest is 3CE Blur Water Tint (₩19,000). peripera Ink Airy Velvet and 3CE Blur Water Tint are in the same family but look different side by side. The lightest, softest color is peripera Ink Airy Velvet.",
+          "reply": "Comparing products is paused for now. I can tell you about each one.",
           "engine": "rule-based",
-          "outcome": "compare",
+          "outcome": "products",
           "products": [
             "OY-A000000121562",
             "OY-A000000148591"
           ],
-          "fails": [],
+          "fails": [
+            "답의 종류 products (기대 compare)"
+          ],
           "grounding": [],
-          "ms": 1
+          "ms": 1.1
         }
       ]
     },
@@ -959,7 +961,7 @@
       "turns": [
         {
           "say": "Rose lips",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900).",
+          "reply": "Here are picks for \"Rose\". My top pick is rom&nd Glasting Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -967,27 +969,27 @@
             "OY-A000000148591",
             "OY-A000000158147",
             "OY-A000000164559",
-            "OY-A000000169711"
+            "OY-A000000178944"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.9
+          "ms": 1.8
         },
         {
           "say": "Show more",
-          "reply": "Here are 5 more (6-10 of 94).",
+          "reply": "Here are 5 more, 6 to 10 of 66.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
-            "OY-A000000170395",
-            "OY-A000000178944",
-            "OY-A000000180567",
             "OY-A000000185265",
-            "OY-A000000192644"
+            "OY-A000000192644",
+            "OY-A000000192940",
+            "OY-A000000200360",
+            "OY-A000000200378"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 1.4
         }
       ]
     },
@@ -999,34 +1001,32 @@
       "turns": [
         {
           "say": "Pink lips",
-          "reply": "My top pick is peripera Water Bare Tint (Glossy · ₩12,000).",
+          "reply": "Here are picks for \"Pink\". My top pick is peripera Water Bare Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000179969",
-            "OY-A000000184327",
             "OY-A000000185183",
             "OY-A000000187348",
-            "OY-A000000187445"
+            "OY-A000000197490",
+            "OY-A000000207056"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 1.5
         },
         {
           "say": "Switch to matte",
-          "reply": "My top pick is wakemake Bold Lip Blur Tint (Matte · ₩16,000).",
+          "reply": "Updated with \"Matte\". My top pick is dasique Cotton Blur Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
-            "OY-A000000258196",
             "OY-A000000261857",
-            "OY-A000000264398",
             "OY-A000000265287"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.6
+          "ms": 2
         }
       ]
     },
@@ -1038,7 +1038,7 @@
       "turns": [
         {
           "say": "Rose lips",
-          "reply": "My top pick is rom&nd Glasting Water Tint (Glossy · ₩10,900).",
+          "reply": "Here are picks for \"Rose\". My top pick is rom&nd Glasting Water Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -1046,23 +1046,23 @@
             "OY-A000000148591",
             "OY-A000000158147",
             "OY-A000000164559",
-            "OY-A000000169711"
+            "OY-A000000178944"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.8
+          "ms": 2.3
         },
         {
           "say": "How much is the last one?",
-          "reply": "MUZIGAE MANSION Objet Liquid is ₩18,000.",
+          "reply": "JUNGSAEMMOOL Lip-Pression Glow Lasting Tint is ₩25,000.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
-            "OY-A000000169711"
+            "OY-A000000178944"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 1.1
         }
       ]
     },
@@ -1074,7 +1074,7 @@
       "turns": [
         {
           "say": "rom&nd lips",
-          "reply": "My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900).",
+          "reply": "Here are picks for \"rom&nd\". My top pick is rom&nd Zero Velvet Tint.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -1082,27 +1082,27 @@
             "OY-A000000136343",
             "OY-A000000158893",
             "OY-A000000158896",
-            "OY-A000000210451"
+            "OY-A000000219477"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 1
         },
         {
           "say": "under 15,000 won",
-          "reply": "My top pick is rom&nd The Juicy Lasting Tint Mini (Glossy · ₩8,000).",
+          "reply": "Updated with \"up to ₩15,000\". My top pick is rom&nd The Juicy Lasting Tint Mini.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
             "OY-A000000246597",
             "OY-A000000120880",
             "OY-A000000136343",
-            "OY-A000000210451",
-            "OY-A000000158893"
+            "OY-A000000158893",
+            "OY-A000000158896"
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 1.2
         }
       ]
     },
@@ -1114,13 +1114,13 @@
       "turns": [
         {
           "say": "Recommend a Chanel lipstick",
-          "reply": "Chanel isn't registered yet. I can search 221 OLIVE YOUNG lip products from 76 brands.",
+          "reply": "Chanel isn't registered yet. I can search 152 OLIVE YOUNG lip products from 64 brands.",
           "engine": "rule-based",
           "outcome": "text",
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 2.1
         }
       ]
     },
@@ -1138,7 +1138,7 @@
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.3
+          "ms": 3.7
         }
       ]
     },
@@ -1156,7 +1156,7 @@
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.2
+          "ms": 5.2
         }
       ]
     },
@@ -1174,7 +1174,7 @@
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.3
+          "ms": 2.7
         }
       ]
     },
@@ -1192,7 +1192,7 @@
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.1
+          "ms": 2.8
         }
       ]
     },
@@ -1210,7 +1210,7 @@
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 1.4
         }
       ]
     },
@@ -1222,13 +1222,13 @@
       "turns": [
         {
           "say": "Is it safe when pregnant?",
-          "reply": "I can't give reliable answers about ingredients or health. Please check the product page or ask a professional.",
+          "reply": "Sorry your lips feel uncomfortable. I can't judge health or ingredients, so please check the ingredient list and talk to a dermatologist or pharmacist. I can still pick a lip that goes on smoothly.",
           "engine": "rule-based",
           "outcome": "text",
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 0.8
+          "ms": 1.6
         }
       ]
     },
@@ -1240,13 +1240,13 @@
       "turns": [
         {
           "say": "Hi",
-          "reply": "Hello! Tell me the color, price range or occasion (everyday, date, interview) you have in mind.",
+          "reply": "Hello! Tell me the color, feel or price range you have in mind.",
           "engine": "rule-based",
           "outcome": "text",
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.3
+          "ms": 3.8
         }
       ]
     },
@@ -1264,7 +1264,7 @@
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 1.3
+          "ms": 3.8
         }
       ]
     },
@@ -1276,13 +1276,13 @@
       "turns": [
         {
           "say": "Who are you?",
-          "reply": "I'm the took beauty chatbot. I'm not an external AI; I find matching lip products from the registered list using set rules.",
+          "reply": "I'm Took, an AI assistant that helps you find lip colors. I'm not a person. I pick matching lips from the registered products using set rules.",
           "engine": "rule-based",
           "outcome": "text",
           "products": [],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 2.2
         }
       ]
     },
@@ -1294,7 +1294,7 @@
       "turns": [
         {
           "say": "I'm so sleepy",
-          "reply": "Feeling tired? Let me find a lip that gives you a healthy flush. My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). Pink, coral and rose shades bring life to your face.",
+          "reply": "Feeling tired? Let me find a lip that gives you a healthy flush. My top pick is peripera Ink Airy Velvet. Pink, coral and rose shades bring life to your face.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -1306,7 +1306,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 2.2
         }
       ]
     },
@@ -1318,7 +1318,7 @@
       "turns": [
         {
           "say": "I'm hungry",
-          "reply": "Hungry? Let me pick lips that stay on even after eating. My top pick is rom&nd Zero Velvet Tint (Velvet · ₩9,900). Matte and velvet finishes tend to last longer.",
+          "reply": "Hungry? Let me pick lips that stay on even after eating. My top pick is rom&nd Zero Velvet Tint. Matte and velvet finishes tend to last longer.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -1330,7 +1330,7 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.7
+          "ms": 1.7
         }
       ]
     },
@@ -1342,7 +1342,7 @@
       "turns": [
         {
           "say": "blah blah",
-          "reply": "Got it! Let me pick a lip that is nice to wear today. My top pick is peripera Ink Airy Velvet (Velvet · ₩10,000). For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
+          "reply": "I didn't quite catch that. For now, here is a lip that is nice to wear today. My top pick is peripera Ink Airy Velvet. For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
           "engine": "rule-based",
           "outcome": "products",
           "products": [
@@ -1354,7 +1354,489 @@
           ],
           "fails": [],
           "grounding": [],
-          "ms": 0.5
+          "ms": 1.7
+        }
+      ]
+    },
+    {
+      "id": "N01",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "I have dark skin, what suits me",
+          "reply": "Here are picks for \"Deeper skin\". My top pick is rom&nd Zero Velvet Tint. Deep brick, brown and berry shades show up clearly on deeper skin.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000120880",
+            "OY-A000000121562",
+            "OY-A000000128184",
+            "OY-A000000148663",
+            "OY-A000000152764"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 2.2
+        }
+      ]
+    },
+    {
+      "id": "N02",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "my skin is really fair",
+          "reply": "Here are picks for \"Fair skin\". My top pick is peripera Ink Airy Velvet. Clear pink, rose and coral shades bring out a pretty flush on fair skin.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000121562",
+            "OY-A000000128184",
+            "OY-A000000136343",
+            "OY-A000000148591",
+            "OY-A000000148663"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.2
+        }
+      ]
+    },
+    {
+      "id": "N03",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "I have yellow undertones",
+          "reply": "Here are picks for \"Yellow undertone\". My top pick is rom&nd Zero Velvet Tint. Warm coral, orange and brown shades suit a yellow undertone.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000120880",
+            "OY-A000000121562",
+            "OY-A000000148663",
+            "OY-A000000152764",
+            "OY-A000000158893"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 2.5
+        }
+      ]
+    },
+    {
+      "id": "N04",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "for a teenager",
+          "reply": "Here are picks for \"Student\". My top pick is Holika Holika Water Vibe Tint. Light pink and coral shades look fresh and natural for students.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000152764",
+            "OY-A000000158893",
+            "OY-A000000164124",
+            "OY-A000000179692",
+            "OY-A000000179969"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.6
+        }
+      ]
+    },
+    {
+      "id": "N05",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "a color that doesn't make me look old",
+          "reply": "Here are picks for \"Elegant\". My top pick is rom&nd Glasting Water Tint. Rose, nude and coral with a moist finish look elegant and soften the lip texture.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000158893",
+            "OY-A000000164124",
+            "OY-A000000178944"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.6
+        }
+      ]
+    },
+    {
+      "id": "N06",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "my lips are thin",
+          "reply": "Here are picks for \"Fuller-looking\". My top pick is rom&nd Glasting Water Tint. A glossy finish catches the light and makes lips look fuller.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000178944",
+            "OY-A000000179692",
+            "OY-A000000179969"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.4
+        }
+      ]
+    },
+    {
+      "id": "N07",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "my lips look dull",
+          "reply": "Here are picks for \"Dull lips\". My top pick is peripera Ink Airy Velvet. Pigmented coral and pink shades layered once more brighten dull or dark lips.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000121562",
+            "OY-A000000128184",
+            "OY-A000000148663",
+            "OY-A000000158896",
+            "OY-A000000188931"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.1
+        }
+      ]
+    },
+    {
+      "id": "N08",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "doesn't stain",
+          "reply": "Here are picks for \"No staining\". My top pick is rom&nd Glasting Water Tint. Glossy and satin finishes tend to leave less stain than water tints.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000158893",
+            "OY-A000000164124",
+            "OY-A000000178944"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.1
+        }
+      ]
+    },
+    {
+      "id": "N09",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "won't transfer to my cup",
+          "reply": "Staying power matters. My top pick is rom&nd Zero Velvet Tint. Matte and velvet finishes tend to last longer.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000120880",
+            "OY-A000000121562",
+            "OY-A000000128184",
+            "OY-A000000148591",
+            "OY-A000000148663"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.2
+        }
+      ]
+    },
+    {
+      "id": "N10",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "lip oil",
+          "reply": "Here are picks for \"Glossy\". My top pick is rom&nd Glasting Water Tint.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000158893",
+            "OY-A000000164124",
+            "OY-A000000178944"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.7
+        }
+      ]
+    },
+    {
+      "id": "N11",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "raspberry",
+          "reply": "Here are picks for \"Berry\". My top pick is Dinto Blurring Lip Veil Tint.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000212223",
+            "OY-A000000246597",
+            "OY-A000000248980"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.6
+        }
+      ]
+    },
+    {
+      "id": "N12",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "first date",
+          "reply": "Here are picks for \"Date\". My top pick is rom&nd Glasting Water Tint. For a date, pink, rose and coral with a glossy finish look lively.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000178944",
+            "OY-A000000179692",
+            "OY-A000000179969"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.3
+        }
+      ]
+    },
+    {
+      "id": "N13",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "autumn deep",
+          "reply": "Here are picks for \"Autumn Warm\". My top pick is rom&nd Zero Velvet Tint. Deep, warm brick, brown and terracotta shades suit autumn warm tones.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000120880",
+            "OY-A000000121562",
+            "OY-A000000148663",
+            "OY-A000000152764",
+            "OY-A000000158893"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.6
+        }
+      ]
+    },
+    {
+      "id": "N14",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "surprise me",
+          "reply": "Sure, I'll pick first. Here are easy-to-wear colors that suit almost anyone. My top pick is peripera Ink Airy Velvet. For everyday wear, nude, rose and coral shades with a soft finish are easy to wear.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000121562",
+            "OY-A000000148591",
+            "OY-A000000148663",
+            "OY-A000000158896",
+            "OY-A000000192940"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 3
+        }
+      ]
+    },
+    {
+      "id": "N15",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "what lip color is trending now",
+          "reply": "I don't have trend or new-release rankings. But I can pick by the feel people often look for, like a juicy glossy lip or a my-lips-but-better nude.",
+          "engine": "rule-based",
+          "outcome": "text",
+          "products": [],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.3
+        }
+      ]
+    },
+    {
+      "id": "N16",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "vegan lipstick",
+          "reply": "Scent, ingredients and vegan info aren't in my data. Please check the ingredient list or ask a staff member. I can find colors and finishes right away.",
+          "engine": "rule-based",
+          "outcome": "text",
+          "products": [],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.1
+        }
+      ]
+    },
+    {
+      "id": "N17",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "can I try it on",
+          "reply": "Tap \"Try it on\" under a recommended product to see it on your lips in the mirror. Tell me the feel you want first.",
+          "engine": "rule-based",
+          "outcome": "text",
+          "products": [],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.1
+        }
+      ]
+    },
+    {
+      "id": "N18",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "where is the restroom",
+          "reply": "For store info, please ask a staff member nearby. I'm here to help you pick a lip color.",
+          "engine": "rule-based",
+          "outcome": "text",
+          "products": [],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.1
+        }
+      ]
+    },
+    {
+      "id": "N19",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "Recommend a lip for a date",
+          "reply": "Here are picks for \"Date\". My top pick is rom&nd Glasting Water Tint. For a date, pink, rose and coral with a glossy finish look lively.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000178944",
+            "OY-A000000179692",
+            "OY-A000000179969"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.2
+        },
+        {
+          "say": "how much is this",
+          "reply": "rom&nd Glasting Water Tint is ₩10,900.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1
+        }
+      ]
+    },
+    {
+      "id": "N20",
+      "cat": "New phrases 2",
+      "pass": true,
+      "groundingIssues": [],
+      "turns": [
+        {
+          "say": "Recommend a lip for a date",
+          "reply": "Here are picks for \"Date\". My top pick is rom&nd Glasting Water Tint. For a date, pink, rose and coral with a glossy finish look lively.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000136343",
+            "OY-A000000152764",
+            "OY-A000000178944",
+            "OY-A000000179692",
+            "OY-A000000179969"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 1.6
+        },
+        {
+          "say": "something else",
+          "reply": "Here are 5 more, 6 to 10 of 45.",
+          "engine": "rule-based",
+          "outcome": "products",
+          "products": [
+            "OY-A000000185265",
+            "OY-A000000197490",
+            "OY-A000000202409",
+            "OY-A000000208305",
+            "OY-A000000209309"
+          ],
+          "fails": [],
+          "grounding": [],
+          "ms": 2.2
         }
       ]
     }

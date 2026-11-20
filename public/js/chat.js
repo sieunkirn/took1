@@ -3,16 +3,16 @@
 // 제품 카드의 '+ 비교'로 비교함에 담고(최대 3개) '비교하기'를 누르면 대화에 비교표를 보여 준다.
 // 오른쪽 패널은 추천 목록이 없을 때 '바코드로 제품 알아보기'(카메라 스캔·번호 입력)를 보여 주고, 인식한 제품을 대화로 설명한다.
 // 답변은 규칙 기반 엔진(src/lib/chat.js)이 만든다.
-// 파일 구성: chat-state.js(상태) · chat-view.js(그리기) · chat-input.js(음성·키보드) · chat-products.js(바코드·NFC)
+// 파일 구성: chat-state.js(상태) · chat-view.js(그리기) · chat-input.js(음성·키보드) · chat-products.js(NFC 태그)
 //           이 파일은 질문 보내기(send)와 버튼 연결, 화면을 처음 열 때 할 일을 맡는다.
 import { $, api, store, qs, won, fullName } from './common.js';
 import { normalizeHex } from '../lib/color.js';
 import { lang as uiLang, t as tr } from './i18n.js';
 import { spokenReply } from './voice.js';
-import { C, STUDIO, BARCODE_PANEL, showTab, log, input, START, state, base, AB_ID, track, save, loadBase, setBrands } from './chat-state.js';
+import { C, STUDIO, showTab, log, input, START, state, base, AB_ID, track, save, loadBase, setBrands } from './chat-state.js';
 import { runCompare, renderLog, streamAt, streamReply } from './chat-view.js';
 import { speaker } from './chat-input.js';
-import { stopScan } from './chat-products.js';
+import './chat-products.js'; // NFC 태그로 제품 알아보기 (카메라 바코드는 2026-11-20 뺐다)
 import { getPicks } from './chat-picks.js';
 
 const TYPING_MIN_MS = 700; // 답이 아무리 빨라도 타이핑 표시를 이만큼은 보여 준다
@@ -52,10 +52,8 @@ export async function send(text) {
     if (newList) {
       state.list = products;
       state.focus = [];
-      // 새 추천 목록이 오면 패널을 목록으로 바꾼다 (바코드 카메라는 끈다)
+      // 새 추천 목록이 오면 합본 화면은 추천 탭으로
       if (products.length) {
-        state.panel = 'list';
-        stopScan();
         showTab('rec'); // 합본 화면: 추천 탭으로
       }
     } else {
@@ -70,7 +68,7 @@ export async function send(text) {
       await loadBase();
     }
     // 못 알아들음 폴백 3단계 (딥리서치 P1): 1~2번째는 챗봇이 무난한 추천과 예시 버튼으로 받고,
-    // 연달아 3번째면 한 번 사과하고 매장 직원 안내 + 매장에서 만든 색 카드(직원이 보고 이어서 도울 수 있게). 이모지 없음
+    // 연달아 3번째면 한 번 사과하고 매장 직원 안내 + 거울에서 고른 색 카드(직원이 보고 이어서 도울 수 있게). 이모지 없음
     const miss = body.unsure ? (store.get('chatMiss', 0) + 1) : 0;
     store.set('chatMiss', miss);
     if (miss === 3) {
@@ -78,7 +76,7 @@ export async function send(text) {
       state.messages.push({
         role: 'bot',
         text: C('몇 번 제대로 알아듣지 못했네요. 죄송해요. 옆에 있는 매장 직원에게 도움을 요청해 주세요. 아래 예시처럼 짧게 물어보셔도 돼요.', "Sorry, I didn't quite get that a few times. Please ask a staff member nearby. You can also try a short question below."),
-        ...(h?.hex ? { swatch: { hex: h.hex, label: C('매장에서 만든 색', 'Your in-store color'), facts: [h.finish && tr('texture.' + h.finish), Number.isFinite(h.intensity) && C(`농도 ${h.intensity}%`, `intensity ${h.intensity}%`)].filter(Boolean).join(' · ') } } : {}),
+        ...(h?.hex ? { swatch: { hex: h.hex, label: C('거울에서 고른 색', 'Color from the mirror'), facts: [h.finish && tr('texture.' + h.finish), Number.isFinite(h.intensity) && C(`농도 ${h.intensity}%`, `intensity ${h.intensity}%`)].filter(Boolean).join(' · ') } } : {}),
         suggestions: START.slice(0, 3),
       });
     }
@@ -99,7 +97,7 @@ $('compare-clear').addEventListener('click', () => {
   renderLog();
 });
 
-// 새 대화 버튼은 합본(studio.html)에만 있다. 챗봇 화면(chat.html)은 그 자리에 '립 다시 바르기'(팔레트로 이동) 링크
+// 새 대화 버튼은 합본(studio.html)에만 있다
 $('chat-reset')?.addEventListener('click', () => {
   speaker.stop();
   store.remove('chatMiss');
@@ -120,15 +118,9 @@ $('base-clear').addEventListener('click', async () => {
 api('api/products').then(async ({ ok, body }) => {
   if (!ok) return;
   setBrands([...new Set(body.products.map((p) => p.brand))]);
-  // 바코드가 하나도 없는 데이터(올리브영 수집 데이터)면 미리 알려 준다
-  const demo = await api('api/demo-products');
-  if (!body.products.some((p) => p.barcode) && !demo.body.products?.length) {
-    $('scan-note').textContent = C('지금 쓰는 올리브영 상품 데이터에는 바코드 정보가 아직 없어요. 바코드를 찍어도 "등록되지 않은 제품"으로 나오니, 찾는 립을 말로 물어봐 주세요.', 'The current OLIVE YOUNG product data has no barcodes yet, so scans show as "not registered". Please ask for the lip you want instead.');
-    $('scan-note').classList.remove('hidden');
-  }
 });
 await loadBase();
-// 바코드 검색·제품 상세에서 기준 제품을 가지고 들어온 경우 안내
+// 제품 상세 등에서 기준 제품을 가지고 들어온 경우 안내
 if (qs('base') && base && !state.messages.some((m) => m.baseNotice === base.id)) {
   state.messages.push({
     role: 'bot', baseNotice: base.id,
@@ -146,7 +138,8 @@ async function paletteHandoff() {
   const hex = normalizeHex(qs('hex') || '');
   if (qs('from') !== 'palette' || !hex) return;
   const fin = TEXTURE_KEYS.includes(qs('fin')) ? qs('fin') : null;
-  const n = Math.round(Number(qs('int')));
+  const rawInt = qs('int'); // 넘기지 않았으면 농도 없음 (예전엔 0% 로 보였다, 2026-11-20)
+  const n = rawInt === null || rawInt === '' ? NaN : Math.round(Number(rawInt));
   const strength = Number.isFinite(n) && n >= 0 && n <= 100 ? n : null;
   const tone = SEASON_KEYS.includes(qs('tone')) ? qs('tone') : null;
   const ids = (qs('recs') || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 3);
@@ -161,19 +154,18 @@ async function paletteHandoff() {
   const facts = [fin && tr('texture.' + fin), strength !== null && C(`농도 ${strength}%`, `intensity ${strength}%`), tone && C(`${tr('season.' + tone)} (추정)`, `${tr('season.' + tone)} (estimate)`)].filter(Boolean).join(' · ');
   // 첫인사 (상담 프롬프트 src/lib/llm/agent.js 와 같은 성격): 인사·AI 도우미 소개 → 가져온 결과 → 할 수 있는 것 → 한계 고지. 아래 바로답변 3개
   // 한 문장에 한 가지 말만, 짧게 (화면에서는 문장마다 줄이 바뀐다). 버튼 안내('아래 버튼을 누르거나…')는 버튼이 보이니 뺐다
-  const text = C('안녕하세요, 립 색을 같이 찾아 드리는 AI 도우미 툭이에요. 매장에서 만든 색을 가져왔어요.', "Hi, I'm Took, an AI assistant that helps you find lip colors. I brought over the color you made in store.")
+  const text = C('안녕하세요, 립 색을 같이 찾아 드리는 AI 도우미 툭이에요. 거울에서 고른 색을 가져왔어요.', "Hi, I'm Took, an AI assistant that helps you find lip colors. I brought over the color you picked in the mirror.")
     + (products.length
-      ? C(' 매장에서 추천받은 제품도 아래에 담았어요.', ' Your in-store picks are below.')
+      ? C(' 이 색과 가장 가까운 립을 골라 봤어요.', ' Here are the lips closest to this color.')
       : C(' 이 색과 비슷한 립을 같이 찾아볼까요?', ' Shall we find lips close to this color?'))
     + C(' 화면 속 색은 실제 발색과 조금 다를 수 있어요.', ' On-screen colors may look a little different in real life.');
   if (products.length) {
     state.list = products;
     state.focus = [];
-    state.panel = 'list';
   }
   state.messages.push({
     role: 'bot', handoff: key, text, products,
-    swatch: { hex, label: C('매장에서 만든 색', 'Your in-store color'), facts },
+    swatch: { hex, label: C('거울에서 고른 색', 'Color from the mirror'), facts },
     // 바로답변: 규칙 챗봇이 알아듣는 짧은 말 (한/영 모두 확인)
     suggestions: C(['이 색이랑 비슷한 립', '더 밝은 색', '더 촉촉하게', '2만원 이하로'], ['Recommend products similar to this color', 'Lighter than this color', 'Glossy in this color', 'This color under 20,000 won']),
   });
@@ -194,7 +186,6 @@ async function picksHandoff() {
   if (!products.length) return false;
   state.list = products;
   state.focus = [];
-  state.panel = 'list';
   state.ctx = { ...(state.ctx || {}), shown: products.map((p) => p.id), offset: 0 };
   const many = products.length >= 2;
   state.messages.push({
@@ -202,19 +193,16 @@ async function picksHandoff() {
     text: C(`담아 오신 제품 ${products.length}개예요. 이 제품들에 대해 궁금한 걸 물어보세요.`, `Here are the ${products.length} products you added. Ask me anything about them.`)
       + (many ? C(' 번호로 자세히 묻거나 제일 싼 걸 찾아볼 수도 있어요.', ' Ask about one by number, or find the cheapest.') : ''), // 비교는 2026-11-19 뺐다
     suggestions: many
-      // '…기준으로 골라 줘' = 그 제품을 기준 제품으로 (그다음 '비슷한 색'·'더 저렴한 거'가 그 제품 기준). 영어 엔진은 아직 못 알아들어 영어에선 뺀다
-      ? C(['첫 번째 거 자세히 알려 줘', '두 번째 거 자세히 알려 줘', '그중에 제일 싼 거는?', '첫 번째 거 기준으로 골라 줘'], ['Tell me more about the first one', 'Tell me more about the second one', 'Which is the cheapest of those?'])
-      : C(['첫 번째 거 자세히 알려 줘', '첫 번째 거 기준으로 골라 줘', '이거보다 저렴한 거'], ['Tell me more about the first one', 'Something cheaper']),
+      // '…기준으로 골라 줘' 버튼은 2026-11-20 사용자 요청으로 뺐다 (말로 물으면 기능은 그대로 된다)
+      ? C(['첫 번째 거 자세히 알려 줘', '두 번째 거 자세히 알려 줘', '그중에 제일 싼 거는?'], ['Tell me more about the first one', 'Tell me more about the second one', 'Which is the cheapest of those?'])
+      : C(['첫 번째 거 자세히 알려 줘', '이거보다 저렴한 거'], ['Tell me more about the first one', 'Something cheaper']),
   });
   save();
   return true;
 }
 await picksHandoff();
 window.addEventListener('took:picks', async () => { if (await picksHandoff()) renderLog(); });
-if (!BARCODE_PANEL) {
-  // 바코드 버튼은 남긴다: 미러 챗봇에서는 '바코드 비추기' 카메라 창을 연다 (chat-products.js, 2026-11-18)
-  $('rec-panel').setAttribute('aria-label', C('추천 제품', 'Recommended products'));
-}
+if (!STUDIO) $('rec-panel').setAttribute('aria-label', C('추천 제품', 'Recommended products'));
 renderLog();
 
 // 합본 화면: 립 매핑에서 고른 색을 챗봇의 기준 색으로 쓰고, '이 컬러로 제품 추천'을 챗봇 질문으로 처리한다
@@ -226,7 +214,3 @@ if (STUDIO) {
     send(C('지금 고른 색과 비슷한 제품 추천해 줘', 'Recommend products similar to my chosen color'));
   });
 }
-// 스캐너가 없을 때: 접으면 PC 카메라를 끈다 (휴대폰 QR 연결은 2026-11-13 삭제)
-$('scan-alt')?.addEventListener('toggle', (e) => {
-  if (!e.target.open) stopScan();
-});

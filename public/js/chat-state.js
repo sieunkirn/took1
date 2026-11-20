@@ -7,13 +7,11 @@ import { isEn } from './i18n.js';
 export const C = (ko, en) => (isEn() ? en : ko);
 
 renderNav();
-// 합본 화면(studio.html): 오른쪽 탭(색 조제·챗봇·추천·바코드)이 보이는 영역을 정하고, 립 매핑(lip.js)과 창 이벤트로 주고받는다
+// 합본 화면(studio.html): 오른쪽 탭(색 조제·챗봇·추천)이 보이는 영역을 정하고, 립 매핑(lip.js)과 창 이벤트로 주고받는다
 //   받음: took:color { hex } / took:recommend { hex }   보냄: took:apply { hex, finish } / took:show-tab { tab }
 export const STUDIO = document.body.dataset.layout === 'studio';
 // 챗봇은 매장 태블릿에서 쓴다 (상단 메뉴 'AI 뷰티 챗봇', 팔레트의 '챗봇과 이어서 상담'). 손님 휴대폰 모드는 2026-11-11 없앴다
-// 챗봇 화면의 바코드 찾기 패널: 지금은 뺀다 (오른쪽 패널은 추천 제품만). 다시 쓰려면 true 로 바꾼다.
-// 합본 화면(studio)은 이 값과 상관없이 바코드를 그대로 쓴다
-export const BARCODE_PANEL = STUDIO || false;
+// 바코드 찾기 패널·탭은 2026-11-20 사용자 요청으로 뺐다 (오른쪽 패널은 추천 제품만)
 export const showTab = (tab) => STUDIO && window.dispatchEvent(new CustomEvent('took:show-tab', { detail: { tab } }));
 export const log = $('chat-log');
 export const input = $('chat-input');
@@ -31,11 +29,8 @@ export const state = {
   list: store.get('chatUserList', []), // 오른쪽 패널의 현재 추천 목록 (번호 = 대화에서 가리키는 번호)
   focus: store.get('chatUserFocus', []), // 최근 답변이 가리킨 제품 (패널에서 강조)
   compare: store.get('chatUserCompare', []), // 비교함에 담은 제품 (최대 3개)
-  panel: store.get('chatUserPanel', null), // 오른쪽 패널: 'scan'(바코드) | 'list'(추천 목록)
   typing: false,
 };
-if (state.panel !== 'scan' && state.panel !== 'list') state.panel = state.list.length ? 'list' : 'scan';
-if (!BARCODE_PANEL) state.panel = 'list';
 export let base = null;
 export let brands = [];
 
@@ -61,7 +56,6 @@ export function save() {
   store.set('chatUserList', state.list);
   store.set('chatUserFocus', state.focus);
   store.set('chatUserCompare', state.compare);
-  store.set('chatUserPanel', state.panel);
 }
 
 // ---------- 기준 제품 ----------

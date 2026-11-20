@@ -71,13 +71,12 @@ const STRINGS = {
     'type.립틴트': '립틴트',
     // 팔레트
     'pal.pageTitle': 'took(툭) - 팔레트', 'pal.camArea': '가상 립 메이크업 화면', 'pal.camRetry': '카메라 다시 연결',
-    'pal.match': '나에게 어울리는 컬러', 'pal.matchBtn': '내 톤으로 추천받기', 'pal.matchSwatches': '추천 컬러',
+    'pal.match': '나에게 어울리는 컬러', 'pal.matchBtn': '이 컬러로 제품 찾기', 'pal.toneBtn': '내 톤으로 추천받기', 'pal.toneBusy': '재는 중… 정면을 봐 주세요', 'pal.toneResult': '내 톤 · {label}', 'pal.toneNoCam': '카메라가 켜져 있어야 톤을 잴 수 있어요. 카메라를 연결해 주세요.', 'pal.matchSwatches': '추천 컬러',
     'pal.board': '팔레트', 'pal.reset': '처음부터 다시 선택', 'pal.paints': '립 컬러 팔레트', 'pal.mixAria': '선택한 색 견본 {hex}',
     'pal.mixCurrent': '현재 색상', 'pal.mixEmpty': '색을 고르면 선택 색상이 여기에 보여요',
     'pal.gradAria': '색상 선택 (누르거나 끌어 색을 고르세요)', 'pal.finishArea': '텍스처와 제품 추천', 'pal.textures': '텍스처',
     'pal.nfcApplied': '{name} 색을 발랐어요', 'pal.nfcUnknown': '등록되지 않은 태그예요',
     'pal.nfcRead': 'NFC 로 읽은 제품', 'pal.chatRead': '챗봇에서 고른 제품',
-    'pal.barcodeRead': '바코드로 읽은 제품', 'pal.barcodeUnknown': '등록되지 않은 바코드예요',
     'pal.intensity': '농도', 'pal.find': '이 색과 비슷한 제품 추천', 'pal.result': '추천 제품', 'pal.backMix': '← 다시 선택',
     'pal.resetDone': '색을 초기화했어요', 'pal.mixed': '선택한 색 {hex}', 'pal.searching': '{hex} 와 비슷한 제품을 찾는 중...',
     'pal.found': '선택한 색 {hex} 와 비슷한 제품 {n}개 (색이 가까운 순)',
@@ -104,7 +103,7 @@ const STRINGS = {
     'lip.matchPalette': '아래 추천 컬러를 누르면 바로 발라 볼 수 있어요.',
     'lip.matchApplied': '추천 컬러 3가지 중 첫 번째를 적용했어요.',
     'lip.mHue': '피부 색상각 {v}° (웜 기준 {t}° 이상)', 'lip.mLight': '피부 밝기 L {v} (밝은 톤 기준 {t})', 'lip.mNoContrast': '눈썹 대비 측정 안 됨',
-    'lip.mContrast': '피부-눈썹 대비 {v} (기준 {t})', 'lip.mWb': '눈 흰자 기준 조명 보정 적용', 'lip.mNoWb': '조명 보정 못 함(눈 흰자 인식 실패)',
+    'lip.mContrast': '피부-눈썹 대비 {v} (기준 {t})', 'lip.mWb': '눈 흰자 기준 조명 보정 적용', 'lip.mCalib': '흰 종이 기준 조명 보정 적용(관리자 색 보정)', 'lip.mNoWb': '조명 보정 못 함(눈 흰자 인식 실패)',
     'lip.ref': '기준 컬러 {hex} 와 비슷한 제품 (색상 유사도 높은 순)', 'lip.recLoading': '추천 제품을 불러오는 중...',
     'lip.recFail': '추천 제품을 불러오지 못했습니다.', 'lip.recCount': "{n}개 제품 · '입술에 발라보기'를 누르면 카메라 화면에 바로 적용됩니다.",
     'lip.recNone': '비슷한 제품이 없습니다.', 'lip.tryOn': '입술에 발라보기', 'lip.applying': '입술에 적용 중: {name}{finish}',
@@ -120,30 +119,15 @@ const STRINGS = {
     'chat.pageTitle': 'took(툭) - AI 뷰티 챗봇',
     'chat.title': 'Beauty Chat', 'chat.subtitle': '나에게 어울리는 뷰티, 함께 찾아봐요', 'chat.back': '뒤로', 'chat.quick': '빠른 답장',
     'chat.tts': '답변 소리로 읽어주기',
-    'chat.toPalette': '립 다시 바르기',
     'chat.base': '기준 제품:',
     'chat.baseClear': '해제',
     'chat.compare': '비교함',
     'chat.compareRun': '비교하기',
     'chat.compareClear': '비우기',
     'chat.heard': '들은 말',
-    'chat.scanOpen': '바코드로 제품 알아보기',
-    'chat.camSheet': '바코드 비추기', 'chat.camSheetTitle': '립 제품 바코드를 네모 안에 비춰 주세요',
-    'chat.side': '바코드 찾기와 추천 제품',
+    'chat.side': '추천 제품',
     'chat.close': '닫기',
-    'chat.scanner': '바코드 스캐너',
-    'chat.scannerTitle': '스캐너로 립 제품의 바코드를 찍어 주세요',
-    'chat.scannerDesc': '찍으면 어떤 제품인지 바로 대화로 설명하고, 그 제품을 기준으로 비슷한 색·더 저렴한 제품을 찾아 드려요.',
-    'chat.scannerReady': '스캐너 대기 중',
-    'chat.typeNumber': '스캐너가 못 읽으면 번호로 입력',
-    'chat.ok': '확인',
     'chat.send': '보내기',
-    'chat.noScanner': '스캐너가 없을 때',
-    'chat.pcCam': 'PC 카메라로 찍기',
-    'chat.camOff': '카메라가 꺼져 있어요',
-    'chat.camStart': '카메라로 바코드 찍기',
-    'chat.camStop': '카메라 끄기',
-    'chat.photo': '사진으로 찍기',
     'voice.candidates': ' (후보 {n}개 중 선택)', 'voice.understood': ' → 이해한 내용: "{text}"', 'voice.nothing': '인식된 말이 없습니다. 버튼을 다시 누르고 말씀해 주세요.',
   },
   en: {
@@ -186,13 +170,12 @@ const STRINGS = {
     'type.립틴트': 'Lip tint',
     // Palette
     'pal.pageTitle': 'took - Palette', 'pal.camArea': 'Virtual lip makeup', 'pal.camRetry': 'Reconnect camera',
-    'pal.match': 'Colors that suit me', 'pal.matchBtn': 'Find my tone', 'pal.matchSwatches': 'Suggested colors',
+    'pal.match': 'Colors that suit me', 'pal.matchBtn': 'Find products in this color', 'pal.toneBtn': 'Match my tone', 'pal.toneBusy': 'Measuring… look straight ahead', 'pal.toneResult': 'My tone · {label}', 'pal.toneNoCam': 'The camera needs to be on to measure your tone. Please connect the camera.', 'pal.matchSwatches': 'Suggested colors',
     'pal.board': 'Palette', 'pal.reset': 'Start over', 'pal.paints': 'Lip color palette', 'pal.mixAria': 'Selected color swatch {hex}',
     'pal.mixCurrent': 'Current color', 'pal.mixEmpty': 'Choose a color to see it here',
     'pal.gradAria': 'Choose a color (tap or drag to select it)', 'pal.finishArea': 'Texture and product picks', 'pal.textures': 'Texture',
     'pal.nfcApplied': 'Trying on {name}', 'pal.nfcUnknown': 'Unregistered tag',
     'pal.nfcRead': 'Product from NFC', 'pal.chatRead': 'Picked in the chat',
-    'pal.barcodeRead': 'Product from barcode', 'pal.barcodeUnknown': "This barcode isn't registered",
     'pal.intensity': 'Intensity', 'pal.find': 'Find products in this color', 'pal.result': 'Recommended products', 'pal.backMix': '← Choose again',
     'pal.resetDone': 'Colors reset', 'pal.mixed': 'Selected color {hex}', 'pal.searching': 'Finding products similar to {hex}...',
     'pal.found': '{n} products similar to selected color {hex} (closest first)',
@@ -219,7 +202,7 @@ const STRINGS = {
     'lip.matchPalette': 'Tap a suggested color below to try it on right away.',
     'lip.matchApplied': 'Applied the first of 3 suggested colors.',
     'lip.mHue': 'Skin hue {v}° (warm if ≥ {t}°)', 'lip.mLight': 'Skin lightness L {v} (light if ≥ {t})', 'lip.mNoContrast': 'Brow contrast not measured',
-    'lip.mContrast': 'Skin–brow contrast {v} (threshold {t})', 'lip.mWb': 'Lighting corrected with eye whites', 'lip.mNoWb': 'Lighting not corrected (eye whites not found)',
+    'lip.mContrast': 'Skin–brow contrast {v} (threshold {t})', 'lip.mWb': 'Lighting corrected with eye whites', 'lip.mCalib': 'Lighting corrected with the white-paper calibration', 'lip.mNoWb': 'Lighting not corrected (eye whites not found)',
     'lip.ref': 'Products similar to {hex} (most similar first)', 'lip.recLoading': 'Loading recommendations...',
     'lip.recFail': "Couldn't load recommendations.", 'lip.recCount': '{n} products · Tap "Try on lips" to apply it on the camera view.',
     'lip.recNone': 'No similar products.', 'lip.tryOn': 'Try on lips', 'lip.applying': 'On your lips: {name}{finish}',
@@ -235,30 +218,15 @@ const STRINGS = {
     'chat.pageTitle': "took - AI Beauty Chat",
     'chat.title': 'Beauty Chat', 'chat.subtitle': 'Find the beauty that suits you, together', 'chat.back': 'Back', 'chat.quick': 'Quick replies',
     'chat.tts': "Read replies aloud",
-    'chat.toPalette': "Try lips again",
     'chat.base': "Base product:",
     'chat.baseClear': "Clear",
     'chat.compare': "Compare",
     'chat.compareRun': "Compare",
     'chat.compareClear': "Clear",
     'chat.heard': "What I heard",
-    'chat.scanOpen': "Look up by barcode",
-    'chat.camSheet': "Show a barcode", 'chat.camSheetTitle': "Hold the lip product's barcode inside the box",
-    'chat.side': "Barcode lookup and recommendations",
+    'chat.side': "Recommended products",
     'chat.close': "Close",
-    'chat.scanner': "Barcode scanner",
-    'chat.scannerTitle': "Scan a lip product barcode",
-    'chat.scannerDesc': "I will describe the product in the chat and find similar colors or cheaper options based on it.",
-    'chat.scannerReady': "Scanner ready",
-    'chat.typeNumber': "If the scanner fails, type the number",
-    'chat.ok': "OK",
     'chat.send': "Send",
-    'chat.noScanner': "No scanner?",
-    'chat.pcCam': "Scan with the PC camera",
-    'chat.camOff': "The camera is off",
-    'chat.camStart': "Scan with camera",
-    'chat.camStop': "Turn off camera",
-    'chat.photo': "Use a photo",
     'voice.candidates': ' (picked from {n} candidates)', 'voice.understood': ' → understood: "{text}"', 'voice.nothing': "Nothing was recognized. Tap the button and speak again.",
   },
 };
@@ -339,7 +307,7 @@ Object.assign(STRINGS.ko, {
   'fc.sheet': '추천 제품 보기', 'fc.sheetClose': '추천 제품 닫기', 'fc.dial': '컬러 다이얼 (돌려서 색 고르기, 손잡이 아래 칸이 고른 색)',
   'fc.theme': '다크 모드 켜기/끄기', 'fc.swatch': '컬러 {hex}', 'fc.families': '컬러 계열',
   'fc.family': '{name} 계열 · {hex}', 'fc.fam.red': '빨강', 'fc.fam.pink': '핑크', 'fc.fam.purple': '보라', 'fc.fam.orange': '오렌지', 'fc.fam.nude': '누드',
-  'fc.texture': '텍스처: {name} (누르면 바뀌어요)', 'fc.textures': '질감 (옆으로 밀어 바꾸기)', 'fc.chat': 'AI 뷰티 챗봇 열기', 'chat.toMirror': '거울로 (컬러 찾기)', 'chat.here': 'AI 뷰티 챗봇 (지금 화면)', 'fc.introTitle': '어떻게 시작할까요?', 'fc.introSub': '거울을 보며 세 가지 방법으로 찾을 수 있어요', 'fc.introNfc': '제품을 리더기에 올려 보세요', 'fc.introNfcSub': '들고 있는 립을 바로 입술에 발라 봐요', 'fc.introDial': '색을 돌려 보세요', 'fc.introDialSub': '아래 다이얼을 돌리면 입술 색이 바뀌어요', 'fc.introChat': '추천받기', 'fc.introChatSub': '몇 가지만 고르면 어울리는 립을 골라 드려요', 'fc.introSkip': '바로 둘러볼게요', 'fc.menu': '메뉴', 'fc.menuScan': '컬러 찾기 (지금 화면)',
+  'fc.texture': '텍스처: {name} (누르면 바뀌어요)', 'fc.textures': '질감 (옆으로 밀어 바꾸기)', 'fc.chat': 'AI 뷰티 챗봇 열기', 'chat.toMirror': '거울로 (컬러 찾기)', 'chat.here': 'AI 뷰티 챗봇 (지금 화면)', 'fc.introTitle': '어떻게 시작할까요?', 'fc.introSub': '거울을 보며 세 가지 방법으로 찾을 수 있어요', 'fc.introNfc': '제품을 리더기에 올려 보세요', 'fc.introNfcSub': '들고 있는 립을 바로 입술에 발라 봐요', 'fc.introDial': '색을 돌려 보세요', 'fc.introDialSub': '아래 다이얼을 돌리면 입술 색이 바뀌어요', 'fc.introChat': '추천받기', 'fc.introChatSub': '몇 가지만 고르면 어울리는 립을 골라 드려요', 'fc.introSkip': '바로 둘러볼게요', 'fc.menu': '메뉴', 'fc.menuToggle': '메뉴 펼치기/접기', 'fc.menuScan': '컬러 찾기 (지금 화면)',
   'fc.searching': '비슷한 제품을 찾고 있어요', 'fc.found': '이 컬러와 비슷한 제품 {n}개', 'fc.none': '비슷한 제품이 없어요', 'fc.back': '← 컬러 다시 고르기',
 });
 Object.assign(STRINGS.en, {
@@ -348,7 +316,7 @@ Object.assign(STRINGS.en, {
   'fc.sheet': 'Show matching products', 'fc.sheetClose': 'Close matching products', 'fc.dial': 'Color dial (turn it; the segment under the handle is your color)',
   'fc.theme': 'Toggle dark mode', 'fc.swatch': 'Color {hex}', 'fc.families': 'Color families',
   'fc.family': '{name} · {hex}', 'fc.fam.red': 'Red', 'fc.fam.pink': 'Pink', 'fc.fam.purple': 'Purple', 'fc.fam.orange': 'Orange', 'fc.fam.nude': 'Nude',
-  'fc.texture': 'Texture: {name} (tap to change)', 'fc.textures': 'Textures (swipe to change)', 'fc.chat': 'Open the AI beauty chatbot', 'chat.toMirror': 'To the mirror (find your color)', 'chat.here': 'AI beauty chat (this screen)', 'fc.introTitle': 'How would you like to start?', 'fc.introSub': 'Three ways to find your lip in the mirror', 'fc.introNfc': 'Place a product on the reader', 'fc.introNfcSub': 'Try the lip in your hand right away', 'fc.introDial': 'Turn the color dial', 'fc.introDialSub': 'Turn the dial below to change your lip color', 'fc.introChat': 'Get a recommendation', 'fc.introChatSub': 'Answer a few picks and we will find lips for you', 'fc.introSkip': 'Just look around', 'fc.menu': 'Menu', 'fc.menuScan': 'Find your color (this screen)',
+  'fc.texture': 'Texture: {name} (tap to change)', 'fc.textures': 'Textures (swipe to change)', 'fc.chat': 'Open the AI beauty chatbot', 'chat.toMirror': 'To the mirror (find your color)', 'chat.here': 'AI beauty chat (this screen)', 'fc.introTitle': 'How would you like to start?', 'fc.introSub': 'Three ways to find your lip in the mirror', 'fc.introNfc': 'Place a product on the reader', 'fc.introNfcSub': 'Try the lip in your hand right away', 'fc.introDial': 'Turn the color dial', 'fc.introDialSub': 'Turn the dial below to change your lip color', 'fc.introChat': 'Get a recommendation', 'fc.introChatSub': 'Answer a few picks and we will find lips for you', 'fc.introSkip': 'Just look around', 'fc.menu': 'Menu', 'fc.menuToggle': 'Open or close the menu', 'fc.menuScan': 'Find your color (this screen)',
   'fc.searching': 'Looking for similar products', 'fc.found': '{n} products similar to this color', 'fc.none': 'No similar products', 'fc.back': '← Choose the color again',
 });
 // NFC 태그 시트 (2026-11-19, js/nfc-window.js): 태그하면 바로 바르고 아래에 호수 줄
@@ -365,9 +333,6 @@ Object.assign(STRINGS.en, {
   'nw.unknown': "This tag isn't registered", 'nw.unknownSub': 'Try another product or ask a staff member',
 });
 
-const svg =(inner, size) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
-const GLOBE = '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/>';
-const CHEVRON = '<path d="m6 9 6 6 6-6"/>';
 
 /**
  * 언어 선택 메뉴. 버튼을 누르면 아래에 목록이 열리고, 다른 언어를 고르면 화면이 그 언어로 다시 열린다.
@@ -393,49 +358,6 @@ export function langToggle(cls = '') {
   return b;
 }
 
-export function languageMenu({ skipIntro = true } = {}) {
-  const cur = lang();
-  const box = document.createElement('div');
-  box.className = 'lang-menu';
-  const trigger = document.createElement('button');
-  trigger.type = 'button';
-  trigger.className = 'lang-trigger';
-  trigger.setAttribute('aria-haspopup', 'menu');
-  trigger.setAttribute('aria-expanded', 'false');
-  trigger.setAttribute('aria-label', t('lang.menu'));
-  trigger.innerHTML = `${svg(GLOBE, 18)}<span>Language</span>${svg(CHEVRON, 16)}`;
-  const pop = document.createElement('div');
-  pop.className = 'lang-pop';
-  pop.setAttribute('role', 'menu');
-  pop.hidden = true;
-  const head = document.createElement('p');
-  head.className = 'lang-cur';
-  head.textContent = t('lang.current', { name: LANG_NAMES[cur][cur] });
-  pop.append(head, document.createElement('hr'));
-  for (const code of LANGS.filter((c) => c !== cur)) {
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.setAttribute('role', 'menuitem');
-    item.lang = code;
-    // "English (영어)" 처럼 그 언어 이름 + 지금 화면 언어로 쓴 이름
-    item.textContent = `${LANG_NAMES[code].native} (${LANG_NAMES[code][cur]})`;
-    item.addEventListener('click', () => setLang(code, { skipIntro }));
-    pop.append(item);
-  }
-  const open = (on) => {
-    pop.hidden = !on;
-    trigger.setAttribute('aria-expanded', String(on));
-    if (on) pop.querySelector('[role=menuitem]')?.focus();
-  };
-  trigger.addEventListener('click', () => open(pop.hidden));
-  // 바깥을 누르거나 Esc 를 누르면 닫는다
-  document.addEventListener('pointerdown', (e) => { if (!box.contains(e.target)) open(false); }, true);
-  box.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { open(false); trigger.focus(); }
-  });
-  box.append(trigger, pop);
-  return box;
-}
 
 // ---------- 다크 모드 (배경 검정) ----------
 // 언어 버튼 옆 버튼으로 켜고 끈다. <html data-theme="dark"> 이면 wireframe.css 가 색 변수를 검정 바탕용으로 바꾼다.
@@ -450,6 +372,8 @@ function applyTheme(v = theme()) {
 }
 applyTheme(); // 이 모듈을 읽는 모든 화면에서 바로 적용
 
+// 아이콘 SVG 틀 (다크 모드 버튼 등)
+const svg =(inner, size) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
 const MOON = '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/>';
 const SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
 

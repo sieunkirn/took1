@@ -128,9 +128,6 @@ function setupInModal() {
   for (const type of ['pointerdown', 'keydown', 'touchstart', 'wheel', 'input']) {
     window.addEventListener(type, () => { try { host.dispatchEvent(new host.Event('took:activity')); } catch { /* 없음 */ } }, { capture: true, passive: true });
   }
-  // '립 다시 바르기': 모달을 닫고, 팔레트가 아닌 화면이면 팔레트로
-  const back = document.getElementById('chat-to-palette');
-  if (back) back.onclick = () => host.tookChat?.close({ toPalette: true });
   applyI18n();
 }
 

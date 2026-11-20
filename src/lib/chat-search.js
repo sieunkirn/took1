@@ -187,10 +187,12 @@ export function runSearch(q, { products, base, ref, toneHint }) {
   list = filterByConditions(list, q, base, conditions);
   list = applyPreferences(list, q, toneHint, { conditions, reasons, notes, tips });
 
-  if ((q.similar || q.lightness) && !ref) {
-    notes.push(L('기준 색상이 없어 색 비교는 못 했어요. 바코드로 제품을 찍거나 팔레트에서 색을 만든 뒤 물어봐 주세요.', 'There is no reference color to compare with. Scan a product barcode or mix a color on the palette, then ask again.'));
+  if (q.similar && !ref) {
+    notes.push(L('기준 색상이 없어 색 비교는 못 했어요. 제품을 리더기에 올리거나 거울에서 색을 고른 뒤 물어봐 주세요.', 'There is no reference color to compare with. Tap a product on the reader or pick a color in the mirror, then ask again.'));
   }
   if (q.depth !== undefined && list.length) list = pickByDepth(list, q.depth, conditions);
+  // 기준 색이 없을 때 "밝은 거·진한 거" (2026-11-20): 후보 중 밝은 쪽(진하기 20)·진한 쪽(80)으로 고른다
+  else if (q.lightness && !ref && list.length) list = pickByDepth(list, q.lightness === 'lighter' ? 20 : 80, conditions);
   if (q.lightness && ref) {
     const refL = hexToLab(ref.hex).L;
     list = list.filter((p) => (q.lightness === 'lighter' ? p.color_lab.L > refL + LIGHTNESS_MARGIN : p.color_lab.L < refL - LIGHTNESS_MARGIN));

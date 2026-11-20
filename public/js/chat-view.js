@@ -1,13 +1,14 @@
 // 챗봇 화면: 대화 그리기. 말풍선·제품 카드·빠른 답장·추천 패널·비교함, 답변을 몇 글자씩 써 내려가는 출력.
-import { $, el, go, won, fullName, shortName, toast, shadePicker } from './common.js';
+import { $, el, go, won, fullName, shortName, toast } from './common.js';
 import { compareSummary } from '../lib/chat.js';
+import { demoBadgeFor } from './demo.js';
 import { lang as uiLang, t as tr, finishText as finishName } from './i18n.js';
-import { C, STUDIO, BARCODE_PANEL, log, START, state, base, track, save } from './chat-state.js';
+import { C, STUDIO, log, START, state, base, track, save } from './chat-state.js';
 import { speaker } from './chat-input.js';
 import { send } from './chat.js';
 import { syncStart } from './chat-start.js'; // 대화가 없을 때의 시작 화면 (chat.html 에만 있다)
 import { startGuide, startMini, guideCard } from './chat-guide.js'; // '답하며 고르기' 단계형 도우미 (2026-11-19)
-import { quickChips } from './chat-quick.js'; // 상황별 빠른 답장 (2026-11-19 1차: A·B·C·D)
+import { quickChips, wearOnLips } from './chat-quick.js'; // 상황별 빠른 답장 (2026-11-19 1차: A·B·C·D) · 카드의 '바르러 가기'
 
 // ---------- 비교함 ----------
 const COMPARE_MAX = 3;
@@ -71,27 +72,23 @@ function compareTable(items) {
 
 // ---------- 대화 그리기 ----------
 export function productMini(p) {
-  // 호수 데이터가 있는 올리브영 제품: 카드 안에서 펼쳐 호수를 고른다 (2026-11-17, 따로 창으로 가지 않는다).
-  // 고르면 카드의 이름 줄과 '발라 보기'가 그 호수로 바뀐다
-  let current = p;
+  // 카드 안의 호수 고르기는 2026-11-20 사용자 요청으로 뺐다. 호수는 '바르러 가기'로 거울에 간 뒤 거울의 제품 카드에서 고른다
   const nameLine = el('span', { text: fullName(p) });
-  const picker = p.shade_count > 1
-    ? shadePicker(p, { onSelect: (s) => { current = s; nameLine.textContent = fullName(s); } })
-    : null;
   return el('div', { class: 'card mini' + (state.focus.includes(p.id) ? ' focus' : ''), 'data-product-id': p.id },
     // 대표 이미지가 있는 제품만 사진을 보여 준다 (불러오지 못하면 사진 자리를 뺀다)
     p.image_url ? el('img', {
       class: 'card-img', src: p.image_url, alt: fullName(p), loading: 'lazy', referrerpolicy: 'no-referrer',
       onerror: (e) => e.target.remove(),
     }) : null,
-    el('div', {}, nameLine),
-    el('div', { class: 'muted small', text: [p.finish ? finishName(p.finish) : null, p.price != null ? won(p.price) : null, // 대표색 안내는 뺐다, 가격은 카드에 둔다 (2026-11-11)
-      p.similarity !== undefined ? C(`기준 색과 유사도 ${p.similarity}%`, `${p.similarity}% similar`) : null].filter(Boolean).join(' · ') }),
+    el('div', {}, nameLine, demoBadgeFor(p)), // 시연용 제품이면 '시연용' 배지 (demo.js)
+    // 카드 아래 줄은 가격만 (제형 '매트·글로시' 글자·'기준 색과 유사도 N%'는 2026-11-20 사용자 요청으로 뺐다)
+    p.price != null ? el('div', { class: 'muted small', text: won(p.price) }) : null,
     // '상세 보기'·'올리브영' 링크는 2026-11-20 사용자 요청으로 뺐다 (손님이 키오스크를 떠나 다른 화면으로 가지 않게. 폰으로 가져가기는 거울의 '가져가기' QR)
     STUDIO ? el('div', { class: 'actions' },
-      el('button', { type: 'button', text: tr('lip.tryOn'), onclick: () => window.dispatchEvent(new CustomEvent('took:apply', { detail: { hex: current.color_hex, finish: current.finish } })) })) : null,
-    picker);
-  // '+ 비교' 버튼은 2026-11-11 카드에서 뺐다. 비교는 "1번이랑 2번 비교해 줘"처럼 말로 물으면 된다
+      el('button', { type: 'button', text: tr('lip.tryOn'), onclick: () => window.dispatchEvent(new CustomEvent('took:apply', { detail: { hex: p.color_hex, finish: p.finish } })) }))
+      // 바르러 가기 (2026-11-20): 거울로 가서 이 제품 색을 입술에 바르고, 거울 아래에 이 제품 카드를 띄운다 (palette.js wearProduct)
+      : el('button', { type: 'button', class: 'wear-btn', text: C('바르러 가기', 'Try it on'), onclick: () => { track('card_click'); wearOnLips(p); } }));
+  // '+ 비교' 버튼은 2026-11-11 카드에서 뺐다. 비교 기능은 쉬는 중(COMPARE_ON)
 }
 
 // 대화 속 추천 제품: 넓은 화면(키오스크)에서는 3장씩 보여 주고 큰 ‹ › 버튼(또는 손가락으로 밀기)으로 넘긴다.
@@ -133,7 +130,7 @@ function productPager(products) {
   return box;
 }
 
-// 매장 팔레트에서 가져온 색 (첫인사): 색 견본(실제 색) + '매장에서 만든 색' + 제형·농도·톤
+// 매장 팔레트에서 가져온 색 (첫인사): 색 견본(실제 색) + '거울에서 고른 색' + 제형·농도·톤
 function swatchCard({ hex, label, facts }) {
   const dot = el('span', { class: 'handoff-dot', 'aria-hidden': 'true' });
   dot.style.background = hex;
@@ -153,9 +150,8 @@ function bubble(m, isLastBot, streaming = false) {
   return el('div', { class: 'bubble ' + m.role + (streaming ? ' streaming' : '') },
     el('div', { class: 'who', text: who }),
     m.swatch ? swatchCard(m.swatch) : null,
-    m.role === 'bot' && !streaming && m.kind !== 'guide'
-      ? el('div', { class: 'btext' }, ...linkify(asLines(m.text), m.products))
-      : el('div', { class: 'btext', text: streaming ? '' : (m.role === 'bot' ? asLines(m.text) : m.text) }),
+    // 답변 속 단어 밑줄(누르면 이어 묻기)은 2026-11-20 사용자 요청으로 뺐다
+    el('div', { class: 'btext', text: streaming ? '' : (m.role === 'bot' ? asLines(m.text) : m.text) }),
     m.kind === 'guide' && m.guide ? guideCard(m, isLastMsg(m), renderLog) : null,
     // 비교 답변은 비교표로, 그 밖에는 좁은 화면용 카드 / 넓은 화면용 짧은 목록 (둘 중 하나만 CSS 로 보인다)
     m.kind === 'compare' && m.products?.length >= 2 ? compareTable(m.products) : null,
@@ -164,47 +160,6 @@ function bubble(m, isLastBot, streaming = false) {
 }
 
 const isLastMsg = (m) => state.messages.at(-1) === m;
-
-// ---------- 답변 속 단어 누르기 (빠른 답장 7번, 2026-11-19) ----------
-// 챗봇 답의 제품 이름·색 계열·질감 단어에 분홍 밑줄. 누르면 그걸로 이어서 묻는다:
-//  제품 이름 → "두 번째 거 자세히 알려 줘"(목록 순서로 묻기: 규칙 챗봇이 제품을 정확히 짚는다) / 색 계열 → "코랄 계열 립 더 보여 줘" / 질감 → "벨벳 립 추천해 줘"
-const KO_ORD = ['첫', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열'];
-const EN_ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
-const FAMILY_KO = ['누드', '로즈', '코랄', '핑크', '레드', '오렌지', '브라운', '베리', '플럼', '버건디'];
-const FAMILY_EN = ['nude', 'rose', 'coral', 'pink', 'red', 'orange', 'brown', 'berry', 'plum', 'burgundy'];
-const FINISH_KO = ['매트', '벨벳', '새틴', '글로시'];
-const FINISH_EN = ['matte', 'velvet', 'satin', 'glossy'];
-const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-function linkTerms(products) {
-  const en = C('ko', 'en') === 'en';
-  const terms = [];
-  for (const p of products || []) {
-    const n = p.n || 1;
-    const ask = en ? `Tell me more about the ${EN_ORD[n - 1] || `#${n}`} one` : `${KO_ORD[n - 1] || n} 번째 거 자세히 알려 줘`;
-    for (const name of [fullName(p), shortName(p), p.brand && p.name ? `${p.brand} ${p.name}` : null, p.name]) if (name && name.length >= 3) terms.push({ w: name, ask });
-  }
-  (en ? FAMILY_EN : FAMILY_KO).forEach((w) => terms.push({ w, ask: en ? `Show me ${w} lips` : `${w} 계열 립 더 보여 줘` }));
-  (en ? FINISH_EN : FINISH_KO).forEach((w) => terms.push({ w, ask: en ? `Recommend ${w} lips` : `${w} 립 추천해 줘` }));
-  return terms.sort((a, b) => b.w.length - a.w.length);
-}
-function linkify(text, products) {
-  const terms = linkTerms(products);
-  if (!text || !terms.length) return [text || ''];
-  const en = C('ko', 'en') === 'en';
-  const re = new RegExp(terms.map((t) => (en && /^[a-z]+$/i.test(t.w) ? `\\b${esc(t.w)}\\b` : esc(t.w))).join('|'), en ? 'gi' : 'g');
-  const out = [];
-  let last = 0;
-  for (const mt of text.matchAll(re)) {
-    const t = terms.find((x) => x.w.toLowerCase() === mt[0].toLowerCase());
-    if (!t) continue;
-    if (mt.index > last) out.push(text.slice(last, mt.index));
-    out.push(el('button', { type: 'button', class: 'bt-link', text: mt[0], 'aria-label': t.ask, title: t.ask,
-      onclick: () => { if (state.typing) return; track('word_tap'); send(t.ask); } }));
-    last = mt.index + mt[0].length;
-  }
-  if (last < text.length) out.push(text.slice(last));
-  return out;
-}
 
 // ---------- 빠른 답장 (2026-11-19 2번): 입력창 바로 위 고정 줄 (옆으로 밀기) ----------
 // 맨 앞은 '답하며 고르기'(단계형 도우미), 그 뒤는 마지막 답변의 다음 질문 추천. 답변을 쓰는 중이거나 도우미가 진행 중이면 숨긴다.
@@ -245,16 +200,7 @@ function welcome() {
 }
 
 export function renderPanel() {
-  if (!STUDIO) {
-    // 챗봇 화면: 오른쪽 패널 하나를 바코드 ↔ 추천 목록으로 바꿔 쓴다 (합본 화면은 탭이 따로 있다)
-    const scan = state.panel === 'scan';
-    $('scan-view').classList.toggle('hidden', !scan);
-    $('list-view').classList.toggle('hidden', scan);
-    $('panel-label').textContent = scan ? C('바코드로 제품 알아보기', 'Look up by barcode') : C('추천 제품', 'Recommended products');
-    const toggle = $('panel-toggle');
-    toggle.textContent = scan ? C(`추천 목록 보기 (${state.list.length})`, `See recommendations (${state.list.length})`) : C('바코드로 찾기', 'Find by barcode');
-    toggle.classList.toggle('hidden', !BARCODE_PANEL || (scan && !state.list.length));
-  }
+  if (!STUDIO) $('panel-label').textContent = C('추천 제품', 'Recommended products'); // 챗봇 화면 오른쪽 패널 = 추천 목록 (바코드 패널은 2026-11-20 뺐다)
   const status = $('rec-status');
   if (!state.list.length) {
     status.textContent = state.ctx?.query
@@ -263,7 +209,7 @@ export function renderPanel() {
     $('rec-list').replaceChildren();
     return;
   }
-  status.textContent = C(`추천 제품 ${state.list.length}개 · "두 번째 거 자세히", "첫 번째랑 두 번째 비교"처럼 순서로 물어보세요.`, `${state.list.length} products · Ask by order, like "the second one" or "compare the first and second".`);
+  status.textContent = C(`추천 제품 ${state.list.length}개 · "두 번째 거 자세히"처럼 순서로 물어보세요.`, `${state.list.length} products · Ask by order, like "tell me more about the second one".`);
   $('rec-list').replaceChildren(...state.list.map((p) => productMini(p)));
   $('rec-list').querySelector('.focus')?.scrollIntoView({ block: 'nearest' });
 }

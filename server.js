@@ -1,5 +1,6 @@
 // took(툭) 개발 서버: 정적 파일 + 제품 API (Node 내장 모듈만 사용)
 import { createServer } from 'node:http';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { createServer as createHttpsServer } from 'node:https';
 import { readFileSync, existsSync } from 'node:fs';
 import { networkInterfaces } from 'node:os';
@@ -13,6 +14,7 @@ import { abEnabled, abStats, recordEvent } from './src/lib/ab.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
 import { normalizeHex } from './src/lib/color.js';
 import { BROWSER_LIBS } from './src/lib/browser-libs.js';
+import { setRealOnlyGetter } from './src/lib/catalog.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 // .env (LLM 주소·키 등 서버 전용 설정). 없으면 규칙 챗봇만 쓴다
@@ -20,6 +22,11 @@ if (existsSync(join(root, '.env'))) process.loadEnvFile(join(root, '.env'));
 const PUBLIC = join(root, 'public');
 const SHARED_LIB = join(root, 'src/lib'); // 브라우저에서 /lib/color.js 등으로 재사용
 const BROWSER_LIB_SET = new Set(BROWSER_LIBS);
+
+// 실데이터만 보기 (2026-11-20): 화면이 'X-Took-Real-Only: 1' 을 보내면 그 요청에서 시연용 제품·호수를 뺀다 (public/js/demo.js).
+// 서버 전체로 켜려면 환경변수 TOOK_REAL_ONLY=1. 요청마다 따로 기억해서(AsyncLocalStorage) 동시에 온 요청끼리 섞이지 않는다
+const realOnlyScope = new AsyncLocalStorage();
+setRealOnlyGetter(() => realOnlyScope.getStore() ?? process.env.TOOK_REAL_ONLY === '1');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -148,7 +155,10 @@ async function handler(req, res) {
   {
     const url = new URL(req.url, 'http://localhost');
     try {
-      if (url.pathname.startsWith('/api/')) await handleApi(req, res, url);
+      if (url.pathname.startsWith('/api/')) {
+        const realOnly = req.headers['x-took-real-only'] === '1' || process.env.TOOK_REAL_ONLY === '1';
+        await realOnlyScope.run(realOnly, () => handleApi(req, res, url));
+      }
       else await serveStatic(res, url.pathname, req.headers.range);
     } catch (e) {
       sendJson(res, 500, { error: e.message });

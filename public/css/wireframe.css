@@ -109,7 +109,7 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .card button.shade-link { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .card .shade-dot { flex: none; width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25); }
 .card .shade-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card .shade-total { flex: none; font-weight: 400; opacity: 0.7; }
+
 /* 카드 안의 호수 고르기 (올리브영 '옵션을 선택해 주세요'처럼): 머리 칸 + 아래로 펼치는 목록 */
 .card > .opt, .opt.opt-detail { grid-column: 1 / -1; border: 1px solid #888; border-radius: 12px; overflow: hidden; margin-top: 6px; }
 .opt.opt-detail { margin-top: 12px; }
@@ -178,36 +178,10 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .compare-table th, .compare-table td { font-size: 14px; padding: 4px 6px; }
 .compare-table th { white-space: nowrap; color: #555; font-weight: normal; }
 .card.mini button[aria-pressed="true"] { background: #000; color: #fff; border-color: #000; }
-/* 챗봇 오른쪽 패널: 바코드 스캐너 ↔ 추천 목록 */
+/* 챗봇 오른쪽 패널: 추천 목록 (바코드 패널은 2026-11-20 뺐다) */
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .panel-head .label { margin: 0; }
-#scan-view { display: flex; flex-direction: column; gap: 8px; }
-.scan-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; border: 1px solid #000; background: #fff; overflow: hidden; }
-.scan-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.scan-guide { position: absolute; left: 12%; right: 12%; top: 32%; bottom: 32%; border: 2px solid #fff; outline: 2px solid #000; }
 .btn-dark { background: #000; color: #fff; border-color: #000; }
-/* 챗봇 바코드: 스캐너가 연결돼 있다고 보고, 찍으라는 안내와 대기 상태를 크게 */
-.scanner-ready { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 22px 16px; border-radius: 16px; background: var(--soft); }
-.scanner-ready p { margin: 0; max-width: 34ch; }
-.scanner-art { width: 120px; height: 80px; color: var(--ink); }
-.scanner-art .beam { animation: scanner-beam 1.6s ease-in-out infinite; }
-@keyframes scanner-beam { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
-.scanner-title { font-size: 17px; }
-.scanner-state { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; padding: 5px 14px; border-radius: 999px; background: var(--paper); font-size: 13px; font-weight: 700; }
-.scanner-state i { width: 8px; height: 8px; border-radius: 50%; background: var(--mute); animation: scanner-wait 1.4s ease-in-out infinite; }
-.scanner-state.hit { background: var(--ink); color: var(--paper); }
-.scanner-state.hit i { background: var(--paper); animation: none; }
-@keyframes scanner-wait { 50% { opacity: 0.25; } }
-#scan-status:empty { display: none; }
-.scan-alt { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 10px; }
-.scan-alt[open] { display: flex; }
-.scan-alt > summary { cursor: pointer; color: var(--mute); font-weight: 600; }
-.scan-alt > * + * { margin-top: 8px; }
-@media (prefers-reduced-motion: reduce) { .scanner-art .beam, .scanner-state i { animation: none; } }
-.scan-form { display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #ccc; padding-top: 8px; }
-.scan-form input { flex: 1; min-width: 0; }
-/* 좁은 화면: 패널은 바코드 버튼을 눌렀을 때만 대화 위에 연다 */
-body.scan-open .chat-side { display: flex; flex-direction: column; gap: 6px; order: -1; margin-bottom: 0; }
 .chat-shell { display: flex; flex-direction: column; gap: 8px; margin-bottom: 0; }
 .chat-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .chat-shell .chat-log { height: 60vh; }
@@ -263,7 +237,7 @@ body.scan-open .chat-side { display: flex; flex-direction: column; gap: 6px; ord
   .chat-user .chat-side { display: flex; flex-direction: column; gap: 6px; margin-bottom: 0; height: 100%; min-height: 0; overflow-y: auto; }
   .chat-user .chat-shell .mini-list { display: none; }
   .chat-user .mini-names { display: block; }
-  .chat-user .narrow-only { display: none; }
+  
 
 }
 
@@ -273,17 +247,13 @@ body.scan-open .chat-side { display: flex; flex-direction: column; gap: 6px; ord
 
 @media print { header.nav, #print { display: none; } }
 
-/* 사진으로 바코드 읽기 버튼 (챗봇) */
-.photo-btn { min-height: 44px; padding: 0 12px; font-weight: normal; cursor: pointer; }
-
 /* 제품 카드: 색상값 옆 색 견본 (무채색 규칙의 예외, CLAUDE.md) */
-.color-dot { display: inline-block; width: 14px; height: 14px; border: 1px solid #555; vertical-align: -2px; margin-right: 6px; }
 
 /* 제품 카드 대표 이미지 (무채색 규칙의 예외, CLAUDE.md). 상품 사진이 잘리지 않게 정사각형 안에 맞춘다 */
 .card-img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: contain; background: #fff; border-bottom: 1px solid #ccc; margin-bottom: 4px; }
 .card-img-empty { display: flex; align-items: center; justify-content: center; color: #888; font-size: 13px; border: 1px dashed #bbb; }
 
-/* ---------- 합본 화면: [립 매핑 카메라 | 색 조제·챗봇·추천·바코드 탭] ---------- */
+/* ---------- 합본 화면: [립 매핑 카메라 | 색 조제·챗봇·추천 탭] ---------- */
 .studio { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .studio .area { margin-bottom: 0; }
 .studio-left { display: flex; flex-direction: column; gap: 6px; }
@@ -323,18 +293,17 @@ header.nav strong { margin-right: 14px; }
 header.nav strong a { padding: 0; font-size: 19px; font-weight: 800; background: none !important; color: var(--ink); }
 
 /* 기본 버튼: 회색 면 + 둥근 모서리, 누르면 살짝 작아진다 */
-button, .btn-primary, .btn-line, .photo-btn {
+button, .btn-primary, .btn-line {
   border: 0; border-radius: var(--r-s); background: var(--soft); color: var(--ink); padding: 10px 16px; font-weight: 600;
   transition: transform 0.18s var(--spring), background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
-button:hover:not(:disabled), .btn-line:hover, .photo-btn:hover { background: var(--soft-2); color: var(--ink); }
-button:active:not(:disabled), .btn-primary:active, .btn-line:active, .photo-btn:active { transform: scale(0.96); transition-duration: 0.08s; }
+button:hover:not(:disabled), .btn-line:hover { background: var(--soft-2); color: var(--ink); }
+button:active:not(:disabled), .btn-primary:active, .btn-line:active { transform: scale(0.96); transition-duration: 0.08s; }
 button:disabled { background: var(--soft); color: var(--faint); opacity: 0.7; }
 .btn-dark, button.btn-dark, .btn-primary, .btn-primary:visited, #chat-send { background: var(--ink); color: var(--paper); }
 .btn-dark:hover:not(:disabled), .btn-primary:hover, #chat-send:hover:not(:disabled) { background: #333333; color: var(--paper); }
 .btn-primary, .btn-line { min-height: 54px; padding: 0 26px; border-radius: 16px; font-size: 16px; justify-content: center; }
 .btn-line, .btn-line:visited { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); }
-.photo-btn { display: inline-flex; align-items: center; font-weight: 600; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 6px; }
 
 /* 입력창: 회색 면, 누르면 흰 바탕 + 검은 테두리 */
@@ -399,7 +368,6 @@ table th, table td { border-bottom-color: var(--line); }
 .card.mini { padding: 12px 14px; border-radius: 16px; }
 .card.mini.focus { outline: 0; box-shadow: inset 0 0 0 1px var(--line-2); }
 .card.mini button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-.color-dot { width: 14px; height: 14px; border: 0; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
 
 /* 불러오는 동안 회색 뼈대 카드 */
 .card.skeleton { pointer-events: none; }
@@ -429,19 +397,6 @@ header.nav .nav-fullscreen { min-height: 34px; padding: 4px 12px; border-radius:
 header.nav .nav-lang { margin-left: auto; }
 /* 챗봇 화면의 짧은 메뉴(로고 + 전체화면): 전체화면 버튼을 오른쪽 끝으로 */
 header.nav.nav-min .nav-fullscreen { margin-left: auto; }
-/* 언어 선택 메뉴 (i18n.js languageMenu): 🌐 Language ▾ 를 누르면 아래에 말풍선처럼 목록이 열린다 */
-.lang-menu { position: relative; display: inline-block; }
-.lang-menu .lang-trigger { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 4px 10px; border-radius: 10px; background: transparent; box-shadow: none; color: var(--ink); font-size: 15px; font-weight: 600; }
-.lang-menu .lang-trigger:hover, .lang-menu .lang-trigger[aria-expanded="true"] { background: var(--soft); }
-.lang-menu .lang-trigger[aria-expanded="true"] svg:last-child { transform: rotate(180deg); }
-.lang-menu .lang-trigger svg:last-child { transition: transform 0.2s; }
-.lang-pop { position: absolute; top: calc(100% + 12px); right: 0; z-index: 60; min-width: 260px; padding: 6px 0 8px; background: var(--paper); border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); text-align: left; }
-/* 위쪽 꼬리: 테두리 있는 작은 마름모 */
-.lang-pop::before { content: ''; position: absolute; top: -7px; right: 36px; width: 12px; height: 12px; background: var(--paper); border-left: 1px solid #ddd; border-top: 1px solid #ddd; transform: rotate(45deg); }
-.lang-pop .lang-cur { margin: 0; padding: 14px 20px 12px; font-size: 16px; color: var(--ink); }
-.lang-pop hr { margin: 0 12px 4px; border: 0; border-top: 1px solid #e6e6e6; }
-.lang-pop [role="menuitem"] { display: block; width: 100%; min-height: 48px; padding: 10px 20px; border-radius: 0; background: transparent; box-shadow: none; color: var(--ink); text-align: left; font-size: 18px; font-weight: 400; }
-.lang-pop [role="menuitem"]:hover, .lang-pop [role="menuitem"]:focus-visible { background: var(--soft); outline: none; }
 /* 키오스크 자동 초기화 안내 = 'See You Soon' 자동 꺼짐 화면 (2026-11-19 사용자 디자인, idle-reset.js showWarning).
    화면 전체를 검정으로 덮는다. 속(.idle-screen)은 900×1440 기준 좌표로 그리고 --k 배율로 창에 맞춘다.
    버튼(뒤로·계속 이용하기)을 포함해 화면 아무 곳이나 누르면 계속 쓰고, 0초면 처음 화면으로 */
@@ -532,11 +487,6 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 .compare-box > button { min-height: 38px; padding: 2px 14px; }
 .compare-table td, .compare-table th { border-bottom: 1px solid var(--line); }
 
-/* 바코드·QR */
-.scan-stage { border: 0; border-radius: var(--r); background: var(--soft); }
-.scan-guide { border-radius: 10px; }
-.scan-form { border-top: 1px solid var(--line); padding-top: 14px; }
-
 /* 합본 */
 .studio-side { gap: 14px; }
 /* 합본 '추천' 탭: 제품 카드를 한 줄에 2개씩 */
@@ -557,7 +507,7 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 
 /* ---------- 홈 인터랙션 (js/home.js) ---------- */
 /* 커서에 반응하는 회색 점 배경: 화면 전체에 고정, 내용 뒤 */
-body.home-page main { position: relative; z-index: 1; }
+
 /* 숨쉬기: 그림자 대신 아주 조금 커졌다 작아진다 (테두리는 회색 면 한 단계) */
 /* 동그라미 둘레를 천천히 도는 회색 점 */
 /* 챗봇 쪽 예시 대화: 동그라미 안에 말풍선 세 개 (회색 = 챗봇, 검정 = 나) */
@@ -565,98 +515,52 @@ body.home-page main { position: relative; z-index: 1; }
 /* 홈 = 대기 화면 (옛 거울 ver4 대기 화면, js/home.js): 화면 전체에 선만. 누르면 팔레트로.
    라이트 모드는 흰 바탕 위 검정 선, 다크 모드는 검정 바탕 위 흰 선 (--paper·--ink 가 바뀐다).
    왼쪽 위 TOOK 로고, 오른쪽 위 시계, 가운데 점선 얼굴(천천히 숨 쉼), 아래 안내 두 줄, 오른쪽 아래 다크 모드·언어 */
-body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; padding: 0; max-width: none; background: var(--paper); color: var(--ink); text-align: center; cursor: pointer; user-select: none; transition: background-color 0.3s, color 0.3s; }
-.home-standby .hs-top { position: absolute; top: max(28px, 4.2dvh); left: max(28px, 7vw); right: max(28px, 7vw); display: flex; align-items: center; justify-content: space-between; }
-.home-standby .hs-logo { display: block; width: clamp(110px, 19vw, 230px); height: auto; }
-.home-standby .hs-clock { font-size: clamp(26px, 4.6vw, 52px); font-weight: 300; letter-spacing: 0.02em; opacity: 0.85; font-variant-numeric: tabular-nums; }
-.home-standby .hs-face { position: absolute; left: 50%; top: 41%; translate: -50% -50%; width: clamp(150px, 30vw, 300px); height: auto; animation: hs-face 4.8s ease-in-out infinite; }
+
 @keyframes hs-face { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.95; } }
-.home-standby .hs-hint { position: absolute; left: 16px; right: 16px; top: 69%; margin: 0; font-size: clamp(22px, 4.2vw, 44px); font-weight: 400; letter-spacing: 0.02em; opacity: 0.85; word-break: keep-all; }
-.home-standby .hs-sub { position: absolute; left: 16px; right: 16px; top: calc(69% + clamp(40px, 6.5vw, 72px)); margin: 0; font-size: clamp(14px, 2.1vw, 20px); color: var(--mute); word-break: keep-all; }
-.home-standby .intro-lang { top: auto; bottom: max(16px, 3vh); cursor: auto; }
-.home-standby .lang-pop { top: auto; bottom: calc(100% + 12px); }
-.home-standby .lang-pop::before { top: auto; bottom: -7px; transform: rotate(225deg); }
-@media (prefers-reduced-motion: reduce) { .home-standby .hs-face { animation: none; opacity: 0.85; } }
-.intro-lang { position: absolute; top: max(16px, 3vh); right: max(16px, 3vw); }
-.intro-lang .lang-trigger { font-size: 17px; min-height: 46px; padding: 6px 14px; }
 
 /* ---------- 팔레트: 왼쪽 카메라 | 오른쪽 ① 내 톤 찾기 ② 팔레트 ③ 텍스처·추천 (추천 후엔 ④ 결과) (js/palette.js + lip.js).
    물감·섞는 칸·조제한 색은 실제 색 (CLAUDE.md 예외) ---------- */
 .palette { display: grid; grid-template-columns: 1fr; gap: 16px; }
 .palette .area { margin-bottom: 0; }
-.pal-cam { display: flex; flex-direction: column; gap: 6px; }
-.pal-right { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
-.pal-board { display: flex; flex-direction: column; gap: 10px; }
+
 .paints { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 2px; }
 /* 테스트 방식(아바타 / 카메라) 버튼: 지금 쓰는 쪽은 검게 */
-.source-row button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.pal-mix { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: stretch; gap: 12px; min-width: 0; }
-.mix-wrap { position: relative; width: 100%; min-width: 0; aspect-ratio: 1.55 / 1; }
-.mix-wrap canvas { width: 100%; height: 100%; display: block; border: 1px solid var(--line); border-radius: 12px; }
-.mix-summary { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; }
-.mix-summary-label { color: var(--mute); font-size: 13px; font-weight: 700; }
-.mix-summary #mix-hex { font-size: 15px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
 /* ① 내 톤 찾기: 버튼과 추천 컬러 3개를 한 줄에, 측정값·안내는 접어 둔다 */
-.pal-match { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; }
-.pal-match .label { margin: 0; }
-.pal-match p { margin: 0; }
-.pal-match-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.pal-match-row > button { min-height: 40px; }
-.pal-match-row .swatches { display: flex; gap: 8px; margin: 0; }
-.pal-match-row .swatches.hidden { display: none; }
-.pal-match-row .swatches button { width: 32px; height: 32px; min-height: 32px; }
-.pal-match #match-result:empty { display: none; }
+
 /* ② 팔레트 머리: 이름 + 오른쪽 위 다시하기 아이콘 */
-.pal-board-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.pal-board-head .label { margin: 0; }
-.pal-reset { width: 40px; min-height: 40px; padding: 0; border-radius: 50%; }
+
 /* ③ 마무리: 텍스처·농도·추천 버튼 */
-.pal-finish { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; }
-.pal-finish .seg { padding: 3px; }
-.pal-finish .seg button { min-height: 32px; font-size: 13px; }
-.pal-finish .slider { margin: 0; }
-.pal-finish input[type="range"] { height: 26px; }
-.pal-finish #find { min-height: 46px; }
+
 /* ④ 추천 결과: 추천을 받은 뒤에만 ①~③ 대신 보인다 */
-.pal-result { display: none; }
-.palette.show-result .pal-match, .palette.show-result .pal-board, .palette.show-result .pal-finish { display: none; }
-.palette.show-result .pal-result { display: flex; flex-direction: column; gap: 10px; flex: 1 1 auto; min-height: 0; overflow-y: auto; animation: took-fade 0.3s var(--ease) backwards; }
-.pal-result-color { display: flex; align-items: center; gap: 10px; font-size: 18px; }
-.pal-result-color .color-dot { width: 28px; height: 28px; }
-.pal-result #back-mix { min-height: 36px; padding: 4px 14px; }
-.pal-result #rec-status { margin: 0; }
-.pal-rec { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
 /* 조제한 색 박스: 작게 모아 스크롤 없이 보이게 (비어 있는 줄은 자리도 차지하지 않는다) */
 /* 추천 결과 보기: 팔레트·텍스처·농도·추천 버튼을 숨기고 조제한 색과 추천 제품만 오른쪽 전체에 */
 /* 팔레트 박스: 남은 높이를 모두 쓰고, 섞는 칸이 그 높이에 맞춰 커진다 */
 /* 립 컬러 매핑 컬러: 22색을 작은 방울로 두 줄에 */
-.lip-paints { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px 2px; }
+
 /* 그라디언트 맵 (2026-11-13): 물감 22색 버튼 대신 색 계열 순서로 이은 색 띠 하나.
    띠를 누르거나 끌다 놓으면 손잡이 자리 색이 떨어진다 (palette-mixer.js). 아래 정지점 동그라미는 뺐다 */
-.lip-paints.gmap { display: block; padding: 14px 4px 6px; min-width: 0; }
-.gmap-bar { position: relative; height: 56px; border-radius: 16px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06); cursor: pointer; touch-action: none; user-select: none; }
-.gmap-bar:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
 /* 손잡이: 띠 위아래로 살짝 넘치는 흰 테두리 막대 */
-.gmap-handle { position: absolute; top: -4px; bottom: -4px; width: 10px; translate: -50% 0; border-radius: 6px; border: 2.5px solid #fff; background: var(--c);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); pointer-events: none; transition: left 0.15s var(--ease); }
-.gmap-bar.picking .gmap-handle { transition: none; }
+
 /* 팔레트 화면 다듬기 (Taste Skill 앱 화면 규칙): 판은 그림자 없이 바탕과 한 단계 다른 면으로,
    칸 이름은 읽히는 크기로, 아직 못 누르는 버튼 글자도 읽히게 (흐린 #b5b5b5 → #6e6e6e) */
 .palette-page .area { box-shadow: none; }
-.palette-page .area > .label, .palette-page .pal-board-head .label { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
-.palette-page .pal-cam > .label { margin-bottom: 4px; }
+.palette-page .area > .label { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+
 .palette-page button:disabled:not(.btn-dark) { color: #6e6e6e; opacity: 1; }
 .palette-page .stage .placeholder { font-size: 16px; line-height: 1.6; color: var(--ink-2); }
-.palette-page .pal-match .muted { color: #6e6e6e; }
+
 @media (orientation: landscape) and (min-width: 960px) {
   .palette { grid-template-columns: minmax(0, 1.15fr) minmax(400px, 0.85fr); height: 100%; }
-  .pal-cam { height: 100%; min-height: 0; }
-  .pal-cam .stage { flex: 0 1 auto; min-height: 0; aspect-ratio: 4 / 3; }
-  .pal-right { height: 100%; }
-  .pal-match, .pal-finish { flex: 0 0 auto; }
-  .pal-board { flex: 1 1 0; min-height: 0; }
-  .pal-mix { flex: 1 1 0; min-height: 0; }
-  .mix-wrap { height: 100%; width: auto; max-width: 100%; max-height: 460px; }
+  
+  
+  
+  
+  
+  
+  
 }
 
 /* 토스트: 화면 아래 가운데에 잠깐 뜨는 알림 */
@@ -682,7 +586,7 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
    키오스크를 세워 두었을 때: 한 화면에 맞추고(스크롤 없음) 위아래로 쌓는다.
    - 홈: 두 동그라미를 위아래로 크게
    - 팔레트: 위 카메라 | 아래 [팔레트 · 내 톤/마무리]
-   - 챗봇: 위 대화 | 아래 바코드·추천 제품 패널 (가로 화면과 같은 '넓은 화면' 동작, js/chat.js 의 WIDE)
+   - 챗봇: 위 대화 | 아래 추천 제품 패널 (가로 화면과 같은 '넓은 화면' 동작, js/chat.js 의 WIDE)
    휴대폰 세로(700px 미만)는 기존 좁은 화면 그대로. PC 에서는 portrait.html 로 미리 본다 */
 @media (orientation: portrait) and (min-width: 700px) {
   header.nav { height: var(--nav-h); padding: 0 20px; flex-wrap: nowrap; }
@@ -691,45 +595,41 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
   main.fit.palette, main.fit.chat-user { max-width: none; height: calc(100dvh - var(--nav-h)); padding: clamp(10px, 1.2vh, 14px) 18px; overflow: hidden; }
   .palette { grid-template-rows: minmax(0, 1fr) auto; gap: clamp(8px, 1vh, 12px); }
   /* 카메라가 주인공: 라벨은 빼고, 고른 색 이름과 아바타/카메라 버튼을 한 줄에 두어 화면을 최대한 크게 */
-  .pal-cam { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto; grid-auto-rows: auto; column-gap: 12px; row-gap: 10px; align-items: center; }
-  .pal-cam > .label { display: none; }
-  .pal-cam .stage { grid-column: 1 / -1; grid-row: 1; height: 100%; min-height: 0; aspect-ratio: auto; }
-  .pal-cam #color-name { grid-column: 1; grid-row: 2; margin: 0; font-size: 15px; font-weight: 700; }
-  .pal-cam .source-row { grid-column: 2; grid-row: 2; flex-wrap: nowrap; }
-  .pal-cam #guide, .pal-cam #error, .pal-cam > .row:not(.source-row) { grid-column: 1 / -1; margin: 0; }
-  .pal-cam #guide:empty, .pal-cam > .row:not(.source-row):not(:has(button:not(.hidden))) { display: none; }
+  
+  
+  
+  
+  
+  
+  
   /* 아래: [팔레트 물감 | 섞는 칸] 한 줄, 그 밑에 [내 톤 찾기 | 텍스처·농도·추천] */
-  .pal-right { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 12px; }
-  .pal-board { grid-column: 1 / -1; grid-row: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; column-gap: 20px; row-gap: 8px; }
-  .pal-board-head { grid-column: 1; grid-row: 1; }
-  .pal-board #lip-paints { grid-column: 1; grid-row: 2; align-self: center; }
-  .pal-mix { grid-column: 2; grid-row: 1 / span 2; gap: 14px; }
-  .mix-wrap { width: 100%; max-width: none; max-height: 210px; }
-  .mix-summary { gap: 6px; }
-  .pal-match { grid-column: 1; grid-row: 2; }
-  .pal-finish { grid-column: 2; grid-row: 2; gap: 10px; }
-  .pal-finish .seg button { padding: 0 4px; }
-  .palette.show-result .pal-right { grid-template-columns: 1fr; }
-  .palette.show-result .pal-result { grid-column: 1 / -1; grid-row: 1; height: clamp(320px, 44dvh, 600px); }
-  .pal-rec { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
-  /* 챗봇: 위 대화, 아래 바코드·추천 제품 */
+  /* 챗봇: 위 대화, 아래 추천 제품 */
   .chat-user { grid-template-rows: minmax(0, 1fr) minmax(0, 39%); height: 100%; gap: 12px; }
   .chat-user .chat-shell { min-height: 0; }
   .chat-user .chat-shell .chat-log { flex: 1; height: auto; min-height: 120px; }
   .chat-user .chat-side { display: flex; flex-direction: column; gap: 6px; margin-bottom: 0; min-height: 0; overflow-y: auto; order: 0; }
   .chat-user .chat-shell .mini-list { display: none; }
   .chat-user .mini-names { display: block; }
-  .chat-user .narrow-only { display: none; }
+  
   /* 추천 제품: 아래 패널 높이 안에 한 줄로 두고 옆으로 밀어 본다 (세로 화면은 폭보다 높이가 귀하다) */
   .chat-user #rec-list { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: calc((100% - 30px) / 3.6); gap: 10px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-bottom: 6px; }
   .chat-user #rec-list > * { scroll-snap-align: start; }
   .chat-user #rec-list > p { grid-column: auto; width: max-content; max-width: 70vw; white-space: normal; }
   .chat-user #rec-list .card-img { max-height: clamp(100px, 11vh, 160px); }
-  /* 바코드 대기 안내는 가로로 눕혀 아래 패널 높이를 아낀다 */
-  .chat-user .scanner-ready { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto; column-gap: 20px; row-gap: 4px; align-items: center; text-align: left; padding: 16px 22px; }
-  .chat-user .scanner-ready .scanner-art { grid-row: 1 / span 3; }
-  .chat-user .scanner-ready .scanner-state { justify-self: start; }
 }
 
 /* ---------- 팔레트 시안 B '거울 전면' (키오스크 가로·세로 공통) ----------
@@ -740,115 +640,69 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 @media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
   .palette-page { --dock-h: 252px; --fin-w: 340px; --gap: 16px; }
   .palette-page main.fit.palette { position: relative; display: block; padding: 0; height: calc(100dvh - var(--nav-h)); overflow: hidden; }
-  .palette-page .pal-right { display: contents; }
+  
   .palette-page .palette .area { position: absolute; margin: 0; }
 
   /* 카메라: 화면 전체 (서랍 뒤로 살짝 들어간다), 화면을 꽉 채우도록 잘라서 보여 준다 */
-  .palette-page .pal-cam { inset: 0; padding: 0; border-radius: 0; background: var(--soft); display: block; }
-  .palette-page .pal-cam > .label { display: none; }
-  .palette-page .pal-cam .stage { position: absolute; inset: 0 0 calc(var(--dock-h) - 8px) 0; width: auto; height: auto; aspect-ratio: auto; border-radius: 0; }
-  .palette-page .pal-cam .stage canvas, .palette-page .pal-cam .stage video { object-fit: cover; }
-  .palette-page .pal-cam .source-row { position: absolute; top: var(--gap); left: var(--gap); margin: 0; flex-wrap: nowrap; gap: 8px; z-index: 2; }
-  .palette-page .pal-cam .source-row button:not([aria-pressed="true"]) { background: var(--paper); }
-  .palette-page .pal-cam #color-name { position: absolute; top: calc(var(--gap) + 58px); left: var(--gap); margin: 0; padding: 8px 14px; border-radius: 999px; background: var(--paper); font-size: 15px; font-weight: 700; z-index: 2; }
-  .palette-page .pal-cam #color-name:empty { display: none; }
-  .palette-page .pal-cam #guide { position: absolute; left: 50%; bottom: calc(var(--dock-h) + 12px); translate: -50% 0; margin: 0; max-width: 80%; padding: 8px 16px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 15px; font-weight: 600; text-align: center; z-index: 2; }
-  .palette-page .pal-cam #guide:empty { display: none; }
-  .palette-page .pal-cam #error { position: absolute; left: var(--gap); right: var(--gap); top: calc(var(--gap) + 110px); margin: 0; z-index: 2; }
-  .palette-page .pal-cam > .row:not(.source-row) { position: absolute; left: 50%; top: 50%; translate: -50% -50%; margin: 0; z-index: 2; }
-  .palette-page .pal-cam > .row:not(.source-row):not(:has(button:not(.hidden))) { display: none; }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   /* 내 톤으로 추천받기: 카메라 오른쪽 위 흰 카드 */
-  .palette-page .pal-match { top: var(--gap); right: var(--gap); max-width: 380px; padding: 10px 12px; border-radius: 20px; gap: 6px; z-index: 2; }
-  .palette-page .pal-match > .label { display: none; }
-  .palette-page .pal-match-row > button { min-height: 44px; border-radius: 999px; padding: 0 18px; }
+  
+  
+  
 
   /* 서랍 왼쪽: 팔레트 이름 + 색상 띠 | 혼합색 견본과 조합 */
-  .palette-page .pal-board { left: var(--gap); right: calc(var(--gap) + var(--fin-w)); bottom: var(--gap); height: var(--dock-h); padding: 20px 8px 20px 24px; border-radius: 28px 0 0 28px;
-    display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 16px; row-gap: 10px; align-items: center; }
-  .palette-page .pal-board-head { grid-column: 1 / -1; grid-row: 1; }
-  .palette-page .pal-board #lip-paints { grid-column: 1; grid-row: 2; align-self: center; }
-  .palette-page .pal-mix { grid-column: 2; grid-row: 2; grid-template-columns: minmax(0, 1.05fr) minmax(110px, 0.95fr); gap: 10px; height: 100%; }
-  .palette-page .mix-wrap { width: 100%; height: 100%; aspect-ratio: auto; max-width: none; max-height: none; }
-  .palette-page .mix-summary { gap: 6px; }
+  
+  
+  
+  
+  
+  
 
   /* 서랍 오른쪽: 텍스처 · 농도 · 추천 버튼 */
-  .palette-page .pal-finish { right: var(--gap); bottom: var(--gap); width: var(--fin-w); height: var(--dock-h); padding: 20px 24px 20px 12px; border-radius: 0 28px 28px 0; justify-content: center; gap: 14px; }
-  .palette-page .pal-finish .seg button { min-height: 40px; font-size: 14px; padding: 0 4px; }
-  .palette-page .pal-finish #find { min-height: 56px; font-size: 17px; border-radius: 16px; }
+  
+  
+  
 
   /* 추천 결과: 서랍과 똑같은 자리·크기의 흰 판 (카메라 크기는 그대로 둔다) */
-  .palette-page .palette.show-result .pal-result { left: var(--gap); right: var(--gap); bottom: var(--gap); top: auto; height: var(--dock-h); padding: 18px 24px; border-radius: 28px; grid-column: auto; grid-row: auto; z-index: 3; }
-  .palette-page .palette.show-result .pal-cam #guide { display: none; }
+  
+  
 }
 /* 세로: 서랍을 두 줄로 — 위 줄 물감 22색(넓게), 아래 줄 [섞는 칸 · 고른 색] | [텍스처 · 농도 · 추천] */
 @media (orientation: portrait) and (min-width: 700px) {
   .palette-page { --dock-h: 420px; --fin-w: 50%; }
-  .palette-page .pal-board { right: var(--gap); border-radius: 28px; padding: 22px 24px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); }
-  .palette-page .pal-board-head { grid-column: 1 / -1; }
-  .palette-page .pal-board #lip-paints { grid-column: 1 / -1; }
-  .palette-page .pal-mix { grid-column: 1; grid-row: 3; grid-template-columns: minmax(0, 1fr); align-content: center; gap: 6px; }
-  .palette-page .mix-wrap { width: 100%; height: clamp(100px, 14vh, 160px); aspect-ratio: auto; }
-  .palette-page .mix-summary { gap: 5px; }
-  .palette-page .pal-finish { height: 248px; width: calc(50% - var(--gap)); padding: 22px 24px 22px 8px; border-radius: 0 0 28px 0; background: transparent; justify-content: flex-end; }
+  
+  
+  
+  
+  
+  
+  
 }
 /* 세로: 추천을 받으면 결과 판이 서랍 크기에서 화면(카메라+서랍 영역)의 절반까지 커지고, 제품은 한 줄에 2개씩 (넘치면 위아래로 밀어 본다) 2026-11-15 */
-@media (orientation: portrait) and (min-width: 700px) {
-  .palette-page .palette.show-result .pal-result { height: calc(50% - var(--gap)); overflow: hidden; animation: pal-grow 0.45s var(--ease) backwards; }
-  .palette-page .palette.show-result #rec-status { flex: none; }
-  .palette-page .palette.show-result .pal-rec { flex: 1 1 auto; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px; overflow-y: auto; overscroll-behavior-y: contain; padding-bottom: 4px; }
-  .palette-page .palette.show-result .pal-rec > p { grid-column: 1 / -1; }
-  /* 카드: 왼쪽 사진, 오른쪽 브랜드·제품명·가격, 아래 버튼 */
-  .palette-page .palette.show-result .pal-rec .card { display: grid; grid-template-columns: 112px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 14px; row-gap: 10px; padding: 12px; align-items: center; }
-  .palette-page .palette.show-result .pal-rec .card-img { grid-row: 1; width: 112px; height: 112px; aspect-ratio: 1; object-fit: cover; border-radius: 14px; margin: 0; }
-  .palette-page .palette.show-result .pal-rec .card dl { display: block; margin: 0; font-size: 15px; line-height: 1.4; }
-  .palette-page .palette.show-result .pal-rec .card dt { display: none; }
-  .palette-page .palette.show-result .pal-rec .card dd { margin: 0; overflow: hidden; text-overflow: ellipsis; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(1) { color: var(--mute); font-size: 14px; white-space: nowrap; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(2) { font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(3) { font-weight: 700; margin-top: 4px; }
-  .palette-page .palette.show-result .pal-rec .card .actions { grid-column: 1 / -1; display: flex; gap: 8px; margin: 0; flex-wrap: nowrap; }
-  .palette-page .palette.show-result .pal-rec .card .actions > * { flex: 1 1 0; min-height: 44px; font-size: 14px; padding: 4px 8px; white-space: nowrap; }
-  .palette-page .palette.show-result #take-phone-res { flex: none; }
-  /* 카메라 오류 때의 '카메라 다시 연결'은 커진 판에 가리지 않게 위쪽 절반 가운데로 */
-  .palette-page .palette.show-result .pal-cam > .row:not(.source-row) { top: 25%; }
-  /* 챗봇 버튼은 커진 판 위로 */
-  .palette-page:has(.palette.show-result) .chat-fab { bottom: calc((100dvh - var(--nav-h)) / 2 + 16px); }
-}
+
 @keyframes pal-grow { from { height: var(--dock-h); } }
 /* 가로: 추천 제품은 서랍 높이에 맞춰 한 줄로 늘어놓고, 넘치면 옆으로 밀어 본다 */
-@media (orientation: landscape) and (min-width: 960px) {
-  .palette-page .palette.show-result .pal-result { overflow: hidden; gap: 10px; }
-  .palette-page .palette.show-result #rec-status { display: none; }
-  /* '챗봇과 이어서 상담'은 머리 줄 오른쪽으로 올려 카드 줄 높이를 지킨다 (가로 키오스크) */
-  .palette-page .palette.show-result .pal-result { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto minmax(0, 1fr); column-gap: 10px; }
-  .palette-page .palette.show-result .pal-result > .pal-board-head { grid-column: 1; grid-row: 1; }
-  .palette-page .palette.show-result #take-phone-res { grid-column: 2; grid-row: 1; width: auto; margin: 0; min-height: 40px; padding: 4px 18px; background: var(--ink); color: var(--paper); }
-  .palette-page .palette.show-result .pal-rec { grid-column: 1 / -1; grid-row: 2; }
-  .palette-page .palette.show-result .pal-rec { flex: 1 1 auto; min-height: 0; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 300px; gap: 12px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-bottom: 6px; }
-  .palette-page .palette.show-result .pal-rec > * { scroll-snap-align: start; }
-  /* 서랍 높이에 맞춘 작은 카드: 왼쪽 사진, 오른쪽 브랜드·제품명·색상값·가격, 아래 두 버튼 */
-  .palette-page .palette.show-result .pal-rec .card { display: grid; grid-template-columns: 84px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; row-gap: 8px; padding: 10px; align-items: start; }
-  .palette-page .palette.show-result .pal-rec .card-img { grid-row: 1; width: 84px; height: 84px; aspect-ratio: 1; object-fit: cover; border-radius: 12px; margin: 0; }
-  .palette-page .palette.show-result .pal-rec .card dl { display: block; margin: 0; font-size: 14px; line-height: 1.35; }
-  .palette-page .palette.show-result .pal-rec .card dt { display: none; }
-  .palette-page .palette.show-result .pal-rec .card dd { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(1) { color: var(--mute); font-size: 13px; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(2) { font-weight: 700; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(3) { font-weight: 700; }
-  .palette-page .palette.show-result .pal-rec .card dd:nth-of-type(4) { font-size: 13px; }
-  .palette-page .palette.show-result .pal-rec .card .actions { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 6px; align-items: center; margin: 0; flex-wrap: nowrap; }
-  .palette-page .palette.show-result .pal-rec .card .actions > * { font-size: 13px; min-height: 32px; padding: 4px 10px; white-space: nowrap; }
-}
 
 /* ---------- 챗봇: 마이크를 가운데에 크게 (음성이 주 입력인 키오스크) ----------
    위 줄: 들은 말(테스트 단계에서는 키보드 입력도 되는 칸)을 가운데 정렬로 한 줄,
-   아래 줄: 가운데 큰 동그라미 마이크(96px), 좁은 화면에서는 그 오른쪽에 바코드 버튼. 그 밑에 듣는 중 안내 */
+   아래 줄: 가운데 큰 동그라미 마이크(96px), 그 밑에 듣는 중 안내 */
 .chat-input.voice-only { display: grid; grid-template-columns: 1fr auto 1fr; grid-template-areas: "heard heard heard" ". mic scan"; align-items: center; row-gap: 12px; padding: 4px 0 0; background: transparent; border-radius: 0; }
 .chat-input.voice-only:focus-within, .chat-input.voice-only:has(input[readonly]):focus-within { background: transparent; box-shadow: none; }
 .chat-input.voice-only #chat-input { grid-area: heard; width: 100%; min-height: 48px; padding: 0 20px; border-radius: 999px; background: var(--soft); text-align: center; font-size: 16px; }
 .chat-input.voice-only #chat-input:focus { background: var(--paper); box-shadow: 0 0 0 2px var(--ink); }
-.chat-input.voice-only #scan-open { grid-area: scan; justify-self: start; margin-left: 20px; }
 
 /* ---------- 챗봇: 추천 제품을 따로 나누지 않고 대화 안에 띄운다 (가로·세로 키오스크) ----------
    오른쪽/아래 '추천 제품' 패널은 숨기고, 대화창이 화면을 다 쓴다. 답변 말풍선 아래에 제품 카드를 한 줄로 늘어놓고 옆으로 밀어 본다 */
@@ -870,11 +724,6 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 .nfc-hint.hit { background: var(--ink); color: var(--paper); }
 .studio .nfc-hint { display: none; }
 /* 팔레트: NFC 안내는 카메라 위 가운데 맨 위에 작게 */
-@media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
-  .palette-page .pal-cam .pal-nfc { position: absolute; top: calc(var(--gap) + 116px); left: var(--gap); margin: 0; z-index: 2; background: var(--paper); }
-  .palette-page .pal-cam .pal-nfc.hit { background: var(--ink); }
-}
-.pal-cam .pal-nfc { margin: 0; }
 
 /* 대화 속 추천 제품: 넘기기 버튼 (넓은 화면에서만 보인다) */
 .pc-nav { display: none; grid-column: 1 / -1; justify-content: center; align-items: center; gap: 20px; padding-top: 4px; }
@@ -885,10 +734,10 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
 /* ================= 다크 모드 (언어 버튼 옆 '다크 모드', js/i18n.js themeToggle) =================
    <html data-theme="dark">: 색 변수만 검정 바탕용으로 바꾼다. 여전히 무채색.
    립 영상·색 견본·제품 사진은 실제 색 그대로 (CLAUDE.md 예외) */
-.nav-lang, .intro-lang { display: flex; align-items: center; gap: 4px; }
+.nav-lang { display: flex; align-items: center; gap: 4px; }
 .theme-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 4px 10px; border: 0; border-radius: 10px; background: transparent; box-shadow: none; color: var(--ink); font-size: 15px; font-weight: 600; }
 .theme-toggle:hover:not(:disabled) { background: var(--soft); color: var(--ink); }
-.intro-lang .theme-toggle { font-size: 17px; min-height: 46px; padding: 6px 14px; }
+
 :root[data-theme="dark"] {
   color-scheme: dark;
   --ink: #f2f2f2;
@@ -904,23 +753,17 @@ body main.home-standby { position: fixed; inset: 0; z-index: 1; margin: 0; paddi
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 0 8px 28px rgba(0, 0, 0, 0.5);
   --shadow-up: 0 2px 6px rgba(0, 0, 0, 0.6), 0 16px 40px rgba(0, 0, 0, 0.7);
 }
-:root[data-theme="dark"] .lang-pop, :root[data-theme="dark"] .lang-pop::before { border-color: var(--line-2); }
-:root[data-theme="dark"] .lang-pop hr { border-top-color: var(--line-2); }
 :root[data-theme="dark"] .card dt, :root[data-theme="dark"] .chat-log .who, :root[data-theme="dark"] .compare-table th { color: var(--mute); }
-:root[data-theme="dark"] .palette-page button:disabled:not(.btn-dark), :root[data-theme="dark"] .palette-page .pal-match .muted { color: var(--mute); }
+:root[data-theme="dark"] .palette-page button:disabled:not(.btn-dark) { color: var(--mute); }
 :root[data-theme="dark"] header.nav { background: rgba(0, 0, 0, 0.86); border-bottom-color: var(--line); }
-.theme-toggle span, .lang-trigger span { white-space: nowrap; }
+.theme-toggle span { white-space: nowrap; }
 /* 상단 메뉴 로고 (common.js logoSvg): 글자 대신 TOOK 그림 */
 header.nav strong a.nav-logo { display: inline-flex; align-items: center; padding: 6px 0; }
 header.nav .nav-logo svg { display: block; width: auto; height: 22px; }
 /* 시작 화면 → 팔레트 전환 (js/home.js leave, palette.html 머리 스크립트)
    떠날 때: 얼굴·안내·시계·버튼이 살짝 커지며 사라지고 로고는 메뉴 로고 자리로 (js).
    들어올 때: 메뉴 로고는 그 자리에 있고, 메뉴의 나머지·화면 내용이 아래에서 차례로 떠오른다 */
-.home-standby.hs-leaving { cursor: default; }
-.home-standby .hs-logo { transform-origin: 0 0; }
-.home-standby.hs-leaving .hs-face { animation: hs-face-out 0.5s cubic-bezier(.4, 0, .2, 1) forwards; }
-.home-standby.hs-leaving .hs-hint, .home-standby.hs-leaving .hs-sub, .home-standby.hs-leaving .hs-clock, .home-standby.hs-leaving .intro-lang { animation: hs-text-out 0.4s cubic-bezier(.4, 0, .2, 1) forwards; }
-.home-standby.hs-leaving .hs-sub, .home-standby.hs-leaving .intro-lang { animation-delay: 0.05s; }
+
 @keyframes hs-face-out { from { opacity: 0.9; scale: 1; } to { opacity: 0; scale: 1.18; } }
 @keyframes hs-text-out { to { opacity: 0; transform: translateY(-10px); } }
 @keyframes took-enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
@@ -929,7 +772,6 @@ html.enter-fx header.nav { border-bottom-color: transparent; transition: border-
 html.enter-fx header.nav > :not(strong) { animation: took-enter-fade 0.5s ease-out 0.15s both; }
 html.enter-fx main { animation: took-enter 0.7s cubic-bezier(.2, .8, .2, 1) 0.1s both; }
 /* 챗봇과 이어서 상담 (palette.html #take-phone) */
-.take-phone { width: 100%; margin-top: 8px; }
 
 /* 제품 카드: 답변 아래 한 줄로 늘어놓고 옆으로 밀어 본다 (쪽 넘김 버튼 없음) */
 /* 빠른 답장: 오른쪽 정렬로 줄바꿈 */
@@ -939,15 +781,7 @@ header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radiu
 
 /* 맨 아래 고정 '물어보기' 줄: 누르면 챗봇 입력칸으로 */
 /* 팔레트 상단 로고 → 시작 화면 전환 (common.js goHomeWithMotion, home.js hs-arrive) */
-.home-veil { position: fixed; inset: 0; z-index: 9998; background: var(--paper); opacity: 0; pointer-events: none; }
-.home-fly { position: fixed; z-index: 9999; color: var(--ink); transform-origin: 0 0; pointer-events: none; }
-.home-fly svg { display: block; width: 100%; height: 100%; }
-.home-standby.hs-arrive .hs-face { animation: hs-face-in 0.8s cubic-bezier(.2, .8, .2, 1) both, hs-face 4.8s ease-in-out 0.8s infinite; }
-.home-standby.hs-arrive .hs-hint, .home-standby.hs-arrive .hs-sub, .home-standby.hs-arrive .hs-clock, .home-standby.hs-arrive .intro-lang { animation: hs-rise 0.6s cubic-bezier(.2, .8, .2, 1) both; }
-.home-standby.hs-arrive .hs-clock { animation-delay: 0.1s; }
-.home-standby.hs-arrive .hs-hint { animation-delay: 0.3s; }
-.home-standby.hs-arrive .hs-sub { animation-delay: 0.4s; }
-.home-standby.hs-arrive .intro-lang { animation-delay: 0.5s; }
+
 @keyframes hs-face-in { from { opacity: 0; scale: 0.92; } to { opacity: 0.9; scale: 1; } }
 @keyframes hs-rise { from { opacity: 0; transform: translateY(12px); } }
 /* 팔레트에서 넘어온 첫인사의 색 견본 카드 (chat.js swatchCard): 색상값 글자 대신 견본(실제 색) */
@@ -991,9 +825,9 @@ header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radiu
 .sh-try { display: flex; flex-direction: column; gap: 6px; }
 .sh-try .stage { aspect-ratio: auto; height: 40dvh; }
 @media (min-width: 700px) { .sh-try .stage { height: 54dvh; } }
-.sh-try .source-row { flex-wrap: nowrap; }
+
 .sh-try #guide:empty { display: none; }
-.sh-try > .row:not(.source-row):not(:has(button:not(.hidden))) { display: none; }
+
 /* 발라 보는 중: 제품 이름을 줄이고 동그라미를 한 줄로 */
 .sh-page.trying .sh-title h1 { font-size: 18px; }
 .sh-page.trying .sh-count, .sh-page.trying .sh-back { display: none; }
@@ -1004,7 +838,7 @@ header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radiu
 .sh-page.trying .sh-big-dot { width: 44px; height: 44px; }
 .sh-page.trying .sh-detail-name strong { font-size: 20px; }
 .sh-page.trying .sh-actions { margin-top: 10px; }
-.shade-open { min-height: 36px; }
+
 .shelf-stock { margin: 6px 0 0; font-size: 18px; font-weight: 800; }
 
 /* ---------- 화면 터치 키보드 (js/touch-keyboard.js): 챗봇 입력줄 아래에 열리는 한/영 키보드 ---------- */
@@ -1058,25 +892,10 @@ header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radiu
 }
 
 /* ---------- 웹캠 설정 (camera-settings.js): 카메라 화면 오른쪽 위 ⚙ + 설정 창 ---------- */
-.stage .cam-gear { position: absolute; top: 10px; right: 10px; z-index: 3; width: 44px; height: 44px; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line-2); background: var(--paper); color: var(--ink); }
-.stage .cam-gear:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
-dialog.cam-settings { width: min(420px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--paper); color: var(--ink); }
-dialog.cam-settings::backdrop { background: rgba(0, 0, 0, .45); }
-.cam-settings form { display: flex; flex-direction: column; gap: 14px; }
-.cam-settings h2 { margin: 0 0 4px; font-size: 20px; }
 
 /* 스크롤은 유지하고 브라우저 스크롤바만 감춘다 */
 html, body, * { scrollbar-width: none; }
 html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar { display: none; }
-.cam-settings label { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
-.cam-settings select { width: 100%; }
-.cam-settings .cam-check { flex-direction: row; align-items: center; gap: 8px; }
-.cam-settings fieldset { border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 12px 12px; display: flex; gap: 16px; flex-wrap: wrap; margin: 0; }
-.cam-settings fieldset label { flex-direction: row; align-items: center; gap: 6px; }
-.cam-settings .cam-note { margin: -6px 0 0; font-size: 13px; color: var(--ink-2); }
-.cam-settings .cam-refresh { align-self: flex-start; }
-.cam-settings .cam-actions { display: flex; gap: 8px; margin-top: 6px; }
-.cam-settings .cam-actions span { flex: 1; }
 
 /* AI 뷰티 챗봇 플로팅 버튼 (2026-11-15, 상단 메뉴 링크 대신): 오른쪽 아래 동그란 검은 버튼. 팔레트 화면은 아래 서랍 위에 띄운다 */
 .chat-fab { position: fixed; right: 24px; bottom: 24px; z-index: 40; width: 68px; height: 68px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--paper); text-decoration: none; box-shadow: var(--shadow-up); transition: transform 0.2s var(--ease); -webkit-tap-highlight-color: transparent; }
@@ -1104,21 +923,8 @@ html.in-chat-modal .chat-head { justify-content: flex-end; }
 
 /* 홈 시작 버튼 두 개 (2026-11-15, js/home.js): 로그인 화면처럼 한 열에 두 줄. 위 = 검은 버튼(카메라·팔레트), 아래 = 테두리 버튼(제품 태그 → 챗봇).
    화면 아무 곳이나 눌러 넘어가지 않으니 얼굴·안내를 조금 위로 올린다 */
-body main.home-standby { cursor: default; }
+
 /* 버튼은 화면 아래쪽(다크 모드·언어 버튼 바로 위), 안내 문구는 버튼 위에 붙인다 */
-.home-standby { --hs-actions-bottom: calc(max(16px, 3vh) + 72px); }
-.home-standby .hs-face { top: 38%; }
-.home-standby .hs-hint { top: auto; bottom: calc(var(--hs-actions-bottom) + 92px * 2 + 14px + 28px); }
-.home-standby .hs-actions { position: absolute; left: 50%; bottom: var(--hs-actions-bottom); translate: -50% 0; width: min(560px, calc(100% - 64px)); display: flex; flex-direction: column; gap: 14px; }
-.home-standby .hs-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%; min-height: 92px; padding: 14px 24px; border-radius: 22px; font: inherit; cursor: pointer; transition: transform 0.15s var(--ease), background-color 0.2s; }
-.home-standby .hs-btn strong { font-size: clamp(20px, 2.8vw, 26px); font-weight: 700; }
-.home-standby .hs-btn span { font-size: clamp(13px, 1.7vw, 16px); opacity: 0.7; word-break: keep-all; }
-.home-standby .hs-btn:active { transform: scale(0.97); }
-.home-standby .hs-btn-main { border: 0; background: var(--ink); color: var(--paper); }
-.home-standby .hs-btn-line { border: 1.5px solid var(--ink); background: var(--paper); color: var(--ink); }
-.home-standby .hs-btn-line:hover { background: var(--soft); }
-.home-standby.hs-leaving .hs-actions { animation: hs-text-out 0.4s cubic-bezier(.4, 0, .2, 1) forwards; }
-.home-standby.hs-arrive .hs-actions { animation: hs-rise 0.6s cubic-bezier(.2, .8, .2, 1) 0.4s both; }
 
 /* 챗봇 플로팅 버튼의 담은 제품 수 · 카드의 '챗봇에 담기' (2026-11-15, js/chat-picks.js) */
 .chat-fab { overflow: visible; }
@@ -1144,3 +950,14 @@ dialog.store-sheet::backdrop { background: rgba(0, 0, 0, .45); }
 .store-meta { font-size: 13px; color: var(--ink-2); }
 .store-qty { flex: none; font-size: 15px; font-weight: 700; }
 .store-note { margin: 12px 0 0; font-size: 12px; color: var(--ink-2); word-break: keep-all; }
+
+/* 시연용 배지 (2026-11-20, public/js/demo.js): 올리브영 실데이터가 아닌 제품·재고에 붙는다.
+   무채색 규칙에 맞춰 글자색(currentColor) 테두리만 쓴다. 밝은 화면·검정 무드 어디서나 보인다 */
+.demo-badge {
+  display: inline-block; align-self: flex-start; flex: none;
+  margin: 0 0 0 6px; padding: 1px 7px;
+  border: 1px solid currentColor; border-radius: 999px;
+  font-size: 12px; font-weight: 600; line-height: 1.5; letter-spacing: 0;
+  opacity: 0.75; white-space: nowrap; vertical-align: middle;
+}
+.card > .demo-badge { margin: 2px 0 0; }

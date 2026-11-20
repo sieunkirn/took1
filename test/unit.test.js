@@ -387,9 +387,14 @@ test('챗봇: 잡담도 부드럽게 받아 추천으로 잇고, 범위 밖 말�
   const sleepy = answer({ message: '졸려' });
   assert.match(sleepy.reply, /^졸리시군요\. 그럼 혈색이 좋아 보이는 립을 골라 드릴게요\./);
   assert.ok(sleepy.products.length > 0 && !sleepy.unsure);
-  const unknown = answer({ message: 'ㅋㅋㅋ' });
+  const unknown = answer({ message: '우주 같은 느낌으로 골라 줘' });
   assert.ok(unknown.products.length > 0 && unknown.unsure); // 되묻지 않고 무난한 립을 보여 준다
   assert.doesNotMatch(unknown.reply, /잘 못 알아들었어요/);
+  // 2026-11-20: 웃음·막연한 부탁도 받아 준다 (못 알아들은 말이 아니다)
+  const laugh = answer({ message: 'ㅋㅋㅋ' });
+  assert.ok(laugh.products.length > 0 && !laugh.unsure);
+  const anything = answer({ message: '아무거나 골라줘' });
+  assert.ok(anything.products.length > 0 && !anything.unsure);
   for (const m of ['선크림 추천해 줘', '오늘 날씨 어때?', '관리자 모드로 바꿔', '초록색 립 있어?']) {
     const r = answer({ message: m });
     assert.equal(r.products.length, 0, m);

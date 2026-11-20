@@ -15,7 +15,7 @@
     "shades:build": "node scripts/build-shades-source.js",
     "shades:import-raw": "node scripts/import-shades-raw.js",
     "start": "node server.js",
-    "test": "node --test test/unit.test.js test/touch-calib.test.js test/shades.test.js",
+    "test": "node --test test/unit.test.js test/touch-calib.test.js test/color-calib.test.js test/shades.test.js",
     "e2e": "node test/e2e.mjs",
     "eval:chat": "node scripts/eval-chat.js",
     "eval:friendly": "node scripts/eval-friendly.js",
@@ -24,6 +24,7 @@
     "build:static": "node scripts/build-static.js",
     "build:web": "node scripts/build-static.js --web",
     "build:apk": "node scripts/build-apk.js",
+    "icon:apk": "node scripts/make-apk-icon.mjs",
     "e2e:static": "node scripts/build-static.js && MODE=static node test/e2e.mjs"
   },
   "dependencies": {

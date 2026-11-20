@@ -14,6 +14,7 @@ export function chatKeepWords() {
     ...COLOR_NAMES.flatMap((x) => x.words), ...AVOID_FINISHES.flatMap((x) => x.words),
     '추천', '제품', '틴트', '립스틱', '립밤', '가격', '얼마', '바코드', '제형', '비교', '기준', '보여', '알려', '찾아', '자세히',
     '밝은', '진한', '어두운', '연한', '그중', '번째', '마지막', '다른', '말고', '바꿔', '고마워', '안녕', '어울리는',
+    '뮤트', '라이트', '브라이트', '딥', '웜톤', '쿨톤',
   ].filter((w) => w.length >= 2);
 }
 
@@ -48,11 +49,13 @@ const amountOf = (num, unit) => {
 // 가격 조건: "2만원 이하·미만·안 넘는·짜리" → 상한, "3만원 이상·넘는·초과" → 하한, "만원대" → 10,000~19,999원
 function parsePriceRange(text) {
   const out = {};
-  const max = text.match(new RegExp(`${AMOUNT}\\s*(이하|미만|아래|까지|이내|짜리|안\\s*넘|넘지\\s*않)`));
+  const max = text.match(new RegExp(`${AMOUNT}\\s*(이하|미만|아래|까지|이내|짜리|안쪽|안으로|선에서|안\\s*넘|넘지\\s*않)`));
   if (max) out.maxPrice = { value: amountOf(max[1], max[2]), strict: max[3] === '미만' };
   const min = text.match(new RegExp(`${AMOUNT}\\s*(이상|넘는|넘게|넘어|넘은|초과|부터|보다\\s*비싼)`));
   if (min) out.minPrice = { value: amountOf(min[1], min[2]), strict: !/이상|부터/.test(min[3]) };
   const band = !max && !min && text.match(new RegExp(`${AMOUNT}\\s*대(?![가-힣])`));
+  // "50대 엄마"·"20대"처럼 단위 없는 작은 수 + 대는 나이다 (2026-11-20)
+  if (band && !band[2] && Number(band[1].replace(/,/g, '')) < 1000) return out;
   if (band) {
     const value = amountOf(band[1], band[2]);
     const step = 10 ** Math.floor(Math.log10(value));
@@ -64,7 +67,7 @@ function parsePriceRange(text) {
 
 // "첫 번째", "2번", "마지막" → 0부터 시작하는 순번 (말한 순서대로)
 const ORDINALS = [
-  [/첫\s*번\s*째|첫\s*번|첫\s*째|첫\s*거/, 0], [/두\s*번\s*째|둘\s*째/, 1], [/세\s*번\s*째|셋\s*째/, 2],
+  [/첫\s*번\s*째|첫\s*번|첫\s*째|첫\s*거|처음\s*(?:거|꺼|것)|맨\s*처음|아까\s*(?:그거|그것|거|꺼)/, 0], [/두\s*번\s*째|둘\s*째/, 1], [/세\s*번\s*째|셋\s*째/, 2],
   [/네\s*번\s*째|넷\s*째/, 3], [/다섯\s*번\s*째/, 4], [/여섯\s*번\s*째/, 5], [/일곱\s*번\s*째/, 6],
   [/여덟\s*번\s*째/, 7], [/아홉\s*번\s*째/, 8], [/(?<![가-힣])열\s*번\s*째/, 9], [/마지막/, -1],
 ];
@@ -111,7 +114,7 @@ function parseColorWords(text, c) {
 function parsePriceWords(text, c) {
   // '비싼' 안에 '싼'이 들어 있으므로 비싼 쪽을 먼저 본다
   const superlative = has(text, ['제일', '가장', '젤 ', '최저', '최고가']);
-  const pricey = has(text, ['비싼', '비싸', '고급', '프리미엄', '최고가']);
+  const pricey = has(text, ['비싼', '비싸', '고급', '프리미엄', '최고가', '명품', '하이엔드', '백화점']);
   const cheap = !pricey && has(text, ['저렴', '싼', '싸', '가성비', '착한 가격', 'cheap', '최저']);
   if (superlative && pricey) c.superlative = 'priciest';
   else if (superlative && cheap) c.superlative = 'cheapest';
@@ -146,7 +149,7 @@ function parseOccasionWords(text, c) {
   if (situations.length && !(tone && situations.every((s) => ['봄', '여름', '가을', '겨울'].includes(s)))) c.situations = situations;
   const concerns = CONCERNS.filter((x) => has(text, x.words)).map((x) => x.label);
   if (concerns.length) c.concerns = concerns;
-  if (has(text, ['나한테', '나에게', '내게', '내 톤', '나랑 어울', '저한테', '저에게', '제게'])) c.mine = true;
+  if (has(text, ['나한테', '나에게', '내게', '내 톤', '나랑 어울', '저한테', '저에게', '제게', '톤 모르', '톤을 모르', '톤 몰라', '퍼스널컬러', '퍼스널 컬러', '퍼컬', '무슨 톤', '어떤 톤'])) c.mine = true;
 }
 
 // 앞 대화에 이어지는 말 ("두 번째 거", "그중에", "비교", "더 보여 줘", "왜", "말고")
@@ -172,7 +175,7 @@ function parseAskWords(text, c) {
 
 // 인사·감사·정체·도움말 같은 가벼운 말
 function parseSmallTalkWords(text, c) {
-  if (has(text, ['안녕', '하이', 'hello', '반가', '헬로'])) c.small = 'greet';
+  if (has(text, ['안녕', '하이', 'hello', '반가', '헬로', 'ㅎㅇ', '하잉', '안뇽'])) c.small = 'greet';
   else if (has(text, ['고마', '감사', '땡큐', 'thank', '고맙'])) c.small = 'thanks';
   else if (has(text, ['잘 가', '잘가', '바이', '다음에 봐', '수고'])) c.small = 'bye';
   else if (has(text, ['누구', '이름이', '너 뭐', '정체', 'ai야', 'ai 야', '인공지능', '사람이야', '사람이에', 'gpt', '로봇'])) c.small = 'identity';
@@ -189,8 +192,8 @@ export function parseMessage(message, brands = []) {
   parsePriceWords(text, c);
   // "입술색이랑 비슷한 거"는 기준 색 비교가 아니라 '입술색 같은' 느낌이고, "체리 같은 색"은 그 색을 말한 것이다
   if (has(text, ['비슷', '유사', '닮은', '같은 색', 'similar']) && !has(text, ['입술색', '입술 색', '내 입술']) && !namedColor) c.similar = true;
-  if (has(text, ['밝은', '연한', '라이트', '가벼운 색'])) c.lightness = 'lighter';
-  else if (has(text, ['어두운', '진한', '딥', '다크'])) c.lightness = 'darker';
+  if (has(text, ['밝은', '밝게', '연한', '라이트', '가벼운 색', '옅은', '맑은'])) c.lightness = 'lighter';
+  else if (has(text, ['어두운', '어둡게', '진한', '딥', '다크'])) c.lightness = 'darker';
   // 진하기 숫자 (2026-11-19, 단계형 도우미의 진하기 바): "연한(진하기 20)" → 0~100. 숫자가 있으면 '연한/진한'은 그 설명일 뿐이다
   const depth = text.match(/진하기\s*(\d{1,3})/);
   if (depth) { c.depth = Math.min(100, Number(depth[1])); delete c.lightness; }
@@ -199,5 +202,11 @@ export function parseMessage(message, brands = []) {
   parseFollowUpWords(text, c);
   parseAskWords(text, c);
   parseSmallTalkWords(text, c);
+  // 2026-11-20: 가리키는 말만 있고 다른 조건이 없을 때
+  const onlyPointing = !c.finish && !c.families && !c.exclude && !c.price && !c.maxPrice && !c.minPrice && !c.lightness && !c.brand
+    && !c.situations && !c.concerns && !c.tone && !c.similar;
+  if (onlyPointing && has(text, ['이거 말고', '이건 말고', '그거 말고', '그건 말고', '이거 별로', '이건 별로', '다른 걸로'])) { c.more = true; delete c.small; }
+  // "이거 얼마야": 무엇을 가리키는지는 대화 상태를 아는 chat.js 가 정한다 (기준 제품이 있으면 그 제품, 없으면 목록의 첫 번째)
+  else if (onlyPointing && !c.ordinals && (c.askPrice || c.askInfo || c.askFinish) && has(text, ['이거', '이건', '그거', '그건', '저거', '저건'])) c.pointing = true;
   return c;
 }

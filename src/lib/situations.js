@@ -77,7 +77,7 @@ export const SITUATIONS = [
   { label: '가을', words: ['가을'],
     families: ['brown', 'burgundy', 'rose', 'nude'], finishes: ['matte', 'velvet'],
     reason: '가을엔 브라운·버건디 같은 깊은 색에 보송한 마무리가 좋아요.' },
-  { label: '겨울', words: ['겨울에', '겨울철', '겨울용', '크리스마스'],
+  { label: '겨울', words: ['겨울에', '겨울철', '겨울용', '크리스마스', '겨울 립', '겨울립', '겨울 느낌', '겨울엔', '겨울 시즌'],
     families: ['red', 'burgundy', 'plum', 'berry'], finishes: ['velvet', 'matte'],
     reason: '겨울엔 레드·버건디·플럼 같은 진한 색이 잘 어울려요.' },
 ];

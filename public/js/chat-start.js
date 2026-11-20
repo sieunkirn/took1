@@ -2,7 +2,7 @@
 // 2026-11-19 Figma 디자인(GP · 추천 멘트 03): '어떤 이야기를 나눠볼까요?' 아래 예시 세 줄(위·가운데·아래, 가운데가 굵은 지금 예시 + 분홍 밑줄 + ↵),
 //   점 표시(지금 예시 = 분홍 긴 점), '마음에 드는 질문을 눌러 대화를 시작하세요', 입력창 위 '직접 물어봐도 좋아요'. 예시 줄에는 첫 줄(상황)만 보이고
 //   누르면 예전처럼 상황 + 질문 전체를 입력창에 써 넣는다. 예시는 열 때마다 5개를 골라 섞는다(거울에서 발라 본 색이 있으면 그 예시가 맨 앞).
-//  1) 예시 질문: 두 줄(상황 한 줄 + 굵은 질문 한 줄, 질문 아래 형광펜 밑줄)이 3초마다 위로 밀려 올라가며 바뀐다 (0.5초).
+//  1) 예시 질문: 두 줄(상황 한 줄 + 굵은 질문 한 줄, 질문 아래 형광펜 밑줄)이 2초마다 위로 밀려 올라가며 바뀐다 (0.5초).
 //     예시는 열 때마다 섞는다. 줄이나 ↵ 를 누르면 바뀌기를 멈추고, 그 질문을 입력창에 한 글자씩(30ms) 써 넣기만 한다.
 //     보내지는 않는다: 손님이 상황 부분(톤·자리·예산 등)을 자기 것으로 고친 뒤 '보내기'로 보낸다. 입력창을 다 지우면 다시 바뀐다.
 //  2) 입력창(chat.html 의 chat-form): 테두리·빛 그림자, 오른쪽 보내기 버튼 (글자가 있을 때만 켜짐). 그 아래 화면 키보드는 기존처럼 항상 열려 있다.
@@ -12,7 +12,7 @@
 // 예시 질문: 매장 손님이 실제로 묻는 말(챗봇 평가 세트 test/eval/chat-cases.json 의 상황·퍼스널 톤·입술 고민·자유 표현 분류)을
 // 두 줄로 다듬었다. 규칙 챗봇(src/lib/chat.js)이 올리브영 실제 데이터에서 '조건을 빼고 찾았어요' 없이 제품을 찾아 답하는 말만
 // 한/영 모두 확인해 골랐다. 거울(팔레트)에서 발라 본 색이 있으면 '그 색과 비슷한 립' 예시를 맨 앞에 더한다.
-import { $, el, store } from './common.js';
+import { $, el } from './common.js';
 import { C, state, input } from './chat-state.js';
 import { guideCard } from './chat-guide.js'; // 시작 화면 = 단계형 1단계 (2026-11-19)
 
@@ -21,7 +21,7 @@ const sendBtn = top ? $('chat-send') : null; // 합본(studio.html)의 보내기
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const ROTATE_MS = 3000; // 예시 질문이 바뀌는 간격
+const ROTATE_MS = 2000; // 예시 질문이 바뀌는 간격 (2026-11-20 사용자 요청: 2초)
 const TYPE_MS = 30; // 예시를 입력창에 쓰는 한 글자 간격
 
 // 예시 질문: '상황\n질문' (마지막 줄이 굵은 질문). 첫 줄이 손님이 자기 것으로 고칠 부분이다
@@ -147,8 +147,9 @@ input.addEventListener('input', () => {
 // ---------- 시작 화면 = '답하며 고르기' 1단계 (2026-11-19 사용자 요청: 단계형이 기본인 느낌) ----------
 // 예시 질문(위 rotator) 자리에 단계형 카드(js/chat-guide.js)를 바로 띄운다. 끝까지 고르면 그 조건 문장을 보내 대화가 시작된다.
 // 직접 입력('직접 물어봐도 좋아요' + 입력창)도 그대로. 진행 상태는 sessionStorage 에 둬서 화면을 옮겨도 이어진다(자동 초기화 때 지워진다).
-// 예시 질문 rotator 코드는 남겨 둔다: START_GUIDE 를 false 로 바꾸면 예전(Figma 예시 질문) 시작 화면
-const START_GUIDE = true;
+// 2026-11-20 사용자 요청으로 다시 예전(Figma 예시 질문이 2초마다 바뀌는) 시작 화면. 단계형은 대화 중 '답하며 고르기' 버튼으로 그대로 쓸 수 있다.
+// START_GUIDE 를 true 로 바꾸면 단계형 1단계가 시작 화면
+const START_GUIDE = false;
 const GUIDE_KEY = 'took.chatStartGuide';
 let startMsg = null;
 function loadStartGuide() {
@@ -189,8 +190,6 @@ if (backBtn) backBtn.addEventListener('click', () => {
   else location.href = 'palette.html';
 });
 
-// 왼쪽 세로 메뉴의 집 버튼 (거울 화면과 같음): 저장값(대화·고른 색 등)을 지우고 처음으로
-$('cm-home')?.addEventListener('click', (e) => { e.preventDefault(); store.clear(); location.href = 'index.html'; });
 
 // 입력창 안내 글: 시작 화면은 HEVA 처럼 '툭에게 물어보기', 대화 화면은 기존 글('아래 키보드로 입력하세요')
 const PH_START = C('툭에게 물어보기', 'Ask Took');

@@ -4,6 +4,7 @@ import { hexToRgb, rgbToHsl, hslToHex } from '../lib/color.js';
 import { FINISH_TO_TEXTURE } from './lip-view.js';
 import { measureTone, classifyTone, matchPresets, TONE_THRESHOLDS, TEXTURES, PRESETS } from './lip-engine.js';
 import { t as tr, finishText as finishName } from './i18n.js';
+import { getColorCalib } from './color-calib.js';
 import { STUDIO, PALETTE, MATCH_FRAMES, MATCH_TIMEOUT_MS, state } from './lip-state.js';
 import { sourceFrame } from './lip-camera.js';
 
@@ -103,7 +104,7 @@ export function showMatchPicks(picks) {
 function finishMatch() {
   const { samples } = state.analyze;
   state.analyze = null;
-  const tone = classifyTone(samples);
+  const tone = classifyTone(samples, { gain: getColorCalib()?.gain }); // 관리자 '카메라 색 보정' 값이 있으면 그걸로 조명 보정
   if (!tone) {
     $('match-result').textContent = tr('lip.matchSkinFail');
     return;
@@ -118,7 +119,7 @@ function finishMatch() {
     tr('lip.mHue', { v: m.hue.toFixed(1), t: T.warmHue }),
     tr('lip.mLight', { v: m.L.toFixed(1), t: T.lightL }),
     m.contrast === null ? tr('lip.mNoContrast') : tr('lip.mContrast', { v: m.contrast.toFixed(1), t: T.contrast }),
-    tr(m.wb ? 'lip.mWb' : 'lip.mNoWb'),
+    tr(m.wb === 'calib' ? 'lip.mCalib' : m.wb ? 'lip.mWb' : 'lip.mNoWb'),
   ].join(' · ');
   showMatchPicks(picks);
   store.set('lipMatch', { season: tone.season, picks });
