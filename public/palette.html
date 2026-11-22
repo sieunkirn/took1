@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="stylesheet" href="css/took-ui.css">
 <link rel="stylesheet" href="css/took-nfc.css">
+<link rel="stylesheet" href="css/took-quick.css"><!-- 거울 위 플로팅 퀵 추천 (js/mirror-quick.js, 2026-11-21) -->
 <link rel="stylesheet" href="css/took-take.css"><!-- 가져가기 (js/takeaway.js, 2026-11-19) --><!-- 세 번째 창: NFC 태그 (js/nfc-window.js, 2026-11-18) -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
@@ -54,6 +55,13 @@
   <!-- 한국어 ↔ 영어 버튼은 2026-11-17 사용자 요청으로 홈(시작 버튼 화면)에만 둔다 -->
   <h1 class="fc-title" data-i18n="fc.title">Find Your Color</h1>
   <p class="fc-sub" data-i18n="fc.sub">나만의 컬러를 찾아보세요</p>
+  <!-- 카메라 축소·확대 (2026-11-21 사용자 요청: 웹캠이 확대돼 보여서). 오른쪽 = 화면 꽉 채움(예전과 같음), 왼쪽 = 영상 전체가 보이게 축소.
+       값은 기기에 저장된다 (localStorage took.camZoom, js/palette.js). 터치 보정 필름이 가로 슬라이더만 다루므로 가로로 둔다 -->
+  <div class="fc-zoom">
+    <span class="fc-zoom-ic" aria-hidden="true">−</span>
+    <input type="range" id="cam-zoom" min="0" max="100" step="1" value="100" data-i18n-aria="pal.camZoom" aria-label="카메라 화면 크기">
+    <span class="fc-zoom-ic" aria-hidden="true">+</span>
+  </div>
 
   <!-- 얼굴 자리: 카메라 + 얼굴 가이드(흐린 괄호 + 타원 격자, 2026-11-19 GP-홈화면 Figma. 11-16 에는 괄호만 있었다).
        2026-11-17 사용자 요청: 카메라는 화면(900×1440) 꽉 차게, 위·아래만 살짝 어둡게 (글자·다이얼이 보이게).
@@ -103,6 +111,11 @@
   <section class="fc-sheet" id="fc-sheet" aria-label="추천 제품" data-i18n-aria="pal.result">
     <!-- 내 톤으로 추천받기 (2026-11-20 사용자 요청: 시트를 열었을 때 왼쪽 위): 카메라로 피부 톤을 재 추천 컬러 3개 (lip-look.js #match).
          결과는 제목 아래 상자(#fc-matchbox), 잰 톤은 '이 컬러로 제품 찾기'로 챗봇에 갈 때 같이 넘어간다. 얼굴을 찾기 전엔 꺼져 있다 (lip-camera.js) -->
+    <!-- 2026-11-21 사용자 요청: 이 자리의 '내 톤으로 추천받기' 버튼은 숨기고(톤 재기는 플로팅 퀵 추천 창에서, js/mirror-quick.js) 추천 제품 안내 멘트를 둔다.
+         버튼은 그 톤 재기(lip-look.js)가 쓰므로 지우지 않고 숨겨 둔다 (css/took-quick.css) -->
+    <p class="fc-rec-guide" id="fc-rec-guide" aria-live="polite"></p>
+    <!-- 마음에 안 드세요? (2026-11-21): 무엇이 아쉬운지(가격·건조·지속력·발색) 묻는 플로팅 퀵 창을 연다 (js/palette.js → mirror-quick.js openRefine) -->
+    <button type="button" class="fc-refine" id="fc-refine" data-i18n="mq.refineBtn">마음에 안 드세요?</button>
     <button type="button" class="fc-tone" id="match" disabled data-i18n="pal.toneBtn">내 톤으로 추천받기</button>
     <div class="fc-results" id="fc-results">
       <div class="fc-rec-dots" id="fc-rec-dots" role="group" aria-label="추천 제품 색" data-i18n-aria="pal.result"></div>

@@ -5,10 +5,8 @@
 // 2026-11-20 사용자 요청 "Tap The Screen 3초만에": 영상을 3.45초부터 틀어 제품 장면은 끝 1.5초만 보여 주고, 입술 장면 1.5초 뒤 3번 = 처음부터 3초
 //  1 제품 장면(3.45~4.95초) + 가운데 로고. 1.5초 뒤(또는 누르면) 2로
 //  2 입술 영상 + 같은 로고. 1.5초 뒤(또는 누르면) 3으로
-//  3 2번 + 로고 아래 "Tap The Screen". 입술 영상 반복. 누르면 바로 팔레트로 (2026-11-18 사용자 요청)
-//  4 (지금은 평소 흐름에 없음, ?step=4 로만) 시작: 로고가 위로 올라가며 빛나고 알약 버튼이 나온다. 로고·버튼은 한 덩어리로 화면 가운데쯤, 버튼은 원본보다 1.2배 크게 + 아래 이름표 (2026-11-16 사용자 요청 "버튼 배치 더 예쁘게")
-//     왼쪽 스캔 아이콘 = 카메라로 발라 보기(팔레트 Find Your Color), 오른쪽 음성 아이콘 = AI 뷰티 챗봇
-//     버튼은 원본 3번 화면의 세 모양 순서대로 빛난다: 평소(어두운 분홍) → 손가락을 대면(분홍) → 떼는 순간(흰색) → 다음 화면
+//  3 2번 + 로고 아래 "Tap The Screen". 입술 영상 반복. 누르면 4번으로 (2026-11-21 사용자 요청)
+//  4 (2026-11-21 Figma GP 1667:704) 로고가 위로 올라가고 알약 버튼 3개가 세로로: 1 스캔 = 거울 · 2 음성 = 챗봇 · 3 NFC = 거울에서 태그 기다리기
 // 예전 홈(점선 얼굴·시계·버튼 두 개·다크 모드·언어 버튼)은 프로토타입에 없어 뺐다 (git 기록 a840e68 에 있음)
 import { store } from './common.js';
 import { t, lang, langToggle } from './i18n.js';
@@ -20,37 +18,24 @@ import { listenNfc } from './nfc.js';
 document.documentElement.lang = lang(); // 홈은 applyI18n 을 부르지 않아 <html lang> 을 직접 맞춘다
 try { sessionStorage.removeItem('took.homeSkipIntro'); } catch { /* 저장 불가 환경 */ }
 
-// 스캔 아이콘: 네 모서리 괄호 (원본 36×35, 선 굵기 3.5)
-const SCAN_SVG = '<svg class="hs-ico-scan" viewBox="0 0 36 35" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">'
-  + '<path d="M2.2 10.6V6.8a4.6 4.6 0 0 1 4.6-4.6h3.6"/><path d="M25.6 2.2h3.6a4.6 4.6 0 0 1 4.6 4.6v3.6"/>'
-  + '<path d="M33.8 24.4v3.8a4.6 4.6 0 0 1-4.6 4.6h-3.6"/><path d="M10.4 32.8H6.8a4.6 4.6 0 0 1-4.6-4.6v-3.8"/></g></svg>';
-// 음성 아이콘: 둥근 막대 다섯 개 (원본 위치·높이 그대로)
-const WAVE_SVG = '<svg class="hs-ico-wave" viewBox="0 0 60 34" aria-hidden="true" focusable="false"><g fill="currentColor">'
-  + '<rect x="0" y="12" width="6" height="9" rx="3"/><rect x="11" y="4" width="8" height="25" rx="4"/><rect x="25" y="0" width="7.4" height="33" rx="3.7"/>'
-  + '<rect x="38" y="4" width="7.4" height="25" rx="3.7"/><rect x="51" y="9" width="8" height="16" rx="4"/></g></svg>';
-
 const stage = document.getElementById('stage');
 fitStage(stage);
 // 쌓는 순서: 배경 영상(소리 없음) → 어두운 덮개 → 로고 → 문구
 stage.innerHTML = `<video class="hs-video" src="videos/home.mp4" autoplay muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video><div class="hs-dim" aria-hidden="true"></div>${logoFull('hs-logo')}
   <p class="hs-tap" aria-hidden="true">Tap The Screen</p>
-  <div class="hs-start" data-state="a" data-side="scan">
-    <div class="hs-glow" aria-hidden="true"><i></i></div>
-    <div class="hs-pill" role="group">
-      <span class="hs-knob" aria-hidden="true"></span>
-      <button type="button" class="hs-opt hs-opt-scan">${SCAN_SVG}</button>
-      <button type="button" class="hs-opt hs-opt-voice">${WAVE_SVG}</button>
-    </div>
-    <div class="hs-labels" aria-hidden="true"><span class="hs-label-scan">${t('home.labelScan')}</span><span class="hs-label-voice">${t('home.labelVoice')}</span></div>
-  </div>
+  <nav class="hs-menu">
+    <button type="button" class="hs-mb hs-mb-mirror" data-go="scan"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-scan.svg" width="36.0482" height="34.8636" alt="" draggable="false"></button>
+    <button type="button" class="hs-mb hs-mb-chat" data-go="voice"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-wave.svg" width="59.0845" height="32.459" alt="" draggable="false"></button>
+    <button type="button" class="hs-mb hs-mb-nfc" data-go="nfc"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-nfc.svg" width="33.0483" height="31.8636" alt="" draggable="false"></button>
+  </nav>
   <p class="sr-only" id="hs-help"></p>`;
 stage.append(langToggle('hs-lang')); // 한국어/영어 (4번 시작 화면 오른쪽 위에서만 보인다)
 const video = stage.querySelector('.hs-video');
-const pill = stage.querySelector('.hs-pill');
-const box = stage.querySelector('.hs-start'); // 눌린 단계(data-state a·b·c)와 고른 쪽(data-side)
-pill.setAttribute('aria-label', t('home.choose'));
-stage.querySelector('.hs-opt-scan').setAttribute('aria-label', t('home.toPalette'));
-stage.querySelector('.hs-opt-voice').setAttribute('aria-label', t('home.toChat'));
+const menu = stage.querySelector('.hs-menu');
+menu.setAttribute('aria-label', t('home.choose'));
+stage.querySelector('.hs-mb-mirror').setAttribute('aria-label', t('home.toPalette'));
+stage.querySelector('.hs-mb-chat').setAttribute('aria-label', t('home.toChat'));
+stage.querySelector('.hs-mb-nfc').setAttribute('aria-label', t('home.toTag'));
 stage.querySelector('#hs-help').textContent = t('home.tapToStart');
 
 // ---------- 1 → 2 → 3 (배경 영상 장면에 맞춘다) ----------
@@ -65,6 +50,7 @@ function seekProduct() {
   else video.addEventListener('loadedmetadata', seek, { once: true });
 }
 let step = 0;
+let menuAt = 0; // 4번이 열린 시각: 3번을 누른 그 손가락이 바로 버튼을 누르지 않게
 let autoTimer = null;
 function toLips() {
   if (stage.classList.contains('hs-lips-on')) return;
@@ -88,6 +74,7 @@ function go(n, { instant = false } = {}) {
   if (n === 1) { seekProduct(); autoTimer = setTimeout(() => go(2), PRODUCT_MS); watchCut(); }
   if (n >= 2) toLips(); // 2번부터는 입술 장면 (누르거나 ?step= 으로 건너뛴 경우 영상도 그 장면으로)
   if (n === 2) autoTimer = setTimeout(() => go(3), LIPS_MS);
+  if (n === 4) menuAt = performance.now();
 }
 // 1번: 영상이 입술 장면에 닿는 순간 2로
 function watchCut() {
@@ -95,58 +82,64 @@ function watchCut() {
   if (video.currentTime >= LIPS_AT) { go(2); return; }
   requestAnimationFrame(watchCut);
 }
-// 1·2번 화면은 아무 곳이나 누르면 다음으로, 3번("Tap The Screen")은 누르면 바로 팔레트로 (2026-11-18 사용자 요청. 손을 뗄 때 한 번만)
+// 1·2번 화면은 아무 곳이나 누르면 다음으로, 3번("Tap The Screen")은 누르면 4번 버튼 화면으로 (2026-11-21 사용자 요청. 손을 뗄 때 한 번만)
 function next() {
   if (leaving) return;
   if (step === 1 || step === 2) go(step + 1);
-  else if (step === 3) { leaving = true; clearTimeout(autoTimer); start('scan'); }
+  else if (step === 3) go(4);
 }
 stage.addEventListener('pointerup', next);
 document.addEventListener('keydown', (e) => {
   if ((e.key === 'Enter' || e.key === ' ') && step < 4) { e.preventDefault(); next(); }
 });
 
-// ---------- 4번 알약 버튼: 누르는 동안 세 단계로 빛난다 ----------
-// 2026-11-18부터 3번에서 바로 팔레트로 가서 평소 흐름에는 나오지 않는다 (?step=4 로만 열림)
-let pressing = null;
+// ---------- 4번 버튼 3개 (2026-11-21): 1 거울 · 2 챗봇 · 3 NFC ----------
+// 톡 누르거나, 손잡이를 오른쪽으로 끌어서 연다 (스위치). 끝까지의 60% 넘게 끌고 놓으면 열리고, 덜 끌면 제자리로 돌아간다
+const KNOB_RUN = 153.48; // 손잡이가 움직이는 거리 (무대 px, took-ui.css .hs-mb.is-on 과 같은 값)
+const OPEN_AT = 0.6;
 let leaving = false;
-const sideOf = (el) => (el?.closest('.hs-opt-voice') ? 'voice' : el?.closest('.hs-opt-scan') ? 'scan' : null);
-pill.addEventListener('pointerdown', (e) => {
-  if (step !== 4 || leaving) return;
-  const side = sideOf(e.target);
-  if (!side) return;
-  pressing = { side, id: e.pointerId };
-  box.dataset.side = side;
-  box.dataset.state = 'b';
-});
-pill.addEventListener('pointerup', (e) => {
-  if (!pressing || leaving) return;
-  const { side } = pressing;
-  pressing = null;
-  // 손가락이 버튼 밖으로 나가서 떼면 취소
-  const r = pill.getBoundingClientRect();
-  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) { box.dataset.state = 'a'; return; }
-  press(side);
-});
-pill.addEventListener('pointercancel', () => { pressing = null; if (!leaving) box.dataset.state = 'a'; });
-pill.addEventListener('pointerleave', (e) => { if (pressing && e.pointerType === 'mouse') { pressing = null; box.dataset.state = 'a'; } });
-// 키보드(Enter·Space)로 누를 때: 같은 세 단계를 짧게 보여 준다
-pill.addEventListener('click', (e) => {
-  if (e.detail !== 0 || leaving) return;
-  const side = sideOf(e.target);
-  if (!side) return;
-  box.dataset.side = side;
-  box.dataset.state = 'b';
-  setTimeout(() => press(side), 160);
-});
-
-function press(side) {
+let drag = null; // { btn, id, x0, dx, moved }
+const menuReady = () => step === 4 && !leaving && performance.now() - menuAt >= 350;
+function openBtn(btn) {
   if (leaving) return;
   leaving = true;
-  box.dataset.side = side;
-  box.dataset.state = 'c';
-  setTimeout(() => start(side), reduce ? 0 : 320);
+  btn.classList.remove('is-drag');
+  btn.style.removeProperty('--drag');
+  btn.classList.add('is-on'); // 스위치처럼 손잡이가 오른쪽 끝으로 미끄러진 뒤 다음 화면
+  setTimeout(() => start(btn.dataset.go), reduce ? 0 : 450);
 }
+menu.addEventListener('pointerdown', (e) => {
+  const btn = e.target.closest('.hs-mb');
+  if (!btn || !menuReady() || drag) return;
+  // 무대는 창 크기에 맞게 줄어 있어 화면 px → 무대 px 로 바꿔 쓴다
+  drag = { btn, id: e.pointerId, x0: e.clientX, k: btn.getBoundingClientRect().width / 333.24, dx: 0, moved: false };
+  try { btn.setPointerCapture(e.pointerId); } catch { /* 지원하지 않는 환경 */ }
+});
+menu.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = Math.max(0, Math.min(KNOB_RUN, (e.clientX - drag.x0) / drag.k));
+  if (!drag.moved && Math.abs(e.clientX - drag.x0) < 8) return; // 살짝 흔들린 건 톡 누르기
+  drag.moved = true;
+  drag.dx = dx;
+  drag.btn.classList.add('is-drag');
+  drag.btn.style.setProperty('--drag', dx + 'px');
+});
+function endDrag(e, cancel = false) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const { btn, dx, moved } = drag;
+  drag = null;
+  if (!moved) { if (!cancel) openBtn(btn); return; } // 톡 누르기
+  btn.classList.remove('is-drag'); // 놓으면 transition 으로 끝까지 가거나 제자리로
+  if (!cancel && dx >= KNOB_RUN * OPEN_AT) openBtn(btn);
+  else btn.style.removeProperty('--drag');
+}
+menu.addEventListener('pointerup', (e) => endDrag(e));
+menu.addEventListener('pointercancel', (e) => endDrag(e, true));
+// 키보드(Enter·Space)로 누를 때 (마우스·터치는 pointerup 에서 처리)
+menu.addEventListener('click', (e) => {
+  const btn = e.target.closest('.hs-mb');
+  if (e.detail === 0 && btn && menuReady()) openBtn(btn);
+});
 
 // ---------- NFC 태그 (2026-11-18): 홈 어느 단계에서든 립 제품을 리더기에 대면 팔레트로 넘어가 그 제품 색을 바로 바른다 ----------
 // 찾기·안내(등록되지 않은 태그 포함)는 팔레트가 한다: 읽은 번호를 took.pendingTag 에 넘긴다 (palette.js)
@@ -155,7 +148,6 @@ listenNfc((code) => {
   try { sessionStorage.setItem('took.pendingTag', code); } catch { /* 저장 불가 환경: 팔레트만 열린다 */ }
   leaving = true;
   clearTimeout(autoTimer);
-  if (step === 4) { box.dataset.side = 'scan'; box.dataset.state = 'c'; start('scan'); return; }
   store.remove('navCurrent.palette.html');
   location.href = 'palette.html';
 });
@@ -164,6 +156,8 @@ listenNfc((code) => {
 // 팔레트: 로고가 Find Your Color 화면 왼쪽 위 작은 로고 자리로 줄어들며 날아가고, 나머지는 사라진다
 const SMALL_LOGO = { left: 354.33, top: 66.31, k: 190 / 612 }; // palette 화면의 로고 (GP-홈화면 2026-11-18: 위 가운데 x 354.33~544.33, y 66.31~110.85)
 function start(where) {
+  // 3번 NFC: 거울로 가서 태그를 기다린다 (팔레트가 took.nfcWait 를 보고 '제품을 태그해 주세요' 안내를 띄움)
+  if (where === 'nfc') { try { sessionStorage.setItem('took.nfcWait', '1'); } catch { /* 저장 불가 환경 */ } }
   if (where === 'voice') {
     store.remove('navCurrent.chat.html');
     location.href = 'chat.html';
@@ -174,7 +168,7 @@ function start(where) {
   if (reduce) { location.href = 'palette.html'; return; }
   stage.classList.add('hs-leaving');
   const logo = stage.querySelector('.hs-logo');
-  // transform 은 로고의 원래 자리(CSS left 144, top 648) 기준이다. 3번 화면에서는 그 자리 그대로(none), 4번에서는 translateY(-200px)
+  // transform 은 로고의 원래 자리(CSS left 144, top 648) 기준이다. 3번 화면에서는 그 자리 그대로(none), 4번에서는 translateY(-267.23px)
   // 지금 보이는 상태에서 출발해, 원래 자리 기준으로 팔레트 로고 자리(위 가운데 354.33, 66.31 · 배율 190/612)에 정확히 멈춘다 (transform-origin 0 0)
   const BASE = { left: 144, top: 648 };
   const dx = SMALL_LOGO.left - BASE.left;

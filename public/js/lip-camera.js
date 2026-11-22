@@ -2,7 +2,7 @@
 import { $, el } from './common.js';
 import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
 import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
-import { getCamSettings, videoConstraints } from './camera-settings.js';
+import { getCamSettings, videoConstraints, isExternalCamera } from './camera-settings.js';
 import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
 import { PALETTE, video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
@@ -91,14 +91,13 @@ let waiting = null; // 연결 대기 중이면 { timer }
 async function hasCamera() {
   try { return (await navigator.mediaDevices.enumerateDevices()).some((d) => d.kind === 'videoinput'); } catch { return false; }
 }
-const EXTERNAL_CAMERA_LABEL = /usb|uvc|webcam|logitech|brio|c920|c922|c930|elgato|obsbot|razer/i;
-const BUILT_IN_CAMERA_LABEL = /front|rear|back|facing|integrated|built[\s-]?in|camera\s*\d|내장|전면|후면/i;
+// 외장 웹캠 판단은 camera-settings.js isExternalCamera (갤탭 Chrome 의 'camera2 N, facing external' 도 외장으로 본다, 2026-11-22)
 async function preferExternalCamera(stream, gen) {
   if (getCamSettings().deviceId) return stream;
   let devices;
   try { devices = await navigator.mediaDevices.enumerateDevices(); } catch { return stream; }
   const external = devices.find((d) => d.kind === 'videoinput'
-    && d.deviceId && EXTERNAL_CAMERA_LABEL.test(d.label) && !BUILT_IN_CAMERA_LABEL.test(d.label));
+    && d.deviceId && isExternalCamera(d.label));
   const currentId = stream.getVideoTracks()[0]?.getSettings().deviceId;
   if (!external || external.deviceId === currentId) return stream;
 
@@ -354,8 +353,8 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) state.lastFrameAt = performance.now(); });
 
 $('cam-retry').addEventListener('click', () => startCamera());
-// 카메라 화면의 ⚙ 카메라 설정 버튼은 2026-11-17 사용자 요청으로 뺐다.
-// 기기에 저장해 둔 설정(웹캠 고르기·해상도·좌우 반전·회전, camera-settings.js localStorage)은 그대로 적용된다 (getCamSettings·videoConstraints)
+// 카메라 화면의 ⚙ 카메라 설정 버튼은 2026-11-17 사용자 요청으로 뺐다. 설정은 관리자 → '웹캠 연결 설정'(camera-setup.html)에서 한다.
+// 저장한 설정(웹캠 고르기·해상도·프레임·좌우 반전·회전, camera-settings.js localStorage)이 여기 그대로 적용된다 (getCamSettings·videoConstraints)
 window.addEventListener('pagehide', stopCamera);
 
 // 아바타 테스트 버튼과 '카메라로 테스트하기' 버튼은 2026-11-15 뺐다 (카메라는 화면에 들어오면 자동으로 켜지고, 못 쓰면 '카메라 다시 연결')

@@ -144,8 +144,8 @@ await step('스크롤바: 표시만 숨기고 스크롤 동작은 유지', async
 const savedLipHex = (pg) => pg.evaluate(() => JSON.parse(sessionStorage.getItem('took.lipColor') || 'null')?.hex);
 
 // 홈·팔레트는 2026-11-16 TOOK_prototype 디자인(컬러)으로 바뀌어 무채색 검사를 하지 않는다
-// 2026-11-18~20: 1 제품 장면 → 2 입술 장면 → 3 'Tap The Screen'(처음부터 3초) → 누르면 바로 팔레트. 시작 버튼(알약)은 ?step=4 로만
-await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen → 누르면 팔레트 / ?step=4 음성 쪽은 챗봇', async () => {
+// 2026-11-18~21: 1 제품 장면 → 2 입술 장면 → 3 'Tap The Screen'(처음부터 3초) → 누르면 4번 버튼 3개(거울·챗봇·NFC, Figma GP 1667:704)
+await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen → 누르면 버튼 3개 → 거울·챗봇·NFC', async () => {
   await page.goto(BASE + '/');
   assert.equal(await page.getAttribute('#stage', 'data-step'), '1');
   await page.click('#stage');
@@ -158,10 +158,20 @@ await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen 
   await page.waitForFunction(() => document.getElementById('stage').dataset.step === '3', null, { timeout: 6000 });
   assert.ok(Date.now() - t0 < 4500, `Tap The Screen 은 3초쯤 (${Date.now() - t0}ms)`);
   await page.click('#stage');
+  await page.waitForFunction(() => document.getElementById('stage').dataset.step === '4');
+  await page.waitForTimeout(700); // 버튼이 나타나는 동안 (3번을 누른 손가락이 바로 버튼을 누르지 않게 350ms 막아 둠)
+  assert.equal(await page.locator('.hs-mb').count(), 3, '버튼 3개');
+  await page.click('.hs-mb-mirror');
   await page.waitForURL(at('palette.html'));
   await page.goto(BASE + '/index.html?step=4');
-  await page.click('.hs-opt-voice');
+  await page.waitForTimeout(700);
+  await page.click('.hs-mb-chat');
   await page.waitForURL(at('chat.html'));
+  await page.goto(BASE + '/index.html?step=4');
+  await page.waitForTimeout(700);
+  await page.click('.hs-mb-nfc');
+  await page.waitForURL(at('palette.html'));
+  await page.waitForFunction(() => document.getElementById('nfc-hint')?.textContent.length > 0, null, { timeout: 3000 });
 });
 
 // ---------- 팔레트 = Find Your Color (홈에서 바로 들어오는 주 화면) ----------

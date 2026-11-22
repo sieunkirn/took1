@@ -20,9 +20,10 @@
   html, body { height: 100%; margin: 0; overflow: hidden; background: #000; color: var(--ink); }
   /* 툭 서비스 화면(kiosk.html)과 같은 세로 900×1440(5:8) 상자를 창에 맞춰 키우거나 줄인다. 남는 곳은 검게 (2026-11-15) */
   /* 버튼 배치 (2026-11-18 사용자 지정): 터치 범위 조정 / 조정값 복사·조정값 초기화 / 스마트 미러 화면으로·호수 검수 */
+  /* 웹캠 연결 설정 (2026-11-22): NFC 테스트·색 보정 줄 아래에 한 줄(.tool) 더 */
   /* 바코드 카메라 테스트 → NFC 테스트 (2026-11-18): 위 배치는 그대로 두고 맨 아래 정보 위에 한 줄(.tool)을 더한다 */
-  .ad { position: fixed; left: 50%; top: 50%; width: 900px; height: 1440px; transform: translate(-50%, -50%) scale(var(--k, 1)); background: var(--paper); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto auto; gap: 12px; padding: 12px; box-sizing: border-box; }
-  .ad.empty { grid-template-rows: auto minmax(0, 1fr) minmax(0, 0.3fr) auto auto; }
+  .ad { position: fixed; left: 50%; top: 50%; width: 900px; height: 1440px; transform: translate(-50%, -50%) scale(var(--k, 1)); background: var(--paper); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto auto auto; gap: 12px; padding: 12px; box-sizing: border-box; }
+  .ad.empty { grid-template-rows: auto minmax(0, 1fr) minmax(0, 0.3fr) auto auto auto; }
   .ad .tool { grid-column: 1 / -1; min-height: 120px; font-size: 24px; }
   .ad .tool.half { grid-column: auto; } /* NFC 테스트·카메라 색 보정 한 줄에 둘 (2026-11-20) */
   .ad .wide { grid-column: 1 / -1; }
@@ -66,6 +67,9 @@
   // 카메라 색 보정 (2026-11-20): 터치 범위 조정처럼 설치할 때 한 번. 흰 종이로 카메라 색 틀어짐을 재서 내 톤 추천에 쓴다 (color-calib.html)
   const colorCalibBtn = () => btn('tool half', '카메라 색 보정', '흰 종이를 대고 측정해 카메라 색 틀어짐을 맞춰요 · 내 톤 추천에 쓰여요',
     () => { location.href = 'color-calib.html'; });
+  // 웹캠 연결 설정 (2026-11-22): 갤탭에서 USB 웹캠이 잘 안 잡혀서. 카메라 고르기·해상도·프레임·반전·회전·연결 진단 (camera-setup.html)
+  const camSetupBtn = () => btn('tool', '웹캠 연결 설정', '카메라 고르기 · 해상도 낮추기 · 반전/회전 · 연결 상태와 진단 기록',
+    () => { location.href = 'camera-setup.html'; });
   // 개발 쪽(Claude)에 그대로 붙여 넣을 글
   const copyText = () => {
     const code = calib.exportCode();
@@ -93,7 +97,7 @@
     box.classList.toggle('empty', !s.saved);
     if (!s.saved) {
       // 조정 전: 터치가 어긋나 있어도 눌리도록 화면 전체가 시작 버튼
-      box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 범위 조정 시작', '정전식 필름을 꽂은 뒤 눌러 주세요. 십자 5개를 차례로 누르고 저장하면 정확도 테스트로 넘어가요', () => calib.startCalib()), shadesBtn('wide'), nfcTestBtn(), colorCalibBtn());
+      box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 범위 조정 시작', '정전식 필름을 꽂은 뒤 눌러 주세요. 십자 5개를 차례로 누르고 저장하면 정확도 테스트로 넘어가요', () => calib.startCalib()), shadesBtn('wide'), nfcTestBtn(), colorCalibBtn(), camSetupBtn());
     } else {
       // 조정값 초기화: 이 기기에 저장한 값을 지운다 (웹에 고정한 값이 있으면 그 값으로). 웹 고정값을 쓰는 중이면 지울 값이 없다
       const local = s.saved.source !== 'builtin';
@@ -108,6 +112,7 @@
         shadesBtn(),
         nfcTestBtn(),
         colorCalibBtn(),
+        camSetupBtn(),
       );
     }
     const info = document.createElement('div');

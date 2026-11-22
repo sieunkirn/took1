@@ -49,7 +49,7 @@ export function createNfcWindow({ stage, onWear, onSimilar, onAsk, onOpen, onTak
 
   const actions = el('div', { class: 'nt-actions' },
     el('button', { type: 'button', class: 'nt-btn', onclick: () => { api_.close(); onSimilar(); } }, t('nw.similar')),
-    el('button', { type: 'button', class: 'nt-btn', onclick: () => { const x = picked || current; api_.close(); onAsk(x); } }, t('nw.ask')),
+    onAsk ? el('button', { type: 'button', class: 'nt-btn', onclick: () => { const x = picked || current; api_.close(); onAsk(x); } }, t('nw.ask')) : null, // onAsk 가 없으면 버튼도 없다
     onTake ? el('button', { type: 'button', class: 'nt-btn nt-btn-pink', onclick: () => { const x = picked || current; api_.close(); onTake(x); } }, t('nw.take')) : null);
 
   const unknown = el('div', { class: 'nt-unknown' },

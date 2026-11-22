@@ -17,7 +17,7 @@ body.tui { max-width: none; width: 100%; color: #fff; }
 :where(.tui-stage) button { all: unset; box-sizing: border-box; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 /* wireframe.css 의 button:hover(회색 바탕)가 이 디자인의 버튼 색을 덮지 않게 (터치 뒤 hover 가 남는 태블릿 포함) */
 .tui .tui-stage button.fc-sw:hover:not(:disabled) { background: var(--c); }
-.tui .tui-stage button.hs-opt:hover:not(:disabled) { background: transparent; color: #fff; }
+.tui .tui-stage button.hs-mb:hover:not(:disabled) { background: transparent; color: #fff; }
 .tui .tui-stage button.fc-sbtn:hover:not(:disabled) { background: #000; color: #fff; }
 .tui .tui-stage .fc-camerr button#cam-retry:hover:not(:disabled) { background: transparent; color: #fff; }
 :where(.tui-stage) button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
@@ -29,8 +29,9 @@ body.tui { max-width: none; width: 100%; color: #fff; }
    쌓는 순서: 배경 영상(제품→입술 장면) → 어두운 덮개 → 로고 → 문구. 좌표는 900×1440 무대 기준, 창 크기에는 무대가 통째로 비례 조정된다 (ui-stage.js) */
 .tui-home .tui-stage { cursor: pointer; }
 .hs-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; z-index: 0; }
-.hs-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: none; z-index: 0; }
-.hs-logo, .hs-tap, .hs-start, .hs-lang { z-index: 1; }
+.hs-dim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: none; z-index: 0; transition: background .6s ease; }
+.tui-stage[data-step="4"] .hs-dim { background: #000; } /* 4번 버튼 화면은 Figma GP 처럼 검정 바탕 (영상을 덮는다) */
+.hs-logo, .hs-tap, .hs-menu, .hs-lang { z-index: 1; }
 /* 로고: 원본 로고 그대로 612×144, 가로 가운데(left 144), 세로 중심 = 화면 높이 50% (top 648 → 중심 720). 1~3번은 자리 고정 */
 .hs-logo { position: absolute; left: 144px; top: 648px; width: 612px; height: 144px; color: #fff; overflow: visible;
   transform-origin: 0 0; filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.55));
@@ -41,63 +42,52 @@ body.tui { max-width: none; width: 100%; color: #fff; }
   white-space: nowrap; pointer-events: none; visibility: hidden; }
 .tui-stage[data-step="3"] .hs-tap { visibility: visible; }
 .tui-stage.hs-leaving .hs-tap { opacity: 0; transition: opacity .35s ease; } /* 3번에서 누르면 문구가 사라지고 로고만 팔레트 자리로 날아간다 */
-/* 4번: 로고가 200px 위로 올라가며 버튼과 한 덩어리 */
-.tui-stage[data-step="4"] .hs-logo { transform: translateY(-200px); filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.88)); }
+/* 4번: 로고가 Figma GP 자리(y 380.77)로 267.23px 올라간다 */
+.tui-stage[data-step="4"] .hs-logo { transform: translateY(-267.23px); filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.88)); }
 .hs-instant, .hs-instant * { transition: none !important; }
 
-/* 3번: 알약 버튼 (원본 03.png 위쪽 버튼: x 286~620, y 814~890 / 손잡이 x 300~453, y 822~881)
-   세 단계 색: a 평소(어두운 분홍) · b 손가락을 댄 순간(분홍) · c 떼는 순간(흰색). 빛 번짐 = 버튼을 흐리게 복사한 층(.hs-glow) */
-.hs-start {
-  position: absolute; left: 286px; top: 814px; width: 334px; height: 77px;
-  opacity: 0; pointer-events: none; transition: opacity .6s ease .25s;
+/* 4번 (2026-11-21 Figma GP 1667:704): 3번에서 누르면 로고가 위(y 380.77)로 올라가고 알약 버튼 3개가 세로로 나온다.
+   1 스캔 = 거울(palette.html) · 2 음성 = 챗봇(chat.html) · 3 NFC = 거울에서 NFC 태그 기다리기.
+   버튼 333.24×79.07 (x 286.85), y 812.81 / 1018.89 / 1203.80, 손잡이 153.5×58.03 (+13.13, +10.64).
+   색은 원본 프로토타입 알약의 세 모양 그대로: 1 어두운 분홍 · 2 분홍 · 3 흰색(아이콘 빨강) */
+.hs-menu { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s ease .25s; }
+.tui-stage[data-step="4"] .hs-menu { opacity: 1; pointer-events: auto; }
+.tui-stage.hs-leaving .hs-menu { opacity: 0; transition: opacity .35s ease; }
+.hs-mb {
+  position: absolute; left: 286.85px; width: 333.24px; height: 79.07px; z-index: 1;
   --track: linear-gradient(90deg, #3d2730 0%, #4a2433 30%, #5c1432 52%, #57203a 70%, #3d2b33 90%, #46313a 100%);
   --knob: linear-gradient(90deg, #968189 0%, #9d7a88 25%, #a0577a 60%, #a32c5e 100%);
-  --knob-x: 14px;
   --glow: linear-gradient(90deg, #d0c8cc 0%, #d8a8bd 15%, #e8186f 38%, #e01868 60%, #cc8aa6 78%, #d8d2d4 100%);
+  --shine: rgba(255, 255, 255, 0.10);
 }
-.tui-stage[data-step="4"] .hs-start { opacity: 1; pointer-events: auto; }
-/* 버튼 배치 (2026-11-16 사용자 요청 "더 예쁘게"): 원본 크기의 1.2배(가운데 기준), 로고 아래 간격을 맞춰 로고와 한 덩어리로 화면 가운데쯤.
-   아래에 작은 이름표(왼쪽 컬러 찾기 · 오른쪽 AI 뷰티 상담) — 고른 쪽은 또렷하게 */
-.hs-start { left: 283px; top: 822px; transform: scale(1.2); transform-origin: 50% 50%; } /* 가운데 = 로고 가운데(450) */
-.hs-labels { position: absolute; left: 0; right: 0; top: 92px; display: grid; grid-template-columns: 1fr 1fr; pointer-events: none;
-  font-size: 15px; line-height: 20px; font-weight: 400; letter-spacing: -0.01em; color: rgba(255, 255, 255, 0.5); text-align: center; }
-.hs-labels span { transition: color .2s ease; }
-.hs-start[data-side="scan"] .hs-label-scan, .hs-start[data-side="voice"] .hs-label-voice { color: #fff; }
-.hs-start[data-side="voice"] { --knob-x: 167px; }
-.hs-glow { position: absolute; inset: -3px; border-radius: 42px; pointer-events: none; background: var(--glow);
-  filter: blur(14px); transition: background .2s ease; }
-.hs-glow i { display: none; }
-.hs-pill {
-  position: absolute; inset: 0; border-radius: 39px; box-sizing: border-box; background: var(--track);
-  box-shadow: inset 0 0 0 1.2px rgba(255, 255, 255, 0.16), inset 0 2px 4px rgba(255, 255, 255, 0.08);
-}
-.hs-knob {
-  position: absolute; left: var(--knob-x); top: 8px; width: 153px; height: 59px; border-radius: 30px; pointer-events: none;
-  background: radial-gradient(70px 40px at 22% 45%, rgba(255, 255, 255, 0.10), transparent 70%), var(--knob);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), inset 0 3px 5px rgba(255, 255, 255, 0.12), inset 0 -3px 5px rgba(255, 255, 255, 0.10);
-  transition: left .28s cubic-bezier(.3, .7, .2, 1);
-}
-.hs-opt { position: absolute; top: 0; height: 77px; color: #fff; z-index: 1; }
-.hs-opt-scan { left: 0; width: 167px; }
-.hs-opt-voice { left: 167px; width: 167px; }
-/* 아이콘 위치 (원본: 스캔 x 355~391 y 835~870, 음성 막대 x 506~565 y 836~869) */
-.hs-ico-scan { position: absolute; left: 69px; top: 21px; width: 36px; height: 35px; transition: color .2s ease; }
-.hs-ico-wave { position: absolute; left: 53px; top: 22px; width: 60px; height: 34px; transition: color .2s ease; }
-/* b: 분홍 */
-.hs-start[data-state="b"] {
+.hs-mb-mirror { top: 812.81px; }
+.hs-mb-chat { top: 1018.89px;
   --track: linear-gradient(90deg, #a99199 0%, #c07e9b 35%, #c5809c 52%, #b993a3 75%, #a6949c 92%, #b1a1a8 100%);
   --knob: linear-gradient(90deg, #f2dee5 0%, #fdc7dd 25%, #ffa3c9 60%, #ff88ba 100%);
-}
-.hs-start[data-state="b"] .hs-knob { background: radial-gradient(70px 40px at 22% 45%, rgba(255, 255, 255, 0.35), transparent 70%), var(--knob); }
-/* c: 흰색, 고른 쪽 아이콘은 빨강 */
-.hs-start[data-state="c"] {
+  --shine: rgba(255, 255, 255, 0.35); }
+.hs-mb-nfc { top: 1203.80px;
   --track: linear-gradient(90deg, #a9a7a6 0%, #c6c6c6 30%, #c4c4c4 60%, #a8a8a8 90%, #b0b0b0 100%);
   --knob: linear-gradient(180deg, #f5f5f5 0%, #ffffff 40%, #fafafa 100%);
   --glow: linear-gradient(90deg, #d0d0d0 0%, #d8d8d8 15%, #e8e8e8 38%, #e0e0e0 60%, #cccccc 78%, #d8d8d8 100%);
-}
-.hs-start[data-state="c"] .hs-knob { background: var(--knob); }
-.hs-start[data-state="c"][data-side="scan"] .hs-ico-scan, .hs-start[data-state="c"][data-side="voice"] .hs-ico-wave { color: #ff0040; }
-.tui-stage.hs-leaving .hs-start { opacity: 0; transition: opacity .35s ease; }
+  --shine: transparent; }
+.hs-mb-glow { position: absolute; inset: -3px; border-radius: 42px; pointer-events: none; background: var(--glow); filter: blur(14px); }
+.hs-mb-track { position: absolute; inset: 0; border-radius: 40px; pointer-events: none; background: var(--track);
+  box-shadow: inset 0 0 0 1.2px rgba(255, 255, 255, 0.16), inset 0 2px 4px rgba(255, 255, 255, 0.08); }
+.hs-mb-knob { position: absolute; left: 13.13px; top: 10.64px; width: 153.5px; height: 58.03px; border-radius: 30px; pointer-events: none;
+  background: radial-gradient(70px 40px at 22% 45%, var(--shine), transparent 70%), var(--knob);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), inset 0 3px 5px rgba(255, 255, 255, 0.12), inset 0 -3px 5px rgba(255, 255, 255, 0.10); }
+.hs-mb img { position: absolute; display: block; max-width: none; pointer-events: none; }
+/* 누르면 스위치처럼 손잡이(+아이콘)가 오른쪽 끝으로 미끄러진 뒤 다음 화면 (2026-11-21 사용자 요청).
+   오른쪽 끝 = 333.24 − 13.13 − 153.5 = 166.61 → 이동 153.48px */
+.hs-mb-knob, .hs-mb img { transition: transform .32s cubic-bezier(.3, .7, .2, 1); }
+.hs-mb.is-on .hs-mb-knob, .hs-mb.is-on img { transform: translateX(153.48px); }
+/* 손잡이를 끌 때: 손가락을 그대로 따라온다 (--drag = home.js) */
+.hs-mb { touch-action: none; }
+.hs-mb .hs-mb-knob, .hs-mb img { transform: translateX(var(--drag, 0px)); }
+.hs-mb.is-drag .hs-mb-knob, .hs-mb.is-drag img { transition: none; }
+.hs-mb-mirror img { left: 71.65px; top: 21.69px; } /* Figma Group 6: x 360 y 836 (선 굵기만큼 1.5px 바깥) */
+.hs-mb-chat img { left: 56.15px; top: 24.11px; } /* Group 3: x 343 y 1043 */
+.hs-mb-nfc img { left: 69.89px; top: 23.72px; } /* icon-nfc-waves: x 356.74 y 1227.52 */
 
 /* ================= Find Your Color 4~11번 (palette.html, js/palette.js) ================= */
 /* 상태: #stage[data-mode] arc 4 · recs 추천 결과 (5~9번·10/11번 시트는 2026-11-16 뺐다), [data-dim] 괄호 빛 번짐이 있는 상태 */
@@ -129,6 +119,17 @@ body.tui { max-width: none; width: 100%; color: #fff; }
 .fc-cam { position: absolute !important; inset: 0; width: auto !important; aspect-ratio: auto !important; border: 0 !important; border-radius: 0 !important;
   background: transparent !important; overflow: hidden; }
 .fc-cam #view { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: var(--cam); transition: opacity .4s ease; }
+/* 카메라 축소 (2026-11-21): 영상 전체가 보이게(contain) 둔 뒤 js/palette.js 가 --camzoom 만큼 키운다.
+   슬라이더 오른쪽 끝 = 예전 cover 와 같은 크기, 왼쪽 끝 = 영상 전체(빈 곳은 검정). 넘치는 부분은 .fc-camarea 가 자른다 */
+.fc-cam #view { object-fit: contain; transform: scale(var(--camzoom, 1)); transform-origin: 50% 50%; }
+.fc-zoom { position: absolute; right: 34px; top: 52px; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 6px 16px; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45); color: #fff; }
+.fc-zoom-ic { font-size: 24px; line-height: 1; font-weight: 300; width: 16px; text-align: center; }
+.fc-zoom input[type="range"] { width: 200px; height: 44px; margin: 0; }
+.fc-zoom input[type="range"]::-webkit-slider-runnable-track { background: linear-gradient(#fff, #fff) 0 / var(--p) 100% no-repeat, rgba(255, 255, 255, 0.3); }
+.fc-zoom input[type="range"]::-moz-range-track { background: rgba(255, 255, 255, 0.3); }
+.fc-zoom input[type="range"]::-moz-range-progress { background: #fff; }
+.fc-zoom input[type="range"]::-webkit-slider-thumb { background: #fff; }
 /* 준비 중·못 쓸 때 안내(placeholder): 흰 글씨로, 아래 오류 안내(.fc-camerr)와 겹치지 않게 얼굴 자리 위쪽(y 470~)에 */
 .tui-stage .fc-cam .placeholder { flex-direction: column; justify-content: flex-start; gap: 12px; padding: 470px 290px 0; border: 0; border-radius: 0; background: transparent;
   color: #fff; font-size: 16px; line-height: 1.5; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }

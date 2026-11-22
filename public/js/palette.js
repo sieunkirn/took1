@@ -20,11 +20,13 @@ import { $, store, api, go, skeletonCards, tryOnCard, shortName } from './common
 import { t as tr } from './i18n.js';
 import { closeChat } from './nav.js'; // 챗봇 모달 닫기 (챗봇은 2026-11-20부터 전체 화면으로 연다)
 import { getPicks } from './chat-picks.js'; // '챗봇에 담기'로 담은 제품
+import { createQuick, shiftHex } from './mirror-quick.js'; // 거울 위 플로팅 퀵 추천 (2026-11-21)
 import { createNfcWindow } from './nfc-window.js'; // NFC 태그 시트 (세 번째 창, 2026-11-19)
 import { listenNfc, findTagProduct, createNfcHint } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
 import { hexToRgb } from '../lib/color.js';
 import { state as lip, video } from './lip-state.js';
 import { applyLook } from './lip-look.js';
+import { matchPresets } from './lip-engine.js'; // 퍼스널 컬러 → 어울리는 립 색 (플로팅 퀵 추천 질문 ①)
 import { sourceFrame } from './lip-camera.js';
 import { mapPoint } from './lip-view.js';
 import { REDUCE_MOTION as reduce } from './motion.js';
@@ -127,6 +129,7 @@ function setTexture(name, { move = true } = {}) {
   swatches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tex === name)));
   save();
   if (move && !texDrag) texGo(TEXTURES.indexOf(name));
+  try { nudgeLater(); } catch { /* 시작 중(말풍선 준비 전) */ } // 질감을 바꿔도 말풍선
 }
 // 텍스처 알약 (예전 그대로): 누를 때마다 matte → glossy → satin → sheer → shimmer. 가운데 질감 동그라미도 같이 넘어간다
 $('fc-tex').addEventListener('click', () => setTexture(TEXTURES[(TEXTURES.indexOf(sel.texture) + 1) % TEXTURES.length]));
@@ -553,7 +556,7 @@ function spinTo(to, ms = 320, live = true) {
 }
 stage.addEventListener('pointerdown', (e) => {
   if (drag || mode !== 'arc' || (e.pointerType === 'mouse' && e.button !== 0)) return;
-  if (e.target.closest('button, a, .fc-swatches, .nt, .fc-intro')) return; // .nt = NFC 태그 시트 (위에 떠 있는 동안 다이얼은 안 돈다), .fc-intro = 첫 화면 안내
+  if (e.target.closest('button, a, .fc-swatches, .nt, .fc-intro, .mq')) return; // .mq = 플로팅 퀵 추천 창 // .nt = NFC 태그 시트 (위에 떠 있는 동안 다이얼은 안 돈다), .fc-intro = 첫 화면 안내
   const p = toStage(stage, e);
   if (p.y < DRAG_ZONE[0] || p.y > DRAG_ZONE[1]) return;
   const r = Math.hypot(p.x - G.cx, p.y - G.cy);
@@ -664,11 +667,34 @@ function toView(points) {
   const H = camArea.offsetHeight;
   const cw = viewEl.width;
   const ch = viewEl.height;
-  const s = Math.max(W / cw, H / ch);
+  const s = Math.max(W / cw, H / ch) * camZoom; // camZoom: 축소 슬라이더 (아래)
   const ox = camArea.offsetLeft + (W - cw * s) / 2;
   const oy = camArea.offsetTop + (H - ch * s) / 2;
   return points.map((q) => { const p = mapPoint(q, !!f.mirror, turn); return { x: ox + p.x * cw * s, y: oy + p.y * ch * s }; });
 }
+// ---------- 카메라 축소 슬라이더 (2026-11-21: 웹캠이 세로 화면을 꽉 채우느라 확대돼 보여서) ----------
+// 값 100 = 꽉 채움(object-fit: cover, 예전과 같음), 0 = 영상 전체가 보이게(contain). 기기에 계속 남도록 localStorage
+const ZOOM_KEY = 'took.camZoom';
+const zoomInput = $('cam-zoom');
+let camZoom = 1; // cover 대비 배율 (1 = 꽉 채움)
+let zoomVal = 100;
+try { const v = Number(localStorage.getItem(ZOOM_KEY)); if (localStorage.getItem(ZOOM_KEY) !== null && v >= 0 && v <= 100) zoomVal = v; } catch { /* 저장소 못 씀 */ }
+if (zoomInput) zoomInput.value = String(zoomVal);
+let zoomKey = '';
+function applyZoom(force) {
+  const cw = viewEl.width, ch = viewEl.height, W = camArea.offsetWidth, H = camArea.offsetHeight;
+  const key = `${cw}x${ch}/${W}x${H}/${zoomVal}`;
+  if (!force && key === zoomKey) return;
+  zoomKey = key;
+  const fit = cw && ch && W && H ? Math.min(W / cw, H / ch) / Math.max(W / cw, H / ch) : 1; // contain ÷ cover
+  camZoom = fit + (1 - fit) * (zoomVal / 100);
+  viewEl.style.setProperty('--camzoom', (camZoom / fit).toFixed(4)); // CSS 는 contain 기준이라 cover 배율로 되돌린다
+}
+zoomInput?.addEventListener('input', () => {
+  zoomVal = Number(zoomInput.value) || 0;
+  try { localStorage.setItem(ZOOM_KEY, String(zoomVal)); } catch { /* 저장소 못 씀 */ }
+  applyZoom(true);
+});
 function faceGoal() {
   const b = lip.lips?.box;
   const pts = b && toView([{ x: b.x0, y: b.y0 }, { x: b.x1, y: b.y0 }, { x: b.x0, y: b.y1 }, { x: b.x1, y: b.y1 }]);
@@ -706,6 +732,7 @@ function placeBrackets() {
   at(brs[3], x1 - BR, y1 - BR);
 }
 function trackFace(now) {
+  applyZoom(false); // 영상 크기가 바뀌면 축소 비율도 다시
   let goal = faceGoal();
   if (goal) { lastGoal = goal; lastSeen = now; } else if (lastGoal && now - lastSeen < 700) goal = lastGoal; // 잠깐 놓쳐도 바로 돌아가지 않게
   faceSec.classList.toggle('fc-tracking', !!goal);
@@ -754,6 +781,7 @@ let recSeq = 0; // 늦게 온 이전 응답은 버린다
 function colorChanged() {
   want = chosen();
   if (mode === 'recs') queueRecs(250);
+  try { nudgeLater(); } catch { /* 시작 중(말풍선 준비 전) */ } // 말풍선 (아래 플로팅 퀵 추천 쪽)
 }
 function queueRecs(ms) {
   clearTimeout(recTimer);
@@ -775,25 +803,37 @@ function showDots(products) {
     return b;
   }));
 }
+// 시트 상단 안내 멘트 (2026-11-21 사용자 요청: '내 톤으로 추천받기' 버튼 자리에 추천 제품 안내). 플로팅 설문으로 열었으면 고른 답으로 안내한다
+const recGuide = $('fc-rec-guide');
+let survey = null; // { hex, finish, maxPrice, note, fixes } 플로팅 설문 결과 (그 색으로 시트를 보는 동안만). fixes = '마음에 안 들어요'로 더한 조건 이름
+function status(text) {
+  recStatus.textContent = text;
+  if (recGuide) recGuide.textContent = text;
+}
 async function loadRecs() {
   const hex = want;
   const seq = ++recSeq;
   shown = hex;
-  recStatus.textContent = tr('fc.searching');
+  const sv = survey && survey.hex === hex ? survey : null; // 설문 뒤 색을 또 바꿨으면 보통 추천으로
+  if (!sv) survey = null;
+  status(tr('fc.searching'));
   recDots.replaceChildren();
   recList.replaceChildren(...skeletonCards(4));
-  const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, limit: RECOMMEND_COUNT }));
+  const ask = (finish) => api('api/recommend?' + new URLSearchParams({ hex, limit: RECOMMEND_COUNT, ...(finish ? { finish } : {}), ...(sv?.maxPrice ? { maxPrice: sv.maxPrice } : {}) }));
+  let { ok, body } = await ask(sv?.finish);
+  if (ok && sv?.finish && !body.products.length) ({ ok, body } = await ask('')); // 그 질감 제품이 없으면 색만으로 (가격 상한은 지킨다)
   if (seq !== recSeq) return; // 그새 색이 또 바뀌었다
   if (!ok) {
     shown = null; // 다음에 열면 다시 찾는다
-    recStatus.textContent = body.error || tr('lip.recFail');
+    status(body.error || tr('lip.recFail'));
     recList.replaceChildren();
     return;
   }
-  recStatus.textContent = body.products.length ? tr('fc.found', { n: body.products.length }) : tr('fc.none');
+  status(!body.products.length ? tr(sv?.maxPrice ? 'mq.noneUnder' : 'fc.none') : sv ? sv.note : tr('fc.guide', { n: body.products.length }));
   showDots(body.products);
   recList.scrollTop = 0;
   recList.replaceChildren(...body.products.map((product) => tryOnCard(product, tryProduct /* 가져가기 주석: , { onTake: takeIt } */)));
+  if (sv && body.products[0]) tryProduct(body.products[0], { quiet: true }); // 설문 끝: 1위 제품을 바로 입술에
 }
 // 추천 카드: '입술에 발라보기' · '챗봇에 담기' (담은 제품은 오른쪽 아래 챗봇 버튼으로 이어서 물어본다)
 // '입술에 발라보기': 그 제품 색·제형을 그대로 입힌다
@@ -832,7 +872,8 @@ function wearProduct(p, kind = 'nfc') {
   recSeq++; // 찾는 중이던 추천은 버리고 이 제품 카드를 보여 준다
   want = shown = chosen();
   setMode('recs');
-  recStatus.textContent = tr(kind === 'chat' ? 'pal.chatRead' : 'pal.nfcRead');
+  survey = null;
+  status(tr(kind === 'chat' ? 'pal.chatRead' : 'pal.nfcRead'));
   showDots([p]);
   recList.replaceChildren(tryOnCard(p, tryProduct /* 가져가기 주석: , { onTake: takeIt } */));
 }
@@ -854,8 +895,89 @@ const nfcWin = createNfcWindow({
   onAsk: (p) => { nfcWin.close(); go('chat.html', { base: lineOf(p) }); },
   // onTake: (p) => takeIt(p), // 가져가기 주석 (NFC 창의 '가져가기' 버튼도 같이 사라진다)
 });
+// 플로팅 퀵 추천 (2026-11-21 사용자 요청 "거울에 플로팅 버튼으로 간단하게, 터치 몇 번이면"): 질문 2개 → 실제 제품을 바로 바르기
+const quick = createQuick({
+  stage,
+  onOpen: () => { nfcWin.close(); if (mode !== 'arc') setMode('arc'); setFolded(true); },
+  onPreview: (hex) => window.dispatchEvent(new CustomEvent('took:pick', { detail: { hex } })), // 다이얼도 가장 가까운 칸으로
+  // 손님이 직접 고른 퍼스널 컬러도 잰 톤처럼 저장한다 (챗봇으로 넘어갈 때 tone 으로 같이 간다, 말풍선 '내 톤' 안내도 그친다)
+  onSeason: (season) => store.set('lipMatch', { season, picks: matchPresets(season, 3), self: true }),
+  // 측정 도우미의 얼굴 확인: 카메라가 없으면 nocam, 입술(얼굴)을 못 찾았으면 noface (lip-camera.js 가 state.lips 를 채운다)
+  faceState: () => (lip.source !== 'camera' || !lip.stream ? 'nocam' : lip.lips ? 'ok' : 'noface'),
+  // 내 톤으로 추천받기 (2026-11-21 사용자 요청 "플로팅 버튼에서 내 톤 추천도 안내"): 시트 안 #match 버튼과 같은 톤 재기(lip-look.js)를 돌린다.
+  // 성공하면 위 took:match 처리가 첫 추천 색을 입술에 바르고, 여기서는 그 색·톤 이름을 퀵 창에 넘긴다. 실패 글은 lip-look/위 처리가 #match-result 에 쓴 것
+  onTone: () => new Promise((resolve) => {
+    let settled = false;
+    const finish = (v) => { if (settled) return; settled = true; window.removeEventListener('took:match', onMatch); clearInterval(watch); clearTimeout(limit); resolve(v); };
+    const onMatch = (e) => {
+      const { season, picks } = e.detail || {};
+      finish(season && picks?.length ? { ok: true, label: tr('season.' + season), hex: picks[0] } : { ok: false, msg: $('match-result').textContent });
+    };
+    window.addEventListener('took:match', onMatch);
+    toneBtn.click(); // 시트가 닫혀 있어도(inert) 스크립트 클릭은 간다
+    // 재기가 끝났는데(lip.analyze 비움) took:match 가 없었으면 실패 (성공은 비우는 것과 같은 순간에 took:match 를 보낸다)
+    const watch = setInterval(() => { if (!lip.analyze) finish({ ok: false, msg: $('match-result').textContent }); }, 150);
+    const limit = setTimeout(() => finish({ ok: false, msg: tr('lip.matchFaceFail') }), 10000);
+  }),
+  // 설문 끝 (2026-11-21 사용자 요청 "설문 받으면 로고 동그라미 버튼 열어서 추천 제품 보여주기"): 퀵 창은 닫히고
+  // 가운데 로고 버튼의 추천 시트를 연다. 고른 색 + 질감 제품으로 찾고, 시트 상단에 고른 답으로 안내 멘트
+  onDone: ({ hex, finish, note }) => {
+    survey = { hex: chosen(), finish, maxPrice: null, note, fixes: [] };
+    want = chosen();
+    shown = null; // 같은 색으로 전에 열었어도 질감 조건으로 다시 찾는다
+    clearTimeout(recTimer);
+    setMode('recs');
+  },
+  // 마음에 안 들 때 (2026-11-21 사용자 요청 "그래도 맘에 안 들면 뭐가 부족한지 물어보자 — 가격, 고민(건조, 지속력, 발색)"):
+  // 조건을 더해 같은 시트를 다시 연다. 건조 → 글로시, 지속력 → 매트·벨벳 (제품 데이터의 제형 값만 쓴다), 발색 → 지금 색을 더 진하고 선명하게, 가격 → 상한
+  onRefine: ({ kind, value }) => {
+    if (!survey) survey = { hex: chosen(), finish: '', maxPrice: null, note: '', fixes: [] };
+    if (kind === 'price') survey.maxPrice = value;
+    else if (kind === 'dry') survey.finish = 'glossy';
+    else if (kind === 'long') survey.finish = 'matte,velvet';
+    else if (kind === 'pigment') window.dispatchEvent(new CustomEvent('took:pick', { detail: { hex: shiftHex(survey.hex, { dl: -7, ds: 12 }) } }));
+    survey.fixes = [...survey.fixes.filter((f) => f.kind !== kind && !(['dry', 'long'].includes(kind) && ['dry', 'long'].includes(f.kind))), { kind, value }];
+    if (kind === 'pigment') survey.hex = chosen(); // 나머지는 설문 색 그대로 (입술엔 1위 제품 색이 발려 있어도 기준은 설문 색)
+    survey.note = tr('mq.refineNote', { what: survey.fixes.map((f) => tr('mq.fix.' + f.kind, { n: f.value ? f.value.toLocaleString('en-US') : '' })).join(' · ') });
+    want = survey.hex;
+    shown = null;
+    clearTimeout(recTimer);
+    setMode('recs');
+  },
+
+});
+sbtn.addEventListener('click', () => quick.close()); // 추천 시트를 열면 퀵 창은 닫는다 (같은 자리)
+// 시트 상단 '마음에 안 드세요?' (2026-11-21): 무엇이 아쉬운지 묻는 퀵 창
+$('fc-refine')?.addEventListener('click', () => quick.openRefine());
+// 립 매핑 중간중간 말풍선 (2026-11-21 사용자 요청): 색·질감을 바꾸고 잠깐 멈추면 상황에 맞는 한마디.
+//   보통 = "지금 바른 색이랑 비슷한 립 추천해 드릴까요?" → 추천 시트 / 여러 번 바꿔 봤으면 = "고르기 어려우세요?" → 퀵 질문
+// 너무 자주 뜨지 않게 한 번 뜨면 NUDGE_GAP 동안 쉰다. 창·시트·NFC 창이 열려 있거나 다이얼을 끄는 중엔 띄우지 않는다
+const NUDGE_WAIT = 2600; // 마지막으로 바꾼 뒤 이만큼 멈추면
+const NUDGE_GAP = 25000;
+const NUDGE_MANY = 6; // 이만큼 넘게 바꿨으면 '고르기 어려우세요?'
+let nudgeChanges = 0;
+let nudgeCount = 0; // 지금까지 띄운 말풍선 수 (번갈아 고르기)
+let nudgeTimer = 0;
+let lastNudge = performance.now(); // 들어올 때 뜨는 첫 말풍선 뒤로 쉰다
+function nudgeLater() {
+  if (quick.isOpen()) return; // 퀵 질문이 바꾼 색은 세지 않는다
+  nudgeChanges++;
+  clearTimeout(nudgeTimer);
+  nudgeTimer = setTimeout(() => {
+    const busy = quick.isOpen() || mode !== 'arc' || drag || !document.getElementById('nw')?.hidden;
+    if (busy || performance.now() - lastNudge < NUDGE_GAP) return;
+    // 아직 톤을 안 쟀으면 두 번에 한 번은 '내 톤' 안내 (2026-11-21)
+    const toneAsk = !store.get('lipMatch')?.season && nudgeCount % 2 === 1;
+    const shown = nudgeChanges > NUDGE_MANY
+      ? quick.say({ text: tr('mq.nudgeHard'), sub: tr('mq.nudgeHardSub'), onTap: () => quick.open() })
+      : toneAsk
+        ? quick.say({ text: tr('mq.nudgeTone'), sub: tr('mq.nudgeToneSub'), onTap: () => quick.open({ tone: true }) })
+        : quick.say({ text: tr('mq.nudgeSimilar'), sub: tr('mq.nudgeSimilarSub'), hex: chosen(), onTap: () => setMode('recs') });
+    if (shown) { lastNudge = performance.now(); nudgeChanges = 0; nudgeCount++; }
+  }, NUDGE_WAIT);
+}
 let intro = { close() {} }; // 거울 첫 화면 안내 (아래에서 만든다). 태그하면 닫는다
-const tagToWindow = (code) => { intro.close(); nfcWin.show(code); };
+const tagToWindow = (code) => { intro.close(); quick.close(); nfcWin.show(code); };
 const lineOf = (p) => p.line || p.id; // 호수 상품(OY-…-01)이면 그 제품 줄 (챗봇 기준 제품)
 listenNfc(tagToWindow);
 // 홈에서 태그하고 넘어온 경우 (home.js 가 took.pendingTag 에 남긴 번호): 들어오자마자 NFC 창에서 그 제품을 보여 준다
@@ -863,6 +985,10 @@ listenNfc(tagToWindow);
   let pending = null;
   try { pending = sessionStorage.getItem('took.pendingTag'); sessionStorage.removeItem('took.pendingTag'); } catch { /* 저장 불가 환경 */ }
   if (pending) tagToWindow(pending);
+  // 홈 4번의 NFC 버튼으로 왔으면(home.js 가 took.nfcWait 를 남김) 태그 안내를 띄우고 리더기를 기다린다 (2026-11-21)
+  let nfcWait = false;
+  try { nfcWait = !!sessionStorage.getItem('took.nfcWait'); sessionStorage.removeItem('took.nfcWait'); } catch { /* 저장 불가 환경 */ }
+  if (nfcWait && !pending) nfcFlash(tr('home.standby'));
   // 거울 첫 화면 안내('어떻게 시작할까요?' 화면 전체)는 2026-11-20 사용자 요청으로 주석 처리. 되살리려면 아래 주석을 벗기면 된다
   // 거울 첫 화면 안내: 홈에서 태그하고 넘어왔으면(바로 NFC 창) 띄우지 않는다
   // intro = createIntro({
@@ -892,4 +1018,4 @@ window.tookWear = (p) => { if (!p?.color_hex) return; closeChat(); wearProduct(p
 const wearId = new URLSearchParams(location.search).get('wear');
 if (wearId) api('api/products/' + encodeURIComponent(wearId)).then((r) => { if (r?.ok && r.body.product?.color_hex) wearProduct(r.body.product, 'chat'); }).catch(() => {});
 // 자동 테스트·화면 확인용
-window.tookFind = { setMode, spinTo, setTexture, sel, chosen, FAMILIES, SEG, rot: () => rot, segHex, texPos: () => texPos };
+window.tookFind = { setMode, spinTo, setTexture, sel, chosen, FAMILIES, SEG, rot: () => rot, segHex, texPos: () => texPos, quick };

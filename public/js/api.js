@@ -29,6 +29,7 @@ async function staticApi(path, options) {
   const q = url.searchParams;
   const ok = (body) => ({ ok: true, status: 200, body });
   const fail = (status, error) => ({ ok: false, status, body: { error } });
+  if (url.pathname === '/api/price-range') return ok(rec.priceRange()); // 거울 퀵 추천의 가격 드래그 바 (2026-11-21)
   if (url.pathname === '/api/products') {
     const finish = q.get('finish');
     return ok({ products: catalog.allProducts().filter((p) => !finish || p.finish === finish) });
@@ -55,7 +56,7 @@ async function staticApi(path, options) {
     if (!hex) return fail(400, 'hex 파라미터가 필요합니다.');
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
-    return ok({ hex, products: rec.recommendByColor(hex, { finish: q.get('finish') || null, limit, excludeIds }) });
+    return ok({ hex, products: rec.recommendByColor(hex, { finish: q.get('finish') || null, maxPrice: Number(q.get('maxPrice')) || null, limit, excludeIds }) });
   }
   if (url.pathname === '/api/chat') {
     const body = JSON.parse(options.body || '{}');

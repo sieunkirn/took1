@@ -180,3 +180,21 @@ test('실데이터만 보기: 켜면 시연용 제품·호수가 목록·찾기�
     catalog.setRealOnlyGetter(null);
   }
 });
+
+test('추천: 제형 여러 개·가격 상한 (2026-11-21 거울 퀵 추천)', () => {
+  const both = recommendByColor('#B3122E', { finish: 'matte,velvet', limit: 30 });
+  assert.ok(both.length > 0 && both.every((p) => p.finish === 'matte' || p.finish === 'velvet'));
+  assert.ok(both.some((p) => p.finish === 'velvet') && both.some((p) => p.finish === 'matte'));
+  const cheap = recommendByColor('#B3122E', { maxPrice: 12000, limit: 30 });
+  assert.ok(cheap.length > 0 && cheap.every((p) => p.price > 0 && p.price <= 12000));
+});
+
+test('가격 범위: 추천 목록 제품의 최저·최고·가운데값 (2026-11-21 가격 드래그 바)', async () => {
+  const { priceRange } = await import('../src/lib/recommend.js');
+  const r = priceRange();
+  const prices = repo.allProducts().map((p) => Number(p.price)).filter((v) => v > 0);
+  assert.equal(r.min, Math.min(...prices));
+  assert.equal(r.max, Math.max(...prices));
+  assert.ok(r.min <= r.median && r.median <= r.max && r.count === prices.length);
+  assert.deepEqual(priceRange([{ price: 0 }, { price: null }]), { min: 0, max: 0, median: 0, count: 0 });
+});

@@ -8,7 +8,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { join, extname, normalize, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { allProducts, allDemoProducts, shadesOf, findById, findByBarcode, normalizeBarcode } from './src/lib/repository.js';
-import { recommendByColor } from './src/lib/recommend.js';
+import { recommendByColor, priceRange } from './src/lib/recommend.js';
 import { hybridAnswer } from './src/lib/llm/agent.js';
 import { abEnabled, abStats, recordEvent } from './src/lib/ab.js';
 import { llmConfig, llmEnabled } from './src/lib/llm/client.js';
@@ -59,6 +59,8 @@ async function handleApi(req, res, url) {
   const path = url.pathname;
   const q = url.searchParams;
 
+  // 가격 범위 (거울 퀵 추천의 가격 드래그 바, 2026-11-21)
+  if (req.method === 'GET' && path === '/api/price-range') return sendJson(res, 200, priceRange());
   if (req.method === 'GET' && path === '/api/products') {
     const finish = q.get('finish');
     return sendJson(res, 200, { products: allProducts().filter((p) => !finish || p.finish === finish) });
@@ -88,7 +90,7 @@ async function handleApi(req, res, url) {
     if (!hex) return sendJson(res, 400, { error: 'hex 파라미터(예: #B3122E)가 필요합니다.' });
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
-    const products = recommendByColor(hex, { finish: q.get('finish') || null, limit, excludeIds });
+    const products = recommendByColor(hex, { finish: q.get('finish') || null, maxPrice: Number(q.get('maxPrice')) || null, limit, excludeIds });
     return sendJson(res, 200, { hex, products });
   }
   if (req.method === 'POST' && path === '/api/chat') {

@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>took(툭) - 웹캠 연결 설정</title>
+<link rel="stylesheet" href="css/wireframe.css">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="js/touch-calib.js"></script>
+<script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
+<script src="js/theme-boot.js"></script>
+<style>
+  /* 웹캠 연결 설정 (2026-11-22): 직원용 화면. 관리자 화면의 '웹캠 연결 설정'으로 온다.
+     갤탭(Android Chrome)에서 USB 웹캠이 잘 안 잡혀서 만든 화면:
+     - 연결 상태(https·카메라 권한·찾은 카메라 수·지금 연결된 카메라 이름/해상도/프레임)를 한눈에
+     - 카메라를 직접 골라 바로 미리보기 (자동 = 외장 USB 웹캠 우선)
+     - 해상도·프레임 낮추기 (USB 허브·OTG 대역폭이나 전원이 모자라면 큰 해상도에서 안 켜진다)
+     - 좌우 반전·회전, '모든 카메라 시험'(카메라마다 켜지는지·실제 해상도), 진단 기록 복사
+     저장한 값은 거울(lip-camera.js)과 카메라 색 보정(color-calib.html)이 쓴다 (js/camera-settings.js, localStorage).
+     무채색 화면. 예외: 카메라 영상은 실제 색 */
+  html, body { background: var(--bg); }
+  .cs { max-width: 900px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; font-size: 17px; }
+  .cs-head { display: flex; gap: 14px; align-items: center; }
+  .cs-head h1, .cs-head p { margin: 0; }
+  .cs-head button { flex: none; min-height: 52px; border-radius: var(--r-s); }
+  .cs-box { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .cs-box h2 { margin: 0; font-size: 19px; }
+  .cs-state { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
+  .cs-state dt { color: var(--mute); }
+  .cs-state dd { margin: 0; font-weight: 700; word-break: break-all; }
+  .cs-state dd.bad { text-decoration: underline; }
+  .cs-cam { position: relative; aspect-ratio: 4 / 3; background: #000; border-radius: var(--r); overflow: hidden; }
+  .cs-cam canvas { width: 100%; height: 100%; display: block; object-fit: contain; }
+  .cs-cam p { position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; color: #fff; font-size: 18px; line-height: 1.5; }
+  .cs-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cs-opts button { min-height: 56px; padding: 8px 16px; border-radius: var(--r-s); font-size: 17px; text-align: left; }
+  .cs-opts button small { display: block; font-size: 13px; color: var(--mute); font-weight: 500; }
+  .cs-opts button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cs-opts button[aria-pressed="true"] small { color: inherit; opacity: 0.75; }
+  .cs-cams { flex-direction: column; }
+  .cs-cams button { width: 100%; }
+  .cs-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cs-actions button { min-height: 64px; border-radius: var(--r-s); font-size: 18px; font-weight: 800; }
+  .cs-actions .primary { grid-column: 1 / -1; background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cs-tips { margin: 0; padding-left: 22px; line-height: 1.6; font-size: 15px; color: var(--mute); }
+  .cs-log { width: 100%; height: 160px; box-sizing: border-box; padding: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--soft); color: var(--ink); font: 12px/1.45 ui-monospace, monospace; resize: vertical; }
+  .cs-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 12px 20px; border-radius: 999px; font-size: 16px; z-index: 10; pointer-events: none; }
+</style>
+</head>
+<body data-idle-reset="off">
+<main class="cs">
+  <div class="cs-head">
+    <button type="button" id="cs-back">← 관리자</button>
+    <div>
+      <h1>웹캠 연결 설정</h1>
+      <p class="muted small">카메라를 골라 바로 확인하고 저장해요. 저장한 값은 거울 화면과 카메라 색 보정에 쓰여요</p>
+    </div>
+  </div>
+
+  <section class="cs-box">
+    <h2>연결 상태</h2>
+    <dl class="cs-state" id="cs-state"></dl>
+  </section>
+
+  <div class="cs-cam"><canvas id="cs-view" width="640" height="480"></canvas><p id="cs-msg">카메라 준비 중…</p></div>
+  <video id="cs-video" playsinline muted hidden></video>
+
+  <section class="cs-box">
+    <h2>카메라</h2>
+    <div class="cs-opts cs-cams" id="cs-cams"></div>
+    <div class="cs-actions">
+      <button type="button" id="cs-refresh">카메라 다시 찾기</button>
+      <button type="button" id="cs-testall">모든 카메라 시험</button>
+    </div>
+  </section>
+
+  <section class="cs-box">
+    <h2>해상도</h2>
+    <p class="muted small" style="margin:0">갤탭에 USB 허브·OTG 젠더로 연결했을 때 안 켜지거나 멈추면 낮춰 보세요</p>
+    <div class="cs-opts" id="cs-res"></div>
+    <h2>프레임</h2>
+    <div class="cs-opts" id="cs-fps"></div>
+  </section>
+
+  <section class="cs-box">
+    <h2>화면 방향</h2>
+    <div class="cs-opts" id="cs-mirror"></div>
+    <div class="cs-opts" id="cs-rotate"></div>
+  </section>
+
+  <div class="cs-actions">
+    <button type="button" class="primary" id="cs-save">저장</button>
+    <button type="button" id="cs-reset">처음 값으로</button>
+    <button type="button" id="cs-mirror-go">거울 화면에서 확인</button>
+  </div>
+
+  <section class="cs-box">
+    <h2>갤탭에서 안 잡힐 때</h2>
+    <ol class="cs-tips">
+      <li>웹캠을 USB-C(OTG) 젠더나 <b>전원을 꽂은</b> USB 허브로 연결하고, 꽂은 뒤 '카메라 다시 찾기'</li>
+      <li>목록에 '외장'이 안 보이면 웹캠을 뽑았다 다시 꽂거나, 다른 USB 포트·케이블로 바꿔 보기</li>
+      <li>'사용 중'이라고 나오면 갤탭의 카메라 앱·다른 Chrome 탭을 모두 닫기</li>
+      <li>권한이 '거부'면 Chrome 주소창 왼쪽 자물쇠 → 권한 → 카메라 허용, 또는 갤탭 설정 → 애플리케이션 → Chrome → 권한 → 카메라 허용</li>
+      <li>터치 필름 USB와 같이 꽂았을 때만 안 되면 해상도를 640×480, 프레임을 15로</li>
+    </ol>
+  </section>
+
+  <section class="cs-box">
+    <h2>진단 기록</h2>
+    <textarea class="cs-log" id="cs-log" readonly aria-label="진단 기록"></textarea>
+    <div class="cs-actions">
+      <button type="button" id="cs-copy">진단 기록 복사</button>
+      <button type="button" id="cs-clearlog">기록 지우기</button>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { getCamSettings, saveCamSettings, clearCamSettings, videoConstraints, isExternalCamera, CAM_DEFAULTS, CAM_RES } from './js/camera-settings.js';
+
+  const $ = (id) => document.getElementById(id);
+  const video = $('cs-video');
+  const view = $('cs-view');
+  const vctx = view.getContext('2d');
+  const md = navigator.mediaDevices;
+
+  let saved = getCamSettings();
+  let cur = { ...saved };            // 화면에서 고르는 중인 값 (저장 전)
+  let cams = [];                     // enumerateDevices 의 videoinput
+  let stream = null;
+  let gen = 0;                       // 카메라를 다시 열 때마다 +1 (늦게 끝난 예전 요청은 버린다)
+  let busy = false;                  // 모든 카메라 시험 중
+  let perm = '확인 불가';
+  let lastError = '';
+  let wasStalled = false;
+  let frames = 0, lastQ = 0, fpsSeen = 0, fpsT = performance.now();
+
+  // ---------- 기록 ----------
+  const logLines = [];
+  function log(msg) {
+    const line = `[${new Date().toLocaleTimeString('ko-KR')}] ${msg}`;
+    logLines.push(line);
+    if (logLines.length > 200) logLines.shift();
+    $('cs-log').value = logLines.join('\n');
+    $('cs-log').scrollTop = 1e9;
+    console.info('[took 웹캠 설정]', msg);
+  }
+  let toastTimer = null;
+  function toast(text) {
+    let t = document.querySelector('.cs-toast');
+    if (!t) { t = document.createElement('div'); t.className = 'cs-toast'; document.body.append(t); }
+    t.textContent = text;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.remove(), 2600);
+  }
+  const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
+  const same = (a, b) => ['deviceId', 'res', 'fps', 'mirror', 'rotate'].every((k) => String(a[k]) === String(b[k]));
+
+  const ERR = {
+    NotAllowedError: '카메라 권한이 거부됐어요 (아래 \'갤탭에서 안 잡힐 때\' 4번)',
+    SecurityError: '보안 연결(https)이 아니라 카메라를 쓸 수 없어요',
+    NotFoundError: '카메라를 찾지 못했어요. 웹캠을 꽂고 \'카메라 다시 찾기\'를 눌러 주세요',
+    NotReadableError: '카메라를 열 수 없어요. 다른 앱이 쓰는 중이거나 USB 전원·대역폭이 모자라요 (해상도를 낮춰 보세요)',
+    AbortError: '카메라를 여는 도중 끊겼어요. 다시 시도해 주세요',
+    OverconstrainedError: '이 카메라가 고른 해상도·프레임을 지원하지 않아요',
+    StallTimeout: '카메라는 열렸는데 화면이 오지 않아요 (USB 대역폭 부족 의심 → 해상도를 낮춰 보세요)',
+  };
+  const errText = (e) => ERR[e?.name] || `${e?.name || '오류'} ${e?.message || ''}`;
+
+  // ---------- 상태 ----------
+  function camName(d, i) {
+    if (!d.label) return `카메라 ${i + 1} (이름은 권한 허용 후 보여요)`;
+    return d.label;
+  }
+  function renderState() {
+    const tr = stream?.getVideoTracks()[0];
+    const st = tr?.getSettings?.() || {};
+    const ext = cams.filter((d) => isExternalCamera(d.label)).length;
+    const rows = [
+      ['보안 연결', window.isSecureContext ? '예 (https 또는 localhost)' : '아니요 → https 주소로 열어 주세요', !window.isSecureContext],
+      ['카메라 기능', md?.getUserMedia ? '지원' : '지원 안 함 (Chrome 으로 열어 주세요)', !md?.getUserMedia],
+      ['카메라 권한', perm, perm === '거부'],
+      ['찾은 카메라', cams.length ? `${cams.length}대 (외장으로 보이는 것 ${ext}대)` : '없음', !cams.length],
+      ['지금 연결', tr ? `${tr.label || '?'} · ${st.width || '?'}×${st.height || '?'} · 화면 ${fpsSeen}fps` : (lastError || '연결 안 됨'), !tr],
+      ['저장된 값', `${saved.deviceId ? (saved.label || '고른 카메라') : '자동(외장 우선)'} · ${CAM_RES[saved.res]?.join('×') || saved.res} · ${Number(saved.fps) || '기본'}fps · 반전 ${saved.mirror ? '켬' : '끔'} · 회전 ${saved.rotate}°`
+        + (same(saved, cur) ? '' : '  ← 바꾼 값 저장 안 됨'), !same(saved, cur)],
+    ];
+    $('cs-state').replaceChildren(...rows.flatMap(([k, v, bad]) => {
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = v; if (bad) dd.className = 'bad';
+      return [dt, dd];
+    }));
+  }
+
+  // ---------- 고르기 버튼 ----------
+  function optButtons(boxId, items, isOn, onPick) {
+    $(boxId).replaceChildren(...items.map((it) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.innerHTML = it.title + (it.sub ? `<small>${it.sub}</small>` : '');
+      b.setAttribute('aria-pressed', isOn(it) ? 'true' : 'false');
+      b.addEventListener('click', () => onPick(it));
+      return b;
+    }));
+  }
+  function renderOpts() {
+    const liveId = stream?.getVideoTracks()[0]?.getSettings?.().deviceId || '';
+    const camItems = [{ id: '', title: '자동', sub: '외장 USB 웹캠이 보이면 그쪽, 없으면 전면 카메라' },
+      ...cams.map((d, i) => ({
+        id: d.deviceId, label: d.label,
+        title: camName(d, i),
+        sub: [isExternalCamera(d.label) ? '외장(USB)으로 보임' : d.label ? '내장 카메라로 보임' : '', d.deviceId && d.deviceId === liveId ? '지금 연결됨' : ''].filter(Boolean).join(' · '),
+      }))];
+    if (cur.deviceId && !cams.some((d) => d.deviceId === cur.deviceId)) {
+      camItems.push({ id: cur.deviceId, label: cur.label, title: `${cur.label || '고른 카메라'} (지금 연결 안 됨)`, sub: '꽂으면 이 카메라를 써요' });
+    }
+    optButtons('cs-cams', camItems, (it) => it.id === cur.deviceId, (it) => { cur.deviceId = it.id; cur.label = it.id ? (it.label || '') : ''; changed(true); });
+    optButtons('cs-res', [
+      { v: '480', title: '640 × 480', sub: '가장 잘 켜짐' }, { v: '720', title: '1280 × 720', sub: 'HD' },
+      { v: '960', title: '1280 × 960', sub: '기본값' }, { v: '1080', title: '1920 × 1080', sub: 'Full HD' },
+    ], (it) => String(cur.res) === it.v, (it) => { cur.res = it.v; changed(true); });
+    optButtons('cs-fps', [{ v: 0, title: '기본', sub: '웹캠이 정함' }, { v: 15, title: '15', sub: '가벼움' }, { v: 30, title: '30', sub: '부드러움' }],
+      (it) => Number(cur.fps) === it.v, (it) => { cur.fps = it.v; changed(true); });
+    optButtons('cs-mirror', [{ v: true, title: '좌우 반전 켬', sub: '거울처럼' }, { v: false, title: '좌우 반전 끔', sub: '찍힌 그대로' }],
+      (it) => !!cur.mirror === it.v, (it) => { cur.mirror = it.v; changed(false); });
+    optButtons('cs-rotate', [0, 90, 180, 270].map((d) => ({ v: d, title: `회전 ${d}°`, sub: d ? '웹캠을 돌려 달았을 때' : '' })),
+      (it) => Number(cur.rotate) === it.v, (it) => { cur.rotate = it.v; changed(false); });
+  }
+  function changed(reopen) {
+    renderOpts();
+    renderState();
+    if (reopen) openCamera();
+  }
+
+  // ---------- 카메라 ----------
+  function stopCamera() {
+    stream?.getTracks().forEach((t) => t.stop());
+    stream = null;
+    video.srcObject = null;
+  }
+  async function listCameras() {
+    try { cams = (await md.enumerateDevices()).filter((d) => d.kind === 'videoinput'); }
+    catch (e) { cams = []; log(`카메라 목록을 못 읽음: ${e.name}`); }
+    return cams;
+  }
+  async function readPerm() {
+    try {
+      const p = await navigator.permissions.query({ name: 'camera' });
+      perm = { granted: '허용', denied: '거부', prompt: '아직 안 물어봄' }[p.state] || p.state;
+      p.onchange = () => { readPerm().then(renderState); };
+    } catch { perm = '확인 불가 (이 브라우저는 조회를 지원 안 함)'; }
+  }
+  function playWithTimeout(ms) {
+    return Promise.race([video.play(), sleep(ms).then(() => { throw Object.assign(new Error('stall'), { name: 'StallTimeout' }); })]);
+  }
+  async function openCamera() {
+    const my = ++gen;
+    stopCamera();
+    lastError = '';
+    $('cs-msg').hidden = false;
+    $('cs-msg').textContent = '카메라 여는 중…';
+    renderState();
+    if (!md?.getUserMedia) { $('cs-msg').textContent = window.isSecureContext ? '이 브라우저는 카메라를 지원하지 않아요' : ERR.SecurityError; return; }
+    await sleep(250); // 갤탭: 앞 카메라를 놓을 시간을 준다 (바로 열면 NotReadableError 가 잦다)
+    if (my !== gen) return;
+    const c = videoConstraints(cur);
+    if (cur.deviceId) c.deviceId = { exact: cur.deviceId }; // 설정 화면에서는 고른 카메라만 (다른 카메라로 대신 켜지면 헷갈린다)
+    log(`열기: ${cur.deviceId ? (cur.label || cur.deviceId.slice(0, 8)) : '자동'} · ${JSON.stringify(c)}`);
+    let s;
+    try {
+      s = await md.getUserMedia({ video: c, audio: false });
+      if (my !== gen) { s.getTracks().forEach((t) => t.stop()); return; }
+      // 자동: 외장 웹캠이 보이면 그쪽으로 바꾼다 (거울 화면 lip-camera.js 와 같은 규칙)
+      if (!cur.deviceId) {
+        await listCameras();
+        const ext = cams.find((d) => d.deviceId && isExternalCamera(d.label));
+        const now = s.getVideoTracks()[0]?.getSettings().deviceId;
+        if (ext && ext.deviceId !== now) {
+          log(`자동: 외장 웹캠으로 바꿈 → ${ext.label}`);
+          s.getTracks().forEach((t) => t.stop());
+          await sleep(250);
+          const c2 = { ...c, deviceId: { exact: ext.deviceId } };
+          delete c2.facingMode;
+          s = await md.getUserMedia({ video: c2, audio: false });
+          if (my !== gen) { s.getTracks().forEach((t) => t.stop()); return; }
+        }
+      }
+    } catch (e) {
+      if (my !== gen) return;
+      lastError = errText(e);
+      log(`실패: ${e.name} ${e.message || ''}`);
+      $('cs-msg').textContent = lastError;
+      await afterChange();
+      return;
+    }
+    stream = s;
+    const tr = s.getVideoTracks()[0];
+    tr?.addEventListener('ended', () => {
+      if (stream !== s) return;
+      log('카메라 연결이 끊김 (USB 분리?)');
+      lastError = '카메라 연결이 끊겼어요. 다시 꽂으면 저절로 연결해요';
+      stopCamera();
+      $('cs-msg').hidden = false;
+      $('cs-msg').textContent = lastError;
+      renderState();
+    });
+    video.srcObject = s;
+    try { await playWithTimeout(5000); }
+    catch (e) {
+      if (my !== gen) return;
+      lastError = errText(e);
+      log(`재생 실패: ${e.name}`);
+      stopCamera();
+      $('cs-msg').textContent = lastError;
+      await afterChange();
+      return;
+    }
+    if (my !== gen) return;
+    const st = tr.getSettings();
+    log(`연결됨: ${tr.label} · ${st.width}×${st.height} · 요청 프레임 ${st.frameRate ? Math.round(st.frameRate) : '?'}`);
+    $('cs-msg').hidden = true;
+    await afterChange();
+  }
+  async function afterChange() {
+    await listCameras();
+    await readPerm();
+    renderOpts();
+    renderState();
+  }
+
+  // 미리보기 그리기: 거울 화면과 같은 반전·회전
+  function draw() {
+    requestAnimationFrame(draw);
+    if (!stream || video.readyState < 2 || !video.videoWidth) return;
+    const w = video.videoWidth, h = video.videoHeight;
+    const rot = ((Number(cur.rotate) || 0) % 360 + 360) % 360;
+    const swap = rot === 90 || rot === 270;
+    const cw = swap ? h : w, ch = swap ? w : h;
+    if (view.width !== cw || view.height !== ch) { view.width = cw; view.height = ch; }
+    vctx.save();
+    vctx.translate(cw / 2, ch / 2);
+    vctx.rotate((rot * Math.PI) / 180);
+    if (cur.mirror) vctx.scale(-1, 1);
+    vctx.drawImage(video, -w / 2, -h / 2, w, h);
+    vctx.restore();
+  }
+  requestAnimationFrame(draw);
+  if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+    const onFrame = () => { frames++; video.requestVideoFrameCallback(onFrame); };
+    video.requestVideoFrameCallback(onFrame);
+  }
+  setInterval(() => {
+    const now = performance.now();
+    const q = 'requestVideoFrameCallback' in HTMLVideoElement.prototype ? frames : (video.getVideoPlaybackQuality?.().totalVideoFrames || 0);
+    fpsSeen = Math.max(0, Math.round((q - lastQ) * 1000 / (now - fpsT)));
+    lastQ = q;
+    fpsT = now;
+    const stalled = !!stream && fpsSeen === 0 && !busy && video.readyState >= 2;
+    if (stalled && !wasStalled) log('화면이 멈췄어요 (1초 동안 새 프레임 없음)');
+    else if (!stalled && wasStalled && stream) log('화면이 다시 들어와요');
+    wasStalled = stalled;
+    if (!busy) renderState();
+  }, 1000);
+
+  // 웹캠을 꽂거나 뽑으면 목록을 새로 읽고, 끊겨 있었으면 다시 연다
+  md?.addEventListener?.('devicechange', async () => {
+    if (busy) return;
+    const before = cams.length;
+    await listCameras();
+    log(`카메라 목록 바뀜: ${before}대 → ${cams.length}대`);
+    renderOpts();
+    renderState();
+    if (!stream && cams.length) openCamera();
+  });
+
+  // 모든 카메라 시험: 카메라마다 지금 고른 해상도로 열어 실제로 화면이 오는지
+  async function testAll() {
+    if (busy) return;
+    busy = true;
+    $('cs-testall').disabled = true;
+    gen++;
+    stopCamera();
+    $('cs-msg').hidden = false;
+    await listCameras();
+    log(`── 모든 카메라 시험 시작 (${cams.length}대, ${CAM_RES[cur.res]?.join('×')}) ──`);
+    for (const [i, d] of cams.entries()) {
+      $('cs-msg').textContent = `시험 중 ${i + 1}/${cams.length}: ${camName(d, i)}`;
+      const c = videoConstraints({ ...cur, deviceId: d.deviceId });
+      c.deviceId = { exact: d.deviceId };
+      let s = null;
+      try {
+        await sleep(400);
+        s = await md.getUserMedia({ video: c, audio: false });
+        video.srcObject = s;
+        await playWithTimeout(4000);
+        const st = s.getVideoTracks()[0].getSettings();
+        log(`  ✓ ${camName(d, i)} → ${st.width}×${st.height}${isExternalCamera(d.label) ? ' (외장)' : ''}`);
+      } catch (e) {
+        log(`  ✗ ${camName(d, i)} → ${errText(e)}`);
+      } finally {
+        s?.getTracks().forEach((t) => t.stop());
+        video.srcObject = null;
+      }
+    }
+    log('── 시험 끝 ──');
+    busy = false;
+    $('cs-testall').disabled = false;
+    toast('시험이 끝났어요. 아래 진단 기록을 확인해 주세요');
+    openCamera();
+  }
+
+  // ---------- 버튼 ----------
+  $('cs-back').addEventListener('click', () => {
+    if (!same(saved, cur) && !confirm('바꾼 값을 저장하지 않았어요. 그냥 나갈까요?')) return;
+    location.href = 'admin.html';
+  });
+  $('cs-refresh').addEventListener('click', async () => {
+    log('카메라 다시 찾기');
+    await afterChange();
+    toast(`카메라 ${cams.length}대를 찾았어요`);
+    openCamera();
+  });
+  $('cs-testall').addEventListener('click', testAll);
+  $('cs-save').addEventListener('click', () => {
+    if (!saveCamSettings(cur)) { toast('이 브라우저에 저장할 수 없어요 (시크릿 창인지 확인)'); return; }
+    saved = getCamSettings();
+    log(`저장: ${JSON.stringify(saved)}`);
+    toast('저장했어요. 거울 화면에 바로 적용돼요');
+    renderState();
+  });
+  $('cs-reset').addEventListener('click', () => {
+    cur = { ...CAM_DEFAULTS };
+    log('처음 값으로 (저장은 아직)');
+    changed(true);
+  });
+  $('cs-mirror-go').addEventListener('click', () => {
+    if (!same(saved, cur) && !confirm('바꾼 값을 저장하지 않았어요. 저장하지 않고 거울 화면으로 갈까요?')) return;
+    location.href = 'index.html';
+  });
+  $('cs-copy').addEventListener('click', async () => {
+    const text = [`[툭 웹캠 진단] ${new Date().toLocaleString('ko-KR')}`, navigator.userAgent,
+      ...[...$('cs-state').children].reduce((a, el, i, arr) => (i % 2 ? a : [...a, `${el.textContent}: ${arr[i + 1]?.textContent || ''}`]), []),
+      '카메라 목록:', ...cams.map((d, i) => `  ${i + 1}. ${d.label || '(이름 없음)'}${isExternalCamera(d.label) ? ' [외장]' : ''}`),
+      '기록:', ...logLines].join('\n');
+    try { await navigator.clipboard.writeText(text); toast('진단 기록을 복사했어요. Claude 에게 붙여 넣어 주세요'); }
+    catch { const ta = $('cs-log'); ta.value = text; ta.select(); toast('아래 글을 길게 눌러 복사해 주세요'); }
+  });
+  $('cs-clearlog').addEventListener('click', () => { logLines.length = 0; $('cs-log').value = ''; });
+  window.addEventListener('pagehide', () => { gen++; stopCamera(); });
+
+  // ---------- 시작 ----------
+  log(`시작 · ${navigator.userAgent}`);
+  (async () => {
+    await afterChange();
+    log(`찾은 카메라 ${cams.length}대: ${cams.map((d, i) => camName(d, i)).join(' / ') || '없음'}`);
+    await openCamera();
+  })();
+</script>
+</body>
+</html>
