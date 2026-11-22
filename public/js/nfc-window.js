@@ -1,10 +1,10 @@
-// NFC 태그 시트 (2026-11-18 "창이 3개: 거울(팔레트) · 챗봇 · NFC 태깅", 2026-11-19 다시 설계).
+// NFC 태그 시트 (2026-11-18, 2026-11-19 다시 설계).
 // 손님은 이미 실물 립을 들고 와서 태그한다 → 색을 크게 보여 줄 필요가 없다. 실물만으로 못 하는 것을 한다:
 //   1) 바로 내 입술에: 태그하는 순간 거울을 가리지 않고 그 제품 색을 입술에 바른다 (palette.js onWear)
 //   2) 들고 있는 호수 찾기·다른 호수 입어 보기: 리더기는 태그 번호만 읽어서 '어떤 제품'까지만 알고 '몇 호'인지는 모른다.
 //      그래서 아래 시트에 그 제품의 실제 호수(/api/shades, 올리브영 호수 데이터)를 줄로 보여 주고, 누를 때마다 입술 색이 바뀐다.
 //      바코드 번호를 써 둔 태그처럼 호수까지 알면 그 호수를 골라 둔다. 호수 데이터가 없으면 대표 색만 바르고 그렇게 알린다
-//   3) 정보와 다음 단계: 사진·브랜드·이름·제형·가격, [이 색과 비슷한 립 보기](거울의 추천 제품) · [챗봇에게 물어보기]
+//   3) 정보와 다음 단계: 사진·브랜드·이름·제형·가격, [이 색과 비슷한 립 보기](거울의 추천 제품)
 // 시트는 화면 아래(다이얼 자리, y 900~)만 덮어 얼굴·입술은 그대로 보인다. 메뉴 버튼은 없고 태그할 때만 올라온다.
 // 등록되지 않은 태그는 제품을 지어내지 않고 작은 안내만 띄웠다가 내려간다(앞서 보던 제품이 있으면 그 제품으로 돌아간다).
 // 방금 태그한 립(최근 3개)은 sessionStorage(store 'nfcShelf') → 자동 초기화·처음으로 때 함께 지워진다. 호수 색·제품 사진은 실제 색
@@ -21,10 +21,10 @@ const lineOf = (p) => p.line || p.id; // 호수 상품(OY-…-01)이면 그 제�
 
 /**
  * NFC 시트 만들기. stage = 팔레트 900×1440 무대.
- * onWear(p): 그 색을 입술에 바르기 · onSimilar(): 지금 색과 비슷한 립(거울 추천 제품) · onAsk(p): 챗봇에게 물어보기 · onOpen(): 시트가 올라올 때
+ * onWear(p): 그 색을 입술에 바르기 · onSimilar(): 지금 색과 비슷한 립(거울 추천 제품) · onOpen(): 시트가 올라올 때
  * onTake(p): 가져가기 화면 (고른 호수, 2026-11-19 진입 흐름의 마지막 화면)
  */
-export function createNfcWindow({ stage, onWear, onSimilar, onAsk, onOpen, onTake }) {
+export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   let shelf = (store.get(SHELF_KEY) || []).filter((p) => p && p.id && p.color_hex).slice(-SHELF_MAX);
   let current = null; // 태그한 제품
   let picked = null; // 입술에 바른 호수 (null = 대표 색)
@@ -49,7 +49,6 @@ export function createNfcWindow({ stage, onWear, onSimilar, onAsk, onOpen, onTak
 
   const actions = el('div', { class: 'nt-actions' },
     el('button', { type: 'button', class: 'nt-btn', onclick: () => { api_.close(); onSimilar(); } }, t('nw.similar')),
-    onAsk ? el('button', { type: 'button', class: 'nt-btn', onclick: () => { const x = picked || current; api_.close(); onAsk(x); } }, t('nw.ask')) : null, // onAsk 가 없으면 버튼도 없다
     onTake ? el('button', { type: 'button', class: 'nt-btn nt-btn-pink', onclick: () => { const x = picked || current; api_.close(); onTake(x); } }, t('nw.take')) : null);
 
   const unknown = el('div', { class: 'nt-unknown' },

@@ -31,11 +31,6 @@ async function shot(file, label, group, path, { lang = 'ko', theme = 'light', wa
   await ctx.close();
 }
 const clickText = (t) => async (pg) => { await pg.getByRole('button', { name: t }).first().click(); };
-const say = (text) => async (pg) => {
-  await pg.locator('#chat-input').evaluate((el, v) => { el.value = v; }, text);
-  await pg.locator('#chat-form').evaluate((f) => f.requestSubmit());
-  await pg.waitForTimeout(3500);
-};
 
 // 1. 홈
 await shot('01-home-standby.png', '홈 · 대기 화면', '홈', 'index.html', { note: '제품 태그 또는 터치 대기' });
@@ -56,13 +51,7 @@ await shot('14-palette-recommend.png', '팔레트 · 비슷한 제품 추천', '
 } });
 await shot('15-palette-dark.png', '팔레트 · 다크 모드', '팔레트', 'palette.html', { theme: 'dark', wait: 3000, act: async (pg) => { await pg.locator('#use-avatar').click(); } });
 await shot('16-palette-en.png', '팔레트 · 영어', '팔레트', 'palette.html', { lang: 'en', wait: 3000, act: async (pg) => { await pg.locator('#use-avatar').click(); } });
-// 3. 챗봇
-await shot('20-chat-welcome.png', '챗봇 · 첫 화면', '챗봇', 'chat.html');
-await shot('21-chat-answer.png', '챗봇 · 추천 답변', '챗봇', 'chat.html', { act: say('2만원 이하 글로시한 코랄') });
-await shot('22-chat-unknown.png', '챗봇 · 못 알아들은 말', '챗봇', 'chat.html', { act: say('asdfqwer') });
-await shot('23-chat-dark.png', '챗봇 · 다크 모드', '챗봇', 'chat.html', { theme: 'dark', act: say('데일리 립 추천해 줘') });
-await shot('24-chat-en.png', '챗봇 · 영어', '챗봇', 'chat.html', { lang: 'en', act: say('glossy coral under 20000 won') });
-// 4. 제품·추천·호수
+// 3. 제품·추천·호수
 await shot('30-product.png', '제품 상세', '제품', 'product.html?id=OY-A000001001860', { full: true });
 await shot('31-product-notfound.png', '제품 상세 · 없는 제품', '제품', 'product.html?id=zzz');
 await shot('32-recommend.png', '색상 기반 추천', '제품', 'recommend.html?hex=%23CE322F', { full: true });
@@ -71,7 +60,6 @@ await shot('34-shades.png', '호수 안내', '제품', 'shades.html?id=D001');
 await shot('35-shades-empty.png', '호수 안내 · 정보 없음', '제품', 'shades.html');
 // 5. 기타 화면
 await shot('40-lip-together.png', '립 컬러 매핑 (lip-together)', '기타', 'lip-together.html', { wait: 4000, full: true });
-await shot('41-studio.png', '합본 (studio) · 링크 없음', '기타', 'studio.html', { wait: 4000 });
 await shot('42-calib.png', '터치 보정 (calib)', '기타', 'calib.html');
 await shot('43-preview.png', '거울 미리보기 (preview)', '기타', 'preview.html', { wait: 3000 });
 await shot('44-kiosk.png', '키오스크 틀 (kiosk)', '기타', 'kiosk.html?page=index.html', { wait: 3000 });

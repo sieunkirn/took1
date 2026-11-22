@@ -1,91 +1,30 @@
-/* 어두운 화면(챗봇·제품 상세·호수 안내·색상 추천, body.tui-mood) 색 통일 (2026-11-20 사용자 요청 "그라데이션이 너무 AI 같고 못생김, 전체 색 깔끔하게 통일", 다크 메신저 레퍼런스).
+/* 어두운 화면(제품 상세·호수 안내·색상 추천, body.tui-mood) 색 통일 (2026-11-20 사용자 요청 "그라데이션이 너무 AI 같고 못생김, 전체 색 깔끔하게 통일", 다크 메신저 레퍼런스).
    그라데이션·빛 번짐·유리 테두리를 빼고 단색 몇 개만 쓴다:
-     바탕 #0b0b0c · 면(봇 말풍선·버튼·카드) #1e1e21 · 눌림 #2a2a2e · 선 #2e2e33 · 흐린 글 #9b9ba1
-     강조(손님 말풍선·주 버튼·점·밑줄) = TOOK 핑크 #FF007B 한 가지 (눌림 #D60067)
-   chat.html·product.html·shades.html·recommend.html 에서 다른 CSS 뒤에 읽는다 (같은 규칙을 덮는다). 왼쪽 세로 메뉴(거울과 같은 유리 알약)와 제품 사진·립 색은 그대로 */
+     바탕 #0b0b0c · 면(버튼·카드) #1e1e21 · 눌림 #2a2a2e · 선 #2e2e33 · 흐린 글 #9b9ba1
+     강조(주 버튼·점·밑줄) = TOOK 핑크 #FF007B 한 가지 (눌림 #D60067)
+   product.html·shades.html·recommend.html 에서 다른 CSS 뒤에 읽는다 (같은 규칙을 덮는다). 왼쪽 세로 메뉴(거울과 같은 유리 알약)와 제품 사진·립 색은 그대로 */
 body.tui-mood {
   --f-bg: #0b0b0c; --f-surface: #1e1e21; --f-press: #2a2a2e; --f-line: #2e2e33; --f-mute: #9b9ba1;
   --f-accent: #ff007b; --f-accent-press: #d60067; --f-accent-ink: #ff007b; /* TOOK 핑크 (README '색', 2026-11-20) */
   --cs-hl: rgba(255, 0, 123, 0.3);
 }
-body.tui-mood, body.tui-mood main.fit.chat-user, html:not(.in-chat-modal) body.tui-mood main.fit.chat-user { background: var(--f-bg); }
+body.tui-mood { background: var(--f-bg); }
 
 /* 버튼: 모두 단색 면 + 얇은 선, 그림자 없음 */
-body.tui-mood main button:not(.tkb-key):not(.pc-arrow):not(.cm-mb),
-body.tui-mood main button:not(.tkb-key):not(.pc-arrow):not(.cm-mb):hover:not(:disabled),
-body.tui-mood .chat-head button, body.tui-mood .chat-head button:hover:not(:disabled),
-body.tui-mood .chat-modal-close, body.tui-mood .chat-modal-close:hover:not(:disabled) {
+body.tui-mood main button:not(.tkb-key):not(.pc-arrow):not(.cm-mb), body.tui-mood main button:not(.tkb-key):not(.pc-arrow):not(.cm-mb):hover:not(:disabled) {
   background: var(--f-surface); border: 1px solid var(--f-line); box-shadow: none; filter: none; color: #fff; }
 body.tui-mood main button:not(.tkb-key):not(.pc-arrow):not(.cm-mb):active { background: var(--f-press); }
 
-/* 말풍선: 봇 = 면, 손님 = 강조 한 가지. 테두리·흐림·빛 없음 */
-body.tui-mood .chat-log .bubble { background: var(--f-surface); border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 20px 20px 20px 6px; }
-body.tui-mood .chat-log .bubble.user { background: var(--f-accent); border: 0; box-shadow: none; border-radius: 20px 20px 6px 20px; }
-body.tui-mood .chat-log .who { color: var(--f-mute); }
-body.tui-mood .chat-log .user .who { color: rgba(255, 255, 255, 0.7); }
-
 /* 제품 카드 */
-body.tui-mood .card, body.tui-mood .card.mini { background: #161618; border: 1px solid var(--f-line); box-shadow: none; }
+body.tui-mood .card { background: #161618; border: 1px solid var(--f-line); box-shadow: none; }
 body.tui-mood .card .actions button[aria-pressed="true"] { background: var(--f-accent); border-color: var(--f-accent); box-shadow: none; }
 
-/* 빠른 답장 줄: 모두 같은 칩, '답하며 고르기'만 강조 단색 */
-#qr-bar .qr-chip, #qr-bar .qr-chip:hover:not(:disabled) { background: var(--f-surface); border: 1px solid var(--f-line); box-shadow: none; color: #eee; }
-#qr-bar .qr-chip:active { background: var(--f-press); }
-#qr-bar .qr-act { border-color: var(--f-line); }
-#qr-bar .qr-act .qr-ico { color: var(--f-accent-ink); }
-#qr-bar .qr-guide, #qr-bar .qr-guide:hover:not(:disabled) { background: var(--f-accent); border-color: var(--f-accent); color: #fff; }
-#qr-bar .qr-guide:active { background: var(--f-accent-press); }
-#qr-bar .qr-guide.qr-strong { box-shadow: none; animation: none; }
-
-/* 답하며 고르기 카드 */
-:is(#chat-log, #cs-top) .gd-dots i.on { background: var(--f-accent-ink); }
-:is(#chat-log, #cs-top) .gd-slider { background: #161618; border-color: var(--f-line); }
-:is(#chat-log, #cs-top) .gd-cta, :is(#chat-log, #cs-top) .gd-cta:hover:not(:disabled) { background: var(--f-accent); border: 0; color: #fff; box-shadow: none; }
-:is(#chat-log, #cs-top) .gd-cta:active { background: var(--f-accent-press); }
-:is(#chat-log, #cs-top) .gd-pr-bar { background: var(--f-press); }
-:is(#chat-log, #cs-top) .gd-pr-fill { background: var(--f-accent-ink); box-shadow: none; }
-:is(#chat-log, #cs-top) .gd-prange .gd-range { --track: transparent; }
-:is(#chat-log, #cs-top) .gd-price .gd-range:not(.gd-pr-lo):not(.gd-pr-hi) { --track: var(--f-press); }
-
-/* 시작 화면 예시 질문 */
-#cs-top .cs-use, #cs-top .cs-use:hover:not(:disabled) { background: var(--f-accent); filter: none; }
-#cs-top .cs-dot.on { background: var(--f-accent-ink); }
-
-/* 입력창·보내기 */
-body.tui-mood #chat-form.chat-input { border: 1px solid var(--f-line); background: var(--f-surface); box-shadow: none; }
-body.tui-mood #chat-form.chat-input:focus-within { border-color: #55555c; background: var(--f-surface); box-shadow: none; }
-body.tui-mood #chat-form #chat-send.cs-send { background: var(--f-accent); box-shadow: none; }
-body.tui-mood #chat-form #chat-send.cs-send:disabled { background: transparent; }
-
 /* 화면 키보드 */
-body.tui-mood .tkb-enter, html:not(.in-chat-modal) body.tui-mood .chat-user .tkb-row-bottom .tkb-enter { background: var(--f-accent); border-color: var(--f-accent); box-shadow: none; }
+body.tui-mood .tkb-enter { background: var(--f-accent); border-color: var(--f-accent); box-shadow: none; }
 body.tui-mood .tkb-enter:active { background: var(--f-accent-press); }
 
 /* 그 밖의 분홍 */
 body.tui-mood .msg { border-left-color: var(--f-accent-ink); }
-body.tui-mood .chat-fab-badge { background: var(--f-accent); }
+
 body.tui-mood ::selection { background: var(--f-accent); }
 
-/* 챗봇 말풍선 제품 카드의 '바르러 가기' (2026-11-20, js/chat-view.js productMini): 카드 아래 꽉 찬 핑크 단색 버튼.
-   위의 어두운 공통 버튼 규칙(body.tui-mood main button:not(...))을 이기도록 같은 세기로 쓰고 뒤에 둔다 */
-body.tui-mood main .card.mini button.wear-btn, .card.mini .wear-btn { margin-top: auto; /* 카드 맨 아래에 붙여 한 줄의 버튼 높이를 맞춘다 (2026-11-20) */ width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-radius: 12px;
-  background: var(--f-accent, #ff007b); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
-body.tui-mood main .card.mini button.wear-btn:hover:not(:disabled) { background: var(--f-accent, #ff007b); color: #fff; }
-body.tui-mood main .card.mini button.wear-btn:active:not(:disabled), .card.mini .wear-btn:active { background: var(--f-accent-press, #d60067); }
-
-/* ---------- 전체 화면 챗봇 상단 (2026-11-20 사용자 디자인) ----------
-   왼쪽 위 뒤로 동그라미(64px, x 49 · y 54) · 가운데 로고 · 'Beauty Chat' · 회색 부제 · 그 아래 한 줄: 왼쪽 분홍 'TOOK AI' / 오른쪽 회색 'BEAUTY ASSISTANT'.
-   id 로 써서 위의 공통 버튼 규칙과 took-mood.css 의 '.cs-back 숨김'보다 앞선다. 모달 안 챗봇은 모달 머리를 쓰므로 그대로 숨긴다 */
-html:not(.in-chat-modal) body.tui-mood #chat-back { position: fixed; left: 49px; top: 54px; z-index: 30; display: grid; place-items: center;
-  width: 64px; height: 64px; min-height: 0; padding: 0; border-radius: 50%; border: 1px solid var(--f-line); background: #121212; box-shadow: none; cursor: pointer; }
-html:not(.in-chat-modal) body.tui-mood #chat-back:active { background: var(--f-press); }
-html:not(.in-chat-modal) body.tui-mood #chat-back img { width: 28px; height: 28px; }
-html:not(.in-chat-modal) body.tui-mood .chat-head { height: auto; }
-html:not(.in-chat-modal) body.tui-mood .chat-head strong { margin-top: 4px; font-size: 32px; line-height: 44px; font-weight: 700; }
-html:not(.in-chat-modal) body.tui-mood .chat-head .chat-sub { margin-top: 14px; font-size: 21px; color: #b4b4ba; }
-.chat-tag { display: none; }
-html:not(.in-chat-modal) body.tui-mood .chat-tag { display: flex; justify-content: space-between; align-items: baseline; margin: 50px 26px 18px 38px; }
-/* 첫 화면(대화 전, body.cs-on)에는 없다: 부제 바로 아래 "어떤 이야기를 나눠볼까요?" (2026-11-20 사용자 디자인). 대화가 시작되면 보인다 */
-html:not(.in-chat-modal) body.tui-mood.cs-on .chat-tag { display: none; }
-.chat-tag .ct-ai { color: var(--f-accent, #ff007b); font-size: 19px; font-weight: 700; letter-spacing: 0.02em; }
-.chat-tag .ct-sub { color: #b4b4ba; font-size: 16px; font-weight: 400; letter-spacing: 0.04em; }

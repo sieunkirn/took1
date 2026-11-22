@@ -6,7 +6,7 @@
 //  1 제품 장면(3.45~4.95초) + 가운데 로고. 1.5초 뒤(또는 누르면) 2로
 //  2 입술 영상 + 같은 로고. 1.5초 뒤(또는 누르면) 3으로
 //  3 2번 + 로고 아래 "Tap The Screen". 입술 영상 반복. 누르면 4번으로 (2026-11-21 사용자 요청)
-//  4 (2026-11-21 Figma GP 1667:704) 로고가 위로 올라가고 알약 버튼 3개가 세로로: 1 스캔 = 거울 · 2 음성 = 챗봇 · 3 NFC = 거울에서 태그 기다리기
+//  4 (2026-11-21 Figma GP 1667:704) 로고가 위로 올라가고 알약 버튼이 세로로: 1 스캔 = 거울 · 2 NFC = 거울에서 태그 기다리기 (가운데 음성 = 챗봇 버튼은 2026-11-22 챗봇과 함께 삭제)
 // 예전 홈(점선 얼굴·시계·버튼 두 개·다크 모드·언어 버튼)은 프로토타입에 없어 뺐다 (git 기록 a840e68 에 있음)
 import { store } from './common.js';
 import { t, lang, langToggle } from './i18n.js';
@@ -25,7 +25,6 @@ stage.innerHTML = `<video class="hs-video" src="videos/home.mp4" autoplay muted 
   <p class="hs-tap" aria-hidden="true">Tap The Screen</p>
   <nav class="hs-menu">
     <button type="button" class="hs-mb hs-mb-mirror" data-go="scan"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-scan.svg" width="36.0482" height="34.8636" alt="" draggable="false"></button>
-    <button type="button" class="hs-mb hs-mb-chat" data-go="voice"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-wave.svg" width="59.0845" height="32.459" alt="" draggable="false"></button>
     <button type="button" class="hs-mb hs-mb-nfc" data-go="nfc"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-nfc.svg" width="33.0483" height="31.8636" alt="" draggable="false"></button>
   </nav>
   <p class="sr-only" id="hs-help"></p>`;
@@ -34,7 +33,6 @@ const video = stage.querySelector('.hs-video');
 const menu = stage.querySelector('.hs-menu');
 menu.setAttribute('aria-label', t('home.choose'));
 stage.querySelector('.hs-mb-mirror').setAttribute('aria-label', t('home.toPalette'));
-stage.querySelector('.hs-mb-chat').setAttribute('aria-label', t('home.toChat'));
 stage.querySelector('.hs-mb-nfc').setAttribute('aria-label', t('home.toTag'));
 stage.querySelector('#hs-help').textContent = t('home.tapToStart');
 
@@ -93,7 +91,7 @@ document.addEventListener('keydown', (e) => {
   if ((e.key === 'Enter' || e.key === ' ') && step < 4) { e.preventDefault(); next(); }
 });
 
-// ---------- 4번 버튼 3개 (2026-11-21): 1 거울 · 2 챗봇 · 3 NFC ----------
+// ---------- 4번 버튼 (2026-11-21, 챗봇 버튼은 2026-11-22 삭제): 1 거울 · 2 NFC ----------
 // 톡 누르거나, 손잡이를 오른쪽으로 끌어서 연다 (스위치). 끝까지의 60% 넘게 끌고 놓으면 열리고, 덜 끌면 제자리로 돌아간다
 const KNOB_RUN = 153.48; // 손잡이가 움직이는 거리 (무대 px, took-ui.css .hs-mb.is-on 과 같은 값)
 const OPEN_AT = 0.6;
@@ -156,13 +154,8 @@ listenNfc((code) => {
 // 팔레트: 로고가 Find Your Color 화면 왼쪽 위 작은 로고 자리로 줄어들며 날아가고, 나머지는 사라진다
 const SMALL_LOGO = { left: 354.33, top: 66.31, k: 190 / 612 }; // palette 화면의 로고 (GP-홈화면 2026-11-18: 위 가운데 x 354.33~544.33, y 66.31~110.85)
 function start(where) {
-  // 3번 NFC: 거울로 가서 태그를 기다린다 (팔레트가 took.nfcWait 를 보고 '제품을 태그해 주세요' 안내를 띄움)
+  // NFC: 거울로 가서 태그를 기다린다 (팔레트가 took.nfcWait 를 보고 '제품을 태그해 주세요' 안내를 띄움)
   if (where === 'nfc') { try { sessionStorage.setItem('took.nfcWait', '1'); } catch { /* 저장 불가 환경 */ } }
-  if (where === 'voice') {
-    store.remove('navCurrent.chat.html');
-    location.href = 'chat.html';
-    return;
-  }
   store.remove('navCurrent.palette.html');
   try { sessionStorage.setItem('took.enterFx', '1'); } catch { /* 저장 불가 환경: 팔레트는 그냥 열린다 */ }
   if (reduce) { location.href = 'palette.html'; return; }

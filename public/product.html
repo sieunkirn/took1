@@ -30,21 +30,20 @@
     <div class="label" data-i18n="detail.actions">연결 기능</div>
     <div class="row">
       <button type="button" id="back" data-i18n="detail.back">이전 화면으로</button>
-      <button type="button" id="to-chat" data-i18n="detail.toChat">이 제품으로 챗봇에 질문하기</button>
       <button type="button" id="to-similar" data-i18n="detail.toSimilar">비슷한 색상 제품 보기</button>
       <a href="index.html" data-i18n="detail.home">홈으로 돌아가기</a>
     </div>
   </section>
 </main>
 <script type="module">
-  import { renderNav, api, qs, go, store, productDetailTable, el, shadePicker } from './js/common.js';
+  import { renderNav, api, qs, go, productDetailTable, el, shadePicker } from './js/common.js';
   import { t } from './js/i18n.js';
   renderNav();
   const id = qs('id');
   const from = qs('from');
   const info = document.getElementById('product-info');
-  const buttons = ['to-chat', 'to-similar'].map((x) => document.getElementById(x));
-  const backTargets = { 'lip-together': 'lip-together.html', recommend: 'recommend.html', chat: 'chat.html' };
+  const buttons = ['to-similar'].map((x) => document.getElementById(x));
+  const backTargets = { 'lip-together': 'lip-together.html', recommend: 'recommend.html' };
   document.getElementById('back').addEventListener('click', () => {
     if (backTargets[from]) location.href = backTargets[from];
     else if (history.length > 1) history.back();
@@ -58,17 +57,13 @@
   } else {
     let p = body.product;
     // 호수 데이터가 있는 제품(또는 그 호수): 정보 표 아래에서 호수를 펼쳐 고른다 (따로 창으로 가지 않는다).
-    // 고르면 정보 표와 '챗봇에 질문'·'비슷한 색상' 버튼이 그 호수 기준으로 바뀐다
+    // 고르면 정보 표와 '비슷한 색상' 버튼이 그 호수 기준으로 바뀐다
     const picker = p.shade_count > 1
       ? shadePicker(p, { onSelect: (s) => { p = s; info.replaceChildren(productDetailTable(p), picker); } })
       : null;
     if (picker) picker.classList.add('opt-detail');
     info.replaceChildren(productDetailTable(p), picker || '');
     buttons[0].addEventListener('click', () => {
-      store.set('chatBaseId', p.id);
-      go('chat.html', { base: p.id });
-    });
-    buttons[1].addEventListener('click', () => {
       go('recommend.html', { hex: p.color_hex, exclude: p.id, source: 'product' });
     });
   }

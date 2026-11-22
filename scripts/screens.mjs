@@ -13,12 +13,10 @@ mkdirSync(fileURLToPath(OUT), { recursive: true });
 const PAGES = [
   ['01-home', '/index.html'],
   ['02-palette', '/palette.html'],
-  ['03-chat', '/chat.html'],
   ['04-shades', '/shades.html'],
   ['05-recommend', '/recommend.html?hex=%23B3122E'],
   ['06-product', '/product.html?id=P001'],
   ['07-lip-together', '/lip-together.html'],
-  ['08-studio', '/studio.html'],
   // ['09-preview', '/preview.html', { width: 1440, height: 900 }], // 거울 화면 미리보기: 2026-11-13 주석 처리
   ['10-kiosk', '/kiosk.html'],
   ['11-calib', '/calib.html'],

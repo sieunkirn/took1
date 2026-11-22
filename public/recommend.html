@@ -35,13 +35,12 @@
   <section class="area">
     <div class="row">
       <button type="button" id="recolor" data-i18n="rec.recolor">다시 조색하기</button>
-      <button type="button" id="to-chat" data-i18n="rec.toChat">이 색상으로 챗봇에 질문하기</button>
       <a href="index.html" data-i18n="detail.home">홈으로 돌아가기</a>
     </div>
   </section>
 </main>
 <script type="module">
-  import { renderNav, api, qs, go, store, el, productCard, FINISH_LABELS } from './js/common.js';
+  import { renderNav, api, qs, store, el, productCard, FINISH_LABELS } from './js/common.js';
   import { t } from './js/i18n.js';
   import { normalizeHex } from './lib/color.js';
   renderNav();
@@ -79,7 +78,6 @@
   finishSel.addEventListener('change', load);
   limitSel.addEventListener('change', load);
   document.getElementById('recolor').addEventListener('click', () => { location.href = 'lip-together.html'; });
-  document.getElementById('to-chat').addEventListener('click', () => go('chat.html', { hex }));
   load();
 </script>
 </body>

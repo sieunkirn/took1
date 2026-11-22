@@ -12,10 +12,7 @@ export const REDUCE_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matc
 
 // ---------- 카드·말풍선 차례로 떠오르기 ----------
 const POP = '.card, .recent-row'; // 홈의 기능 카드·단계는 home.js 가 따로 움직인다
-// 대화창은 말할 때마다 통째로 다시 그려서, 말풍선마다 '처음 본 시각'을 기억해 새 말풍선만 떠오르게 한다
-const seenBubbles = new WeakMap(); // 대화창 → Map(말풍선 열쇠 → 처음 본 시각)
-const POP_MS = 500;
-let quietUntil = 0; // 화면을 처음 열 때 이전 대화를 복원하는 동안은 움직이지 않는다
+let quietUntil = 0; // 화면을 처음 열 때(이전 상태를 복원하는 동안)는 움직이지 않는다
 
 function pop(node, i) {
   node.style.setProperty('--i', String(Math.min(i, 8)));
@@ -23,29 +20,9 @@ function pop(node, i) {
 }
 
 function animateNew(root) {
-  // 대화창: 새로 늘어난 말풍선만 떠오르게 한다
-  for (const logEl of root.matches?.('.chat-log') ? [root] : root.querySelectorAll?.('.chat-log') || []) {
-    const seen = seenBubbles.get(logEl) || new Map();
-    seenBubbles.set(logEl, seen);
-    const now = performance.now();
-    let fresh = 0;
-    [...logEl.querySelectorAll(':scope > .bubble')].forEach((b, k) => {
-      const key = k + ':' + b.textContent.slice(0, 60);
-      const first = seen.get(key);
-      if (first === undefined) {
-        seen.set(key, now);
-        if (now > quietUntil) pop(b, fresh++);
-      } else if (now - first < POP_MS) {
-        // 움직이는 도중에 다시 그려졌으면 이어서 움직인다
-        pop(b, 0);
-        b.style.animationDelay = `${first - now}ms`;
-      }
-    });
-  }
   const items = root.matches?.(POP) ? [root] : [...(root.querySelectorAll?.(POP) || [])];
   const perParent = new Map();
   for (const item of items) {
-    if (item.closest('.chat-log')) continue; // 말풍선 안 카드는 말풍선과 함께 움직인다
     const n = perParent.get(item.parentNode) || 0;
     perParent.set(item.parentNode, n + 1);
     pop(item, n);
@@ -140,7 +117,6 @@ export function skeletonCards(n = 3) {
 
 // ---------- 시작 ----------
 function init() {
-  document.querySelectorAll('.studio-tabs').forEach((g) => segmented(g, 'aria-selected'));
   document.querySelectorAll('.seg').forEach((g) => segmented(g, 'aria-pressed'));
   quietUntil = performance.now() + 400;
   fillAllRanges();
@@ -148,7 +124,6 @@ function init() {
   animateNew(document.body);
   new MutationObserver((records) => {
     for (const r of records) {
-      if (r.type === 'childList' && r.target.classList?.contains('chat-log')) animateNew(r.target);
       for (const node of r.addedNodes) if (node.nodeType === 1 && !node.classList.contains('seg-thumb')) animateNew(node);
     }
   }).observe(document.body, { childList: true, subtree: true });

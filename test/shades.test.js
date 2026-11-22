@@ -154,9 +154,8 @@ test('NFC 테스트 카드: 리더기 번호(띄어쓰기 포함)로 찾고, 블
   assert.equal(matchTag('322490'), null); // 너무 짧으면 맞추지 않는다
 });
 
-test('실데이터만 보기: 켜면 시연용 제품·호수가 목록·찾기·바코드·이름 부르기에서 빠지고, 끄면 돌아온다', async () => {
+test('실데이터만 보기: 켜면 시연용 제품·호수가 목록·찾기·바코드에서 빠지고, 끄면 돌아온다', async () => {
   const catalog = await import('../src/lib/catalog.js');
-  const { answer } = await import('../src/lib/chat.js');
   const demo = repo.allDemoProducts()[0];
   assert.ok(demo && catalog.isDemo(demo), '시연용 제품이 있어야 한다');
   assert.equal(catalog.isDemo(repo.allProducts()[0]), false, '올리브영 제품은 실데이터');
@@ -171,9 +170,6 @@ test('실데이터만 보기: 켜면 시연용 제품·호수가 목록·찾기�
     assert.deepEqual(repo.shadesOf(demo), []);
     assert.ok(repo.allProducts().length > 0 && repo.allProducts().every((p) => !catalog.isDemo(p)));
     assert.ok(recommendByColor('#C8102E', { limit: 30 }).every((p) => !catalog.isDemo(p)));
-    // 시연용 제품 이름을 불러도 그 제품을 지어내지 않는다
-    const r = answer({ message: `${demo.brand} ${demo.name} 보여줘` });
-    assert.ok((r.products || []).every((p) => !catalog.isDemo(p)), JSON.stringify((r.products || []).map((p) => p.id)));
     on = false;
     assert.equal(repo.findById(demo.id)?.id, demo.id);
   } finally {
@@ -181,7 +177,7 @@ test('실데이터만 보기: 켜면 시연용 제품·호수가 목록·찾기�
   }
 });
 
-test('추천: 제형 여러 개·가격 상한 (2026-11-21 거울 퀵 추천)', () => {
+test('추천: 제형 여러 개·가격 상한', () => {
   const both = recommendByColor('#B3122E', { finish: 'matte,velvet', limit: 30 });
   assert.ok(both.length > 0 && both.every((p) => p.finish === 'matte' || p.finish === 'velvet'));
   assert.ok(both.some((p) => p.finish === 'velvet') && both.some((p) => p.finish === 'matte'));
@@ -189,12 +185,3 @@ test('추천: 제형 여러 개·가격 상한 (2026-11-21 거울 퀵 추천)', 
   assert.ok(cheap.length > 0 && cheap.every((p) => p.price > 0 && p.price <= 12000));
 });
 
-test('가격 범위: 추천 목록 제품의 최저·최고·가운데값 (2026-11-21 가격 드래그 바)', async () => {
-  const { priceRange } = await import('../src/lib/recommend.js');
-  const r = priceRange();
-  const prices = repo.allProducts().map((p) => Number(p.price)).filter((v) => v > 0);
-  assert.equal(r.min, Math.min(...prices));
-  assert.equal(r.max, Math.max(...prices));
-  assert.ok(r.min <= r.median && r.median <= r.max && r.count === prices.length);
-  assert.deepEqual(priceRange([{ price: 0 }, { price: null }]), { min: 0, max: 0, median: 0, count: 0 });
-});

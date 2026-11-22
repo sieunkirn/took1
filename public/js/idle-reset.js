@@ -43,8 +43,7 @@ export function setupIdleReset(custom = {}) {
   // 읽어주는 중이거나 듣는 중(마이크 버튼에 listening 표시)이면 손님이 아직 있다.
   // 다만 speechSynthesis.speaking 이 끝나지 않고 남는 브라우저가 있어, 이 이유로는 최대 60초만 미룬다
   const busy = () => {
-    const inFrame = [...document.querySelectorAll('iframe.chat-modal-frame')].some((f) => { try { return !!f.contentWindow.speechSynthesis?.speaking; } catch { return false; } });
-    const now = !!window.speechSynthesis?.speaking || inFrame || !!document.querySelector('.listening');
+    const now = !!window.speechSynthesis?.speaking || !!document.querySelector('.listening');
     if (!now) { busySince = 0; return false; }
     busySince ||= Date.now();
     return Date.now() - busySince < 60000;
@@ -138,8 +137,7 @@ export function setupIdleReset(custom = {}) {
     }, 1000);
   }
 
-  // took:activity = 챗봇 모달(iframe) 안에서 누른 것 (nav.js setupInModal)
-  for (const type of ['pointerdown', 'keydown', 'touchstart', 'wheel', 'input', 'took:activity']) {
+  for (const type of ['pointerdown', 'keydown', 'touchstart', 'wheel', 'input']) {
     window.addEventListener(type, () => { if (!dialog) schedule(); }, { capture: true, passive: true });
   }
   schedule();

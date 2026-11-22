@@ -9,7 +9,6 @@ export const view = $('view');
 export const viewCtx = view.getContext('2d', { willReadFrequently: true });
 
 export const INLINE = document.body.dataset.recommend === 'inline';
-export const STUDIO = document.body.dataset.layout === 'studio';
 export const PALETTE = document.body.dataset.layout === 'palette';
 export const MATCH_FRAMES = 15; // 피부색은 여러 프레임 평균으로 측정해 순간적인 빛 변화의 영향을 줄인다
 export const MATCH_TIMEOUT_MS = 6000;

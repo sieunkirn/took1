@@ -5,7 +5,7 @@
 //  4) 고른 호수의 재고 수량을 설명 아래에 보여 준다 (매대 위치 안내는 2026-11-11 삭제)
 //  5) '근처 매장 재고'를 누르면 가까운 매장 5곳의 재고와 추천 매장을 보여 준다 (store-stock.js, 시연용)
 // 호수·재고는 시연용 데이터(src/data/products.demo.json)다. 화면에 '시연용' 배지로 표시한다 (demo.js).
-// 주소 값: id(제품), from(돌아갈 곳: chat), try=1(이 색을 바로 발라 본다)
+// 주소 값: id(제품), try=1(이 색을 바로 발라 본다)
 import { $, renderNav, api, el, qs, won, toast } from './common.js';
 import { isEn, brandOf, nameOf, finishText, t as tr } from './i18n.js';
 import { shadeLabel, stockText } from './shade-label.js';
@@ -20,11 +20,9 @@ document.title = C('took(툭) - 호수 안내', 'took - Shade guide');
 $('sh-try').setAttribute('aria-label', C('입술에 발라 보기', 'Try on your lips'));
 $('sh-grid').setAttribute('aria-label', C('호수 목록', 'All shades'));
 
-const BACK = { chat: 'chat.html' };
-const from = qs('from');
 const backBtn = () => el('button', {
   type: 'button', class: 'sh-back', text: C('← 돌아가기', '← Back'),
-  onclick: () => { if (BACK[from]) location.href = BACK[from]; else if (history.length > 1) history.back(); else location.href = 'index.html'; },
+  onclick: () => { if (history.length > 1) history.back(); else location.href = 'index.html'; },
 });
 
 const lightness = (L) => (L >= 65 ? C('밝은 편', 'Light') : L >= 45 ? C('중간 밝기', 'Medium') : C('진한 편', 'Deep'));

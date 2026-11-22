@@ -5,7 +5,7 @@ import { FINISH_TO_TEXTURE } from './lip-view.js';
 import { measureTone, classifyTone, matchPresets, TONE_THRESHOLDS, TEXTURES, PRESETS } from './lip-engine.js';
 import { t as tr, finishText as finishName } from './i18n.js';
 import { getColorCalib } from './color-calib.js';
-import { STUDIO, PALETTE, MATCH_FRAMES, MATCH_TIMEOUT_MS, state } from './lip-state.js';
+import { PALETTE, MATCH_FRAMES, MATCH_TIMEOUT_MS, state } from './lip-state.js';
 import { sourceFrame } from './lip-camera.js';
 
 const RECOMMEND_COUNT = 6; // 고른 색과 비슷한 제품을 몇 개 보여 줄지
@@ -21,11 +21,11 @@ export function applyLook() {
   // 선택한 컬러(색상값·텍스처) 문구는 2026-11-11 화면에서 뺐다
   store.set('lipDisplay', { texture: state.texture, intensity: state.intensity });
   syncMixSliders();
-  window.tookLipHex = state.hex; // 합본 화면에서 챗봇이 늦게 로드돼도 현재 색을 알 수 있게
+  window.tookLipHex = state.hex; // 지금 입술 색 (자동 테스트가 읽는다)
   window.dispatchEvent(new CustomEvent('took:color', { detail: { hex: state.hex, texture: state.texture } }));
 }
 
-// 고른 색은 다른 화면(홈 최근 기록, 챗봇 기준 색)에서도 쓰도록 저장한다
+// 고른 색은 다른 화면(홈 최근 기록, 색상 추천)에서도 쓰도록 저장한다
 function saveColor(hex, source) {
   store.set('lipColor', { ...rgbToHsl(hexToRgb(hex)), hex, source });
 }
@@ -140,17 +140,12 @@ $('match')?.addEventListener('click', () => {
 });
 
 // ---------- 제품 추천 ----------
-// 합본 화면에서는 오른쪽 '추천' 탭의 목록에 그린다
 export async function showInlineRecommend(hex) {
   const ref = tr('lip.ref', { hex });
-  if (STUDIO) {
-    window.dispatchEvent(new CustomEvent('took:show-tab', { detail: { tab: 'rec' } }));
-  } else {
-    store.set('lipInlineRec', { hex });
-    $('controls').classList.add('hidden');
-    $('rec-panel').classList.remove('hidden');
-    $('rec-ref').textContent = ref;
-  }
+  store.set('lipInlineRec', { hex });
+  $('controls').classList.add('hidden');
+  $('rec-panel').classList.remove('hidden');
+  $('rec-ref').textContent = ref;
   $('rec-status').textContent = tr('lip.recLoading');
   $('rec-list').replaceChildren(...skeletonCards(3));
   const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, limit: RECOMMEND_COUNT }));
@@ -158,7 +153,7 @@ export async function showInlineRecommend(hex) {
     $('rec-status').textContent = body.error || tr('lip.recFail');
     return;
   }
-  $('rec-status').textContent = (STUDIO ? ref + ' · ' : '') + (body.products.length
+  $('rec-status').textContent = (body.products.length
     ? tr('lip.recCount', { n: body.products.length })
     : tr('lip.recNone'));
   $('rec-list').replaceChildren(...body.products.map((product) => tryOnCard(product, (p) => {
@@ -170,9 +165,7 @@ export async function showInlineRecommend(hex) {
 
 $('recommend')?.addEventListener('click', () => {
   saveColor(state.hex, '립 컬러 매핑 컬러 선택');
-  // 합본 화면: 같은 화면의 챗봇이 이 색과 비슷한 제품을 찾아 '추천' 탭에 보여 준다
-  if (STUDIO) window.dispatchEvent(new CustomEvent('took:recommend', { detail: { hex: state.hex } }));
-  else showInlineRecommend(state.hex);
+  showInlineRecommend(state.hex);
 });
 $('rec-back')?.addEventListener('click', () => {
   store.remove('lipInlineRec');
@@ -180,7 +173,7 @@ $('rec-back')?.addEventListener('click', () => {
   $('controls').classList.remove('hidden');
 });
 
-// 다른 스크립트가 색을 보낸다: 합본의 챗봇 추천 카드 '입술에 발라보기', 팔레트(섞는 동안 quiet 로 계속)
+// 다른 스크립트가 색을 보낸다: 팔레트(섞는 동안 quiet 로 계속)
 window.addEventListener('took:apply', (e) => {
   const { hex, finish, quiet = false, source = '추천 제품 색' } = e.detail;
   applyProduct(hex, finish, source);

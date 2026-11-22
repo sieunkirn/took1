@@ -320,7 +320,7 @@
       const doc = g.win.document;
       const f = el.closest?.(FOCUSABLE);
       if (f && !f.disabled) {
-        // 안드로이드 시스템 키보드는 페이지 밖이라 보정이 안 된다 → 띄우지 않는다 (챗봇은 화면 터치 키보드를 쓴다)
+        // 안드로이드 시스템 키보드는 페이지 밖이라 보정이 안 된다 → 띄우지 않는다
         if (f.matches(TEXT_INPUT)) f.setAttribute('inputmode', 'none');
         if (doc.activeElement !== f) f.focus();
       } else if (doc.activeElement && doc.activeElement !== doc.body && doc.activeElement.matches?.(FOCUSABLE)) {

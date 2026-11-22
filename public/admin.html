@@ -158,7 +158,7 @@
     const time = new Date().toLocaleTimeString('ko-KR');
     line.textContent = `NFC 태그 확인 (${time}): 읽은 번호 ${n} (${n.length}글자)`
       + (key ? ` → ${NFC_LABELS[key] || key}` + (key === n ? '' : ' (글자 빠짐 감안)') + ` · ${id}`
-        : id ? ` → 제품 ID · ${id}` : ' → 표에 없음 (바코드 번호면 팔레트·챗봇에서 찾아요)');
+        : id ? ` → 제품 ID · ${id}` : ' → 표에 없음 (바코드 번호면 팔레트에서 찾아요)');
   });
 </script>
 </body>

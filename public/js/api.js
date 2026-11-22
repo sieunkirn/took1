@@ -1,5 +1,5 @@
 // 서버 API 호출. 정적 모드(서버 없음)에서는 같은 응답을 브라우저에서 만든다.
-// 정적 모드: 서버 없이(예: claude.ai Artifact 링크) 같은 추천/검색/챗봇 로직을 브라우저에서 실행한다.
+// 정적 모드: 서버 없이(예: claude.ai Artifact 링크) 같은 추천/검색 로직을 브라우저에서 실행한다.
 // 빌드 스크립트(scripts/build-static.js)가 <meta name="took-mode" content="static"> 을 넣는다.
 import { realOnly } from './demo.js'; // 실데이터만 보기 설정 (정적 모드는 demo.js 가 catalog 에 직접 알린다)
 
@@ -9,14 +9,14 @@ let localApi = null;
 async function getLocalApi() {
   if (!localApi) {
     localApi = (async () => {
-      const [catalog, rec, chat, color] = await Promise.all([
-        import('../lib/catalog.js'), import('../lib/recommend.js'), import('../lib/chat.js'), import('../lib/color.js'),
+      const [catalog, rec, color] = await Promise.all([
+        import('../lib/catalog.js'), import('../lib/recommend.js'), import('../lib/color.js'),
       ]);
       catalog.setProducts(await (await fetch(new URL('../data/products.json', import.meta.url))).json());
       catalog.setDemoProducts(await (await fetch(new URL('../data/products.demo.json', import.meta.url))).json());
       // 실제 호수 데이터 (없는 옛 빌드면 빈 목록)
       catalog.setShades(await fetch(new URL('../data/products.shades.json', import.meta.url)).then((r) => (r.ok ? r.json() : [])).catch(() => []));
-      return { catalog, rec, chat, color };
+      return { catalog, rec, color };
     })();
   }
   return localApi;
@@ -24,12 +24,11 @@ async function getLocalApi() {
 
 // server.js 의 /api 라우트와 같은 응답을 브라우저에서 만든다
 async function staticApi(path, options) {
-  const { catalog, rec, chat, color } = await getLocalApi();
+  const { catalog, rec, color } = await getLocalApi();
   const url = new URL(path, 'http://local');
   const q = url.searchParams;
   const ok = (body) => ({ ok: true, status: 200, body });
   const fail = (status, error) => ({ ok: false, status, body: { error } });
-  if (url.pathname === '/api/price-range') return ok(rec.priceRange()); // 거울 퀵 추천의 가격 드래그 바 (2026-11-21)
   if (url.pathname === '/api/products') {
     const finish = q.get('finish');
     return ok({ products: catalog.allProducts().filter((p) => !finish || p.finish === finish) });
@@ -57,11 +56,6 @@ async function staticApi(path, options) {
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
     return ok({ hex, products: rec.recommendByColor(hex, { finish: q.get('finish') || null, maxPrice: Number(q.get('maxPrice')) || null, limit, excludeIds }) });
-  }
-  if (url.pathname === '/api/chat') {
-    const body = JSON.parse(options.body || '{}');
-    if (!body.message) return fail(400, 'message 가 필요합니다.');
-    return ok({ engine: 'rule-based', ...chat.answer({ message: body.message, baseProductId: body.baseProductId, selectedHex: body.selectedHex, context: body.context, tone: body.tone, lang: body.lang === 'en' ? 'en' : 'ko' }) });
   }
   return fail(404, '알 수 없는 API 입니다.');
 }

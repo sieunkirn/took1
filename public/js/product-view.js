@@ -5,7 +5,6 @@ import { el } from './dom.js';
 import { isDemo, demoBadgeFor } from './demo.js';
 import { go } from './store.js';
 import { api } from './api.js';
-import { hasPick, togglePick } from './chat-picks.js';
 
 // 화면에 보이는 제품 이름: 영어 화면이면 글로벌 올리브영 영어 이름(없으면 한국어 이름), 한국어면 그대로
 export const fullName = (p) => (isEn() ? displayName(p) : koFullName(p));
@@ -36,33 +35,14 @@ export function detailLink(product, from, text = t('card.detail')) {
 // 카드에는 브랜드·제품명·색상값·제형·가격과 올리브영 링크만 보여 준다 (나머지 정보는 제품 상세 화면에)
 // extraActions: 화면마다 필요한 버튼 (예: 립 컬러 매핑의 '입술에 발라보기')
 /** '입술에 발라보기' 버튼이 붙은 제품 카드. 누르면 onTry(제품) */
-// 그 옆 '챗봇에 담기'(2026-11-15): 담은 제품으로 챗봇과 이야기한다 (chat-picks.js · chat.js picksHandoff)
-// 카드 안에서 호수(옵션)를 바꾸면 '발라보기'·'챗봇에 담기'도 고른 호수로 한다
+// 카드 안에서 호수(옵션)를 바꾸면 '발라보기'도 고른 호수로 한다 (옆의 '챗봇에 담기'는 2026-11-22 챗봇과 함께 삭제)
 export function tryOnCard(product, onTry, { onTake } = {}) { // onTake: 거울의 '가져가기' (2026-11-19)
   let current = product;
-  const pick = pickButton(() => current);
   return productCard(product, {
-    extraActions: [el('button', { type: 'button', text: t('lip.tryOn'), onclick: () => onTry(current) }), pick,
+    extraActions: [el('button', { type: 'button', text: t('lip.tryOn'), onclick: () => onTry(current) }),
       onTake ? el('button', { type: 'button', class: 'take-btn', text: t('nw.take'), onclick: () => onTake(current) }) : null].filter(Boolean),
-    onShade: (s) => { current = s; pick.sync(); },
+    onShade: (s) => { current = s; },
   });
-}
-
-/** '챗봇에 담기' 버튼: 누를 때마다 담기/빼기. 담은 상태면 눌린 모양('담음 ✓'). product 는 제품이나 '지금 제품을 돌려주는 함수' */
-export function pickButton(product) {
-  const cur = typeof product === 'function' ? product : () => product;
-  const b = el('button', { type: 'button', class: 'pick-btn' });
-  const sync = () => {
-    const on = hasPick(cur().id);
-    b.textContent = t(on ? 'card.picked' : 'card.pick');
-    b.setAttribute('aria-pressed', String(on));
-    b.setAttribute('aria-label', t('card.pickAria', { name: shortName(cur()) }));
-  };
-  b.addEventListener('click', () => { togglePick(cur(), shortName(cur())); });
-  window.addEventListener('took:picks-change', sync);
-  sync();
-  b.sync = sync;
-  return b;
 }
 
 // ---------- 카드 안의 호수 고르기 (2026-11-17, 아코디언) ----------
