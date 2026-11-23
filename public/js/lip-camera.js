@@ -2,7 +2,8 @@
 import { $, el } from './common.js';
 import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
 import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
-import { getCamSettings, videoConstraints, isExternalCamera, applyWide, softZoomFor } from './camera-settings.js';
+import { getCamSettings, videoConstraints, isExternalCamera, widestZoom } from './camera-settings.js';
+import { attachWideView, wideAmount } from './wide-view.js';
 import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
 import { PALETTE, video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
@@ -35,14 +36,14 @@ function stopCamera() {
   stopStream(state.stream);
   state.stream = null;
   video.srcObject = null;
-  setSoftZoom(1);
 }
-/** 줌 없는 웹캠의 화면 확대 (#view 가운데 기준). 얼굴 틀 좌표는 palette.js toView 가 data-zoom 을 읽어 맞춘다 */
-function setSoftZoom(z) {
-  const k = z > 1.001 ? z : 1;
-  view.style.transform = k > 1 ? `scale(${k.toFixed(3)})` : '';
-  view.dataset.zoom = String(k);
-}
+// 광각 보기 (0.5배 줌처럼 배경 넓게, 2026-11-23): 웹캠 영상일 때만, 세기는 관리자 → 웹캠 연결 설정 '광각'.
+// 얼굴 틀 자리는 palette.js toView 가 window.tookWideView.mapPoint 로 맞춘다
+export const wideView = attachWideView(view, {
+  getAmount: () => (state.source === 'camera' ? wideAmount(getCamSettings().wide) : 0),
+  visible: () => !view.classList.contains('hidden'),
+});
+window.tookWideView = wideView;
 
 // ---------- 웹캠 연결 안정화 (2026-11-13) ----------
 // 1) 켤 때 '사용 중'(NotReadableError·AbortError)이면 잠깐 기다렸다 다시 요청한다
@@ -74,10 +75,7 @@ async function openStream(gen) {
       s = await preferExternalCamera(s, gen);
       const st = s.getVideoTracks()[0]?.getSettings() || {};
       console.info(`[took] 웹캠 연결: ${s.getVideoTracks()[0]?.label || '?'} ${st.width}×${st.height}${lowRes ? ' (낮춘 해상도)' : ''}`);
-      // 광각 정도 (관리자 → 웹캠 연결 설정, 2026-11-23): 웹캠 줌으로, 줌이 없으면 화면 확대로
-      const wide = await applyWide(s.getVideoTracks()[0]);
-      setSoftZoom(softZoomFor(getCamSettings(), wide.hw));
-      console.info(`[took] 웹캠 광각: ${wide.info}`);
+      console.info(`[took] 웹캠 화각: ${await widestZoom(s.getVideoTracks()[0])}`); // 줌 되는 웹캠은 가장 넓게
       return s;
     } catch (e) {
       last = e;
