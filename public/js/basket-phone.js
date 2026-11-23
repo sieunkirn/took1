@@ -9,7 +9,7 @@ import { api } from './api.js';
 import { el, $ } from './dom.js';
 import { t, applyI18n, langToggle, brandOf, nameOf } from './i18n.js';
 import { normalizeTag, resolveTag, findTagProduct } from './nfc.js';
-import { getBasket, addToBasket, removeFromBasket, clearBasket } from './basket.js';
+import { getBasket, addToBasket, removeFromBasket, clearBasket, sendToMirror, getSent } from './basket.js';
 
 const CARD_KEY = 'tookBasket.card';
 let card = null;
@@ -73,6 +73,7 @@ function render() {
     itemRow(p, el('button', { type: 'button', onclick: () => remove(p) }, t('bk.remove')))));
   $('bk-empty').hidden = items.length > 0;
   $('bk-mirror').hidden = !(card && items.length);
+  $('bk-send').hidden = !(card && items.length);
 }
 
 // ---------- 카드 ----------
@@ -193,11 +194,13 @@ if (!('NDEFReader' in window)) {
   status(t('bk.noNfc'), '');
   statusEl.classList.add('err');
 }
-startBtn.addEventListener('click', async () => {
+let scanCtl = null;
+async function startScan() {
   if (listening) return;
   try {
+    scanCtl = new AbortController();
     const reader = new NDEFReader();
-    await reader.scan();
+    await reader.scan({ signal: scanCtl.signal });
     listening = true;
     startBtn.setAttribute('aria-pressed', 'true');
     startBtn.disabled = true;
@@ -211,7 +214,58 @@ startBtn.addEventListener('click', async () => {
   } catch (e) {
     status(t('bk.nfcDenied') + (e?.name ? ` (${e.name})` : ''), 'err');
   }
-});
+}
+// 휴대폰을 거울 리더기에 '카드처럼' 대려면 휴대폰이 NFC 를 읽는 중이면 안 된다(읽는 쪽끼리는 서로 못 읽는다) → 읽기를 멈춘다
+function stopScan() {
+  scanCtl?.abort();
+  scanCtl = null;
+  if (!listening) return;
+  listening = false;
+  startBtn.removeAttribute('aria-pressed');
+  startBtn.disabled = false;
+  startBtn.textContent = t('bk.restart');
+  idleStatus();
+}
+startBtn.addEventListener('click', startScan);
+
+// ---------- 거울에 보내기 ----------
+// 찍기: 서버에 '이 카드가 20초 안에 찍어요'를 남기고 휴대폰 NFC 읽기를 멈춘다. 리더기가 휴대폰(모르는 번호)을 읽으면 거울이 이 카드를 띄운다.
+// 휴대폰이 리더기에 보이는 번호는 댈 때마다 바뀌어서, 번호가 아니라 '방금 누른 카드'로 알아본다 (거울 한 대 기준)
+// 바로 띄우기: 찍지 않고 거울이 3초마다 확인해서 띄운다
+const sendStatus = $('bk-send-status');
+let sendTimer = 0;
+async function send(mode) {
+  if (!card) return;
+  clearInterval(sendTimer);
+  if (mode === 'tap') stopScan();
+  sendStatus.className = 'bk-send-status wait';
+  sendStatus.textContent = t('bk.server');
+  const sent = await sendToMirror(card, mode).catch((e) => { sendStatus.textContent = t('bk.serverErr', { msg: e.message }); return null; });
+  if (!sent) return;
+  const until = Date.now() + (mode === 'tap' ? 20000 : 12000);
+  const tick = async () => {
+    const left = Math.ceil((until - Date.now()) / 1000);
+    if (left <= 0) {
+      clearInterval(sendTimer);
+      sendStatus.className = 'bk-send-status';
+      sendStatus.textContent = t('bk.tapTimeout');
+      return;
+    }
+    if (mode === 'tap') sendStatus.textContent = t('bk.tapWait', { s: left });
+    else sendStatus.textContent = t('bk.nowSent');
+    const now = await getSent({ timeoutMs: 3000 }).catch(() => undefined);
+    if (now !== undefined && now?.id !== sent.id && Date.now() < until) { // 거울이 받아서 지웠다
+      clearInterval(sendTimer);
+      sendStatus.className = 'bk-send-status';
+      sendStatus.textContent = t('bk.tapDone');
+      navigator.vibrate?.([60, 60, 60]);
+    }
+  };
+  tick();
+  sendTimer = setInterval(tick, 1000);
+}
+$('bk-tap').addEventListener('click', () => send('tap'));
+$('bk-now').addEventListener('click', () => send('now'));
 
 // ---------- 이름으로 찾아 담기 ----------
 let pool = null;

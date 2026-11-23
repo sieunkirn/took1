@@ -13,7 +13,7 @@
 import { store, api, el, won, shortName, shadeLabelOf } from './common.js';
 import { t, brandOf, nameOf, finishText } from './i18n.js';
 import { findTagProduct, normalizeTag } from './nfc.js';
-import { getBasket, keepAwake } from './basket.js'; // 카드 담기 (휴대폰 basket.html 에서 담은 립, 2026-11-23)
+import { getBasket, keepAwake, getSent, takeSent } from './basket.js'; // 카드 담기 (휴대폰 basket.html 에서 담은 립, 2026-11-23)
 import { REDUCE_MOTION as reduce } from './motion.js';
 
 const SHELF_MAX = 3;
@@ -47,6 +47,21 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   let pollTimer = 0;
   const rowItems = () => (basket ? basket.items : shelf);
   keepAwake(); // 담기 서버(Render)가 잠들지 않게
+  // 휴대폰의 [거울에 바로 띄우기] (2026-11-23): 3초마다 서버를 보고, 보낸 카드가 있으면 그 카드의 립을 띄운다
+  let nowBusy = false;
+  setInterval(async () => {
+    if (nowBusy || document.hidden) return;
+    nowBusy = true;
+    try {
+      const sent = await getSent({ timeoutMs: 5000 }).catch(() => null);
+      if (sent?.mode !== 'now') return;
+      await takeSent(sent.id);
+      const b = await getBasket(sent.card, { timeoutMs: 8000 }).catch(() => null);
+      if (b?.items?.some((x) => x.color_hex)) { seq++; showBasket(b); }
+    } finally {
+      nowBusy = false;
+    }
+  }, 3000);
 
   // ---------- 틀 ----------
   const photo = el('img', { class: 'nt-photo', alt: '', draggable: 'false', referrerpolicy: 'no-referrer' });
@@ -344,6 +359,17 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
       if (my !== seq) return;
       if (b?.items?.some((x) => x.color_hex)) { showBasket(b); return; }
       if (p?.color_hex) stopBasket(); // 제품 태그를 대면 카드 목록 보기는 끝
+      // 휴대폰 찍기 (2026-11-23): 모르는 번호 = 휴대폰일 수 있다. 휴대폰 번호는 댈 때마다 바뀌므로, 방금 휴대폰에서 [거울에 찍기]를 누른 카드를 띄운다
+      if (!p?.color_hex) {
+        const sent = await getSent({ timeoutMs: 3000 }).catch(() => null);
+        if (my !== seq) return;
+        if (sent?.mode === 'tap') {
+          takeSent(sent.id);
+          const sb = await getBasket(sent.card, { timeoutMs: 5000 }).catch(() => null);
+          if (my !== seq) return;
+          if (sb?.items?.some((x) => x.color_hex)) { showBasket(sb); return; }
+        }
+      }
       if (!p?.color_hex && modalOpen() && modal.dataset.state !== 'hit') {
         // 안내를 띄운 채로 등록 안 된 태그: 모달 안에서 '?' 를 잠깐 보이고 다시 안내로
         modal.dataset.state = 'unknown';

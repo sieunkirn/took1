@@ -65,10 +65,34 @@ const CORS = {
 // 담은 제품 ID → 제품 (지금 데이터에 없는 ID 는 빼고, 지어내지 않는다)
 const basketView = (b) => ({ card: b.card, updated: b.updated, items: b.items.map((id) => findById(id)).filter(Boolean) });
 
+// 거울에 보내기 (2026-11-23): 휴대폰 담기 화면의 버튼. 거울(키오스크)은 한 대라고 보고 자리 하나만 둔다.
+// mode 'tap' = 20초 안에 휴대폰을 거울 리더기에 대면(휴대폰 번호는 댈 때마다 바뀌어 알 수 없으므로 '방금 누른 카드'로 본다) 그 카드를 띄운다
+// mode 'now' = 찍지 않고 거울에 바로 띄운다 (거울이 3초마다 확인)
+const SEND_MS = 25000;
+let sent = null; // { id, card, mode, at }
+const sentNow = () => (sent && Date.now() - sent.at < SEND_MS ? sent : null);
+
+async function handleSend(req, res, url) {
+  if (req.method === 'GET') return sendJson(res, 200, { sent: sentNow() });
+  if (req.method === 'POST') {
+    const body = await readBody(req);
+    const card = baskets.match(body.card);
+    if (!card) return sendJson(res, 404, { error: '담은 립이 없는 카드입니다.' });
+    sent = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), card, mode: body.mode === 'now' ? 'now' : 'tap', at: Date.now() };
+    return sendJson(res, 200, { sent });
+  }
+  if (req.method === 'DELETE') {
+    if (sent && sent.id === url.searchParams.get('id')) sent = null;
+    return sendJson(res, 200, { sent: sentNow() });
+  }
+  return sendJson(res, 405, { error: '지원하지 않는 요청입니다.' });
+}
+
 async function handleBasket(req, res, url) {
   for (const [k, v] of Object.entries(CORS)) res.setHeader(k, v);
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   const q = url.searchParams;
+  if (url.pathname === '/api/basket/send') return handleSend(req, res, url);
   if (req.method === 'GET') {
     const card = normalizeCard(q.get('card'));
     if (!validCard(card)) return sendJson(res, 400, { error: 'card 파라미터(카드 번호)가 필요합니다.' });
@@ -93,7 +117,7 @@ async function handleBasket(req, res, url) {
 async function handleApi(req, res, url) {
   const path = url.pathname;
   const q = url.searchParams;
-  if (path === '/api/basket') return handleBasket(req, res, url);
+  if (path === '/api/basket' || path === '/api/basket/send') return handleBasket(req, res, url);
 
   // 가격 범위 (거울 퀵 추천의 가격 드래그 바, 2026-11-21)
   if (req.method === 'GET' && path === '/api/products') {

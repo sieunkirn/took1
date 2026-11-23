@@ -53,3 +53,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bk-mirror { margin: 14px 0 0; font-weight: 700; color: #fff; }
 
 .bk-langbtn { border: 1px solid var(--line); background: #000; border-radius: 999px; min-height: 36px; padding: 0 14px; font-size: 14px; }
+
+/* 거울에 보내기 (2026-11-23) */
+.bk-send { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.bk-send-status { margin: 4px 0 0; min-height: 22px; text-align: center; font-size: 15px; color: #fff; font-weight: 700; }
+.bk-send-status.wait { color: var(--pink); }

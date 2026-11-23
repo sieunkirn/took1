@@ -296,6 +296,8 @@ Object.assign(STRINGS.ko, {
   'bk.server': '서버에 연결하는 중… 잠들어 있으면 1분쯤 걸려요', 'bk.serverErr': '서버에 연결하지 못했어요 ({msg})',
   'bk.mirrorHint': '이제 거울 리더기에 카드를 대 보세요',
   'bk.cardHit': '카드에 담은 립 {n}개', 'bk.row': '카드에 담은 립', 'bk.newItem': '방금 담은 립이에요',
+  'bk.tap': '휴대폰으로 거울에 찍기', 'bk.now': '거울에 바로 띄우기', 'bk.tapWait': '{s}초 안에 휴대폰 뒷면을 거울 리더기에 대 주세요',
+  'bk.tapDone': '거울이 받았어요', 'bk.tapTimeout': '시간이 지났어요 · 다시 눌러 주세요', 'bk.nowSent': '거울에 띄웠어요', 'bk.restart': 'NFC 다시 켜기',
 });
 Object.assign(STRINGS.en, {
   'nw.close': 'Close', 'nw.recent': 'Just tagged', 'nw.take': 'Take it home', 'nw.similar': 'Similar lips',
@@ -319,6 +321,8 @@ Object.assign(STRINGS.en, {
   'bk.server': 'Connecting to the server… up to a minute if it was asleep', 'bk.serverErr': "Couldn't reach the server ({msg})",
   'bk.mirrorHint': 'Now tap the card on the mirror reader',
   'bk.cardHit': '{n} lips on your card', 'bk.row': 'Lips on your card', 'bk.newItem': 'Just saved',
+  'bk.tap': 'Tap the phone on the mirror', 'bk.now': 'Show on the mirror now', 'bk.tapWait': 'Within {s}s, hold the back of the phone to the mirror reader',
+  'bk.tapDone': 'The mirror got it', 'bk.tapTimeout': 'Time is up · please try again', 'bk.nowSent': 'Shown on the mirror', 'bk.restart': 'Turn NFC on again',
 });
 
 /**

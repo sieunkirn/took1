@@ -37,3 +37,27 @@ export function keepAwake() {
   const id = setInterval(ping, 10 * 60 * 1000);
   return () => clearInterval(id);
 }
+
+// ---------- 거울에 보내기 (2026-11-23, server.js handleSend) ----------
+const SEND_URL = BASKET_SERVER + '/api/basket/send';
+async function sendCall(method, query, body, timeoutMs) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), timeoutMs);
+  try {
+    const res = await fetch(SEND_URL + (query ? '?' + new URLSearchParams(query) : ''), {
+      method, signal: ctl.signal, cache: 'no-store',
+      ...(body ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || '서버 오류 ' + res.status);
+    return data.sent || null; // { id, card, mode: 'tap'|'now', at }
+  } finally {
+    clearTimeout(timer);
+  }
+}
+/** 휴대폰: mode 'tap' = 20초 안에 휴대폰을 거울 리더기에 댈게요, 'now' = 거울에 바로 띄워 주세요 */
+export const sendToMirror = (card, mode) => sendCall('POST', null, { card, mode }, 60000);
+/** 거울: 지금 보낸 카드 (없으면 null) */
+export const getSent = ({ timeoutMs = 4000 } = {}) => sendCall('GET', null, null, timeoutMs);
+/** 거울: 받은 것 지우기 (같은 걸 두 번 띄우지 않게) */
+export const takeSent = (id) => sendCall('DELETE', { id }, null, 8000).catch(() => null);
