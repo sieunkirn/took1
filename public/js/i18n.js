@@ -282,6 +282,20 @@ Object.assign(STRINGS.ko, {
   'nm.step1': '제품을 손에 들어요', 'nm.step2': '리더기에 톡 대요', 'nm.step3': '거울 속 입술에 바로 발라져요',
   'nm.waiting': '리더기 기다리는 중', 'nm.dial': '다이얼로 고르기 (테스트용)',
   'nm.hit': '인식했어요', 'nm.applied': '입술에 바로 발라드릴게요', 'nm.toCard': '제품 보기',
+  // 카드 담기 (2026-11-23): 휴대폰 담기 화면(basket.html) · 거울에서 카드를 댔을 때
+  'bk.title': '카드에 담기', 'bk.sub': '내 카드를 먼저 대고, 마음에 드는 립 제품 태그를 휴대폰 뒷면에 대 주세요.\n거울 리더기에 카드를 대면 담은 립이 입술에 발라져요.',
+  'bk.start': 'NFC 켜고 시작', 'bk.listening': '휴대폰 뒷면에 태그를 대 주세요',
+  'bk.noNfc': '이 휴대폰·브라우저는 NFC 읽기를 지원하지 않아요. 안드로이드 휴대폰의 Chrome 에서 열어 주세요.',
+  'bk.nfcDenied': 'NFC 를 켜지 못했어요. 휴대폰 설정에서 NFC 를 켜고 다시 눌러 주세요.',
+  'bk.step1': '내 카드', 'bk.cardWait': '카드를 휴대폰 뒷면에 대 주세요', 'bk.card': '카드 {code}', 'bk.changeCard': '카드 바꾸기',
+  'bk.step2': '담은 립', 'bk.empty': '제품 태그를 대면 여기에 담겨요', 'bk.added': '{name} 담았어요', 'bk.cardSet': '카드를 연결했어요 · 이제 제품 태그를 대 주세요',
+  'bk.cardSwitch': '다른 카드로 바꿨어요', 'bk.sameCard': '지금 연결된 카드예요', 'bk.unknownProduct': '등록되지 않은 제품 태그예요',
+  'bk.remove': '빼기', 'bk.clear': '모두 비우기', 'bk.cleared': '카드를 비웠어요',
+  'bk.search': '이름으로 찾아 담기', 'bk.searchPh': '브랜드·제품 이름', 'bk.noResult': '찾는 제품이 없어요',
+  'bk.manualCard': '카드 번호 직접 넣기 (테스트용)', 'bk.manualOk': '연결',
+  'bk.server': '서버에 연결하는 중… 잠들어 있으면 1분쯤 걸려요', 'bk.serverErr': '서버에 연결하지 못했어요 ({msg})',
+  'bk.mirrorHint': '이제 거울 리더기에 카드를 대 보세요',
+  'bk.cardHit': '카드에 담은 립 {n}개', 'bk.row': '카드에 담은 립', 'bk.newItem': '방금 담은 립이에요',
 });
 Object.assign(STRINGS.en, {
   'nw.close': 'Close', 'nw.recent': 'Just tagged', 'nw.take': 'Take it home', 'nw.similar': 'Similar lips',
@@ -292,6 +306,19 @@ Object.assign(STRINGS.en, {
   'nm.step1': 'Pick up the product', 'nm.step2': 'Tap it on the reader', 'nm.step3': 'See it on your lips in the mirror',
   'nm.waiting': 'Waiting for the reader', 'nm.dial': 'Choose with the dial (test)',
   'nm.hit': 'Got it', 'nm.applied': 'Putting it on your lips now', 'nm.toCard': 'See product',
+  'bk.title': 'Save to card', 'bk.sub': 'Tap your card first, then tap the lip product tags you like on the back of the phone.\nTap the card on the mirror reader to try them on.',
+  'bk.start': 'Turn on NFC', 'bk.listening': 'Hold a tag to the back of the phone',
+  'bk.noNfc': "This phone or browser can't read NFC. Please open it in Chrome on an Android phone.",
+  'bk.nfcDenied': "Couldn't turn on NFC. Turn NFC on in the phone settings and try again.",
+  'bk.step1': 'My card', 'bk.cardWait': 'Hold your card to the back of the phone', 'bk.card': 'Card {code}', 'bk.changeCard': 'Change card',
+  'bk.step2': 'Saved lips', 'bk.empty': 'Tap product tags to save them here', 'bk.added': 'Saved {name}', 'bk.cardSet': 'Card linked · now tap product tags',
+  'bk.cardSwitch': 'Switched to another card', 'bk.sameCard': 'This card is already linked', 'bk.unknownProduct': "This product tag isn't registered",
+  'bk.remove': 'Remove', 'bk.clear': 'Clear all', 'bk.cleared': 'Card cleared',
+  'bk.search': 'Find by name', 'bk.searchPh': 'Brand or product name', 'bk.noResult': 'No matching products',
+  'bk.manualCard': 'Enter a card number (test)', 'bk.manualOk': 'Link',
+  'bk.server': 'Connecting to the server… up to a minute if it was asleep', 'bk.serverErr': "Couldn't reach the server ({msg})",
+  'bk.mirrorHint': 'Now tap the card on the mirror reader',
+  'bk.cardHit': '{n} lips on your card', 'bk.row': 'Lips on your card', 'bk.newItem': 'Just saved',
 });
 
 /**

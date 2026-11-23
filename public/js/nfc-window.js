@@ -12,7 +12,8 @@
 // 방금 태그한 립(최근 3개)은 sessionStorage(store 'nfcShelf') → 자동 초기화·처음으로 때 함께 지워진다. 호수 색·제품 사진은 실제 색
 import { store, api, el, won, shortName, shadeLabelOf } from './common.js';
 import { t, brandOf, nameOf, finishText } from './i18n.js';
-import { findTagProduct } from './nfc.js';
+import { findTagProduct, normalizeTag } from './nfc.js';
+import { getBasket, keepAwake } from './basket.js'; // 카드 담기 (휴대폰 basket.html 에서 담은 립, 2026-11-23)
 import { REDUCE_MOTION as reduce } from './motion.js';
 
 const SHELF_MAX = 3;
@@ -22,7 +23,9 @@ const NFC_SVG = '<svg viewBox="0 0 33.05 31.86" aria-hidden="true" fill="none" s
 const CHECK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 const SHELF_KEY = 'nfcShelf';
 const CLOSE_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
-const lineOf = (p) => p.line || p.id; // 호수 상품(OY-…-01)이면 그 제품 줄
+const lineOf = (p) => p.line || p.id;
+const BASKET_POLL_MS = 4000; // 카드를 댄 뒤 휴대폰에서 새로 담으면 거울도 바로 바뀌게 서버를 다시 본다
+const BASKET_LIVE_MS = 10 * 60 * 1000; // 카드를 마지막으로 댄 뒤 이만큼만 (그 뒤 다시 대면 다시 시작) // 호수 상품(OY-…-01)이면 그 제품 줄
 
 /**
  * NFC 시트 만들기. stage = 팔레트 900×1440 무대.
@@ -36,6 +39,14 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   let shades = [];
   let seq = 0;
   let unknownTimer = 0;
+  // 카드 담기 (2026-11-23): 손님 카드를 대면 휴대폰에서 담은 립 목록(basket)을 가져와 차례로 입술에 바른다.
+  // 같은 카드를 다시 대면 다음 립으로. 카드를 댄 뒤 10분 동안은 4초마다 목록을 다시 봐서, 휴대폰으로 새로 담은 립이 바로 발라진다
+  let basket = null; // { card, items: [제품] }
+  let basketPos = 0;
+  let basketAt = 0;
+  let pollTimer = 0;
+  const rowItems = () => (basket ? basket.items : shelf);
+  keepAwake(); // 담기 서버(Render)가 잠들지 않게
 
   // ---------- 틀 ----------
   const photo = el('img', { class: 'nt-photo', alt: '', draggable: 'false', referrerpolicy: 'no-referrer' });
@@ -88,7 +99,8 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   const hDot = el('i');
   const hMeta = el('span');
   const hBar = el('i');
-  const badge = el('span', { class: 'nm-badge' }, el('b'), el('span', { text: t('nm.hit') }));
+  const badgeText = el('span', { text: t('nm.hit') });
+  const badge = el('span', { class: 'nm-badge' }, el('b'), badgeText);
   badge.querySelector('b').innerHTML = CHECK_SVG;
   const hitBox = el('div', { class: 'nm-hitbox' }, badge, hPhotoWrap, hBrand, hName, el('p', { class: 'nm-shade' }, hDot, hMeta),
     el('p', { class: 'nm-status' }, el('i'), el('span', { text: t('nm.applied') })),
@@ -125,6 +137,7 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     }
     if (!testPool.length || !modalOpen()) return;
     const p = testPool[Math.floor(Math.random() * testPool.length)];
+    stopBasket();
     seq++;
     addToShelf(p);
     clearTimeout(unknownTimer);
@@ -137,9 +150,10 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     modalClose();
     if (p) showProduct(p, { fromTag: true, worn: true });
   }
-  function showHit(p) {
+  function showHit(p, label = t('nm.hit')) {
     clearTimeout(hitTimer);
     hitProduct = p;
+    badgeText.textContent = label;
     hPhotoWrap.style.setProperty('--c', p.color_hex); // 사진 뒤 원 = 그 제품 실제 색
     if (p.image_url) { hImg.src = p.image_url; hPhotoWrap.replaceChildren(hImg); } else hPhotoWrap.replaceChildren();
     hBrand.textContent = brandOf(p);
@@ -168,8 +182,11 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     brand.textContent = brandOf(p);
     name.textContent = nameOf(p);
     meta.textContent = [p.finish && finishText(p.finish), p.price && won(p.price)].filter(Boolean).join(' · ');
-    recent.replaceChildren(...(shelf.length > 1 ? shelf.map((x) => {
-      const b = el('button', { type: 'button', class: 'nt-rec', 'aria-pressed': String(x.id === p.id), 'aria-label': shortName(x), onclick: () => showProduct(x) });
+    const row = rowItems();
+    recent.classList.toggle('nt-recent-basket', !!basket);
+    recent.setAttribute('aria-label', t(basket ? 'bk.row' : 'nw.recent'));
+    recent.replaceChildren(...(row.length > 1 ? row.map((x, i) => {
+      const b = el('button', { type: 'button', class: 'nt-rec', 'aria-pressed': String(x.id === p.id), 'aria-label': shortName(x), onclick: () => { if (basket) basketPos = i; showProduct(x); } });
       if (x.image_url) b.append(el('img', { src: x.image_url, alt: '', draggable: 'false', referrerpolicy: 'no-referrer' }));
       else b.style.background = x.color_hex;
       return b;
@@ -213,6 +230,50 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     const sel = picked && chips.querySelector(`[data-id="${CSS.escape(picked.id)}"]`);
     if (sel) chips.scrollLeft = sel.offsetLeft - chips.clientWidth / 2 + sel.offsetWidth / 2;
     else chips.scrollLeft = 0;
+  }
+
+  // ---------- 카드 담기 ----------
+  function showBasket(b) {
+    const list = (b.items || []).filter((p) => p.color_hex);
+    const same = basket && basket.card === b.card;
+    basket = { card: b.card, items: list };
+    basketPos = same ? (basketPos + 1) % list.length : 0; // 처음엔 먼저 담은 것부터, 같은 카드를 다시 대면 다음 립
+    basketAt = Date.now();
+    onOpen?.();
+    if (!root.hidden) { document.documentElement.classList.remove('nfc-win-open'); root.hidden = true; }
+    clearTimeout(unknownTimer);
+    showHit(list[basketPos], t('bk.cardHit', { n: list.length }));
+    poll();
+  }
+  function stopBasket() {
+    basket = null;
+    clearTimeout(pollTimer);
+  }
+  function poll() {
+    clearTimeout(pollTimer);
+    pollTimer = setTimeout(async () => {
+      if (!basket || Date.now() - basketAt > BASKET_LIVE_MS) return;
+      const card = basket.card;
+      const b = await getBasket(card, { timeoutMs: 8000 }).catch(() => null);
+      if (!basket || basket.card !== card) return;
+      if (b) {
+        const list = (b.items || []).filter((p) => p.color_hex);
+        const had = new Set(basket.items.map((x) => x.id));
+        const fresh = list.filter((x) => !had.has(x.id));
+        const changed = fresh.length || list.length !== basket.items.length;
+        basket.items = list;
+        if (fresh.length) {
+          const p = fresh[fresh.length - 1]; // 휴대폰으로 방금 담은 립을 바로 바른다
+          basketPos = list.findIndex((x) => x.id === p.id);
+          seq++;
+          if (!root.hidden) { document.documentElement.classList.remove('nfc-win-open'); root.hidden = true; }
+          showHit(p, t('bk.newItem'));
+        } else if (changed && !root.hidden && current) {
+          if (list.length) renderHead(current); else stopBasket();
+        }
+      }
+      poll();
+    }, BASKET_POLL_MS);
   }
 
   function showProduct(p, { fromTag = false, worn = false } = {}) {
@@ -273,8 +334,16 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     /** 리더기로 읽은 번호 → 제품을 찾아 바로 바르고 '인식했어요' 모달 → 아래 제품 카드(시트) */
     async show(code) {
       const my = ++seq;
-      const p = await findTagProduct(code, api).catch(() => null);
+      // 카드 담기: 태그 번호(UID)면 담은 목록도 함께 본다. 담은 게 있으면 그 카드가 손님 카드다 (제품 태그로 등록된 번호라도 담은 게 있으면 카드).
+      // 서버가 늦으면 2.5초만 기다리고 제품 태그로 본다
+      const uid = /^[0-9A-F]{8,}$/.test(normalizeTag(code));
+      const [p, b] = await Promise.all([
+        findTagProduct(code, api).catch(() => null),
+        uid ? getBasket(code, { timeoutMs: 2500 }).catch(() => null) : null,
+      ]);
       if (my !== seq) return;
+      if (b?.items?.some((x) => x.color_hex)) { showBasket(b); return; }
+      if (p?.color_hex) stopBasket(); // 제품 태그를 대면 카드 목록 보기는 끝
       if (!p?.color_hex && modalOpen() && modal.dataset.state !== 'hit') {
         // 안내를 띄운 채로 등록 안 된 태그: 모달 안에서 '?' 를 잠깐 보이고 다시 안내로
         modal.dataset.state = 'unknown';

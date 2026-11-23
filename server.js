@@ -12,6 +12,7 @@ import { recommendByColor } from './src/lib/recommend.js';
 import { normalizeHex } from './src/lib/color.js';
 import { BROWSER_LIBS } from './src/lib/browser-libs.js';
 import { setRealOnlyGetter } from './src/lib/catalog.js';
+import { createBasketStore, normalizeCard, validCard } from './src/lib/basket-store.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 // .env (서버 전용 설정). 없으면 기본값
@@ -52,9 +53,47 @@ async function readBody(req) {
   return data ? JSON.parse(data) : {};
 }
 
+// 카드 담기 (2026-11-23, src/lib/basket-store.js): 휴대폰 담기 화면이 쌓고 거울이 가져간다.
+// 거울·휴대폰 화면이 Vercel·앱(정적)에서 열려도 이 서버(Render)로 요청하므로 /api/basket 만 다른 주소의 요청을 허용한다(CORS)
+const baskets = createBasketStore({ file: process.env.TOOK_BASKET_FILE ?? join(root, '.baskets.json') });
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Took-Real-Only',
+  'Access-Control-Max-Age': '86400',
+};
+// 담은 제품 ID → 제품 (지금 데이터에 없는 ID 는 빼고, 지어내지 않는다)
+const basketView = (b) => ({ card: b.card, updated: b.updated, items: b.items.map((id) => findById(id)).filter(Boolean) });
+
+async function handleBasket(req, res, url) {
+  for (const [k, v] of Object.entries(CORS)) res.setHeader(k, v);
+  if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+  const q = url.searchParams;
+  if (req.method === 'GET') {
+    const card = normalizeCard(q.get('card'));
+    if (!validCard(card)) return sendJson(res, 400, { error: 'card 파라미터(카드 번호)가 필요합니다.' });
+    return sendJson(res, 200, basketView(baskets.get(card)));
+  }
+  if (req.method === 'POST') {
+    const body = await readBody(req);
+    const card = normalizeCard(body.card);
+    if (!validCard(card)) return sendJson(res, 400, { error: '카드 번호가 올바르지 않습니다.' });
+    const p = findById(String(body.id || ''));
+    if (!p) return sendJson(res, 404, { error: '제품을 찾을 수 없습니다.' });
+    return sendJson(res, 200, basketView(baskets.add(card, p.id)));
+  }
+  if (req.method === 'DELETE') {
+    const card = normalizeCard(q.get('card'));
+    if (!validCard(card)) return sendJson(res, 400, { error: 'card 파라미터(카드 번호)가 필요합니다.' });
+    return sendJson(res, 200, basketView(baskets.remove(card, q.get('id') || null)));
+  }
+  return sendJson(res, 405, { error: '지원하지 않는 요청입니다.' });
+}
+
 async function handleApi(req, res, url) {
   const path = url.pathname;
   const q = url.searchParams;
+  if (path === '/api/basket') return handleBasket(req, res, url);
 
   // 가격 범위 (거울 퀵 추천의 가격 드래그 바, 2026-11-21)
   if (req.method === 'GET' && path === '/api/products') {

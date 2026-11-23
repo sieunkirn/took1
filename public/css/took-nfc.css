@@ -139,3 +139,8 @@
 .nm-unk > span:not(.nt-q) { font-size: 23px; color: #9b9ba1; }
 
 @media (prefers-reduced-motion: reduce) { .nm, .nm * { animation: none !important; transition: none !important; } }
+
+/* 카드 담기 (2026-11-23): 휴대폰으로 담은 립이 많으면 옆으로 밀어서 본다 */
+.nt-recent.nt-recent-basket { max-width: 300px; overflow-x: auto; padding: 4px; scrollbar-width: none; }
+.nt-recent.nt-recent-basket::-webkit-scrollbar { display: none; }
+.nt-recent-basket .nt-rec { flex: none; }

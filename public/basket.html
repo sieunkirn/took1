@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>took · 카드에 담기</title>
+<!-- 휴대폰 담기 화면 (2026-11-23): 휴대폰이 진열대 리더기 역할을 한다.
+     안드로이드 Chrome 의 Web NFC 로 손님 카드(번호)와 제품 태그를 읽어, 서버(/api/basket)에 '카드 번호 → 담은 제품'으로 쌓는다.
+     거울 리더기에 같은 카드를 대면 담은 립이 입술에 발라진다 (js/nfc-window.js).
+     키오스크 화면이 아니라서 device-frame.js(5:8 틀로 옮기기)를 넣지 않는다 -->
+<link rel="stylesheet" href="css/basket.css">
+</head>
+<body>
+<main class="bk">
+  <header class="bk-top">
+    <span class="bk-logo">took</span>
+    <span id="bk-lang"></span>
+  </header>
+  <h1 data-i18n="bk.title">카드에 담기</h1>
+  <p class="bk-sub" data-i18n="bk.sub"></p>
+
+  <button type="button" id="bk-start" class="bk-btn bk-btn-pink" data-i18n="bk.start">NFC 켜고 시작</button>
+  <p id="bk-status" class="bk-status" role="status" aria-live="polite"></p>
+
+  <section class="bk-card" aria-labelledby="bk-h1">
+    <div class="bk-row">
+      <h2 id="bk-h1" data-i18n="bk.step1">내 카드</h2>
+      <button type="button" id="bk-change" class="bk-link" data-i18n="bk.changeCard" hidden>카드 바꾸기</button>
+    </div>
+    <p id="bk-cardline" class="bk-cardline" data-i18n="bk.cardWait"></p>
+    <details class="bk-manual">
+      <summary data-i18n="bk.manualCard">카드 번호 직접 넣기 (테스트용)</summary>
+      <form id="bk-manual-form" class="bk-inline">
+        <input id="bk-manual" inputmode="latin" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="04379D1A322490">
+        <button type="submit" class="bk-btn bk-btn-small" data-i18n="bk.manualOk">연결</button>
+      </form>
+    </details>
+  </section>
+
+  <section class="bk-card" aria-labelledby="bk-h2">
+    <div class="bk-row">
+      <h2 id="bk-h2"><span data-i18n="bk.step2">담은 립</span> <span id="bk-count"></span></h2>
+      <button type="button" id="bk-clear" class="bk-link" data-i18n="bk.clear" hidden>모두 비우기</button>
+    </div>
+    <ul id="bk-list" class="bk-list"></ul>
+    <p id="bk-empty" class="bk-empty" data-i18n="bk.empty"></p>
+    <p id="bk-mirror" class="bk-mirror" data-i18n="bk.mirrorHint" hidden></p>
+  </section>
+
+  <section class="bk-card" aria-labelledby="bk-h3">
+    <h2 id="bk-h3" data-i18n="bk.search">이름으로 찾아 담기</h2>
+    <input id="bk-q" type="search" class="bk-search" data-i18n-placeholder="bk.searchPh" autocomplete="off">
+    <ul id="bk-results" class="bk-list bk-results"></ul>
+  </section>
+</main>
+<script type="module" src="js/basket-phone.js"></script>
+</body>
+</html>

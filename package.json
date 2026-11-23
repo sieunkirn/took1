@@ -15,7 +15,7 @@
     "shades:build": "node scripts/build-shades-source.js",
     "shades:import-raw": "node scripts/import-shades-raw.js",
     "start": "node server.js",
-    "test": "node --test test/unit.test.js test/touch-calib.test.js test/color-calib.test.js test/shades.test.js",
+    "test": "node --test test/unit.test.js test/touch-calib.test.js test/color-calib.test.js test/shades.test.js test/basket.test.js",
     "e2e": "node test/e2e.mjs",
     "cert": "node scripts/cert.js",
     "samples": "node scripts/make-samples.js",

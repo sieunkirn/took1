@@ -1,0 +1,55 @@
+/* 휴대폰 담기 화면 (basket.html, 2026-11-23). 거울과 같은 무드: 검정 바탕·흰 글자, 핑크는 #FF007B 한 가지(눌림 #D60067), 면은 단색.
+   제품 사진·립 색 동그라미만 실제 색 (CLAUDE.md 예외) */
+:root { color-scheme: dark; --pink: #ff007b; --pink-down: #d60067; --line: #2e2e33; --dim: rgba(255, 255, 255, 0.62); }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #000; color: #fff; }
+body { font-family: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%; }
+.bk { max-width: 520px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom)); }
+.bk-top { display: flex; justify-content: space-between; align-items: center; height: 44px; }
+.bk-logo { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+h1 { font-size: 28px; letter-spacing: -0.03em; margin: 18px 0 8px; }
+h2 { font-size: 17px; margin: 0; }
+.bk-sub { color: var(--dim); font-size: 15px; line-height: 1.55; margin: 0 0 20px; }
+
+button { font: inherit; color: inherit; cursor: pointer; }
+.bk-btn { display: block; width: 100%; min-height: 54px; border: 0; border-radius: 999px; background: #1b1b1b; font-size: 17px; font-weight: 700; }
+.bk-btn-pink { background: var(--pink); }
+.bk-btn-pink:active { background: var(--pink-down); }
+.bk-btn-pink[aria-pressed="true"] { background: #1b1b1b; box-shadow: inset 0 0 0 1.5px var(--line); }
+.bk-btn-small { width: auto; min-height: 44px; padding: 0 20px; font-size: 15px; background: #fff; color: #000; }
+.bk-link { border: 0; background: none; color: var(--dim); font-size: 14px; text-decoration: underline; padding: 8px 0; min-height: 40px; }
+
+.bk-status { min-height: 22px; margin: 12px 0 16px; font-size: 15px; color: var(--dim); text-align: center; }
+.bk-status.on::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pink); margin-right: 8px; vertical-align: 2px;
+  animation: bk-blink 1.4s ease-in-out infinite; }
+.bk-status.hit { color: #fff; font-weight: 700; }
+.bk-status.err { color: #fff; }
+@keyframes bk-blink { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .bk-status.on::before { animation: none; } }
+
+.bk-card { border: 1px solid var(--line); border-radius: 22px; padding: 18px; margin-bottom: 14px; background: #0e0e0f; }
+.bk-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 40px; }
+.bk-cardline { margin: 8px 0 0; font-size: 16px; color: var(--dim); word-break: break-all; }
+.bk-cardline.set { color: #fff; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bk-manual { margin-top: 12px; color: var(--dim); font-size: 14px; }
+.bk-manual summary { cursor: pointer; padding: 6px 0; }
+.bk-inline { display: flex; gap: 8px; margin-top: 8px; }
+.bk-inline input, .bk-search { flex: 1; min-width: 0; min-height: 44px; border-radius: 12px; border: 1px solid var(--line); background: #000; color: #fff; padding: 0 14px; font: inherit; font-size: 16px; }
+.bk-search { width: 100%; margin-top: 12px; }
+
+.bk-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.bk-item { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 16px; background: #161617; }
+.bk-item img, .bk-item .bk-sw { flex: none; width: 52px; height: 52px; border-radius: 12px; object-fit: contain; background: #fff; }
+.bk-item .bk-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bk-item .bk-b { font-size: 13px; color: var(--dim); }
+.bk-item .bk-n { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bk-item .bk-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.bk-item button { flex: none; min-width: 64px; min-height: 40px; border-radius: 999px; border: 1px solid var(--line); background: #000; font-size: 14px; }
+.bk-results .bk-item button { background: #fff; color: #000; border: 0; font-weight: 700; }
+.bk-item.new { animation: bk-in .5s ease-out; }
+@keyframes bk-in { from { background: var(--pink); } }
+.bk-empty { color: var(--dim); font-size: 15px; margin: 10px 0 0; }
+.bk-mirror { margin: 14px 0 0; font-weight: 700; color: #fff; }
+
+.bk-langbtn { border: 1px solid var(--line); background: #000; border-radius: 999px; min-height: 36px; padding: 0 14px; font-size: 14px; }
