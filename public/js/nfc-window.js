@@ -5,7 +5,9 @@
 //      그래서 아래 시트에 그 제품의 실제 호수(/api/shades, 올리브영 호수 데이터)를 줄로 보여 주고, 누를 때마다 입술 색이 바뀐다.
 //      바코드 번호를 써 둔 태그처럼 호수까지 알면 그 호수를 골라 둔다. 호수 데이터가 없으면 대표 색만 바르고 그렇게 알린다
 //   3) 정보와 다음 단계: 사진·브랜드·이름·제형·가격, [이 색과 비슷한 립 보기](거울의 추천 제품)
-// 시트는 화면 아래(다이얼 자리, y 900~)만 덮어 얼굴·입술은 그대로 보인다. 메뉴 버튼은 없고 태그할 때만 올라온다.
+// 시트는 화면 아래(다이얼 자리, y 900~)만 덮어 얼굴·입술은 그대로 보인다.
+// 2026-11-22: 태그하면 먼저 가운데 '인식했어요' 모달(제품 사진)을 2.2초 보여 준 뒤 이 시트(제품 카드)로 넘어간다.
+// 거울 알약의 NFC 버튼은 같은 모달로 '제품을 리더기에 대 주세요' 안내를 띄운다(아래 '가운데 세로 모달').
 // 등록되지 않은 태그는 제품을 지어내지 않고 작은 안내만 띄웠다가 내려간다(앞서 보던 제품이 있으면 그 제품으로 돌아간다).
 // 방금 태그한 립(최근 3개)은 sessionStorage(store 'nfcShelf') → 자동 초기화·처음으로 때 함께 지워진다. 호수 색·제품 사진은 실제 색
 import { store, api, el, won, shortName, shadeLabelOf } from './common.js';
@@ -15,6 +17,9 @@ import { REDUCE_MOTION as reduce } from './motion.js';
 
 const SHELF_MAX = 3;
 const UNKNOWN_MS = 3200;
+const HIT_MS = 2200; // '인식했어요' 모달을 보여 주는 시간. 그 뒤 아래 제품 카드(시트)로 넘어간다 (2026-11-22)
+const NFC_SVG = '<svg viewBox="0 0 33.05 31.86" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7.78 13.44C10.04 15.1 10.04 16.76 7.78 18.42" stroke-width="2.6"/><path d="M12.64 8.96C16.85 13.61 16.85 18.26 12.64 22.9" stroke-width="2.8"/><path d="M17.01 4.98C23.17 12.28 23.17 19.58 17.01 26.89" stroke-width="2.8"/><path d="M21.38 1.99C29.48 11.29 29.48 20.58 21.38 29.87" stroke-width="2.8"/></svg>';
+const CHECK_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 const SHELF_KEY = 'nfcShelf';
 const CLOSE_SVG = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 const lineOf = (p) => p.line || p.id; // 호수 상품(OY-…-01)이면 그 제품 줄
@@ -58,9 +63,104 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   const root = el('section', { class: 'nt', id: 'nw', hidden: '', 'data-state': 'product', role: 'dialog', 'aria-labelledby': 'nt-name' },
     el('i', { class: 'nt-grab', 'aria-hidden': 'true' }), head, shadeBox, actions, unknown);
   stage.append(root);
-  // 시트 밖(거울)을 누르면 내려간다. 다이얼·메뉴를 만지려는 손길도 같다
-  stage.addEventListener('pointerdown', (e) => { if (!root.hidden && !root.contains(e.target)) api_.close(); }, true);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !root.hidden) api_.close(); });
+
+  // ---------- 가운데 세로 모달 (2026-11-22, Figma 시안 D·F·H) ----------
+  // wait   : 거울 왼쪽 알약의 NFC 버튼(또는 홈의 NFC 버튼)을 누르면 '제품을 리더기에 대 주세요' 안내. 리더기는 늘 듣고 있다
+  // hit    : 태그를 읽으면 '인식했어요' + 제품 사진·이름·호수. 입술에는 그 순간 바로 바르고, HIT_MS 뒤 아래 제품 카드(시트)로 넘어간다
+  // unknown: 안내를 띄운 채로 등록 안 된 태그를 대면 '?' 를 잠깐 보이고 다시 wait
+  let hitTimer = 0;
+  let hitProduct = null;
+  const mClose = el('button', { type: 'button', class: 'nm-close', 'aria-label': t('nw.close'), title: t('nw.close'), onclick: () => modalTap() });
+  mClose.innerHTML = CLOSE_SVG;
+  const art = el('div', { class: 'nm-art', 'aria-hidden': 'true' }, el('i', { class: 'nm-ring' }), el('i', { class: 'nm-ring nm-ring2' }), el('span', { class: 'nm-dot' }));
+  art.querySelector('.nm-dot').innerHTML = NFC_SVG;
+  const step = (n) => el('li', {}, el('b', { text: String(n) }), el('span', { text: t('nm.step' + n) }));
+  const waitBox = el('div', { class: 'nm-wait' }, art,
+    el('h2', { class: 'nm-title', id: 'nm-title', text: t('nm.title') }),
+    el('p', { class: 'nm-sub', text: t('nm.sub') }),
+    el('ol', { class: 'nm-steps' }, step(1), step(2), step(3)),
+    el('p', { class: 'nm-status' }, el('i'), el('span', { text: t('nm.waiting') })),
+    el('button', { type: 'button', class: 'nm-btn', onclick: () => fakeTag() }, t('nm.dial')));
+  const hPhotoWrap = el('div', { class: 'nm-photo' });
+  const hImg = el('img', { alt: '', draggable: 'false', referrerpolicy: 'no-referrer' });
+  const hBrand = el('span', { class: 'nm-brand' });
+  const hName = el('strong', { class: 'nm-name' });
+  const hDot = el('i');
+  const hMeta = el('span');
+  const hBar = el('i');
+  const badge = el('span', { class: 'nm-badge' }, el('b'), el('span', { text: t('nm.hit') }));
+  badge.querySelector('b').innerHTML = CHECK_SVG;
+  const hitBox = el('div', { class: 'nm-hitbox' }, badge, hPhotoWrap, hBrand, hName, el('p', { class: 'nm-shade' }, hDot, hMeta),
+    el('p', { class: 'nm-status' }, el('i'), el('span', { text: t('nm.applied') })),
+    el('div', { class: 'nm-bar', 'aria-hidden': 'true' }, hBar),
+    el('button', { type: 'button', class: 'nm-btn nm-btn-pink', onclick: () => toCard() }, t('nm.toCard')));
+  const unkBox = el('div', { class: 'nm-unk' }, el('span', { class: 'nt-q', 'aria-hidden': 'true', text: '?' }),
+    el('strong', { text: t('nw.unknown') }), el('span', { text: t('nw.unknownSub') }));
+  const mBox = el('section', { class: 'nm-box', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'nm-title' }, mClose, waitBox, hitBox, unkBox);
+  const modal = el('div', { class: 'nm', id: 'nfc-modal', hidden: '', 'data-state': 'wait' }, el('div', { class: 'nm-back', onclick: () => modalTap() }), mBox);
+  stage.append(modal);
+  const modalOpen = () => !modal.hidden;
+  function modalShow(state) {
+    modal.dataset.state = state;
+    if (!modal.hidden) return;
+    modal.hidden = false;
+    if (!reduce) mBox.animate([{ transform: 'translateY(-50%) scale(.94)', opacity: 0 }, { transform: 'translateY(-50%)', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.2, .9, .3, 1)' });
+  }
+  function modalClose() {
+    clearTimeout(hitTimer);
+    clearTimeout(unknownTimer);
+    hitProduct = null;
+    if (modal.hidden) return;
+    const done = () => { modal.hidden = true; };
+    if (reduce) { done(); return; }
+    mBox.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-50%) scale(.96)' }], { duration: 200, easing: 'ease-in' }).finished.then(done, done);
+  }
+  // 테스트용 (2026-11-22 사용자 요청): 안내 모달의 '다이얼로 고르기 (테스트용)' 버튼 = 리더기 없이 NFC 가 인식된 척.
+  // 화면 목록(/api/products, 호수 있는 실제 제품)에서 아무 제품이나 하나 골라 실제 태그와 같은 길('인식했어요' → 제품 카드)로 보낸다
+  let testPool = null;
+  async function fakeTag() {
+    if (!testPool) {
+      const r = await api('api/products').catch(() => null);
+      testPool = (r?.ok && r.body?.products || []).filter((p) => p.color_hex);
+    }
+    if (!testPool.length || !modalOpen()) return;
+    const p = testPool[Math.floor(Math.random() * testPool.length)];
+    seq++;
+    addToShelf(p);
+    clearTimeout(unknownTimer);
+    showHit(p);
+  }
+  // 바깥·닫기를 누르면: 안내 중이면 닫고, '인식했어요' 중이면 바로 제품 카드로
+  function modalTap() { if (modal.dataset.state === 'hit' && hitProduct) toCard(); else modalClose(); }
+  function toCard() {
+    const p = hitProduct;
+    modalClose();
+    if (p) showProduct(p, { fromTag: true, worn: true });
+  }
+  function showHit(p) {
+    clearTimeout(hitTimer);
+    hitProduct = p;
+    hPhotoWrap.style.setProperty('--c', p.color_hex); // 사진 뒤 원 = 그 제품 실제 색
+    if (p.image_url) { hImg.src = p.image_url; hPhotoWrap.replaceChildren(hImg); } else hPhotoWrap.replaceChildren();
+    hBrand.textContent = brandOf(p);
+    hName.textContent = nameOf(p);
+    hDot.style.background = p.color_hex;
+    hMeta.textContent = [p.shade_no && shadeLabelOf(p), p.finish && finishText(p.finish), p.price && won(p.price)].filter(Boolean).join(' · ');
+    onWear(p); // 모달 뒤 거울 속 입술에는 지금 바로
+    modalShow('hit');
+    if (!reduce) {
+      hBar.getAnimations().forEach((a) => a.cancel());
+      hBar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: HIT_MS, easing: 'linear', fill: 'forwards' });
+    }
+    hitTimer = setTimeout(toCard, HIT_MS);
+  }
+
+  // 시트 밖(거울)을 누르면 내려간다. 다이얼·메뉴를 만지려는 손길도 같다 (모달을 누르는 건 빼고)
+  stage.addEventListener('pointerdown', (e) => { if (!root.hidden && !root.contains(e.target) && !modal.contains(e.target)) api_.close(); }, true);
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (modalOpen()) modalTap(); else if (!root.hidden) api_.close();
+  });
 
   // ---------- 그리기 ----------
   function renderHead(p) {
@@ -115,7 +215,7 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     else chips.scrollLeft = 0;
   }
 
-  function showProduct(p, { fromTag = false } = {}) {
+  function showProduct(p, { fromTag = false, worn = false } = {}) {
     seq++;
     clearTimeout(unknownTimer);
     current = p;
@@ -124,7 +224,7 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     chips.replaceChildren(...Array.from({ length: 8 }, () => el('span', { class: 'nt-chip nt-chip-wait', 'aria-hidden': 'true' }, el('i'))));
     pickLabel.textContent = t('nw.pickShade');
     pickNow.textContent = '';
-    onWear(p); // 우선 그 제품 색(호수를 알면 그 호수)을 바로 입술에
+    if (!worn) onWear(p); // 우선 그 제품 색(호수를 알면 그 호수)을 바로 입술에 ('인식했어요' 모달에서 이미 발랐으면 건너뜀)
     renderHead(p);
     root.dataset.state = 'product';
     open();
@@ -162,11 +262,26 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
       if (reduce) { done(); return; }
       root.animate([{ transform: 'none' }, { transform: 'translateY(105%)' }], { duration: 260, easing: 'cubic-bezier(.4, 0, 1, 1)' }).finished.then(done, done);
     },
-    /** 리더기·바코드로 읽은 번호 → 제품을 찾아 바로 바르고 시트를 올린다 */
+    /** NFC 안내 모달 열기 (거울 알약의 NFC 버튼·홈의 NFC 버튼) */
+    wait() {
+      onOpen?.();
+      if (!root.hidden) api_.close();
+      clearTimeout(hitTimer);
+      hitProduct = null;
+      modalShow('wait');
+    },
+    /** 리더기로 읽은 번호 → 제품을 찾아 바로 바르고 '인식했어요' 모달 → 아래 제품 카드(시트) */
     async show(code) {
       const my = ++seq;
       const p = await findTagProduct(code, api).catch(() => null);
       if (my !== seq) return;
+      if (!p?.color_hex && modalOpen() && modal.dataset.state !== 'hit') {
+        // 안내를 띄운 채로 등록 안 된 태그: 모달 안에서 '?' 를 잠깐 보이고 다시 안내로
+        modal.dataset.state = 'unknown';
+        clearTimeout(unknownTimer);
+        unknownTimer = setTimeout(() => { if (modalOpen()) modal.dataset.state = 'wait'; }, UNKNOWN_MS);
+        return;
+      }
       if (!p?.color_hex) {
         const back = !root.hidden && current;
         root.dataset.state = 'unknown';
@@ -176,7 +291,13 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
         return;
       }
       addToShelf(p);
-      showProduct(p, { fromTag: true });
+      onOpen?.();
+      if (!root.hidden) { // 제품 카드가 떠 있으면 내리고 '인식했어요'부터
+        document.documentElement.classList.remove('nfc-win-open');
+        root.hidden = true;
+      }
+      clearTimeout(unknownTimer);
+      showHit(p);
     },
   };
   window.tookNfcWin = api_; // 화면 확인·자동 테스트용: tookNfcWin.show('TEST0001')

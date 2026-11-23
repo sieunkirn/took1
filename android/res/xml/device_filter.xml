@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- USB 웹캠(UVC = 영상 클래스 14)을 꽂으면 툭 앱을 연다. '항상 툭으로 열기'를 고르면 USB 권한을 다시 묻지 않는다 (2026-11-22) -->
+<resources>
+    <usb-device class="14" />
+    <usb-device class="239" subclass="2" protocol="1" />
+</resources>

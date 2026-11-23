@@ -366,20 +366,31 @@ sbtn.addEventListener('click', () => setMode(mode === 'arc' ? 'recs' : 'arc'));
 // (언어 버튼은 2026-11-17 사용자 요청으로 홈에만 — 여기서 바꾸지 않는다)
 // 왼쪽 세로 메뉴 (GP-홈화면 2026-11-18): 스캔 = 이 화면(추천 결과면 다이얼로 돌아오기), 9점 = 지금 색의 추천 제품 열기/닫기(가운데 로고 버튼과 같은 일),
 // 집 = 처음으로(로고와 같은 일). 음성(챗봇) 버튼은 2026-11-22 삭제
-$('fc-mb-scan').addEventListener('click', () => { if (mode !== 'arc') setMode('arc'); });
-// 세로 알약 (2026-11-20 사용자 요청): 처음엔 3번만 보이게 접혀 있다가 3번을 누르면 1·2·3·4 로 펼친다.
-// 펼친 뒤 3번 = 다시 접기 (추천 시트는 아래 로고 버튼으로 연다. 시트가 열려 있으면 닫고 접는다), 알약 바깥을 누르면 접힌다
-const menu = $('fc-menu');
-const setFolded = (on) => {
-  menu.classList.toggle('folded', on);
-  $('fc-mb-grid').setAttribute('aria-expanded', String(!on));
-};
+$('fc-mb-scan').addEventListener('click', () => { moveKnob('scan'); if (mode !== 'arc') setMode('arc'); });
+// 세로 알약 (2026-11-22 Figma 1653:469): 늘 펼친 4칸. 2번 = NFC(옛 음성 자리): 태그 안내 모달을 띄운다(리더기는 늘 듣고 있다),
+$('fc-mb-nfc').addEventListener('click', () => { moveKnob('nfc'); nfcWin.wait(); watchNfcModal(); }); // 손잡이는 안내가 닫힐 때까지 NFC 에 (syncKnob).  가운데 세로 모달로 '제품을 리더기에 대 주세요' (js/nfc-window.js)
+// 3번(9점) = 알약 접기/펼치기 (2026-11-22 사용자 요청): 접으면 9점 동그라미 하나만 남고, 다시 누르면 4칸으로 펼친다. 추천 제품은 아래 로고 버튼으로
 $('fc-mb-grid').addEventListener('click', () => {
-  if (mode !== 'arc') { setMode('arc'); setFolded(true); return; }
-  setFolded(!menu.classList.contains('folded'));
+  const menu = $('fc-menu');
+  const folded = menu.classList.toggle('folded');
+  $('fc-mb-grid').setAttribute('aria-expanded', String(!folded));
+  for (const id of ['fc-mb-scan', 'fc-mb-nfc', 'fc-mb-home']) $(id).tabIndex = folded ? -1 : 0;
 });
-document.addEventListener('pointerdown', (e) => { if (mode === 'arc' && !menu.contains(e.target)) setFolded(true); }, true);
-$('fc-mb-home').addEventListener('click', (e) => { e.preventDefault(); store.clear(); location.href = 'index.html'; });
+$('fc-mb-home').addEventListener('click', (e) => {
+  e.preventDefault();
+  store.clear();
+  moveKnob('home');
+  setTimeout(() => { location.href = 'index.html'; }, reduce ? 0 : 320); // 손잡이가 집까지 가는 걸 보여 주고 넘어간다
+});
+// NFC 안내 모달이 닫히면 손잡이는 알약 맨 위(스캔)로 돌아온다 (2026-11-22 사용자 요청). 모달은 nfc-window.js 가 나중에 만들므로 처음 누를 때 붙인다
+let nfcWatch = null;
+function watchNfcModal() {
+  const m = document.getElementById('nfc-modal');
+  if (!m || nfcWatch) return;
+  nfcWatch = new MutationObserver(() => { if (m.hidden && document.getElementById('fc-menu')?.dataset.focus === 'nfc') moveKnob('scan'); }); // 닫으면 늘 맨 위(스캔)로
+  nfcWatch.observe(m, { attributes: true, attributeFilter: ['hidden'] });
+}
+syncKnob(true);
 // 내 톤 추천 컬러를 누르면(lip-look.js took:pick) 그 색을 그대로 입히고 다이얼도 가장 가까운 칸으로 돌린다
 window.addEventListener('took:pick', (e) => {
   const hex = e.detail?.hex;
@@ -459,6 +470,42 @@ function setMode(m, { instant = false } = {}) {
   sheet.inert = !open;
   wheel.setAttribute('aria-valuetext', chosen());
   if (open) queueRecs(0); // 로고 버튼을 누르면 바로 지금 색의 추천 제품
+  syncKnob();
+}
+
+// ---------- 세로 알약 포커스 이동 (2026-11-22) ----------
+// 흰 손잡이(.fc-menu-knob)가 누른 버튼으로 0.3초 동안 미끄러져 옮겨 간다 (크기만 새 버튼에 맞춤). 손잡이 위 아이콘만 검정(.is-focus).
+// 함수 선언으로 둔다: setMode 가 이 아래 상수보다 먼저 불려도 되게 상태는 #fc-menu 의 data-focus 에만 둔다
+function knobBox(k) {
+  const b = document.getElementById('fc-mb-' + k);
+  return { x: b.offsetLeft, y: b.offsetTop, s: b.offsetWidth };
+}
+function moveKnob(k, instant = false) {
+  const menu = document.getElementById('fc-menu');
+  const knob = menu?.querySelector('.fc-menu-knob');
+  if (!knob) return;
+  const from = menu.dataset.focus || 'scan';
+  if (from === k && !instant) return;
+  menu.dataset.focus = k;
+  for (const key of ['scan', 'nfc', 'grid', 'home']) document.getElementById('fc-mb-' + key)?.classList.toggle('is-focus', key === k);
+  const a = knobBox(from);
+  const b = knobBox(k);
+  const px = (v) => v + 'px';
+  Object.assign(knob.style, { left: px(b.x), top: px(b.y), width: px(b.s), height: px(b.s) });
+  knob.getAnimations().forEach((an) => an.cancel());
+  if (instant || reduce || from === k) return;
+  // 늘어나거나 튕기지 않고 그대로 미끄러진다 (2026-11-22 사용자 요청 "쫀득하지 않게 깔끔하게")
+  knob.animate([
+    { left: px(a.x), top: px(a.y), width: px(a.s), height: px(a.s) },
+    { left: px(b.x), top: px(b.y), width: px(b.s), height: px(b.s) },
+  ], { duration: 300, easing: 'cubic-bezier(.4, 0, .2, 1)' });
+}
+/** 손잡이는 스캔으로 (9점은 접기 버튼이라 손잡이가 가지 않는다). NFC 를 누른 뒤엔 안내가 닫힐 때(force)까지 그대로 */
+function syncKnob(instant = false, force = false) {
+  const menu = document.getElementById('fc-menu');
+  if (!menu) return;
+  if (menu.dataset.focus === 'nfc' && !instant && !force) return;
+  moveKnob('scan', instant);
 }
 
 // ---------- 농도 (흰 점 바, 2026-11-20) ----------
@@ -628,34 +675,12 @@ function toView(points) {
   const H = camArea.offsetHeight;
   const cw = viewEl.width;
   const ch = viewEl.height;
-  const s = Math.max(W / cw, H / ch) * camZoom; // camZoom: 축소 슬라이더 (아래)
+  const s = Math.max(W / cw, H / ch);
   const ox = camArea.offsetLeft + (W - cw * s) / 2;
   const oy = camArea.offsetTop + (H - ch * s) / 2;
   return points.map((q) => { const p = mapPoint(q, !!f.mirror, turn); return { x: ox + p.x * cw * s, y: oy + p.y * ch * s }; });
 }
-// ---------- 카메라 축소 슬라이더 (2026-11-21: 웹캠이 세로 화면을 꽉 채우느라 확대돼 보여서) ----------
-// 값 100 = 꽉 채움(object-fit: cover, 예전과 같음), 0 = 영상 전체가 보이게(contain). 기기에 계속 남도록 localStorage
-const ZOOM_KEY = 'took.camZoom';
-const zoomInput = $('cam-zoom');
-let camZoom = 1; // cover 대비 배율 (1 = 꽉 채움)
-let zoomVal = 100;
-try { const v = Number(localStorage.getItem(ZOOM_KEY)); if (localStorage.getItem(ZOOM_KEY) !== null && v >= 0 && v <= 100) zoomVal = v; } catch { /* 저장소 못 씀 */ }
-if (zoomInput) zoomInput.value = String(zoomVal);
-let zoomKey = '';
-function applyZoom(force) {
-  const cw = viewEl.width, ch = viewEl.height, W = camArea.offsetWidth, H = camArea.offsetHeight;
-  const key = `${cw}x${ch}/${W}x${H}/${zoomVal}`;
-  if (!force && key === zoomKey) return;
-  zoomKey = key;
-  const fit = cw && ch && W && H ? Math.min(W / cw, H / ch) / Math.max(W / cw, H / ch) : 1; // contain ÷ cover
-  camZoom = fit + (1 - fit) * (zoomVal / 100);
-  viewEl.style.setProperty('--camzoom', (camZoom / fit).toFixed(4)); // CSS 는 contain 기준이라 cover 배율로 되돌린다
-}
-zoomInput?.addEventListener('input', () => {
-  zoomVal = Number(zoomInput.value) || 0;
-  try { localStorage.setItem(ZOOM_KEY, String(zoomVal)); } catch { /* 저장소 못 씀 */ }
-  applyZoom(true);
-});
+// 카메라는 항상 화면 꽉 채움(cover). 11-21 축소 슬라이더(took.camZoom)는 2026-11-22 사용자 요청으로 뺐다
 function faceGoal() {
   const b = lip.lips?.box;
   const pts = b && toView([{ x: b.x0, y: b.y0 }, { x: b.x1, y: b.y0 }, { x: b.x0, y: b.y1 }, { x: b.x1, y: b.y1 }]);
@@ -693,7 +718,6 @@ function placeBrackets() {
   at(brs[3], x1 - BR, y1 - BR);
 }
 function trackFace(now) {
-  applyZoom(false); // 영상 크기가 바뀌면 축소 비율도 다시
   let goal = faceGoal();
   if (goal) { lastGoal = goal; lastSeen = now; } else if (lastGoal && now - lastSeen < 700) goal = lastGoal; // 잠깐 놓쳐도 바로 돌아가지 않게
   faceSec.classList.toggle('fc-tracking', !!goal);
@@ -853,7 +877,7 @@ listenNfc(tagToWindow);
   // 홈 4번의 NFC 버튼으로 왔으면(home.js 가 took.nfcWait 를 남김) 태그 안내를 띄우고 리더기를 기다린다 (2026-11-21)
   let nfcWait = false;
   try { nfcWait = !!sessionStorage.getItem('took.nfcWait'); sessionStorage.removeItem('took.nfcWait'); } catch { /* 저장 불가 환경 */ }
-  if (nfcWait && !pending) nfcFlash(tr('home.standby'));
+  if (nfcWait && !pending) nfcWin.wait();
 }
 // 거울 웹캠으로 바코드를 읽던 기능은 2026-11-20 사용자 요청으로 뺐다 (제품은 NFC 리더기로 올린다)
 

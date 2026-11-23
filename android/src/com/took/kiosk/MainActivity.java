@@ -7,11 +7,16 @@ package com.took.kiosk;
 // - 음성 인식(Web Speech API)은 안드로이드 WebView 에 없어서 동작하지 않는다 (화면은 '지원하지 않음' 안내를 띄운다)
 // - 화면 전체를 쓰고(상태·내비게이션 바 숨김) 화면이 꺼지지 않게 한다.
 // - 페이지의 전체화면 요청(js/fullscreen-keep.js)은 onShowCustomView 로 받아 준다. 받지 않으면 화면이 빈다.
+// - USB 웹캠 직접 연결 (2026-11-22): 갤탭이 USB 웹캠을 카메라로 등록하지 않아 getUserMedia 로 못 여는 문제 때문에
+//   UvcCamera 가 USB 로 웹캠을 직접 열고, 페이지는 window.TookUvc 와 /__uvc/frame 으로 영상을 받는다 (js/uvc-bridge.js)
+// - 두 가지 APK (2026-11-22): 1번 '툭' 은 앱 안 화면, 2번 '툭 웹' 은 assets/start-url.txt 의 웹 주소(Vercel)를 연다.
+//   웹 주소에서도 USB 웹캠(window.TookUvc, /__uvc/frame)·카메라 권한은 그 주소에만 준다. 첫 화면을 못 열면(인터넷 끊김) 앱 안 화면으로 연다
 // - 콘솔 로그는 logcat 태그 "took" 로 남는다 (adb logcat -s took). chrome://inspect 로 원격 디버깅도 된다.
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -48,7 +53,10 @@ import java.util.Map;
 public class MainActivity extends Activity {
     static final String TAG = "took";
     static final String HOST = "appassets.androidplatform.net";
-    static final String START_URL = "https://" + HOST + "/index.html";
+    static final String LOCAL_URL = "https://" + HOST + "/index.html";
+    String startUrl = LOCAL_URL; // 2번 '툭 웹' 이면 assets/start-url.txt 의 웹 주소
+    String webHost = null;       // 2번이면 그 주소의 호스트 (took-sieunkirns-projects.vercel.app)
+    boolean fellBack;            // 웹 주소를 못 열어 앱 안 화면으로 바꿨다
     static final int REQ_MEDIA = 7;
 
     FrameLayout root;
@@ -56,6 +64,7 @@ public class MainActivity extends Activity {
     View customView; // 페이지가 전체화면을 켰을 때 WebView 가 넘겨주는 화면
     WebChromeClient.CustomViewCallback customCallback;
     PermissionRequest pendingRequest; // 카메라 권한을 묻는 동안 기다리는 페이지 요청
+    UvcCamera uvc; // USB 웹캠 직접 연결
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +77,34 @@ public class MainActivity extends Activity {
             w.getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         }
 
+        readStartUrl();
         root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
         setContentView(root);
+        uvc = new UvcCamera(this, new UvcCamera.Listener() {
+            @Override public void onUsbEvent(String type) { Log.i(TAG, "usb " + type); }
+        });
         createWebView();
-        if (savedInstanceState == null || web.restoreState(savedInstanceState) == null) web.loadUrl(START_URL);
+        if (savedInstanceState == null || web.restoreState(savedInstanceState) == null) web.loadUrl(startUrl);
         hideSystemBars();
+    }
+
+    // 2번 '툭 웹': 빌드할 때 넣은 assets/start-url.txt 가 있으면 그 주소로 시작한다
+    void readStartUrl() {
+        try {
+            InputStream in = getAssets().open("start-url.txt");
+            byte[] b = new byte[2048];
+            int n = in.read(b);
+            in.close();
+            String u = n > 0 ? new String(b, 0, n, "UTF-8").trim() : "";
+            Uri uri = Uri.parse(u);
+            if ("https".equals(uri.getScheme()) && uri.getHost() != null) { startUrl = u; webHost = uri.getHost(); }
+            Log.i(TAG, "start url: " + startUrl);
+        } catch (IOException ignored) { /* 1번 '툭': 앱 안 화면 */ }
+    }
+
+    boolean ourHost(String host) {
+        return HOST.equals(host) || (webHost != null && webHost.equals(host));
     }
 
     void createWebView() {
@@ -81,6 +112,7 @@ public class MainActivity extends Activity {
         web = new WebView(this);
         web.setBackgroundColor(Color.BLACK);
         root.addView(web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        web.addJavascriptInterface(uvc.bridge, "TookUvc"); // 앱 안 화면(appassets)만 쓴다
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -101,7 +133,25 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                return serveAsset(request.getUrl());
+                Uri u = request.getUrl();
+                // USB 웹캠 영상: 앱 안 화면이든 웹 주소든 같은 경로로 준다
+                if ("/__uvc/frame".equals(u.getPath()) && ourHost(u.getHost())) {
+                    Map<String, String> h = new HashMap<String, String>();
+                    h.put("Access-Control-Allow-Origin", "*");
+                    return serveUvcFrame(u, h);
+                }
+                return serveAsset(u);
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, android.webkit.WebResourceError error) {
+                // 2번 '툭 웹': 인터넷이 끊겨 첫 화면을 못 열면 앱 안 화면으로 연다
+                if (request.isForMainFrame() && webHost != null && webHost.equals(request.getUrl().getHost()) && !fellBack) {
+                    fellBack = true;
+                    Log.w(TAG, "web load failed (" + error.getErrorCode() + " " + error.getDescription() + "), falling back to bundled pages");
+                    String path = request.getUrl().getPath();
+                    view.loadUrl("https://" + HOST + (path == null || path.isEmpty() ? "/index.html" : path));
+                }
             }
 
             @Override
@@ -117,7 +167,7 @@ public class MainActivity extends Activity {
                 root.removeView(web);
                 web.destroy();
                 createWebView();
-                web.loadUrl(START_URL);
+                web.loadUrl(startUrl);
                 return true;
             }
         });
@@ -170,6 +220,9 @@ public class MainActivity extends Activity {
 
     // ---------- 카메라 권한: 페이지가 요청하면 안드로이드 권한을 묻고 그 결과대로 허락한다 ----------
     void handlePermission(PermissionRequest request) {
+        // 카메라는 앱 안 화면과 툭 웹 주소에만 준다 (앱 안에서 연 다른 사이트에는 안 준다)
+        Uri origin = request.getOrigin();
+        if (origin == null || !ourHost(origin.getHost())) { request.deny(); return; }
         List<String> missing = new ArrayList<String>();
         for (String r : request.getResources()) {
             String p = androidPermission(r);
@@ -223,6 +276,18 @@ public class MainActivity extends Activity {
             Log.w(TAG, "not found: " + path);
             return notFound(headers);
         }
+    }
+
+    // USB 웹캠 다음 장: ?after=N 보다 새 장이 올 때까지 최대 1초 기다려 JPEG 로 준다 (WebView 의 요청 처리 스레드라 기다려도 된다)
+    WebResourceResponse serveUvcFrame(Uri url, Map<String, String> headers) {
+        long after = 0;
+        try { after = Long.parseLong(url.getQueryParameter("after")); } catch (Exception ignored) { }
+        headers.put("Cache-Control", "no-store");
+        Object[] f = uvc == null ? null : uvc.waitJpeg(after, 1000);
+        if (f == null) return new WebResourceResponse("text/plain", "utf-8", 204, "No Frame", headers, new ByteArrayInputStream(new byte[0]));
+        headers.put("X-Seq", String.valueOf(f[0]));
+        headers.put("Access-Control-Expose-Headers", "X-Seq");
+        return new WebResourceResponse("image/jpeg", null, 200, "OK", headers, new ByteArrayInputStream((byte[]) f[1]));
     }
 
     static WebResourceResponse notFound(Map<String, String> headers) {
@@ -293,8 +358,16 @@ public class MainActivity extends Activity {
         if (web != null) web.saveState(out);
     }
 
+    // USB 웹캠을 꽂아 앱이 열렸을 때 (USB_DEVICE_ATTACHED 필터): 화면은 그대로, 페이지가 꽂힌 걸 알아서 연결한다
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
     @Override
     protected void onDestroy() {
+        if (uvc != null) { uvc.destroy(); uvc = null; }
         if (web != null) { root.removeView(web); web.destroy(); web = null; }
         super.onDestroy();
     }

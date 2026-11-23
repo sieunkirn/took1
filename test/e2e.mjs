@@ -167,7 +167,8 @@ await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen 
   await page.waitForTimeout(700);
   await page.click('.hs-mb-nfc');
   await page.waitForURL(at('palette.html'));
-  await page.waitForFunction(() => document.getElementById('nfc-hint')?.textContent.length > 0, null, { timeout: 3000 });
+  // 2026-11-22: NFC 버튼 → 거울 가운데 세로 안내 모달 (js/nfc-window.js)
+  await page.waitForFunction(() => { const m = document.getElementById('nfc-modal'); return m && !m.hidden && m.dataset.state === 'wait'; }, null, { timeout: 3000 });
 });
 
 // ---------- 팔레트 = Find Your Color (홈에서 바로 들어오는 주 화면) ----------

@@ -2,7 +2,7 @@
 import { $, el } from './common.js';
 import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
 import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
-import { getCamSettings, videoConstraints, isExternalCamera } from './camera-settings.js';
+import { getCamSettings, videoConstraints, isExternalCamera, widestZoom } from './camera-settings.js';
 import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
 import { PALETTE, video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
@@ -67,6 +67,7 @@ async function openStream(gen) {
       s = await preferExternalCamera(s, gen);
       const st = s.getVideoTracks()[0]?.getSettings() || {};
       console.info(`[took] 웹캠 연결: ${s.getVideoTracks()[0]?.label || '?'} ${st.width}×${st.height}${lowRes ? ' (낮춘 해상도)' : ''}`);
+      console.info(`[took] 웹캠 화각: ${await widestZoom(s.getVideoTracks()[0])}`); // 줌 되는 웹캠은 가장 넓게 (2026-11-23)
       return s;
     } catch (e) {
       last = e;

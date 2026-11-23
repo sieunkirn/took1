@@ -54,13 +54,6 @@
   <!-- 한국어 ↔ 영어 버튼은 2026-11-17 사용자 요청으로 홈(시작 버튼 화면)에만 둔다 -->
   <h1 class="fc-title" data-i18n="fc.title">Find Your Color</h1>
   <p class="fc-sub" data-i18n="fc.sub">나만의 컬러를 찾아보세요</p>
-  <!-- 카메라 축소·확대 (2026-11-21 사용자 요청: 웹캠이 확대돼 보여서). 오른쪽 = 화면 꽉 채움(예전과 같음), 왼쪽 = 영상 전체가 보이게 축소.
-       값은 기기에 저장된다 (localStorage took.camZoom, js/palette.js). 터치 보정 필름이 가로 슬라이더만 다루므로 가로로 둔다 -->
-  <div class="fc-zoom">
-    <span class="fc-zoom-ic" aria-hidden="true">−</span>
-    <input type="range" id="cam-zoom" min="0" max="100" step="1" value="100" data-i18n-aria="pal.camZoom" aria-label="카메라 화면 크기">
-    <span class="fc-zoom-ic" aria-hidden="true">+</span>
-  </div>
 
   <!-- 얼굴 자리: 카메라 + 얼굴 가이드(흐린 괄호 + 타원 격자, 2026-11-19 GP-홈화면 Figma. 11-16 에는 괄호만 있었다).
        2026-11-17 사용자 요청: 카메라는 화면(900×1440) 꽉 차게, 위·아래만 살짝 어둡게 (글자·다이얼이 보이게).
@@ -118,14 +111,15 @@
     </div>
   </section>
   <button type="button" class="fc-sbtn" id="fc-sbtn" aria-expanded="false" data-i18n-aria="fc.sheet" aria-label="제품 찾기 열기"></button>
-  <!-- 왼쪽 세로 메뉴 (GP-홈화면 Figma, 2026-11-18): 유리 알약 안에 위 = 스캔(이 화면, 음성 = 챗봇 버튼은 2026-11-22 삭제),
-       아래 = 9점(지금 색의 추천 제품 열기/닫기) · 집(처음으로). -->
-  <nav class="fc-menu folded" id="fc-menu" aria-label="메뉴" data-i18n-aria="fc.menu">
+  <!-- 왼쪽 세로 메뉴 (Figma 2026-IPD GP-홈화면 1653:469, 2026-11-22): 늘 펼친 4칸. 위 흰 알약 = 스캔(이 화면) · NFC(태그 안내, 옛 음성 자리),
+       아래 = 9점(알약 접기/펼치기, 접으면 9점만 남는다. 처음엔 접힌 채로 시작) · 집(처음으로). -->
+  <nav class="fc-menu folded" id="fc-menu" data-focus="scan" aria-label="메뉴" data-i18n-aria="fc.menu">
     <span class="fc-menu-pair" aria-hidden="true"></span>
     <span class="fc-menu-knob" aria-hidden="true"></span>
-    <button type="button" class="fc-mb fc-mb-scan" id="fc-mb-scan" aria-current="page" data-i18n-aria="fc.menuScan" aria-label="컬러 찾기 (지금 화면)"><svg viewBox="0 0 46.83 46.83" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M14.66 18.75Q14.66 15.09 18.71 15.09"/><path d="M31.22 18.75Q31.22 15.09 27.17 15.09"/><path d="M14.66 28.08Q14.66 31.75 18.71 31.75"/><path d="M31.22 28.08Q31.22 31.75 27.17 31.75"/></g></svg></button>
+    <button type="button" class="fc-mb fc-mb-scan is-focus" id="fc-mb-scan" tabindex="-1" aria-current="page" data-i18n-aria="fc.menuScan" aria-label="컬러 찾기 (지금 화면)"><svg viewBox="0 0 46.83 46.83" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M14.66 18.75Q14.66 15.09 18.71 15.09"/><path d="M31.22 18.75Q31.22 15.09 27.17 15.09"/><path d="M14.66 28.08Q14.66 31.75 18.71 31.75"/><path d="M31.22 28.08Q31.22 31.75 27.17 31.75"/></g></svg></button>
+    <button type="button" class="fc-mb fc-mb-nfc" id="fc-mb-nfc" tabindex="-1" data-i18n-aria="fc.menuNfc" aria-label="NFC 태그로 제품 올리기"><svg viewBox="0 0 52.96 52.96" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-linecap="round" transform="translate(14.4 14.9) scale(0.73)"><path d="M7.78 13.44C10.04 15.1 10.04 16.76 7.78 18.42" stroke-width="2.6"/><path d="M12.64 8.96C16.85 13.61 16.85 18.26 12.64 22.9" stroke-width="2.8"/><path d="M17.01 4.98C23.17 12.28 23.17 19.58 17.01 26.89" stroke-width="2.8"/><path d="M21.38 1.99C29.48 11.29 29.48 20.58 21.38 29.87" stroke-width="2.8"/></g></svg></button>
     <button type="button" class="fc-mb fc-mb-grid" id="fc-mb-grid" data-i18n-aria="fc.menuToggle" aria-label="메뉴 펼치기/접기" aria-expanded="false" aria-controls="fc-menu"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="currentColor"><circle cx="20.36" cy="19.49" r="2.09"/><circle cx="27.94" cy="19.49" r="2.09"/><circle cx="35.53" cy="19.49" r="2.09"/><circle cx="20.36" cy="27.46" r="2.09"/><circle cx="27.94" cy="27.46" r="2.09"/><circle cx="35.53" cy="27.46" r="2.09"/><circle cx="20.36" cy="35.44" r="2.09"/><circle cx="27.94" cy="35.44" r="2.09"/><circle cx="35.53" cy="35.44" r="2.09"/></g></svg></button>
-    <a class="fc-mb fc-mb-home" id="fc-mb-home" href="index.html" data-i18n-aria="nav.reset" aria-label="took(초기화)"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.99 26.89L27.46 18.99L36.94 26.89"/><path d="M20.62 24.88V35.94H34.31V24.88"/><path d="M24.83 35.94V29.62H30.1V35.94"/></g></svg></a>
+    <a class="fc-mb fc-mb-home" id="fc-mb-home" tabindex="-1" href="index.html" data-i18n-aria="nav.reset" aria-label="took(초기화)"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.99 26.89L27.46 18.99L36.94 26.89"/><path d="M20.62 24.88V35.94H34.31V24.88"/><path d="M24.83 35.94V29.62H30.1V35.94"/></g></svg></a>
   </nav>
   <p id="nfc-hint" class="fc-toast" aria-live="polite"></p>
 

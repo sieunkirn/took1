@@ -70,7 +70,7 @@ const STRINGS = {
     'detail.shadeOf': '{n}가지 중 대표색', 'detail.shadeRep': '대표색', 'detail.byName': ' (상품명 기준 추정)', 'detail.byColor': ' (색상값으로 추정)',
     'type.립틴트': '립틴트',
     // 팔레트
-    'pal.pageTitle': 'took(툭) - 팔레트', 'pal.camArea': '가상 립 메이크업 화면', 'pal.camRetry': '카메라 다시 연결', 'pal.camZoom': '카메라 화면 크기',
+    'pal.pageTitle': 'took(툭) - 팔레트', 'pal.camArea': '가상 립 메이크업 화면', 'pal.camRetry': '카메라 다시 연결',
     'pal.match': '나에게 어울리는 컬러', 'pal.toneBtn': '내 톤으로 추천받기', 'pal.toneBusy': '재는 중… 정면을 봐 주세요', 'pal.toneResult': '내 톤 · {label}', 'pal.toneNoCam': '카메라가 켜져 있어야 톤을 잴 수 있어요. 카메라를 연결해 주세요.', 'pal.matchSwatches': '추천 컬러',
     'pal.board': '팔레트', 'pal.reset': '처음부터 다시 선택', 'pal.paints': '립 컬러 팔레트', 'pal.mixAria': '선택한 색 견본 {hex}',
     'pal.mixCurrent': '현재 색상', 'pal.mixEmpty': '색을 고르면 선택 색상이 여기에 보여요',
@@ -149,7 +149,7 @@ const STRINGS = {
     'detail.shadeOf': 'representative of {n} shades', 'detail.shadeRep': 'representative shade', 'detail.byName': ' (estimated from product name)', 'detail.byColor': ' (estimated from color)',
     'type.립틴트': 'Lip tint',
     // Palette
-    'pal.pageTitle': 'took - Palette', 'pal.camArea': 'Virtual lip makeup', 'pal.camRetry': 'Reconnect camera', 'pal.camZoom': 'Camera zoom',
+    'pal.pageTitle': 'took - Palette', 'pal.camArea': 'Virtual lip makeup', 'pal.camRetry': 'Reconnect camera',
     'pal.match': 'Colors that suit me', 'pal.toneBtn': 'Match my tone', 'pal.toneBusy': 'Measuring… look straight ahead', 'pal.toneResult': 'My tone · {label}', 'pal.toneNoCam': 'The camera needs to be on to measure your tone. Please connect the camera.', 'pal.matchSwatches': 'Suggested colors',
     'pal.board': 'Palette', 'pal.reset': 'Start over', 'pal.paints': 'Lip color palette', 'pal.mixAria': 'Selected color swatch {hex}',
     'pal.mixCurrent': 'Current color', 'pal.mixEmpty': 'Choose a color to see it here',
@@ -252,7 +252,7 @@ Object.assign(STRINGS.ko, {
   'fc.sheet': '추천 제품 보기', 'fc.sheetClose': '추천 제품 닫기', 'fc.dial': '컬러 다이얼 (돌려서 색 고르기, 손잡이 아래 칸이 고른 색)',
   'fc.theme': '다크 모드 켜기/끄기', 'fc.swatch': '컬러 {hex}', 'fc.families': '컬러 계열',
   'fc.family': '{name} 계열 · {hex}', 'fc.fam.red': '빨강', 'fc.fam.pink': '핑크', 'fc.fam.purple': '보라', 'fc.fam.orange': '오렌지', 'fc.fam.nude': '누드',
-  'fc.texture': '텍스처: {name} (누르면 바뀌어요)', 'fc.textures': '질감 (옆으로 밀어 바꾸기)', 'fc.menu': '메뉴', 'fc.menuToggle': '메뉴 펼치기/접기', 'fc.menuScan': '컬러 찾기 (지금 화면)',
+  'fc.texture': '텍스처: {name} (누르면 바뀌어요)', 'fc.textures': '질감 (옆으로 밀어 바꾸기)', 'fc.menu': '메뉴', 'fc.menuToggle': '메뉴 펼치기/접기', 'fc.menuScan': '컬러 찾기 (지금 화면)', 'fc.menuNfc': 'NFC 태그로 제품 올리기',
   'fc.searching': '비슷한 제품을 찾고 있어요', 'fc.found': '이 컬러와 비슷한 제품 {n}개', 'fc.none': '비슷한 제품이 없어요', 'fc.back': '← 컬러 다시 고르기',
 });
 Object.assign(STRINGS.en, {
@@ -261,7 +261,7 @@ Object.assign(STRINGS.en, {
   'fc.sheet': 'Show matching products', 'fc.sheetClose': 'Close matching products', 'fc.dial': 'Color dial (turn it; the segment under the handle is your color)',
   'fc.theme': 'Toggle dark mode', 'fc.swatch': 'Color {hex}', 'fc.families': 'Color families',
   'fc.family': '{name} · {hex}', 'fc.fam.red': 'Red', 'fc.fam.pink': 'Pink', 'fc.fam.purple': 'Purple', 'fc.fam.orange': 'Orange', 'fc.fam.nude': 'Nude',
-  'fc.texture': 'Texture: {name} (tap to change)', 'fc.textures': 'Textures (swipe to change)', 'fc.menu': 'Menu', 'fc.menuToggle': 'Open or close the menu', 'fc.menuScan': 'Find your color (this screen)',
+  'fc.texture': 'Texture: {name} (tap to change)', 'fc.textures': 'Textures (swipe to change)', 'fc.menu': 'Menu', 'fc.menuToggle': 'Open or close the menu', 'fc.menuScan': 'Find your color (this screen)', 'fc.menuNfc': 'Tag a product (NFC)',
   'fc.searching': 'Looking for similar products', 'fc.found': '{n} products similar to this color', 'fc.none': 'No similar products', 'fc.back': '← Choose the color again',
 });
 // 추천 시트 안내 (2026-11-21)
@@ -276,13 +276,22 @@ Object.assign(STRINGS.ko, {
   'nw.close': '닫기', 'nw.recent': '방금 태그한 립', 'nw.take': '가져가기', 'nw.similar': '이 색과 비슷한 립 보기',
   'nw.pickShade': '들고 계신 호수를 골라 주세요', 'nw.wearing': '지금 입은 호수', 'nw.shadeCount': '{n}가지',
   'nw.noShades': '호수 정보 준비 중이에요 · 대표 색을 발랐어요',
-  'nw.unknown': '등록되지 않은 태그예요', 'nw.unknownSub': '다른 제품을 올리거나 직원에게 알려 주세요',
+  'nw.unknown': '등록되지 않은 태그예요', 'nw.unknownSub': '태그를 다시 한 번 리더기 가운데에 대 주세요',
+  // NFC 안내·인식 모달 (2026-11-22)
+  'nm.title': '제품을 리더기에 대 주세요', 'nm.sub': '들고 계신 립 제품의 색을 입술에 바로 발라 드려요',
+  'nm.step1': '제품을 손에 들어요', 'nm.step2': '리더기에 톡 대요', 'nm.step3': '거울 속 입술에 바로 발라져요',
+  'nm.waiting': '리더기 기다리는 중', 'nm.dial': '다이얼로 고르기 (테스트용)',
+  'nm.hit': '인식했어요', 'nm.applied': '입술에 바로 발라드릴게요', 'nm.toCard': '제품 보기',
 });
 Object.assign(STRINGS.en, {
   'nw.close': 'Close', 'nw.recent': 'Just tagged', 'nw.take': 'Take it home', 'nw.similar': 'Similar lips',
   'nw.pickShade': 'Pick the shade you are holding', 'nw.wearing': 'Wearing', 'nw.shadeCount': '{n} shades',
   'nw.noShades': 'Shade info coming soon · showing the main color',
-  'nw.unknown': "This tag isn't registered", 'nw.unknownSub': 'Try another product or ask a staff member',
+  'nw.unknown': "This tag isn't registered", 'nw.unknownSub': 'Please tap it again on the center of the reader',
+  'nm.title': 'Hold the product to the reader', 'nm.sub': 'We will put its color on your lips right away',
+  'nm.step1': 'Pick up the product', 'nm.step2': 'Tap it on the reader', 'nm.step3': 'See it on your lips in the mirror',
+  'nm.waiting': 'Waiting for the reader', 'nm.dial': 'Choose with the dial (test)',
+  'nm.hit': 'Got it', 'nm.applied': 'Putting it on your lips now', 'nm.toCard': 'See product',
 });
 
 /**
