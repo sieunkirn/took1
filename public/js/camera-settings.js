@@ -10,7 +10,8 @@ import './uvc-bridge.js';
 const KEY = 'took.camSettings';
 // deviceId '' = 자동(외장 USB 웹캠이 보이면 그쪽, 없으면 전면 카메라). label 은 고른 카메라 이름(화면 표시·기록용)
 // fps 0 = 웹캠 기본값
-export const CAM_DEFAULTS = { deviceId: '', label: '', res: '960', fps: 0, mirror: true, rotate: 0 };
+// wide = 광각 정도 0~100 (100 = 가장 넓게, 2026-11-23)
+export const CAM_DEFAULTS = { deviceId: '', label: '', res: '960', fps: 0, mirror: true, rotate: 0, wide: 100 };
 export const CAM_RES = { 480: [640, 480], 720: [1280, 720], 960: [1280, 960], 1080: [1920, 1080] };
 
 export function getCamSettings() {
@@ -47,19 +48,31 @@ export function isExternalCamera(label = '') {
   return EXTERNAL_LABEL.test(label) && !BUILT_IN_LABEL.test(label);
 }
 
-// ---------- 가장 넓게 (2026-11-23 사용자 요청 "좀 더 광각으로") ----------
-// 줌을 지원하는 웹캠(Chrome 에서 zoom 이 보이는 것)은 줌을 가장 작은 값으로 맞춰 렌즈가 담는 전체를 쓴다.
-// 줌이 없는 웹캠은 이미 가장 넓게 찍고 있으므로 그대로 둔다. 화면 축소(여백 생김)는 11-22 사용자 요청으로 쓰지 않는다.
-/** @returns {Promise<string>} 결과 설명 (진단 기록용) */
-export async function widestZoom(track) {
+// ---------- 광각 정도 (2026-11-23 사용자 요청 "광각의 정도를 정할 수 있는 기능") ----------
+// wide 0~100. 100 = 가장 넓게, 내리면 좁게(가까이).
+//  - 줌 되는 웹캠(Chrome 에서 zoom 이 보이는 것): 웹캠 줌으로 정한다 (100 = 줌 최소 = 렌즈 전체)
+//  - 줌 없는 웹캠: 화면에서 확대해 좁힌다 (100 = 지금처럼 화면 꽉 채움, 0 = 2배 확대)
+//  화면보다 작게 줄이는 방식(여백 생김)은 11-22 사용자 요청으로 쓰지 않는다 → 줌 없는 웹캠은 100 이 가장 넓다
+export const SOFT_ZOOM_MAX = 2;
+const clampWide = (w) => Math.max(0, Math.min(100, Number.isFinite(Number(w)) ? Number(w) : 100));
+/** 화면 확대 배율 (줌 없는 웹캠일 때만 1보다 크다) */
+export function softZoomFor(s = getCamSettings(), hwZoom = false) {
+  return hwZoom ? 1 : 1 + (SOFT_ZOOM_MAX - 1) * (1 - clampWide(s.wide) / 100);
+}
+/** 웹캠 줌을 광각 정도에 맞춘다. @returns {Promise<{ hw: boolean, info: string }>} hw = 웹캠 줌으로 맞췄는지 */
+export async function applyWide(track, s = getCamSettings()) {
+  const wide = clampWide(s.wide);
   const cap = track?.getCapabilities?.()?.zoom;
-  if (!cap || typeof cap.min !== 'number') return '줌 없음 (렌즈 그대로 가장 넓게)';
-  const now = track.getSettings?.().zoom;
-  if (now === cap.min) return `줌 ${cap.min} (가장 넓게, 범위 ${cap.min}~${cap.max})`;
+  if (!cap || typeof cap.min !== 'number' || !(cap.max > cap.min)) {
+    return { hw: false, info: `웹캠 줌 없음 → 화면 확대 ×${softZoomFor(s).toFixed(2)} (광각 ${wide})` };
+  }
+  let z = cap.max - (cap.max - cap.min) * (wide / 100);
+  if (cap.step > 0) z = cap.min + Math.round((z - cap.min) / cap.step) * cap.step;
+  z = Math.max(cap.min, Math.min(cap.max, z));
   try {
-    await track.applyConstraints({ advanced: [{ zoom: cap.min }] });
-    return `줌 ${now ?? '?'} → ${cap.min} (가장 넓게, 범위 ${cap.min}~${cap.max})`;
+    await track.applyConstraints({ advanced: [{ zoom: z }] });
+    return { hw: true, info: `웹캠 줌 ${z} (범위 ${cap.min}~${cap.max}, 광각 ${wide})` };
   } catch (e) {
-    return `줌 바꾸기 실패: ${e?.name || e}`;
+    return { hw: false, info: `웹캠 줌 바꾸기 실패(${e?.name || e}) → 화면 확대 ×${softZoomFor(s).toFixed(2)}` };
   }
 }

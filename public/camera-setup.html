@@ -45,6 +45,10 @@
   .cs-actions .primary { grid-column: 1 / -1; background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .cs-tips { margin: 0; padding-left: 22px; line-height: 1.6; font-size: 15px; color: var(--mute); }
   .cs-log { width: 100%; height: 160px; box-sizing: border-box; padding: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--soft); color: var(--ink); font: 12px/1.45 ui-monospace, monospace; resize: vertical; }
+  .cs-wide { display: flex; align-items: center; gap: 14px; }
+  .cs-wide input { flex: 1; height: 44px; accent-color: var(--ink); }
+  .cs-wide output { flex: none; min-width: 64px; font-size: 22px; font-weight: 800; text-align: right; }
+  .cs-wide-ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--mute); margin-top: -6px; }
   .cs-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 12px 20px; border-radius: 999px; font-size: 16px; z-index: 10; pointer-events: none; }
 </style>
 </head>
@@ -89,6 +93,17 @@
     <div class="cs-opts" id="cs-rotate"></div>
   </section>
 
+  <section class="cs-box">
+    <h2>광각 정도</h2>
+    <p class="muted small" style="margin:0">오른쪽 끝이 가장 넓게 보여요. 위 미리보기의 흰 테두리 안이 거울 화면에 보이는 부분이에요.
+      줌이 되는 웹캠은 웹캠 줌으로, 안 되는 웹캠은 화면을 확대해서 좁혀요 (줌 없는 웹캠은 오른쪽 끝보다 넓어지지 않아요)</p>
+    <div class="cs-wide">
+      <input type="range" id="cs-wide" min="0" max="100" step="5" aria-label="광각 정도">
+      <output id="cs-wide-val"></output>
+    </div>
+    <div class="cs-wide-ends"><span>좁게 (가까이)</span><span>넓게</span></div>
+  </section>
+
   <div class="cs-actions">
     <button type="button" class="primary" id="cs-save">저장</button>
     <button type="button" id="cs-reset">처음 값으로</button>
@@ -128,7 +143,7 @@
 </main>
 
 <script type="module">
-  import { getCamSettings, saveCamSettings, clearCamSettings, videoConstraints, isExternalCamera, widestZoom, CAM_DEFAULTS, CAM_RES } from './js/camera-settings.js';
+  import { getCamSettings, saveCamSettings, clearCamSettings, videoConstraints, isExternalCamera, applyWide, softZoomFor, CAM_DEFAULTS, CAM_RES } from './js/camera-settings.js';
   import { uvcStatus, uvcInApp, UVC_ID } from './js/uvc-bridge.js';
 
   const $ = (id) => document.getElementById(id);
@@ -167,7 +182,7 @@
     toastTimer = setTimeout(() => t.remove(), 2600);
   }
   const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
-  const same = (a, b) => ['deviceId', 'res', 'fps', 'mirror', 'rotate'].every((k) => String(a[k]) === String(b[k]));
+  const same = (a, b) => ['deviceId', 'res', 'fps', 'mirror', 'rotate', 'wide'].every((k) => String(a[k]) === String(b[k]));
 
   const ERR = {
     NotAllowedError: '카메라 권한이 거부됐어요 (아래 \'갤탭에서 안 잡힐 때\' 4번)',
@@ -197,7 +212,7 @@
       ['찾은 카메라', cams.length ? `${cams.length}대 (외장으로 보이는 것 ${ext}대)` : '없음', !cams.length],
       ['지금 연결', tr ? `${tr.label || '?'} · ${st.width || '?'}×${st.height || '?'} · 화면 ${fpsSeen}fps` : (lastError || '연결 안 됨'), !tr],
       ['화각(줌)', tr ? (zoomInfo || '확인 중') : '-', false],
-      ['저장된 값', `${saved.deviceId ? (saved.label || '고른 카메라') : '자동(외장 우선)'} · ${CAM_RES[saved.res]?.join('×') || saved.res} · ${Number(saved.fps) || '기본'}fps · 반전 ${saved.mirror ? '켬' : '끔'} · 회전 ${saved.rotate}°`
+      ['저장된 값', `${saved.deviceId ? (saved.label || '고른 카메라') : '자동(외장 우선)'} · ${CAM_RES[saved.res]?.join('×') || saved.res} · ${Number(saved.fps) || '기본'}fps · 반전 ${saved.mirror ? '켬' : '끔'} · 회전 ${saved.rotate}° · 광각 ${saved.wide}`
         + (same(saved, cur) ? '' : '  ← 바꾼 값 저장 안 됨'), !same(saved, cur)],
     ];
     renderUvc();
@@ -272,7 +287,32 @@
     optButtons('cs-rotate', [0, 90, 180, 270].map((d) => ({ v: d, title: `회전 ${d}°`, sub: d ? '웹캠을 돌려 달았을 때' : '' })),
       (it) => Number(cur.rotate) === it.v, (it) => { cur.rotate = it.v; changed(false); });
   }
+  // 광각 정도: 바로 웹캠 줌에 반영하고, 미리보기 흰 테두리(거울에 보이는 부분)를 다시 그린다
+  let wideHw = false;
+  let wideTimer = null;
+  async function applyWideNow(logIt) {
+    const tr = stream?.getVideoTracks()[0];
+    if (!tr) { zoomInfo = ''; wideHw = false; return; }
+    const r = await applyWide(tr, cur);
+    wideHw = r.hw;
+    zoomInfo = r.info;
+    if (logIt) log(`광각: ${zoomInfo}`);
+    renderState();
+  }
+  function renderWide() {
+    $('cs-wide').value = String(cur.wide);
+    $('cs-wide-val').textContent = String(cur.wide);
+  }
+  $('cs-wide').addEventListener('input', () => {
+    cur.wide = Number($('cs-wide').value);
+    renderWide();
+    renderState();
+    clearTimeout(wideTimer);
+    wideTimer = setTimeout(() => applyWideNow(false), 120); // 웹캠 줌은 너무 자주 바꾸지 않게
+  });
+  $('cs-wide').addEventListener('change', () => applyWideNow(true));
   function changed(reopen) {
+    renderWide();
     renderOpts();
     renderState();
     if (reopen) openCamera();
@@ -362,8 +402,7 @@
       return;
     }
     if (my !== gen) return;
-    zoomInfo = await widestZoom(tr); // 줌 되는 웹캠은 가장 넓게 (거울 화면과 같이, 2026-11-23)
-    log(`화각: ${zoomInfo}`);
+    await applyWideNow(true);
     const st = tr.getSettings();
     log(`연결됨: ${tr.label} · ${st.width}×${st.height} · 요청 프레임 ${st.frameRate ? Math.round(st.frameRate) : '?'}`);
     $('cs-msg').hidden = true;
@@ -390,6 +429,20 @@
     vctx.rotate((rot * Math.PI) / 180);
     if (cur.mirror) vctx.scale(-1, 1);
     vctx.drawImage(video, -w / 2, -h / 2, w, h);
+    vctx.restore();
+    // 거울 화면(세로 5:8, 꽉 채움)에 보이는 부분 = 흰 테두리. 줌 없는 웹캠은 화면 확대만큼 더 좁다
+    const z = softZoomFor(cur, wideHw);
+    let vw = cw, vh = cw * 8 / 5;
+    if (vh > ch) { vh = ch; vw = ch * 5 / 8; }
+    vw /= z; vh /= z;
+    const x = (cw - vw) / 2, y = (ch - vh) / 2;
+    vctx.save();
+    vctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    vctx.fillRect(0, 0, cw, y); vctx.fillRect(0, y + vh, cw, ch - y - vh);
+    vctx.fillRect(0, y, x, vh); vctx.fillRect(x + vw, y, cw - x - vw, vh);
+    vctx.strokeStyle = '#fff';
+    vctx.lineWidth = Math.max(2, cw / 320);
+    vctx.strokeRect(x, y, vw, vh);
     vctx.restore();
   }
   requestAnimationFrame(draw);
@@ -505,6 +558,7 @@
   window.addEventListener('pagehide', () => { gen++; stopCamera(); });
 
   // ---------- 시작 ----------
+  renderWide();
   log(`시작 · ${navigator.userAgent}`);
   (async () => {
     await afterChange();

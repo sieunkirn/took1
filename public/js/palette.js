@@ -675,12 +675,13 @@ function toView(points) {
   const H = camArea.offsetHeight;
   const cw = viewEl.width;
   const ch = viewEl.height;
-  const s = Math.max(W / cw, H / ch);
+  const s = Math.max(W / cw, H / ch) * (Number(viewEl.dataset.zoom) || 1); // 광각 정도 화면 확대 (가운데 기준, lip-camera.js setSoftZoom)
   const ox = camArea.offsetLeft + (W - cw * s) / 2;
   const oy = camArea.offsetTop + (H - ch * s) / 2;
   return points.map((q) => { const p = mapPoint(q, !!f.mirror, turn); return { x: ox + p.x * cw * s, y: oy + p.y * ch * s }; });
 }
 // 카메라는 항상 화면 꽉 채움(cover). 11-21 축소 슬라이더(took.camZoom)는 2026-11-22 사용자 요청으로 뺐다
+// 11-23 광각 정도: 줌 없는 웹캠은 cover 보다 더 확대만 한다(여백 없음)
 function faceGoal() {
   const b = lip.lips?.box;
   const pts = b && toView([{ x: b.x0, y: b.y0 }, { x: b.x1, y: b.y0 }, { x: b.x0, y: b.y1 }, { x: b.x1, y: b.y1 }]);
