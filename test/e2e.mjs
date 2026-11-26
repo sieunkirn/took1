@@ -11,7 +11,7 @@ import { join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createApp } from '../server.js';
 import { allProducts } from '../src/lib/repository.js';
-import { recommendByColor } from '../src/lib/recommend.js';
+import { recommendByColor, recommendByTexture } from '../src/lib/recommend.js';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -47,7 +47,6 @@ const results = [];
 const apiRequests = [];
 // 페이지 이동 대기: 서버 모드는 쿼리 포함, 정적 모드는 쿼리 없이 이동한다
 const at = (file) => new RegExp('/' + file.replace('.', '\\.') + '(\\?.*)?$');
-const refColorHas = (pg, hex) => pg.waitForFunction((h) => document.getElementById('ref-color').textContent.includes(h), hex);
 const consoleErrors = [];
 
 // ONLY=<이름 일부> 를 주면 그 단계만 돌린다 (예: ONLY=거울 npm run e2e)
@@ -117,23 +116,14 @@ const page = await ctx.newPage();
 watch(page, 'main');
 const shot = (n) => SHOTS && page.screenshot({ path: `${SHOTS}/${n}.png`, fullPage: true });
 // 저장한 상태(고른 색·대화)를 비우고 그 화면을 새로 연다. 화면 스크립트가 없는 주소에서 비워야, 떠나는 화면이 상태를 다시 써넣지 못한다.
-// 새로고침은 첫 화면으로 돌려보내므로(common.js) 쓰지 않는다
-const openFresh = async (pg, path) => {
-  await pg.goto(BASE + '/samples/samples.json');
-  await pg.evaluate(() => sessionStorage.clear());
-  await pg.goto(BASE + path);
-};
 await step('전체화면: 모든 HTML 화면에 전체화면 유지 스크립트 포함', async () => {
-  for (const path of ['/', '/calib.html', '/kiosk.html', '/lip-together.html', '/palette.html', '/product.html?id=P001', '/recommend.html?hex=%23B3122E', '/shades.html']) {
+  for (const path of ['/', '/calib.html', '/kiosk.html', '/palette.html']) {
     await page.goto(BASE + path);
     assert.equal(await page.locator('script[src="js/fullscreen-keep.js"]').count(), 1, path);
   }
-  await page.goto(BASE + '/shades.html');
-  assert.equal(await page.locator('.nav-fullscreen').count(), 1);
-  assert.equal(await page.locator('.nav-idle-test').count(), 0);
 });
 await step('스크롤바: 표시만 숨기고 스크롤 동작은 유지', async () => {
-  await page.goto(BASE + '/shades.html');
+  await page.goto(BASE + '/palette.html');
   const styles = await page.evaluate(() => ({
     scrollbarWidth: getComputedStyle(document.documentElement).scrollbarWidth,
     webkitScrollbarDisplay: getComputedStyle(document.documentElement, '::-webkit-scrollbar').display,
@@ -141,11 +131,10 @@ await step('스크롤바: 표시만 숨기고 스크롤 동작은 유지', async
   assert.equal(styles.scrollbarWidth, 'none');
   assert.equal(styles.webkitScrollbarDisplay, 'none');
 });
-const savedLipHex = (pg) => pg.evaluate(() => JSON.parse(sessionStorage.getItem('took.lipColor') || 'null')?.hex);
 
 // 홈·팔레트는 2026-11-16 TOOK_prototype 디자인(컬러)으로 바뀌어 무채색 검사를 하지 않는다
-// 2026-11-18~21: 1 제품 장면 → 2 입술 장면 → 3 'Tap The Screen'(처음부터 3초) → 누르면 4번 버튼 2개(거울·NFC, 챗봇은 2026-11-22 삭제)
-await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen → 누르면 버튼 2개 → 거울·NFC', async () => {
+// 1 제품 장면 → 2 입술 장면 → 3 'Tap The Screen'(처음부터 3초) → 누르면 바로 거울 (2026-11-24). 4번 버튼 화면은 ?step=4 로만 보인다
+await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen → 누르면 바로 거울, ?step=4 버튼 2개 → 거울·NFC', async () => {
   await page.goto(BASE + '/');
   assert.equal(await page.getAttribute('#stage', 'data-step'), '1');
   await page.click('#stage');
@@ -158,8 +147,9 @@ await step('홈: 제품 장면 → 입술 장면 → 3초 안에 Tap The Screen 
   await page.waitForFunction(() => document.getElementById('stage').dataset.step === '3', null, { timeout: 6000 });
   assert.ok(Date.now() - t0 < 4500, `Tap The Screen 은 3초쯤 (${Date.now() - t0}ms)`);
   await page.click('#stage');
-  await page.waitForFunction(() => document.getElementById('stage').dataset.step === '4');
-  await page.waitForTimeout(700); // 버튼이 나타나는 동안 (3번을 누른 손가락이 바로 버튼을 누르지 않게 350ms 막아 둠)
+  await page.waitForURL(at('palette.html'));
+  await page.goto(BASE + '/index.html?step=4');
+  await page.waitForTimeout(700); // 버튼이 나타나는 동안 (350ms 막아 둠)
   assert.equal(await page.locator('.hs-mb').count(), 2, '버튼 2개');
   await page.click('.hs-mb-mirror');
   await page.waitForURL(at('palette.html'));
@@ -249,7 +239,8 @@ await step('팔레트: 원형 다이얼 돌리기 → 칸 톡 누르기 → 질�
   assert.equal(await page.locator('#find, #intensity:visible').count(), 0, '시트에 농도·제품 찾기 버튼은 없다');
   await page.waitForSelector('#rec-list .card[data-product-id]');
   const ids = await page.$$eval('#rec-list .card', (cs) => cs.map((c) => c.dataset.productId));
-  assert.deepEqual(ids, recommendByColor(picked, { limit: 6 }).map((p) => p.id), `고른 색 ${picked} 의 추천 순서 (화면: ${ids.join(' ')} / 기대: ${recommendByColor(picked, { limit: 6 }).map((p) => p.id).join(' ')})`);
+  const expect = recommendByTexture(picked, 'sheer', { limit: 6 }).products.map((p) => p.id); // 지금 질감(sheer) 제품 먼저
+  assert.deepEqual(ids, expect, `고른 색 ${picked}·sheer 의 추천 순서 (화면: ${ids.join(' ')} / 기대: ${expect.join(' ')})`);
   await shot('03-palette-recommend');
   await page.click('#rec-list .card >> nth=0 >> text=입술에 발라보기');
   await page.click('#fc-sbtn');
@@ -257,7 +248,7 @@ await step('팔레트: 원형 다이얼 돌리기 → 칸 톡 누르기 → 질�
 });
 
 // 세로 키오스크(갤럭시탭 세로 800×1280, 조금 낮은 820×1180): 주 화면은 스크롤 없이 한 화면에 들어온다
-await step('세로 키오스크: 홈/팔레트/호수 안내가 스크롤 없이 한 화면, 주요 요소가 화면 안에 표시', async () => {
+await step('세로 키오스크: 홈/팔레트가 스크롤 없이 한 화면, 주요 요소가 화면 안에 표시', async () => {
   const pg = await ctx.newPage();
   watch(pg, 'kiosk');
   for (const vp of [KIOSK, { width: 820, height: 1180 }]) {
@@ -265,7 +256,6 @@ await step('세로 키오스크: 홈/팔레트/호수 안내가 스크롤 없이
     for (const [path, ids] of [
       ['/', ['#stage']],
       ['/palette.html', ['.fc-camarea', '.fc-wheel', '#fc-swatches', '#fc-sbtn', '.fc-logo']],
-      ['/shades.html', ['#sh-page']],
     ]) {
       await pg.goto(BASE + path);
       await pg.waitForLoadState('networkidle');
@@ -284,7 +274,7 @@ await step('세로 키오스크: 홈/팔레트/호수 안내가 스크롤 없이
   }
   if (SHOTS) {
     await pg.setViewportSize(KIOSK);
-    for (const [n, path] of [['kiosk-1-home', '/'], ['kiosk-2-palette', '/palette.html'], ['kiosk-3-shades', '/shades.html']]) {
+    for (const [n, path] of [['kiosk-1-home', '/'], ['kiosk-2-palette', '/palette.html']]) {
       await pg.goto(BASE + path);
       await pg.waitForLoadState('networkidle');
       await pg.screenshot({ path: `${SHOTS}/${n}.png` });
@@ -296,7 +286,7 @@ await step('세로 키오스크: 홈/팔레트/호수 안내가 스크롤 없이
 await step('그 밖의 화면 크기(가로 태블릿·PC): 가로 스크롤 없음', async () => {
   for (const vp of [{ width: 1180, height: 820 }, { width: 1440, height: 900 }, { width: 1920, height: 1080 }]) {
     await page.setViewportSize(vp);
-    for (const path of ['/', '/lip-together.html', '/palette.html', '/shades.html', '/recommend.html?hex=%23B3122E', '/product.html?id=P001']) {
+    for (const path of ['/', '/palette.html']) {
       await page.goto(BASE + path);
       await page.waitForLoadState('networkidle');
       const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -307,20 +297,9 @@ await step('그 밖의 화면 크기(가로 태블릿·PC): 가로 스크롤 없
   await page.setViewportSize(KIOSK);
 });
 
-await step('잘못된 제품 ID / 색상 없음 처리', async () => {
-  const n = consoleErrors.length;
-  await page.goto(BASE + '/product.html?id=NOPE');
-  await page.waitForFunction(() => document.getElementById('product-info').textContent.includes('찾을 수 없습니다'));
-  // 존재하지 않는 제품의 404 응답 로그는 의도된 것이므로 제외
-  consoleErrors.splice(n, consoleErrors.length - n, ...consoleErrors.slice(n).filter((e) => !e.includes('404')));
-  await page.evaluate(() => sessionStorage.clear());
-  await page.goto(BASE + '/recommend.html');
-  await page.waitForFunction(() => document.getElementById('rec-status').textContent.includes('전달된 색상값이 없습니다'));
-});
-
 if (STATIC) {
   await step('정적 모드: 서버 API 요청 없음', async () => {
-    assert.deepEqual(apiRequests, []);
+    assert.deepEqual(apiRequests, [], '서버 API 요청: ' + apiRequests.join(' '));
   });
 }
 

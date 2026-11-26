@@ -1,7 +1,6 @@
 // 안드로이드 APK 만들기 (2026-11-17)
-// 정적 버전(npm run build:web 과 같은 dist/static)을 앱 안에 넣은 WebView 앱을 만든다. 두 가지가 나온다 (2026-11-22):
-//   dist/apk/took.apk      1번 '툭'    앱 안 화면만 쓴다
-//   dist/apk/took-web.apk  2번 '툭 웹' Vercel 웹 주소를 연다 (배포하면 바로 반영, 인터넷 끊기면 앱 안 화면)
+// 정적 버전(npm run build:web 과 같은 dist/static)을 앱 안에 넣은 WebView 앱을 만든다 → dist/apk/took.apk (앱 안 화면만 쓴다)
+// ('툭 웹' took-web.apk 는 2026-11-24 사용자 요청으로 뺐다)
 //   npm run build:apk
 // 앱 코드: android/AndroidManifest.xml, android/src/com/took/kiosk/MainActivity.java
 // 필요: JDK 17 이상(javac·java·keytool), Android SDK(build-tools, platforms/android-NN). Gradle 은 쓰지 않고 SDK 도구로 바로 만든다.
@@ -111,15 +110,10 @@ if (clang && existsSync(clang)) {
     + '\n       Android Studio → SDK Manager → SDK Tools → NDK (Side by side) 를 설치한 뒤 다시 만드세요.\n');
 }
 
-// ---------- 4. 두 가지 APK (2026-11-22 사용자 요청) ----------
-//  1번 took.apk     (앱 이름 '툭',    com.took.kiosk)     앱 안에 넣은 화면(assets/www)만 쓴다. 인터넷 없이도 된다
-//  2번 took-web.apk (앱 이름 '툭 웹', com.took.kiosk.web) 웹 주소(Vercel)를 연다 → push 로 배포하면 앱을 다시 안 깔아도 바로 반영.
-//      인터넷이 끊겨 첫 화면을 못 열면 앱 안 화면으로 연다. 두 앱은 이름·패키지가 달라 같이 설치된다
-// 둘 다 USB 웹캠 직접 연결(UvcCamera·libtookuvc.so)이 들어 있다. 시작 주소는 assets/start-url.txt 로 알려 준다 (MainActivity)
-const WEB_URL = 'https://took-sieunkirns-projects.vercel.app/index.html';
+// ---------- 4. APK ----------
+// took.apk (앱 이름 '툭', com.took.kiosk): 앱 안에 넣은 화면(assets/www)만 쓴다. 인터넷 없이도 된다. USB 웹캠 직접 연결(UvcCamera·libtookuvc.so) 포함
 const VARIANTS = [
-  { file: 'took.apk', label: '툭', pkg: null, startUrl: null },
-  { file: 'took-web.apk', label: '툭 웹', pkg: 'com.took.kiosk.web', startUrl: WEB_URL },
+  { file: 'took.apk', label: '툭', pkg: null },
 ];
 const ks = join(homedir(), '.android', 'debug.keystore');
 if (!existsSync(ks)) {
@@ -147,13 +141,7 @@ for (const v of VARIANTS) {
     '--version-code', String(versionCode), '--version-name', versionName, w('res.zip')]);
   // 앱 안 파일(assets/www)·classes.dex·네이티브 라이브러리는 JDK jar 로 넣는다. aapt2 -A 는 윈도우에서 경로를 'assets/www\a.html' 처럼
   // 역슬래시로 넣어서 기기가 파일을 찾지 못한다. jar 는 늘 '/' 로 넣는다 (resources.arsc 는 무압축 그대로 둔다)
-  const extra = [];
-  if (v.startUrl) {
-    mkdirSync(vd('extra', 'assets'), { recursive: true });
-    writeFileSync(vd('extra', 'assets', 'start-url.txt'), v.startUrl);
-    extra.push('-C', vd('extra'), 'assets');
-  }
-  run(jdk('jar'), ['--update', '--no-manifest', '--file', vd('base.apk'), '-C', work, 'assets', ...extra,
+  run(jdk('jar'), ['--update', '--no-manifest', '--file', vd('base.apk'), '-C', work, 'assets',
     ...(nativeLibs ? ['-C', work, 'lib'] : []), '-C', w('dex'), 'classes.dex']);
   run(join(bt, 'zipalign' + EXE), ['-f', '-p', '4', vd('base.apk'), vd('aligned.apk')]);
   run(jdk('java'), [...apksigner, 'sign', '--ks', ks, '--ks-pass', 'pass:android', '--key-pass', 'pass:android',
@@ -164,14 +152,13 @@ for (const v of VARIANTS) {
   const entries = execFileSync(jdk('jar'), ['--list', '--file', vd(v.file)], { encoding: 'utf8', maxBuffer: 256 << 20 }).split(/\r?\n/);
   if (!entries.includes('classes.dex') || !entries.includes('resources.arsc')) fail(`${v.file} 에 classes.dex 또는 resources.arsc 가 없습니다.`);
   if (nativeLibs && !entries.includes('lib/arm64-v8a/libtookuvc.so')) fail(`${v.file} 에 lib/arm64-v8a/libtookuvc.so 가 없습니다.`);
-  if (v.startUrl && !entries.includes('assets/start-url.txt')) fail(`${v.file} 에 assets/start-url.txt 가 없습니다.`);
   const listed = new Set(entries.filter((l) => l.startsWith('assets/www/') && !l.endsWith('/')).map((l) => l.slice('assets/www/'.length)));
   const missing = walk(www).map((f) => relative(www, f).split(sep).join('/')).filter((f) => !listed.has(f));
   if (missing.length) fail(`${v.file} 에 빠진 파일 ${missing.length}개:\n  ${missing.slice(0, 20).join('\n  ')}`);
 
   copyFileSync(vd(v.file), join(outDir, v.file));
   const mb = (statSync(join(outDir, v.file)).size / 1048576).toFixed(1);
-  done.push(`  dist/apk/${v.file}  '${v.label}'  ${mb} MB  ${v.startUrl ? '웹 주소: ' + v.startUrl : '앱 안 화면 ' + listed.size + '개'}`);
+  done.push(`  dist/apk/${v.file}  '${v.label}'  ${mb} MB  앱 안 화면 ${listed.size}개`);
 }
 rmSync(work, { recursive: true, force: true });
 console.log(`\nAPK 완료 (버전 ${versionName}, USB 웹캠 직접 연결 ${nativeLibs ? '포함' : '빠짐(NDK 없음)'})\n${done.join('\n')}`);

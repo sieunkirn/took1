@@ -38,7 +38,8 @@ function countUp(root) {
     const start = performance.now();
     const dur = 600;
     const tick = (now) => {
-      const t = Math.min(1, (now - start) / dur);
+      // 첫 프레임 시각(now)이 start 보다 살짝 앞설 수 있어 0 아래는 자른다 (2026-11-26: 음수면 '-683원'처럼 보였다)
+      const t = Math.max(0, Math.min(1, (now - start) / dur));
       const eased = 1 - (1 - t) ** 3;
       span.textContent = priceText(Math.round(to * eased)); // 한국어 '13,000원', 영어 '₩13,000'
       if (t < 1 && span.isConnected) requestAnimationFrame(tick);

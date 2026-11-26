@@ -69,10 +69,8 @@ header.nav strong a { color: var(--ink); font-weight: 800; font-size: 17px; lett
 main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 
 /* 영역: 가는 선 상자 + 작은 자간 라벨 */
-.area { border: 1px solid var(--line); background: var(--paper); padding: 16px; margin-bottom: 12px; }
-.area > .label, .label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); margin-bottom: 8px; }
+.label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); margin-bottom: 8px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .muted { color: var(--mute); }
 .small { font-size: 13px; }
 .msg { border: 0; border-left: 3px solid var(--ink); background: var(--soft); padding: 10px 12px; margin: 8px 0; }
@@ -86,19 +84,12 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .btn-primary:hover { background: #fff; color: #000; }
 .btn-line, .btn-line:visited { background: #fff; color: #000; }
 .btn-line:hover { background: #000; color: #fff; }
-.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid #000; }
-.steps li { display: flex; flex-direction: column; gap: 6px; padding-top: 16px; }
-.steps .num { font-size: 32px; font-weight: bold; line-height: 1; }
-.steps strong { font-size: 18px; }
 .recent-row { display: grid; grid-template-columns: 160px 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #ccc; }
 @media (max-width: 700px) {
-  .steps { grid-template-columns: 1fr; gap: 0; }
-  .steps li { padding: 14px 0; border-bottom: 1px solid #ccc; }
   .recent-row { grid-template-columns: 1fr; gap: 4px; }
 }
 
 /* 제품 카드 */
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .card { border: 1px solid #888; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
 .card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0 8px; font-size: 14px; }
 .card dt { color: #555; }
@@ -111,8 +102,7 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .card .shade-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* 카드 안의 호수 고르기 (올리브영 '옵션을 선택해 주세요'처럼): 머리 칸 + 아래로 펼치는 목록 */
-.card > .opt, .opt.opt-detail { grid-column: 1 / -1; border: 1px solid #888; border-radius: 12px; overflow: hidden; margin-top: 6px; }
-.opt.opt-detail { margin-top: 12px; }
+.card > .opt { grid-column: 1 / -1; border: 1px solid #888; border-radius: 12px; overflow: hidden; margin-top: 6px; }
 .opt .opt-head { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; padding: 6px 12px; margin: 0; border: 0; border-radius: 0; background: none; color: inherit; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
 .opt .opt-label { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
 .opt .opt-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
@@ -143,9 +133,6 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .slider input[type="range"] { width: 100%; }
 
 /* ---------- 사용자용 립 컬러 매핑: [화면 | 컬러·텍스처·추천] ---------- */
-.lip-user { display: grid; grid-template-columns: 1fr; gap: 12px; }
-.lip-user .area { margin-bottom: 0; display: flex; flex-direction: column; gap: 6px; }
-.lip-user-side { display: flex; flex-direction: column; gap: 12px; }
 .seg button[aria-pressed="true"] { background: #000; color: #fff; border-color: #000; }
 /* 카메라 준비 중 로딩 스피너 (무채색, 립 컬러 매핑 화면 전용) */
 .placeholder p { margin: 0; white-space: pre-line; }
@@ -153,49 +140,15 @@ main { padding: 24px; max-width: 1200px; margin: 0 auto; }
 .placeholder.loading { flex-direction: column; gap: 12px; }
 .placeholder.loading .spinner { display: block; width: 32px; height: 32px; border: 3px solid #ccc; border-top-color: #000; border-radius: 50%; animation: took-spin 0.9s linear infinite; }
 @keyframes took-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .placeholder.loading .spinner { animation-duration: 2.5s; } }
-.rec-inline { display: flex; flex-direction: column; gap: 8px; } /* 추천 같이: 오른쪽 패널 안 제품 카드 세로 목록 */
-
-
-
-.btn-dark { background: #000; color: #fff; border-color: #000; }
-
-.icon-btn { width: 44px; height: 44px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
-.icon-btn[aria-pressed="true"], .icon-btn.listening { background: #000; color: #fff; border-color: #000; }
-
-/* 타이핑 표시: 말풍선 안에서 점 세 개가 차례로 튄다 */
-.typing-dots { display: flex; gap: 5px; padding: 6px 2px 2px; }
-.typing-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--mute, #888); animation: took-typing 1.1s ease-in-out infinite; }
-.typing-dots i:nth-child(2) { animation-delay: 0.15s; } .typing-dots i:nth-child(3) { animation-delay: 0.3s; }
-@keyframes took-typing { 0%, 60%, 100% { transform: none; opacity: 0.45; } 30% { transform: translateY(-5px); opacity: 1; } }
-/* 스트리밍 출력: 말풍선은 다 쓴 크기 그대로, 글자만 채워진다 (아직 안 나온 글은 투명하게 자리만 차지).
-   글이 다 나올 때까지 커서가 깜빡이고, 제품·빠른 답장은 그 뒤에 나온다 */
-
-@keyframes took-caret { 50% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .typing-dots i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .placeholder.loading .spinner { animation-duration: 2.5s; } } /* 추천 같이: 오른쪽 패널 안 제품 카드 세로 목록 */
 
 /* ---------- 태블릿 가로(iPad 가로 1024~1366px) / PC: 한 화면에 맞춤 ---------- */
 @media (orientation: landscape) and (min-width: 960px) {
   header.nav { height: var(--nav-h); padding: 0 24px; flex-wrap: nowrap; }
-  main.fit { max-width: none; height: calc(100dvh - var(--nav-h)); padding: 16px 24px; overflow: hidden; }
-
-  /* 사용자용 립 컬러 매핑: 화면을 가장 크게, 오른쪽에 선택 패널 */
-  .lip-user { grid-template-columns: minmax(0, 1fr) minmax(300px, 28%); height: 100%; }
-  .lip-user-view { height: 100%; min-height: 0; }
-  .lip-user .stage { flex: 0 1 auto; min-height: 0; aspect-ratio: 4 / 3; }
-  .lip-user-side { height: 100%; min-height: 0; overflow-y: auto; }
-
-  
 
 }
 
-@media (max-width: 900px) {
-  .grid-2 { grid-template-columns: 1fr; }
-}
-
-@media print { header.nav, #print { display: none; } }
-
-/* 제품 카드: 색상값 옆 색 견본 (무채색 규칙의 예외, CLAUDE.md) */
+@media print { header.nav { display: none; } }
 
 /* 제품 카드 대표 이미지 (무채색 규칙의 예외, CLAUDE.md). 상품 사진이 잘리지 않게 정사각형 안에 맞춘다 */
 .card-img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: contain; background: #fff; border-bottom: 1px solid #ccc; margin-bottom: 4px; }
@@ -223,8 +176,8 @@ button, .btn-primary, .btn-line {
 button:hover:not(:disabled), .btn-line:hover { background: var(--soft-2); color: var(--ink); }
 button:active:not(:disabled), .btn-primary:active, .btn-line:active { transform: scale(0.96); transition-duration: 0.08s; }
 button:disabled { background: var(--soft); color: var(--faint); opacity: 0.7; }
-.btn-dark, button.btn-dark, .btn-primary, .btn-primary:visited { background: var(--ink); color: var(--paper); }
-.btn-dark:hover:not(:disabled), .btn-primary:hover { background: #333333; color: var(--paper); }
+.btn-primary, .btn-primary:visited { background: var(--ink); color: var(--paper); }
+.btn-primary:hover { background: #333333; color: var(--paper); }
 .btn-primary, .btn-line { min-height: 54px; padding: 0 26px; border-radius: 16px; font-size: 16px; justify-content: center; }
 .btn-line, .btn-line:visited { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line-2); }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 6px; }
@@ -246,10 +199,7 @@ input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border: 0; bo
 input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.18); }
 
 /* 영역: 흰 카드. 카드 안 영역은 구분선만 */
-.area { border: 0; border-radius: var(--r); background: var(--paper); padding: 20px; box-shadow: var(--shadow); }
-.area .area { box-shadow: none; border-radius: 0; padding: 4px 0 16px; border-bottom: 1px solid var(--line); }
-.area .area:last-of-type { border-bottom: 0; }
-.area > .label, .label { font-size: 13px; letter-spacing: -0.01em; font-weight: 700; color: var(--mute); }
+.label { font-size: 13px; letter-spacing: -0.01em; font-weight: 700; color: var(--mute); }
 .msg { border: 0; border-radius: var(--r-s); background: var(--soft); padding: 12px 14px; }
 .placeholder { border: 0; border-radius: 16px; background: var(--soft); color: var(--mute); }
 table th, table td { border-bottom-color: var(--line); }
@@ -272,13 +222,10 @@ table th, table td { border-bottom-color: var(--line); }
 .slider { grid-template-columns: 56px 1fr 48px; }
 .slider label { font-size: 14px; color: var(--ink-2); }
 .slider output { font-size: 14px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-#color-name { font-size: 15px; font-weight: 700; }
 
 /* 제품 카드: 흰 카드, 마우스를 올리면 떠오른다 */
 .card { border: 0; border-radius: var(--r); padding: 14px; gap: 6px; background: var(--paper); box-shadow: var(--shadow); transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease); }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-up); }
-.area .card { box-shadow: inset 0 0 0 1px var(--line); }
-.area .card:hover { box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-up); }
 .card dl { gap: 3px 14px; font-size: 14px; }
 .card dt { color: var(--mute); font-weight: 500; }
 .card dd { font-weight: 600; }
@@ -365,88 +312,19 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
   .idle-overlay.idle-closing { transition: opacity .3s ease; } .idle-pressed { animation: none !important; }
 }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-/* 빠른 답장: 사용자가 할 말이므로 내 말풍선처럼 오른쪽에 붙인다 */
-
-.icon-btn { width: 46px; height: 46px; min-height: 46px; padding: 0; border-radius: 50%; background: var(--paper); }
-
-.icon-btn:hover:not(:disabled) { background: var(--soft-2); }
-.icon-btn[aria-pressed="true"], .icon-btn.listening { background: var(--ink); color: var(--paper); }
-
-.icon-btn.listening { animation: took-pulse 1.2s ease-out infinite; }
-
-/* 음성 전용 입력줄: 마이크가 주 버튼, 가운데 칸은 들은 말만 보여 준다 */
-
-@keyframes took-listen { 50% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.12); } }
-
-/* 비교함·비교표 */
 
 /* 홈: 큰 제목, 흰 카드 메뉴 */
-.steps { border: 0; gap: 14px; }
-.steps li { padding: 22px; border-radius: var(--r); background: var(--paper); box-shadow: var(--shadow); }
-.steps .num { font-size: 15px; font-weight: 800; color: var(--mute); }
 .recent-row { border-bottom: 1px solid var(--line); }
 .recent-row:last-child { border-bottom: 0; }
-@media (max-width: 700px) {
-  .steps { gap: 10px; }
-  .steps li { border-bottom: 0; padding: 18px; }
-}
 
 /* ---------- 홈 인터랙션 (js/home.js) ---------- */
-/* 커서에 반응하는 회색 점 배경: 화면 전체에 고정, 내용 뒤 */
-
-/* 숨쉬기: 그림자 대신 아주 조금 커졌다 작아진다 (테두리는 회색 면 한 단계) */
 /* 동그라미 둘레를 천천히 도는 회색 점 */
-@keyframes caret { 50% { opacity: 0; } }
-/* 홈 = 대기 화면 (옛 거울 ver4 대기 화면, js/home.js): 화면 전체에 선만. 누르면 팔레트로.
-   라이트 모드는 흰 바탕 위 검정 선, 다크 모드는 검정 바탕 위 흰 선 (--paper·--ink 가 바뀐다).
-   왼쪽 위 TOOK 로고, 오른쪽 위 시계, 가운데 점선 얼굴(천천히 숨 쉼), 아래 안내 두 줄, 오른쪽 아래 다크 모드·언어 */
-
-@keyframes hs-face { 0%, 100% { opacity: 0.55; } 50% { opacity: 0.95; } }
-
-/* ---------- 팔레트: 왼쪽 카메라 | 오른쪽 ① 내 톤 찾기 ② 팔레트 ③ 텍스처·추천 (추천 후엔 ④ 결과) (js/palette.js + lip.js).
-   물감·섞는 칸·조제한 색은 실제 색 (CLAUDE.md 예외) ---------- */
-.palette { display: grid; grid-template-columns: 1fr; gap: 16px; }
-.palette .area { margin-bottom: 0; }
-
-.paints { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 2px; }
-/* 테스트 방식(아바타 / 카메라) 버튼: 지금 쓰는 쪽은 검게 */
-
-/* ① 내 톤 찾기: 버튼과 추천 컬러 3개를 한 줄에, 측정값·안내는 접어 둔다 */
-
-/* ② 팔레트 머리: 이름 + 오른쪽 위 다시하기 아이콘 */
-
-/* ③ 마무리: 텍스처·농도·추천 버튼 */
-
-/* ④ 추천 결과: 추천을 받은 뒤에만 ①~③ 대신 보인다 */
-
-/* 조제한 색 박스: 작게 모아 스크롤 없이 보이게 (비어 있는 줄은 자리도 차지하지 않는다) */
-/* 추천 결과 보기: 팔레트·텍스처·농도·추천 버튼을 숨기고 조제한 색과 추천 제품만 오른쪽 전체에 */
-/* 팔레트 박스: 남은 높이를 모두 쓰고, 섞는 칸이 그 높이에 맞춰 커진다 */
-/* 립 컬러 매핑 컬러: 22색을 작은 방울로 두 줄에 */
-
-/* 그라디언트 맵 (2026-11-13): 물감 22색 버튼 대신 색 계열 순서로 이은 색 띠 하나.
-   띠를 누르거나 끌다 놓으면 손잡이 자리 색이 떨어진다 (palette-mixer.js). 아래 정지점 동그라미는 뺐다 */
-
-/* 손잡이: 띠 위아래로 살짝 넘치는 흰 테두리 막대 */
 
 /* 팔레트 화면 다듬기 (Taste Skill 앱 화면 규칙): 판은 그림자 없이 바탕과 한 단계 다른 면으로,
    칸 이름은 읽히는 크기로, 아직 못 누르는 버튼 글자도 읽히게 (흐린 #b5b5b5 → #6e6e6e) */
-.palette-page .area { box-shadow: none; }
-.palette-page .area > .label { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
 
 .palette-page button:disabled:not(.btn-dark) { color: #6e6e6e; opacity: 1; }
 .palette-page .stage .placeholder { font-size: 16px; line-height: 1.6; color: var(--ink-2); }
-
-@media (orientation: landscape) and (min-width: 960px) {
-  .palette { grid-template-columns: minmax(0, 1.15fr) minmax(400px, 0.85fr); height: 100%; }
-  
-  
-  
-  
-  
-  
-  
-}
 
 /* 토스트: 화면 아래 가운데에 잠깐 뜨는 알림 */
 .toast-wrap { position: fixed; left: 50%; bottom: 28px; z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 8px; transform: translateX(-50%); pointer-events: none; }
@@ -460,7 +338,6 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 @keyframes took-shimmer { to { background-position: -200% 0; } }
 @keyframes took-toast-in { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: none; } }
 @keyframes took-toast-out { to { opacity: 0; transform: translateY(8px) scale(0.98); } }
-@keyframes took-pulse { 0% { box-shadow: 0 0 0 0 rgba(25, 25, 25, 0.35); } 100% { box-shadow: 0 0 0 14px rgba(25, 25, 25, 0); } }
 .placeholder.loading .spinner { border-color: var(--soft-2); border-top-color: var(--ink); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -470,118 +347,16 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 /* ================= 태블릿 세로 (iPad 세로 768~1024px) =================
    키오스크를 세워 두었을 때: 한 화면에 맞추고(스크롤 없음) 위아래로 쌓는다.
    - 홈: 두 동그라미를 위아래로 크게
-   - 팔레트: 위 카메라 | 아래 [팔레트 · 내 톤/마무리]
    휴대폰 세로(700px 미만)는 기존 좁은 화면 그대로. PC 에서는 portrait.html 로 미리 본다 */
 @media (orientation: portrait) and (min-width: 700px) {
   header.nav { height: var(--nav-h); padding: 0 20px; flex-wrap: nowrap; }
 
-  /* 팔레트 */
-  main.fit.palette { max-width: none; height: calc(100dvh - var(--nav-h)); padding: clamp(10px, 1.2vh, 14px) 18px; overflow: hidden; }
-  .palette { grid-template-rows: minmax(0, 1fr) auto; gap: clamp(8px, 1vh, 12px); }
-  /* 카메라가 주인공: 라벨은 빼고, 고른 색 이름과 아바타/카메라 버튼을 한 줄에 두어 화면을 최대한 크게 */
-  
-  
-  
-  
-  
-  
-  
-  /* 아래: [팔레트 물감 | 섞는 칸] 한 줄, 그 밑에 [내 톤 찾기 | 텍스처·농도·추천] */
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  
-  /* 추천 제품: 아래 패널 높이 안에 한 줄로 두고 옆으로 밀어 본다 (세로 화면은 폭보다 높이가 귀하다) */
-
 }
 
-/* ---------- 팔레트 시안 B '거울 전면' (키오스크 가로·세로 공통) ----------
-   카메라가 화면 전체를 채우고, 도구는 아래 흰 서랍 하나에 모은다. 마크업은 그대로 두고 CSS 로만 자리를 옮긴다:
-   .pal-right 는 display: contents 로 풀어서 그 안의 판들을 main 기준으로 놓는다.
-   서랍 = 왼쪽 .pal-board(물감·섞는 칸) + 오른쪽 .pal-finish(텍스처·농도·추천), 두 판이 이어 붙어 한 장처럼 보인다.
-   카메라 위: 왼쪽 위 아바타/카메라 버튼과 고른 색, 오른쪽 위 '내 톤으로 추천받기', 서랍 바로 위 안내 문구 */
-@media (orientation: landscape) and (min-width: 960px), (orientation: portrait) and (min-width: 700px) {
-  .palette-page { --dock-h: 252px; --fin-w: 340px; --gap: 16px; }
-  .palette-page main.fit.palette { position: relative; display: block; padding: 0; height: calc(100dvh - var(--nav-h)); overflow: hidden; }
-  
-  .palette-page .palette .area { position: absolute; margin: 0; }
-
-  /* 카메라: 화면 전체 (서랍 뒤로 살짝 들어간다), 화면을 꽉 채우도록 잘라서 보여 준다 */
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  /* 내 톤으로 추천받기: 카메라 오른쪽 위 흰 카드 */
-  
-  
-  
-
-  /* 서랍 왼쪽: 팔레트 이름 + 색상 띠 | 혼합색 견본과 조합 */
-  
-  
-  
-  
-  
-  
-
-  /* 서랍 오른쪽: 텍스처 · 농도 · 추천 버튼 */
-  
-  
-  
-
-  /* 추천 결과: 서랍과 똑같은 자리·크기의 흰 판 (카메라 크기는 그대로 둔다) */
-  
-  
-}
-/* 세로: 서랍을 두 줄로 — 위 줄 물감 22색(넓게), 아래 줄 [섞는 칸 · 고른 색] | [텍스처 · 농도 · 추천] */
-@media (orientation: portrait) and (min-width: 700px) {
-  .palette-page { --dock-h: 420px; --fin-w: 50%; }
-  
-  
-  
-  
-  
-  
-  
-}
-/* 세로: 추천을 받으면 결과 판이 서랍 크기에서 화면(카메라+서랍 영역)의 절반까지 커지고, 제품은 한 줄에 2개씩 (넘치면 위아래로 밀어 본다) 2026-11-15 */
-
-@keyframes pal-grow { from { height: var(--dock-h); } }
-/* 가로: 추천 제품은 서랍 높이에 맞춰 한 줄로 늘어놓고, 넘치면 옆으로 밀어 본다 */
-
-/* NFC 안내: 마이크 아래 작은 줄. 태그를 읽으면 잠깐 검게 바뀐다 */
+/* NFC 안내: 작은 줄. 태그를 읽으면 잠깐 검게 바뀐다 */
 .nfc-hint { margin: 0 auto; width: fit-content; padding: 6px 14px; border-radius: 999px; background: var(--soft); color: var(--ink-2); font-size: 14px; font-weight: 600; text-align: center; transition: background 0.2s, color 0.2s; }
 .nfc-hint:empty { display: none; }
 .nfc-hint.hit { background: var(--ink); color: var(--paper); }
-
-/* 팔레트: NFC 안내는 카메라 위 가운데 맨 위에 작게 */
-
-/* 대화 속 추천 제품: 넘기기 버튼 (넓은 화면에서만 보인다) */
-.pc-nav { display: none; grid-column: 1 / -1; justify-content: center; align-items: center; gap: 20px; padding-top: 4px; }
-.pc-arrow { width: 56px; height: 56px; min-height: 56px; padding: 0; border-radius: 50%; background: var(--ink) !important; color: var(--paper) !important; font-size: 30px; line-height: 1; font-weight: 700; }
-.pc-arrow:disabled { background: var(--soft) !important; color: #b0b0b0 !important; }
-.pc-count { min-width: 56px; text-align: center; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ================= 다크 모드 (언어 버튼 옆 '다크 모드', js/i18n.js themeToggle) =================
    <html data-theme="dark">: 색 변수만 검정 바탕용으로 바꾼다. 여전히 무채색.
@@ -615,136 +390,19 @@ header.nav .nav-logo svg { display: block; width: auto; height: 22px; }
 /* 시작 화면 → 팔레트 전환 (js/home.js leave, palette.html 머리 스크립트)
    떠날 때: 얼굴·안내·시계·버튼이 살짝 커지며 사라지고 로고는 메뉴 로고 자리로 (js).
    들어올 때: 메뉴 로고는 그 자리에 있고, 메뉴의 나머지·화면 내용이 아래에서 차례로 떠오른다 */
-
-@keyframes hs-face-out { from { opacity: 0.9; scale: 1; } to { opacity: 0; scale: 1.18; } }
-@keyframes hs-text-out { to { opacity: 0; transform: translateY(-10px); } }
 @keyframes took-enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 @keyframes took-enter-fade { from { opacity: 0; } to { opacity: 1; } }
 html.enter-fx header.nav { border-bottom-color: transparent; transition: border-color 0.6s 0.4s; }
 html.enter-fx header.nav > :not(strong) { animation: took-enter-fade 0.5s ease-out 0.15s both; }
 html.enter-fx main { animation: took-enter 0.7s cubic-bezier(.2, .8, .2, 1) 0.1s both; }
-
-/* 제품 카드: 답변 아래 한 줄로 늘어놓고 옆으로 밀어 본다 (쪽 넘김 버튼 없음) */
-
-/* 입력줄: [마이크][입력칸][보내기]. 입력칸 글자 16px (iPhone 이 확대하지 않게) */
 /* 기기 선택 해제 (태블릿으로 고정한 기기에서만, common.js deviceResetButton) */
 header.nav .nav-device-reset { min-height: 34px; padding: 4px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
-
-/* 팔레트 상단 로고 → 시작 화면 전환 (common.js goHomeWithMotion, home.js hs-arrive) */
-
-@keyframes hs-face-in { from { opacity: 0; scale: 0.92; } to { opacity: 0.9; scale: 1; } }
-@keyframes hs-rise { from { opacity: 0; transform: translateY(12px); } }
-
-/* ================= 호수 안내 (shades.html) =================
-   세로 화면 기준. 호수 색 동그라미만 실제 색이고 나머지는 무채색. 품절·재고는 색이 아니라 글자로 알린다 */
-.sh-body { background: var(--paper); }
-.sh-page { max-width: 720px; margin: 0 auto; padding: 16px 16px max(24px, env(safe-area-inset-bottom)); }
-.sh-page { display: flex; flex-direction: column; gap: 14px; min-height: calc(100dvh - var(--nav-h)); }
-.sh-head { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-.sh-back { min-height: 44px; }
-.sh-brand, .sh-count { color: var(--ink-2); font-size: 14px; }
-.sh-title h1 { margin: 2px 0; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.25; word-break: keep-all; }
-.sh-count { margin: 0; }
-.sh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
-.sh-shade { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 116px; padding: 10px 4px; background: var(--paper); border-radius: 14px; box-shadow: inset 0 0 0 1px var(--line); line-height: 1.25; }
-.sh-shade[aria-pressed="true"], .sh-shade[aria-pressed="true"]:hover { background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); }
-.sh-dot { width: 48px; height: 48px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); margin-bottom: 4px; }
-.sh-no { font-size: 14px; font-weight: 800; }
-.sh-name { font-size: 13px; color: var(--ink-2); word-break: keep-all; text-align: center; }
-.sh-out { font-size: 12px; font-weight: 700; color: var(--paper); background: var(--ink-2); border-radius: 6px; padding: 1px 6px; margin-top: 2px; }
-.sh-detail { position: sticky; bottom: 0; margin-top: auto; padding: 16px; border-radius: var(--r); background: var(--paper); box-shadow: 0 0 0 1px var(--line), var(--shadow-up); }
-.sh-detail-top { display: flex; align-items: center; gap: 14px; }
-.sh-big-dot { flex: none; width: 64px; height: 64px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
-.sh-detail-name { display: flex; flex-direction: column; line-height: 1.25; }
-.sh-detail-no { font-size: 15px; font-weight: 700; color: var(--ink-2); }
-.sh-detail-name strong { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; word-break: keep-all; }
-.sh-desc { margin: 10px 0 0; font-size: 16px; line-height: 1.5; word-break: keep-all; }
-.sh-facts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
-.sh-facts li { padding: 4px 10px; border-radius: 999px; background: var(--soft); font-size: 13px; font-weight: 600; }
-.sh-actions { display: flex; gap: 8px; margin-top: 14px; }
-.sh-actions button { flex: 1; min-height: 52px; font-size: 16px; }
-.sh-try { display: flex; flex-direction: column; gap: 6px; }
-.sh-try .stage { aspect-ratio: auto; height: 40dvh; }
-@media (min-width: 700px) { .sh-try .stage { height: 54dvh; } }
-
-.sh-try #guide:empty { display: none; }
-
-/* 발라 보는 중: 제품 이름을 줄이고 동그라미를 한 줄로 */
-.sh-page.trying .sh-title h1 { font-size: 18px; }
-.sh-page.trying .sh-count, .sh-page.trying .sh-back { display: none; }
-.sh-page.trying .sh-grid { display: flex; overflow-x: auto; padding: 2px; scrollbar-width: none; }
-.sh-page.trying .sh-shade { flex: 0 0 84px; min-height: 0; padding: 8px 2px; }
-.sh-page.trying .sh-name { display: none; }
-.sh-page.trying .sh-desc, .sh-page.trying .sh-facts { display: none; }
-.sh-page.trying .sh-big-dot { width: 44px; height: 44px; }
-.sh-page.trying .sh-detail-name strong { font-size: 20px; }
-.sh-page.trying .sh-actions { margin-top: 10px; }
-
-.shelf-stock { margin: 6px 0 0; font-size: 18px; font-weight: 800; }
-
-/* ---------- 화면 터치 키보드 (js/touch-keyboard.js): 한/영 키보드 ---------- */
-.tkb { flex: none; margin-top: 4px; padding: 4px 4px 6px; border-radius: 16px; background: var(--soft-2); user-select: none; -webkit-user-select: none; touch-action: manipulation; animation: took-fade 0.2s var(--ease) backwards; }
-.tkb-top { display: flex; justify-content: flex-end; }
-.tkb-hide { min-height: 28px; width: 48px; padding: 0; display: grid; place-items: center; background: transparent; box-shadow: none; color: var(--ink-2); }
-.tkb-rows { display: flex; flex-direction: column; gap: 6px; max-width: 760px; margin: 0 auto; }
-.tkb-row { display: flex; gap: 5px; justify-content: center; }
-.tkb-row-mid { padding: 0 4.5%; }
-.tkb-key { flex: 1 1 0; min-width: 0; min-height: 46px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 8px; background: var(--paper); color: var(--ink); font-size: 19px; font-weight: 500; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12); }
-.tkb-key:active { background: var(--line-2); }
-.tkb-fn { flex: 1.4 1 0; background: var(--line-2); font-size: 14px; font-weight: 600; }
-.tkb-fn:active { background: var(--faint); }
-.tkb-shift[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-.tkb-row-bottom .tkb-fn { flex: 1.3 1 0; }
-.tkb-space { flex: 4 1 0; font-size: 14px; color: var(--mute); }
-.tkb-enter { flex: 2 1 0; background: var(--ink); color: var(--paper); font-size: 15px; font-weight: 700; }
-.tkb-enter:active { background: var(--ink-2); }
-:root[data-theme="dark"] .tkb { background: #2a2a2a; }
-:root[data-theme="dark"] .tkb-key { background: #3d3d3d; color: #fff; box-shadow: none; }
-:root[data-theme="dark"] .tkb-fn { background: #1f1f1f; }
-:root[data-theme="dark"] .tkb-enter, :root[data-theme="dark"] .tkb-shift[aria-pressed="true"] { background: #fff; color: #111; }
-
-/* ================= 가로 키오스크 (스탠드형 동그란 거울 + 갤럭시탭 S10 FE+ 가로, 1280×800 기준, 2026-11-11) ================= */
-
-/* 호수 안내 (shades.html): 가로 키오스크는 [호수 동그라미 | 제품·고른 호수], 발라 보기 중에는 [카메라 | 제품·호수 한 줄·고른 호수] */
-@media (orientation: landscape) and (min-width: 960px) {
-  .sh-page { max-width: 1240px; height: calc(100dvh - var(--nav-h)); min-height: 0; padding: 20px 28px; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 28px; row-gap: 14px; overflow: hidden; }
-  .sh-head { grid-column: 2; grid-row: 1; }
-  .sh-grid { grid-column: 1; grid-row: 1 / -1; align-content: start; overflow-y: auto; padding: 2px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
-  .sh-detail { grid-column: 2; grid-row: 2; position: static; align-self: start; margin: 0; }
-  /* 발라 보기: 왼쪽은 카메라가 화면 높이를 다 쓰고, 호수는 오른쪽에 한 줄 */
-  .sh-page.trying { grid-template-rows: auto auto minmax(0, 1fr); }
-  .sh-page.trying .sh-try { grid-column: 1; grid-row: 1 / -1; min-height: 0; }
-  .sh-page.trying .sh-try .stage { flex: 1 1 auto; height: auto; min-height: 0; }
-  .sh-page.trying .sh-grid { grid-column: 2; grid-row: 2; overflow-y: hidden; }
-  .sh-page.trying .sh-detail { grid-row: 3; }
-}
 
 /* ---------- 웹캠 설정 (camera-settings.js): 카메라 화면 오른쪽 위 ⚙ + 설정 창 ---------- */
 
 /* 스크롤은 유지하고 브라우저 스크롤바만 감춘다 */
 html, body, * { scrollbar-width: none; }
 html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar { display: none; }
-
-/* 버튼은 화면 아래쪽(다크 모드·언어 버튼 바로 위), 안내 문구는 버튼 위에 붙인다 */
-
-/* 근처 매장 재고 창 (store-stock.js, 시연용 데이터) */
-dialog.store-sheet { width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 20px; border: 0; border-radius: 20px; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-up); }
-dialog.store-sheet::backdrop { background: rgba(0, 0, 0, .45); }
-.store-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.store-head strong { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
-.store-sub { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); word-break: keep-all; }
-.store-close { flex: none; width: 48px; height: 48px; min-height: 48px; padding: 0; border: 0; border-radius: 50%; background: var(--soft); color: var(--ink); font-size: 18px; }
-.store-pick { margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 16px; font-weight: 700; line-height: 1.45; word-break: keep-all; }
-.store-list { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.store-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line); }
-.store-row.best { box-shadow: inset 0 0 0 2px var(--ink); }
-.store-row.out { color: var(--ink-2); }
-.store-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.store-name { display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 700; }
-.store-badge { font-size: 12px; font-weight: 700; color: var(--paper); background: var(--ink); border-radius: 6px; padding: 1px 6px; }
-.store-meta { font-size: 13px; color: var(--ink-2); }
-.store-qty { flex: none; font-size: 15px; font-weight: 700; }
-.store-note { margin: 12px 0 0; font-size: 12px; color: var(--ink-2); word-break: keep-all; }
 
 /* 시연용 배지 (2026-11-20, public/js/demo.js): 올리브영 실데이터가 아닌 제품·재고에 붙는다.
    무채색 규칙에 맞춰 글자색(currentColor) 테두리만 쓴다. 밝은 화면·검정 무드 어디서나 보인다 */
@@ -756,3 +414,22 @@ dialog.store-sheet::backdrop { background: rgba(0, 0, 0, .45); }
   opacity: 0.75; white-space: nowrap; vertical-align: middle;
 }
 .card > .demo-badge { margin: 2px 0 0; }
+
+/* ---------- 자동꺼짐 화면 반투명 시안 (2026-11-24 사용자 요청: 색깔 없이 반투명 느낌) ----------
+   검정 막 대신 뒤 화면이 흐리게 비치는 유리 막. 분홍 점·분홍 버튼은 흰색 투명도로.
+   원래 검정·핑크 디자인으로 돌리려면 이 블록만 지우면 된다 */
+.idle-overlay { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-filter: blur(30px) saturate(1.1); backdrop-filter: blur(30px) saturate(1.1); }
+.idle-back { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.24); }
+.idle-ring .dot { fill: #fff; }
+.idle-keep { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.32);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.idle-keep.idle-pressed { background: rgba(255, 255, 255, 0.28); }
+.idle-back.idle-pressed { background: rgba(255, 255, 255, 0.22); }
+
+/* 글자 배치 (2026-11-25): 'AUTO SLEEP' 줄을 지운 뒤 위(제목·안내)·원·아래(질문·버튼)를 고른 간격(72px)으로 다시 놓음 */
+.idle-title { top: 196px; }
+.idle-sub { top: 252px; }
+.idle-ring { top: 352px; }
+.idle-ask { top: 984px; }
+.idle-help { top: 1046px; }
+.idle-keep { top: 1188px; }

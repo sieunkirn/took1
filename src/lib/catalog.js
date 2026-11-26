@@ -106,25 +106,3 @@ export function shadesOf(product) {
   }
   return shadesByLine.get(product.id) || [];
 }
-
-// 제품 이름으로 찾기: 띄어쓰기·기호를 빼고 비교한다. 이름 말고 다른 조건("더 저렴한", "추천")이 붙은 말은 기존 검색에 맡긴다
-const nameKey = (s) => String(s ?? '').toLowerCase().replace(/[^0-9a-z가-힣]/g, '');
-const NAME_FILLER = /틴트|립스틱|립글로스|립오일|립밤|립|제품|색상|색깔|색|컬러|호수|번호|전체|모든|전부|몇가지|몇개|보여주세요|보여줘|보여|찾아주세요|찾아줘|찾아|알려주세요|알려줘|알려|있어요|있나요|있니|있어|뭐예요|뭐야|주세요|좀|이|가|은|는|을|를|의|요|다|shades?|colou?rs?|show|find|please|tint|lipstick|what|are|all|the|of|for|me|see/g;
-
-/** 메시지가 제품 이름을 부른 말이면 그 제품 (시연용 제품 먼저, 긴 이름 우선), 아니면 null */
-export function findNamedProduct(text) {
-  const msg = nameKey(text);
-  if (!msg) return null;
-  let best = null;
-  for (const p of [...allDemoProducts(), ...allProducts()]) {
-    for (const [brand, name] of [[p.brand, p.name], [p.brand_en, p.name_en]]) {
-      const n = nameKey(name), b = nameKey(brand);
-      if (!n || !msg.includes(n)) continue;
-      const withBrand = !!b && msg.includes(b);
-      if (n.length < (withBrand ? 4 : 6)) continue; // '벨벳 틴트'처럼 짧은 이름은 브랜드까지 말했을 때만
-      const score = n.length + (withBrand ? 100 : 0);
-      if (!best || score > best.score) best = { p, score, rest: msg.replace(n, '').replace(withBrand ? b : '', '') };
-    }
-  }
-  return best && !best.rest.replace(NAME_FILLER, '') ? best.p : null;
-}

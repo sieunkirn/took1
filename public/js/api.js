@@ -55,6 +55,7 @@ async function staticApi(path, options) {
     if (!hex) return fail(400, 'hex 파라미터가 필요합니다.');
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
+    if (q.get('texture')) return ok({ hex, texture: q.get('texture'), ...rec.recommendByTexture(hex, q.get('texture'), { limit, excludeIds }) });
     return ok({ hex, products: rec.recommendByColor(hex, { finish: q.get('finish') || null, maxPrice: Number(q.get('maxPrice')) || null, limit, excludeIds }) });
   }
   return fail(404, '알 수 없는 API 입니다.');

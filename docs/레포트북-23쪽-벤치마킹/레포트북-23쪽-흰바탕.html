@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TOOK 레포트북 23쪽(흰 바탕) · 2.2 Research 시장 벤치마킹</title>
+<style>
+  /* B5(JIS) 182×257mm · 23쪽(홀수 쪽: 위 색 띠는 안쪽=왼쪽)
+     무드: 피그마 'Benchmarking' 슬라이드 구성을 흰 바탕으로 — 사진 없음, 가운데 정렬 제목,
+     가는 흰 테두리 알약 칸, 가는 선 기호(◎○△×), 아래 큰 알약 요약. 포인트 색은 #D32C3E 하나. */
+  @page { size: 182mm 257mm; margin: 0; }
+  :root {
+    --accent: #D32C3E;                       /* 레포트북 빨강 */
+    --accent-fill: rgba(211, 44, 62, .08);   /* 서비스 설명 알약 (슬라이드의 분홍 38% 칸) */
+    --accent-row: rgba(211, 44, 62, .07);    /* TOOK 줄 바탕 */
+    --ink: #111;
+    --sub: #8c8c8c;                          /* 영어·보조 글 */
+    --line: #d9d9d9;         /* 표 가로선 */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #e9e9e9; }
+  body { font-family: "Noto Sans KR", "Malgun Gothic", sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .page {
+    position: relative; isolation: isolate; width: 182mm; height: 257mm; background: #fff;
+    margin: 10mm auto; overflow: hidden;
+    padding: 19mm 14mm 12mm;
+    display: flex; flex-direction: column;
+  }
+  .page > * { flex-shrink: 0; }
+  @media print { html, body { background: #fff; } .page { margin: 0; } }
+
+  /* 매장 사진: 제목·표 뒤에 어둡게, 위아래는 검정으로 사라짐 */
+  .photo { position: absolute; z-index: -2; left: 0; right: 0; top: 0; height: 152mm; background: url(img/store-bg.png) center 45% / cover no-repeat; opacity: .62; filter: grayscale(1); }
+  .shade {
+    position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 153mm;
+    background:
+      radial-gradient(ellipse 80% 62% at 50% 50%, transparent 58%, #000 100%),
+      linear-gradient(#000 0%, rgba(0,0,0,.4) 18%, rgba(0,0,0,.22) 46%, rgba(0,0,0,.68) 80%, #000 100%);
+  }
+
+  .bar { position: absolute; top: 13mm; left: 0; width: 66mm; height: 3mm; background: var(--accent); }
+
+  /* ── 제목 ── */
+  .top { text-align: center; }
+  .label { font-size: 9pt; line-height: 1; font-weight: 500; color: var(--accent); letter-spacing: .02em; }
+  h1 { font-size: 20pt; line-height: 1.2; font-weight: 700; letter-spacing: -.03em; margin-top: 2.4mm; }
+  .h1-en { font-size: 9.5pt; line-height: 1.3; font-weight: 300; color: #6e6e6e; margin-top: .4mm; letter-spacing: .01em; }
+  .lead { font-size: 8pt; line-height: 1.6; font-weight: 300; margin-top: 3.4mm; letter-spacing: -.01em; word-break: keep-all; }
+  .lead em { font-style: normal; font-weight: 500; color: var(--accent); }
+  .lead-en { font-size: 6.5pt; line-height: 1.5; color: var(--sub); margin-top: .8mm; }
+
+  /* ── 비교 표: 줄 = 서비스, 칸 = 기준 ── */
+  .bench { margin-top: 6mm; display: grid; grid-template-columns: 19mm 35mm 2.5mm repeat(3, 1fr); }
+  .corner { grid-column: 1 / 4; padding-top: .6mm; }
+  .corner b { display: block; font-size: 7.3pt; line-height: 1.3; font-weight: 700; }
+  .corner span { display: block; font-size: 6pt; line-height: 1.3; color: var(--sub); }
+
+  .crit { padding: 0 1.4mm 2.2mm; text-align: center; }
+  .crit .pill { border: .25mm solid var(--ink); border-radius: 1.6mm; font-size: 7.2pt; line-height: 1; font-weight: 500; padding: 1.5mm 0 1.6mm; letter-spacing: -.01em; }
+  .crit .en { font-size: 6pt; line-height: 1.3; font-weight: 500; color: var(--accent); margin-top: 1.4mm; }
+  .crit .q { font-size: 6pt; line-height: 1.5; font-weight: 300; color: #555; margin-top: 1mm; word-break: keep-all; }
+
+  .logo { height: 9.8mm; display: flex; align-items: center; justify-content: center; }
+  .logo img { display: block; }
+  .logo .oy { width: 17.5mm; }
+  .logo .lo { width: 15.5mm; }
+  .logo .cm { height: 6.2mm; }
+  .logo .sm { height: 6.2mm; }
+  .logo b { font-size: 12.5pt; line-height: 1; font-weight: 800; letter-spacing: .03em; }
+
+  .desc { display: flex; align-items: center; }
+  .desc span { display: block; width: 100%; background: var(--accent-fill); border: .25mm solid var(--accent); border-radius: 1.6mm; font-size: 6.6pt; line-height: 1.2; font-weight: 500; text-align: center; padding: 1.5mm .8mm 1.6mm; white-space: nowrap; letter-spacing: -.01em; }
+  .desc.took span { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .mark { display: flex; align-items: center; justify-content: center; border-bottom: .2mm solid var(--line); }
+  .mark svg { width: 5.2mm; height: 5.2mm; fill: none; stroke: var(--ink); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+  .took.mark { background: var(--accent-row); }
+  .took.mark svg { stroke: var(--accent); stroke-width: 1.6; }
+
+  .legend { display: flex; justify-content: flex-end; gap: 3.4mm; margin-top: 2.3mm; font-size: 6pt; line-height: 1; color: var(--sub); }
+  .legend span { display: inline-flex; align-items: center; gap: 1.1mm; }
+  .legend svg { width: 2.7mm; height: 2.7mm; fill: none; stroke: #555; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+
+  /* 슬라이드의 아래 화살표 — 그라데이션 없이 단색 */
+  .arrow { width: 22mm; height: 6mm; margin: 3.6mm auto 0; background: var(--accent); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+
+  /* ── 인사이트 네 가지 ── */
+  .ins-head { text-align: center; margin-top: 3.4mm; }
+  .ins-head h2 { font-size: 12pt; line-height: 1.35; font-weight: 700; letter-spacing: -.025em; }
+  .ins-head p { font-size: 6.5pt; line-height: 1.4; color: var(--sub); margin-top: .6mm; }
+  .ins { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2.4mm; margin-top: 3.2mm; }
+  .ins li { border: .25mm solid #c8c8c8; border-radius: 2.4mm; padding: 2.5mm 3.8mm 2.7mm 3.2mm; display: grid; grid-template-columns: 6.6mm 1fr; }
+  .ins .n { font-size: 8.5pt; line-height: 1.45; font-weight: 700; color: var(--accent); letter-spacing: .01em; }
+  .ins .ko { font-size: 7.4pt; line-height: 1.48; font-weight: 500; letter-spacing: -.01em; word-break: keep-all; }
+  .ins .en { font-size: 6pt; line-height: 1.42; color: var(--sub); margin-top: .9mm; }
+
+  /* ── 빈자리: 슬라이드 맨 아래 큰 알약 ── */
+  .gap { margin-top: auto; border-left: .9mm solid var(--accent); padding: .6mm 0 .8mm 3.6mm; }
+  .gap .ko { font-size: 7.8pt; line-height: 1.6; font-weight: 500; letter-spacing: -.01em; word-break: keep-all; }
+  .gap .en { font-size: 6.5pt; line-height: 1.5; color: var(--sub); margin-top: .8mm; }
+</style>
+</head>
+<body>
+
+<!-- 기호: ◎ 높음 · ○ 보통 · △ 낮음 · × 없음 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="hi" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5"/><circle cx="12" cy="12" r="5"/></symbol>
+  <symbol id="fair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5"/></symbol>
+  <symbol id="low" viewBox="0 0 24 24"><path d="M12 2.3 22.8 20.9H1.2z"/></symbol>
+  <symbol id="none" viewBox="0 0 24 24"><path d="M3.5 3.5l17 17M20.5 3.5l-17 17"/></symbol>
+</svg>
+
+<!-- ───────────── 23쪽 ───────────── -->
+<section class="page odd">
+  <div class="bar"></div>
+
+  <header class="top">
+    <div class="label">2.2 Research</div>
+    <h1>시장 벤치마킹</h1>
+    <div class="h1-en">Market Benchmarking</div>
+    <p class="lead">국내외 네 가지 서비스를 <em>세 가지 기준으로 비교</em>했다.<br>평가는 공개 자료와 팀의 체험을 바탕으로 한 팀의 판단이다.</p>
+    <p class="lead-en">We compared four services in Korea and abroad by three criteria.<br>The ratings are the team’s judgment based on public materials and our own trials.</p>
+  </header>
+
+  <div class="bench">
+    <div class="corner"><b>비교 기준</b><span>Criteria</span></div>
+    <div class="crit">
+      <div class="pill">1. 온·오프라인 연결</div>
+      <div class="en">Online–offline link</div>
+      <p class="q">매장 거울의 결과가 모바일 앱, 재고 확인, 결제까지 이어지는가?</p>
+    </div>
+    <div class="crit">
+      <div class="pill">2. 가상 체험(AR) 정밀도</div>
+      <div class="en">AR try-on precision</div>
+      <p class="q">매장 조명 보정과 입술에 밀착한 렌더링으로 실제 발색과의 오차를 줄이는가?</p>
+    </div>
+    <div class="crit">
+      <div class="pill">3. 위생·탐색 효율</div>
+      <div class="en">Hygiene &amp; search efficiency</div>
+      <p class="q">공용 테스터 걱정을 덜고, 고르기부터 구매 결정까지의 시간을 줄이는가?</p>
+    </div>
+
+    <!-- 올리브영 -->
+    <div class="logo"><img class="oy" src="img/oliveyoung-black.png" alt="OLIVE YOUNG"></div>
+    <div class="desc"><span>AI 쇼핑 어시스턴트 · 스킨스캔</span></div><i></i>
+    <div class="mark"><svg><use href="#hi"/></svg></div>
+    <div class="mark"><svg><use href="#none"/></svg></div>
+    <div class="mark"><svg><use href="#low"/></svg></div>
+
+    <!-- 로레알 -->
+    <div class="logo"><img class="lo" src="img/loreal-black.png" alt="L’ORÉAL PARIS"></div>
+    <div class="desc"><span>ModiFace · Perso</span></div><i></i>
+    <div class="mark"><svg><use href="#low"/></svg></div>
+    <div class="mark"><svg><use href="#hi"/></svg></div>
+    <div class="mark"><svg><use href="#low"/></svg></div>
+
+    <!-- 커스텀미 -->
+    <div class="logo"><img class="cm" src="img/custom-me-black.png" alt="커스텀미"></div>
+    <div class="desc"><span>커스텀미 · Lip Factory</span></div><i></i>
+    <div class="mark"><svg><use href="#fair"/></svg></div>
+    <div class="mark"><svg><use href="#fair"/></svg></div>
+    <div class="mark"><svg><use href="#low"/></svg></div>
+
+    <!-- see me -->
+    <div class="logo"><img class="sm" src="img/seeme-black.png" alt="see me"></div>
+    <div class="desc"><span>중국 AI 스마트미러</span></div><i></i>
+    <div class="mark"><svg><use href="#none"/></svg></div>
+    <div class="mark"><svg><use href="#low"/></svg></div>
+    <div class="mark"><svg><use href="#fair"/></svg></div>
+
+    <!-- TOOK -->
+    <div class="logo took"><b>TOOK</b></div>
+    <div class="desc took"><span>지향점 · Target</span></div><i></i>
+    <div class="mark took"><svg><use href="#hi"/></svg></div>
+    <div class="mark took"><svg><use href="#hi"/></svg></div>
+    <div class="mark took"><svg><use href="#hi"/></svg></div>
+  </div>
+
+  <div class="legend">
+    <span><svg><use href="#hi"/></svg>높음 High</span>
+    <span><svg><use href="#fair"/></svg>보통 Fair</span>
+    <span><svg><use href="#low"/></svg>낮음 Low</span>
+    <span><svg><use href="#none"/></svg>없음 None</span>
+  </div>
+
+  <div class="arrow"></div>
+
+  <div class="ins-head">
+    <h2>벤치마킹에서 네 가지 인사이트를 얻었다.</h2>
+    <p>We drew four insights from the benchmarking.</p>
+  </div>
+  <ol class="ins">
+    <li><span class="n">01</span><div><p class="ko">한 번의 측정으로 끝나지 않고 앱과 구매로 이어져야 한다.</p><p class="en">It should not end with one measurement but continue to the app and to purchase.</p></div></li>
+    <li><span class="n">02</span><div><p class="ko">매장 조명에 맞춘 보정으로 화면의 색과 실제 발색의 차이를 줄여야 한다.</p><p class="en">Calibration to store lighting should reduce the gap between the screen color and the real color.</p></div></li>
+    <li><span class="n">03</span><div><p class="ko">점수를 보여 주는 리포트에서 대화로 좁혀 가는 추천으로 옮겨 가고 있다.</p><p class="en">Services are moving from score reports to recommendations that narrow down through conversation.</p></div></li>
+    <li><span class="n">04</span><div><p class="ko">바르지 않는 가상 메이크업은 테스터 위생 걱정과 고르는 시간을 줄인다.</p><p class="en">Virtual makeup that needs no application reduces tester hygiene worries and choosing time.</p></div></li>
+  </ol>
+
+  <div class="gap">
+    <p class="ko">그런데 빈자리가 보였다. 피부 측정은 올리브영이, 정밀한 가상 메이크업은 로레알이, 맞춤 제조는 아모레퍼시픽이 이미 하고 있다. 그러나 여러 브랜드가 섞여 있는 유통 매장의 립 매대 앞에서, 테스터를 바르지 않고 색을 비교해 실제 진열 제품으로 이어 주는 서비스는 확인되지 않았다.</p>
+    <p class="en">We also saw an empty spot. Olive Young already does skin measurement, L’Oréal precise virtual makeup, and Amorepacific custom manufacturing. But we found no service that, at the lip shelf of a multi-brand store, compares colors without a tester and leads to the real products on the shelf.</p>
+  </div>
+</section>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 import './use-virtual-data.js'; // 가상 제품 데이터로 고정 (다른 import 보다 먼저)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hexToLab, deltaE2000, hslToHex, rgbToHsl, hexToRgb, similarityFromDeltaE } from '../src/lib/color.js';
+import { hexToLab, deltaE2000, hslToHex, rgbToHsl, hexToRgb, similarityFromDeltaE, labToHex, lookHex, BARE_LIP_HEX } from '../src/lib/color.js';
 import { allProducts, findByBarcode, findById } from '../src/lib/repository.js';
 import { recommendByColor } from '../src/lib/recommend.js';
 import { normalizeAmounts } from '../src/lib/spoken.js';
@@ -120,27 +120,12 @@ test('시연용 호수 데이터: 바코드·ID 로 찾고, 같은 제품의 호
   assert.ok(!allProducts().some((p) => p.source === 'demo'));
 });
 
-test('QR: 만든 QR 을 zxing 이 그대로 읽는다 (버전 1~6), 너무 길면 null', async () => {
-  const { createRequire } = await import('node:module');
-  const Z = createRequire(import.meta.url)('@zxing/library');
-  const { qrMatrix } = await import('../public/js/qr.js');
-  const decode = (m) => {
-    const S = 6, Q = 4, n = (m.length + Q * 2) * S;
-    const lum = new Uint8ClampedArray(n * n).fill(255);
-    m.forEach((row, y) => row.forEach((on, x) => {
-      if (!on) return;
-      for (let a = 0; a < S; a++) for (let b = 0; b < S; b++) lum[((y + Q) * S + a) * n + (x + Q) * S + b] = 0;
-    }));
-    return new Z.QRCodeReader().decode(new Z.BinaryBitmap(new Z.HybridBinarizer(new Z.RGBLuminanceSource(lum, n, n)))).getText();
-  };
-  const texts = ['hi', 'x'.repeat(30), 'y'.repeat(50), 'z'.repeat(75), 'w'.repeat(100), 'v'.repeat(134),
-    'https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=A000000120880'];
-  const versions = new Set();
-  for (const text of texts) {
-    const m = qrMatrix(text);
-    versions.add((m.length - 17) / 4);
-    assert.equal(decode(m), text);
-  }
-  assert.deepEqual([...versions].sort(), [1, 2, 3, 4, 5, 6]);
-  assert.equal(qrMatrix('a'.repeat(135)), null);
+
+test('농도별 입술에 보이는 색 (lookHex, 2026-11-26): 80 = 고른 색 그대로, 낮을수록 맨입술 쪽, 높으면 더 진하게', () => {
+  for (const h of ['#DA3B52', '#EBA1B4', '#A0554A', '#000000', '#FFFFFF']) assert.equal(labToHex(hexToLab(h)), h, 'Lab 왕복');
+  assert.equal(lookHex('#DA3B52', 80), '#DA3B52');
+  assert.equal(lookHex('#DA3B52', 0), BARE_LIP_HEX);
+  const bare = hexToLab(BARE_LIP_HEX);
+  const d = (i) => deltaE2000(hexToLab(lookHex('#DA3B52', i)), bare);
+  assert.ok(d(20) < d(40) && d(40) < d(60) && d(60) < d(80) && d(80) < d(100), '농도가 오를수록 맨입술에서 멀어진다');
 });

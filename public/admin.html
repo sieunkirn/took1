@@ -11,134 +11,266 @@
 <script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
 <script src="js/theme-boot.js"></script>
 <style>
-  /* 관리자 화면 (2026-11-15): 홈 오른쪽 아래 '관리자' 버튼으로 온다.
+  /* 관리자 대시보드 (2026-11-15, 홈 5초 길게 → 여기)
      - 터치 범위 조정: 정전식 터치 필름을 꽂은 뒤 십자 5개를 눌러 터치 좌표를 화면에 맞춘다 (js/touch-calib.js)
-     - 호수 검수 (2026-11-18): 로컬 수집·검수 서버의 전체 검수 화면을 새 탭으로 연다
-     - 조정값은 이 기기 브라우저에 저장되고, '조정값 복사'로 코드를 복사해 개발 쪽에 넘기면
-       touch-calib.js 의 BUILT_IN_CODE 에 넣어 어느 기기·언제 켜도 같은 값이 적용된다
-     calib.html 처럼 맨 위 창에서 바로 열리고, 키오스크와 같은 5:8 상자를 직접 그린다. 조정 전에는 터치가 어긋나 있으므로 화면 전체가 버튼 하나다 */
+     - 조정값은 이 기기 브라우저에 저장된다 (조정값 복사·초기화 버튼은 2026-11-26 사용자 요청으로 뺐다. touch-calib.js 의 BUILT_IN_CODE·exportCode 는 그대로)
+     - 카메라 색 보정(2026-11-20, 11-26 컬러체커 흰색 칸) · 웹캠 연결 설정(11-22) · NFC 테스트(11-18) · 호수 검수(11-18)
+     디자인 (2026-11-26 사용자 지정, docs/관리자-시안/시안2 D·E): 왼쪽 메뉴 + 대시보드.
+       제목·날짜시간 알약 → 검은 큰 칸(터치 범위 조정) → 기능 점검 카드 2×2(색 보정·웹캠 카드 태그 = 지금 상태) → 터치 조정 정보
+       - 왼쪽 메뉴와 기능 점검 카드는 이름·순서가 같다
+       - 설명 문구는 뺐다. 거울로 가는 길은 터치 조정 정보 맨 아래 '스마트 미러로 돌아가기' 회색 줄 하나 (사용자 요청)
+     무채색만 쓴다. 색은 wireframe.css 변수라 다크 모드(html[data-theme="dark"])에서는 저절로 뒤집힌다 (큰 칸이 흰색)
+     calib.html 처럼 맨 위 창에서 바로 열리고, 키오스크와 같은 5:8 상자를 직접 그린다.
+     조정 전에는 터치가 어긋나 있으므로 큰 칸과 상자 밖 검은 여백 어디를 눌러도 조정이 시작된다 */
   html, body { height: 100%; margin: 0; overflow: hidden; background: #000; color: var(--ink); }
-  /* 툭 서비스 화면(kiosk.html)과 같은 세로 900×1440(5:8) 상자를 창에 맞춰 키우거나 줄인다. 남는 곳은 검게 (2026-11-15) */
-  /* 버튼 배치 (2026-11-18 사용자 지정): 터치 범위 조정 / 조정값 복사·조정값 초기화 / 스마트 미러 화면으로·호수 검수 */
-  /* 웹캠 연결 설정 (2026-11-22): NFC 테스트·색 보정 줄 아래에 한 줄(.tool) 더 */
-  /* 바코드 카메라 테스트 → NFC 테스트 (2026-11-18): 위 배치는 그대로 두고 맨 아래 정보 위에 한 줄(.tool)을 더한다 */
-  .ad { position: fixed; left: 50%; top: 50%; width: 900px; height: 1440px; transform: translate(-50%, -50%) scale(var(--k, 1)); background: var(--paper); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto auto auto; gap: 12px; padding: 12px; box-sizing: border-box; }
-  .ad.empty { grid-template-rows: auto minmax(0, 1fr) minmax(0, 0.3fr) auto auto auto; }
-  .ad .tool { grid-column: 1 / -1; min-height: 120px; font-size: 24px; }
-  .ad .tool.half { grid-column: auto; } /* NFC 테스트·카메라 색 보정 한 줄에 둘 (2026-11-20) */
-  .ad .wide { grid-column: 1 / -1; }
-  .ad button.off { opacity: 0.45; }
-  .ad h1 { grid-column: 1 / -1; margin: 4px 4px 0; font-size: 22px; }
-  .ad button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 0; border-radius: 24px; font-size: 28px; font-weight: 800; word-break: keep-all; }
-  .ad button small { font-size: 16px; font-weight: 500; color: var(--mute); }
-  .ad .primary { grid-column: 1 / -1; background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .ad .primary small { color: inherit; opacity: 0.75; }
-  .ad-code { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--mute); }
-  .ad-code textarea { width: 100%; height: 76px; box-sizing: border-box; padding: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--soft); color: var(--ink); font: 13px/1.4 ui-monospace, monospace; resize: none; }
+  .ad { position: fixed; left: 50%; top: 50%; width: 900px; height: 1440px; transform: translate(-50%, -50%) scale(var(--k, 1));
+    display: grid; grid-template-columns: 176px 1fr; background: var(--bg); color: var(--ink); letter-spacing: -0.02em; overflow: hidden;
+    --bg: #fafafa; --side: var(--soft); --chip: #f1f1f1; }
+  :root[data-theme="dark"] .ad { --bg: #0a0a0a; --side: #111; --chip: #222; }
+  .ad svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  /* 전역 button 스타일(테두리·마우스 올리면 검게)을 이 화면에서는 끈다. 버튼 면 색은 --b·--c 로만 정한다 (터치 뒤 남는 hover 에도 그대로) */
+  .ad button { appearance: none; margin: 0; border: 0; background: var(--b, none); color: var(--c, inherit); font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; min-height: 0; padding: 0; }
+  .ad button:hover:not(:disabled) { background: var(--b, none); color: var(--c, inherit); }
+  .ad button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .ad button:disabled { cursor: default; }
+
+  /* 왼쪽 메뉴: 다른 관리자 화면으로 가는 길. 맨 위는 툭 로고 (js/brand.js logoFull) */
+  .ad-side { background: var(--side); border-right: 1px solid var(--line); padding: 38px 12px 28px; display: flex; flex-direction: column; gap: 6px; }
+  .ad-logo { display: block; color: var(--ink); padding: 0 14px 36px; }
+  .ad-logo svg { display: block; width: 104px; height: auto; }
+  .ad .nav { display: flex; align-items: center; gap: 10px; width: 100%; height: 54px; padding: 0 12px; border-radius: 14px; font-size: 15px; color: var(--mute); white-space: nowrap; }
+  .ad .nav svg.i { width: 20px; height: 20px; }
+  .ad .nav.on { --b: var(--paper); color: var(--ink); font-weight: 700; box-shadow: 0 0 0 1px var(--line); cursor: default; }
+  .ad .nav:not(.on):active { --b: var(--soft-2); }
+
+  /* margin 0: wireframe.css 의 main { margin: 0 auto } 가 칸을 가운데로 줄여 오른쪽 전체가 Figma(668px)보다 16px 좁았다 (2026-11-26) */
+  .ad-main { padding: 34px 28px 28px; margin: 0; max-width: none; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  /* 제목 줄 높이: 검은 큰 칸 윗선이 왼쪽 '대시보드' 흰 버튼 윗선(38 + 로고 24.5 + 36 + 6 = 104.5px)과 맞게 34 + 52.5 + 18 (2026-11-26) */
+  .ad-head { display: flex; justify-content: space-between; align-items: center; height: 52.5px; flex: none; }
+  .ad-head h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.04em; }
+  /* 오른쪽 위 알약: 날짜·시간 + 새로고침 (예전 모양, NFC 칩은 뺐다) */
+  .ad-pill { display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 6px 0 18px; border-radius: 23px; background: var(--paper); box-shadow: 0 0 0 1px var(--line); font-size: 14px; color: var(--mute); font-variant-numeric: tabular-nums; }
+  .ad-pill .reload { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 1px var(--line); color: var(--ink); }
+  .ad-pill .reload svg.i { width: 18px; height: 18px; }
+  .ad-pill .reload:active { opacity: 0.7; }
+
+  /* 검은 큰 칸: 조정 전에는 칸 전체가 버튼, 조정 뒤에는 '다시 조정'·'정확도 테스트' 두 버튼 */
+  .ad .ad-hero { height: 600px; flex: none; width: 100%; border-radius: 28px; background: var(--ink); color: var(--paper); --b: var(--ink); --c: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; }
+  .ad-hero > svg.i { width: 76px; height: 76px; stroke-width: 1.6; }
+  .ad-hero h2 { margin: 0; font-size: 40px; line-height: 1.22; font-weight: 800; letter-spacing: -0.04em; color: inherit; }
+  .ad-hero p { margin: 0; font-size: 17px; line-height: 1.5; opacity: 0.72; }
+  .ad-hero .row { display: flex; gap: 10px; margin-top: 6px; }
+  .ad-hero .row button { height: 56px; padding: 0 26px; border-radius: 28px; display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; --b: color-mix(in srgb, var(--paper) 16%, transparent); --c: var(--paper); }
+  .ad-hero .row button.w { --b: var(--paper); --c: var(--ink); }
+  .ad-hero .row button:active { opacity: 0.8; }
+  .ad-hero .row svg.i { width: 18px; height: 18px; }
+
+
+  .ad-sec { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; margin: 6px 4px -4px; }
+  .ad-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ad .card { --b: var(--paper); border-radius: 20px; box-shadow: 0 0 0 1px var(--line); display: grid; grid-template-columns: 52px 1fr 40px; align-items: center; gap: 14px; padding: 22px 20px; min-height: 150px; width: 100%; }
+  .ad .card:active { --b: var(--soft); }
+  .ad .card .ic svg.i { width: 36px; height: 36px; stroke-width: 1.6; }
+  .ad .card b { font-size: 18px; font-weight: 800; display: block; }
+  .ad .card small { display: block; font-size: 14px; color: var(--mute); margin-top: 5px; line-height: 1.4; }
+  .ad .card .go { width: 40px; height: 40px; border-radius: 50%; background: var(--chip); display: grid; place-items: center; }
+  .ad .card .go svg.i { width: 18px; height: 18px; }
+
+  .ad-bottom { display: grid; grid-template-columns: 1fr; flex: 1; min-height: 0; }
+  /* 터치 조정 정보 (Figma 2365:285, 2026-11-26 맞춤): 제목 24+8 · 정보 줄 39(위아래 9 + 글 15×1.35) · 아래 회색 줄 82 · 글은 Bold(700), 줄 높이 1.35 */
+  .ad-box { background: var(--paper); border-radius: 22px; box-shadow: 0 0 0 1px var(--line); padding: 22px 22px 18px; display: flex; flex-direction: column; min-height: 0; }
+  .ad-box h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 18px; font-weight: 700; line-height: 1.35; }
+  /* 터치 조정 정보 맨 아래 '스마트 미러로 돌아가기' 회색 줄 (기능 카드와 같은 말투) */
+  .ad .ad-back { margin-top: auto; width: 100%; border-radius: 18px; --b: var(--soft); display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 14px; padding: 18px; box-sizing: border-box; }
+  .ad .ad-back:active { --b: var(--soft-2); }
+  .ad-back .ic, .ad-back .go { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; }
+  .ad-back .ic { background: var(--paper); }
+  .ad-back .go { background: var(--ink); color: var(--paper); }
+  .ad-back svg.i { width: 20px; height: 20px; stroke-width: 2.16; } /* 20px 로 줄여 그려도 선이 Figma 처럼 1.8px (24칸 기준 1.8 × 24/20) */
+  .ad-back b { display: block; font-size: 18px; font-weight: 700; line-height: 1.35; }
+  .ad-back small { display: block; font-size: 14px; color: var(--mute); margin-top: 3px; line-height: 1.35; }
+  .ad-box-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  /* 조정 뒤에는 정보 줄이 4~6개라 큰 칸을 줄이고 줄 간격을 좁혀 한 화면에 담는다 */
+  .ad.cal .ad-hero { height: 500px; }
+  .ad.cal .kv { padding: 9px 4px; }
+  .ad .kv { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 4px; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.35; }
+  .ad .kv span { color: var(--mute); white-space: nowrap; }
+  .ad .kv b { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body data-idle-reset="off">
 <div class="ad" id="ad"></div>
-<script>
+<script type="module">
+  import { logoFull } from './js/brand.js';
+
   const calib = window.__tookCalib || (() => { try { return window.top.__tookCalib; } catch { return null; } })();
   const box = document.getElementById('ad');
-  const btn = (cls, title, sub, onclick) => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    if (cls) b.className = cls;
-    b.innerHTML = `${title}<small>${sub}</small>`;
-    b.addEventListener('click', onclick);
-    return b;
+
+  // 선 아이콘 (이 화면 전용, 무채색)
+  const I = {
+    home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/>',
+    hand: '<path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 10.5V6.5a1.5 1.5 0 0 1 3 0v7c0 4-2.5 7-6.5 7-3 0-4.5-1.5-6-4l-2-3.5a1.5 1.5 0 0 1 2.6-1.5L9 13"/>',
+    target: '<circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/>',
+    cam: '<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    webcam: '<circle cx="12" cy="10" r="6.5"/><circle cx="12" cy="10" r="2.5"/><path d="M8 20h8M12 16.5V20"/>',
+    nfc: '<path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/><circle cx="12" cy="12" r="1.5"/>',
+    swatch: '<path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.7 0-1.4-1.3-1.6-1.3-2.8 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    refresh: '<path d="M20 11a8 8 0 0 0-14.5-4.5L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.5 4.5L20 16"/><path d="M20 20v-4h-4"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 10"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    mirror: '<rect x="6" y="2.5" width="12" height="16" rx="3"/><path d="M12 18.5v3M8.5 21.5h7"/>',
   };
-  // NFC 태그 확인 (2026-11-18): 리더기에 태그를 대면 읽은 번호와 표(nfc.js NFC_TAGS)에서 찾은 결과를 맨 아래 정보 줄에 보여 준다
-  // 새 태그를 등록하거나 글자가 빠진 번호를 바로잡을 때 쓴다. 줄은 다시 그려도 그대로 쓰도록 한 번만 만든다
-  const nfcLine = document.createElement('span');
-  nfcLine.textContent = 'NFC 태그 확인: 리더기에 태그를 대 보세요';
-  window.__nfcLine = nfcLine;
-  const when = (iso) => (iso ? new Date(iso).toLocaleString('ko-KR') : '');
+  const ic = (k) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
+  const el = (tag, cls, html, onclick) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    if (tag === 'button') n.type = 'button';
+    if (onclick) n.addEventListener('click', onclick);
+    return n;
+  };
+  const short = (iso) => {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const p = (n) => String(n).padStart(2, '0');
+    return `${d.getMonth() + 1}.${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  // 터치 성공 기준: 정확도 테스트에서 '맞음'으로 치는 반지름(js/touch-calib.js HIT_R)과 같은 30px
+  const OK_PX = 30;
+
+  // ── 각 기능으로 가기 ──
   // 호수 전체 검수 (2026-11-18): 로컬 수집·검수 서버(npm run shades:server, scripts/shades-server.js)의 /all 화면.
-  // 그 서버가 켜진 컴퓨터에서만 열린다. 키오스크 화면은 두고 새 탭으로 연다 (검수가 끝나면 탭을 닫으면 된다)
+  // 그 서버가 켜진 컴퓨터에서만 열린다. 키오스크 화면은 두고 새 탭으로 연다
   const SHADES_REVIEW = 'http://localhost:8766/all';
-  const shadesBtn = (cls = '') => btn(cls, '호수 검수', '모든 제품·호수를 보고 넣기/빼기/색 고치기 · 이 컴퓨터에서 npm run shades:server 가 켜져 있어야 열려요 (새 탭)',
-    () => { const w = window.open(SHADES_REVIEW, '_blank'); if (!w) location.href = SHADES_REVIEW; });
-  // NFC 테스트 (2026-11-18 사용자 요청. 바코드 카메라 테스트 화면은 2026-11-20 바코드 기능과 함께 삭제)
-  const nfcTestBtn = () => btn('tool half', 'NFC 테스트', '리더기에 카드를 대면 몇 번 카드인지, 읽은 번호와 찾은 제품을 크게 보여 줘요',
-    () => { location.href = 'nfc-test.html'; });
-  // 카메라 색 보정 (2026-11-20): 터치 범위 조정처럼 설치할 때 한 번. 흰 종이로 카메라 색 틀어짐을 재서 내 톤 추천에 쓴다 (color-calib.html)
-  const colorCalibBtn = () => btn('tool half', '카메라 색 보정', '흰 종이를 대고 측정해 카메라 색 틀어짐을 맞춰요 · 내 톤 추천에 쓰여요',
-    () => { location.href = 'color-calib.html'; });
-  // 웹캠 연결 설정 (2026-11-22): 갤탭에서 USB 웹캠이 잘 안 잡혀서. 카메라 고르기·해상도·프레임·반전·회전·연결 진단 (camera-setup.html)
-  const camSetupBtn = () => btn('tool', '웹캠 연결 설정', '카메라 고르기 · 해상도 낮추기 · 반전/회전 · 연결 상태와 진단 기록',
-    () => { location.href = 'camera-setup.html'; });
-  // 개발 쪽(Claude)에 그대로 붙여 넣을 글
-  const copyText = () => {
-    const code = calib.exportCode();
-    if (!code) return null;
-    const s = calib.status().saved;
-    return `[툭 터치 조정값] 이 값을 웹에 고정 적용해 줘 (${when(s.at)}, 조정 오차 ${s.rms.toFixed(1)}px)\n${code}`;
+  // 이 화면을 노트북 로컬 서버(localhost)로 열었을 때만 호수 서버를 찾는다.
+  // 배포 주소(Vercel·Render)나 태블릿에서 localhost 를 찾으면 Chrome 이 '로컬 네트워크 접근' 허용 창을 띄울 수 있고, 어차피 그 기기에는 서버가 없다
+  const LOCAL_PAGE = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  const go = {
+    // 2026-11-26: 서버가 꺼져 있으면 새 탭이 흰 화면(연결 실패)만 보여서, 먼저 서버가 켜져 있는지 1.5초 안에 확인한다.
+    // 꺼져 있으면 열지 않고 켜는 방법을 알려 준다
+    async shades() {
+      if (!LOCAL_PAGE) { calib?.toast('호수 검수는 노트북에서 npm run shades:server 와 npm start 를 켜고 localhost 관리자 화면에서 열어요'); return; }
+      let up = false;
+      try {
+        const ac = new AbortController();
+        const timer = setTimeout(() => ac.abort(), 1500);
+        await fetch(SHADES_REVIEW, { mode: 'no-cors', cache: 'no-store', signal: ac.signal });
+        clearTimeout(timer);
+        up = true;
+      } catch { up = false; }
+      if (!up) { calib?.toast('호수 검수 서버가 꺼져 있어요. 이 컴퓨터 터미널에서 npm run shades:server 를 켠 뒤 다시 눌러 주세요'); return; }
+      const w = window.open(SHADES_REVIEW, '_blank');
+      if (!w) location.href = SHADES_REVIEW;
+    },
+    nfc() { location.href = 'nfc-test.html'; },
+    // 스마트 미러로 돌아가기 (2026-11-26, 터치 조정 정보 맨 아래 회색 줄): 홈을 거치지 않고 거울(palette.html)을 처음부터 연다 (지난 위치 navCurrent 지움, home.js 와 같게)
+    mirror() { try { sessionStorage.removeItem('took.navCurrent.palette.html'); } catch { /* 저장 불가 환경 */ } location.href = 'palette.html'; },
+    color() { location.href = 'color-calib.html'; }, // 카메라 색 보정 (2026-11-20, color-calib.html)
+    camera() { location.href = 'camera-setup.html'; }, // 웹캠 연결 설정 (2026-11-22, camera-setup.html)
   };
-  async function copy(ta) {
-    const text = ta.value;
-    try {
-      if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); calib.toast('조정값을 복사했어요. Claude 에게 붙여 넣어 주세요'); return; }
-    } catch { /* 아래로 */ }
-    ta.focus();
-    ta.select();
-    let ok = false;
-    try { ok = document.execCommand('copy'); } catch { ok = false; }
-    calib.toast(ok ? '조정값을 복사했어요. Claude 에게 붙여 넣어 주세요' : '아래 글을 길게 눌러 복사해 주세요');
-  }
+
+  // 카드 태그(색 보정 '측정 안 함'·웹캠 '자동 선택'·호수 검수 'shades 서버 필요 · 새 탭')는 2026-11-26 사용자 요청으로 뺐다 (버튼처럼 보여서)
+
+
   const render = () => {
     const s = calib.status();
+    const saved = s.saved;
     box.replaceChildren();
-    const h = document.createElement('h1');
-    h.textContent = '관리자';
-    box.append(h);
-    box.classList.toggle('empty', !s.saved);
-    if (!s.saved) {
-      // 조정 전: 터치가 어긋나 있어도 눌리도록 화면 전체가 시작 버튼
-      box.append(btn('primary', '화면 아무 곳이나 눌러<br>터치 범위 조정 시작', '정전식 필름을 꽂은 뒤 눌러 주세요. 십자 5개를 차례로 누르고 저장하면 정확도 테스트로 넘어가요', () => calib.startCalib()), shadesBtn('wide'), nfcTestBtn(), colorCalibBtn(), camSetupBtn());
+    box.classList.toggle('cal', !!saved);
+
+    // 왼쪽 메뉴: 이름·순서는 오른쪽 '기능 점검' 카드와 같게. (홈으로·스마트 미러로는 2026-11-26 사용자 요청으로 뺐다)
+    const side = el('aside', 'ad-side');
+    side.append(el('div', 'ad-logo', logoFull('', 'TOOK')));
+    const nav = (k, t, f, on) => { const b = el('button', 'nav' + (on ? ' on' : ''), ic(k) + t, f); if (on) b.setAttribute('aria-current', 'page'); return b; };
+    side.append(
+      nav('home', '대시보드', null, true),
+      nav('cam', '카메라 색 보정', go.color),
+      nav('webcam', '웹캠 연결 설정', go.camera),
+      nav('nfc', 'NFC 테스트', go.nfc),
+      nav('swatch', '호수 검수', go.shades),
+    );
+
+    const main = el('main', 'ad-main');
+    // 제목 줄: 오른쪽 위 알약에는 날짜·시간과 새로고침만
+    const head = el('div', 'ad-head', '<h1>관리자 대시보드</h1>');
+    const pill = el('div', 'ad-pill');
+    const reload = el('button', 'reload', ic('refresh'), () => location.reload());
+    reload.setAttribute('aria-label', '새로고침');
+    pill.append(el('span', 'clock'), reload);
+    head.append(pill);
+
+    // 큰 칸
+    let hero;
+    if (!saved) {
+      // 조정 전: 터치가 어긋나 있어도 눌리도록 칸 전체가 시작 버튼
+      hero = el('button', 'ad-hero', `${ic('hand')}<h2>터치 범위 조정 시작</h2><p>정전식 필름을 꽂은 뒤 눌러 주세요<br>오차가 ${OK_PX}px 이하면 성공이에요</p>`, () => calib.startCalib());
     } else {
-      // 조정값 초기화: 이 기기에 저장한 값을 지운다 (웹에 고정한 값이 있으면 그 값으로). 웹 고정값을 쓰는 중이면 지울 값이 없다
-      const local = s.saved.source !== 'builtin';
-      const resetBtn = btn(local ? '' : 'off', '조정값 초기화',
-        local ? (s.builtIn ? '이 기기 조정값을 지우고 웹에 고정한 값으로 돌아가요' : '조정 전 상태로 돌아가요') : '지울 조정값이 없어요 (웹에 고정한 값 사용 중)',
-        () => (local ? calib.reset() : calib.toast('지금은 웹에 고정한 값을 쓰고 있어서 지울 조정값이 없어요')));
-      box.append(
-        btn('primary', '터치 범위 조정', '정전식 필름을 꽂은 뒤 십자 5개를 다시 눌러 맞춰요. 저장하면 정확도 테스트로 넘어가요', () => calib.startCalib()),
-        btn('', '조정값 복사', 'Claude 에게 붙여 넣으면 웹에 고정돼요', () => copy(box.querySelector('textarea'))),
-        resetBtn,
-        btn('', '스마트 미러 화면으로', '조정한 채로 실제 화면을 써 봐요', () => { location.href = 'index.html'; }),
-        shadesBtn(),
-        nfcTestBtn(),
-        colorCalibBtn(),
-        camSetupBtn(),
+      hero = el('div', 'ad-hero', `${ic('target')}<h2>터치 범위 조정 완료<br>오차 ${saved.rms.toFixed(1)}px</h2><p>오차가 ${OK_PX}px 이하면 성공이에요 · ${saved.rms <= OK_PX ? '지금 성공' : '다시 조정해 주세요'}</p>`);
+      const row = el('div', 'row');
+      row.append(
+        el('button', 'w', `${ic('target')}다시 조정`, () => calib.startCalib()),
+        el('button', '', `${ic('hand')}정확도 테스트`, () => calib.startTest()),
       );
+      hero.append(row);
     }
-    const info = document.createElement('div');
-    info.className = 'ad-code';
-    const src = !s.saved ? '조정값 없음'
-      : s.saved.source === 'builtin' ? '웹에 고정한 값 사용 중'
-      : s.sameAsBuiltIn ? '이 기기에 저장한 값 사용 중 (웹에 고정한 값과 같음)'
-      : '이 기기에 저장한 값 사용 중' + (s.builtIn ? ' (웹에 고정한 값과 다름 → 복사해서 다시 고정하세요)' : ' (아직 웹에 고정 안 됨 → 복사해서 Claude 에게 붙여 넣으세요)');
+
+    // 상태 칸은 2026-11-26 사용자 요청으로 뺐다: 마지막 테스트는 아래 '터치 조정 정보'에 보여 준다
     const t = s.lastTest;
-    const line = document.createElement('span');
-    line.textContent = src
-      + (s.saved ? ` · ${when(s.saved.at)} · 조정 오차 ${s.saved.rms.toFixed(1)}px` : '')
-      + (t ? ` · 마지막 테스트 ${t.n}/${t.total} 맞음 (평균 ${t.avg.toFixed(0)}px)` : '')
-      + (s.sim ? ' · 시뮬레이션' : '');
-    info.append(line, nfcLine);
-    if (s.saved) {
-      const ta = document.createElement('textarea');
-      ta.readOnly = true;
-      ta.value = copyText() || '';
-      ta.setAttribute('aria-label', '복사할 조정값');
-      info.append(ta);
-    }
-    box.append(info);
+
+    // 기능 점검 카드 (왼쪽 메뉴와 같은 이름·순서)
+    const card = (k, title, sub, f) => el('button', 'card',
+      `<span class="ic">${ic(k)}</span><span><b>${title}</b><small>${sub}</small></span><span class="go">${ic('arrow')}</span>`, f);
+    const cards = el('div', 'ad-cards');
+    cards.append(
+      card('cam', '카메라 색 보정', '컬러체커로 색 틀어짐 맞추기', go.color),
+      card('webcam', '웹캠 연결 설정', '카메라 · 해상도 · 반전/회전', go.camera),
+      card('nfc', 'NFC 테스트', '카드 번호와 찾은 제품을 크게', go.nfc),
+      card('swatch', '호수 검수', '제품·호수 넣기/빼기/색 고치기', go.shades),
+    );
+
+    // 아래: 터치 조정 정보 (2026-11-26: '빠른 동작' 칸·조정값 복사·초기화·NFC 태그 확인 줄은 사용자 요청으로 뺐다. 다시 맞출 때는 위 '다시 조정')
+    const info = el('div', 'ad-box');
+    const infoHead = el('div', 'ad-box-head', `<h3>${ic('info')}터치 조정 정보</h3>`);
+    info.append(infoHead);
+    const fixed = !s.builtIn ? '없음' : s.sameAsBuiltIn || saved?.source === 'builtin' ? '있음 (지금 값과 같음)' : '있음 (지금 값과 다름)';
+    const rows = [
+      ['값 출처', !saved ? '조정값 없음' : saved.source === 'builtin' ? '웹에 고정한 값' : '이 기기에 저장'],
+      ['웹 고정값', fixed],
+    ];
+    if (saved) rows.push(['조정 오차', `${saved.rms.toFixed(1)}px`]); // '조정한 때' 줄은 2026-11-26 사용자 요청으로 뺐다
+    if (t) rows.push(['마지막 테스트', `${t.at ? short(t.at) + ' · ' : ''}${t.n}/${t.total} 맞음`], ['테스트 평균 오차', `${t.avg.toFixed(0)}px`]);
+    if (s.sim) rows.push(['모드', '시뮬레이션']);
+    rows.forEach(([a, b]) => info.append(el('div', 'kv', `<span>${a}</span><b>${b}</b>`)));
+    // 칸 맨 아래: 스마트 미러로 돌아가기 (2026-11-26 사용자 지정 시안 C 회색 줄. 왼쪽 메뉴의 '스마트 미러로'는 이걸로 옮기며 뺐다)
+    info.append(el('button', 'ad-back', `<span class="ic">${ic('mirror')}</span><span><b>스마트 미러로 돌아가기</b><small>점검을 마쳤으면 거울을 처음부터 열어요</small></span><span class="go">${ic('arrow')}</span>`, go.mirror));
+
+    const bottom = el('div', 'ad-bottom');
+    bottom.append(info);
+    main.append(head, hero, el('div', 'ad-sec', `${ic('check')}기능 점검`), cards, bottom);
+    box.append(side, main);
+    tick();
   };
+
+  // 오른쪽 위 날짜·시간
+  const tick = () => {
+    const c = box.querySelector('.ad-pill .clock');
+    if (!c) return;
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    c.textContent = `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  setInterval(tick, 5000);
+
   if (calib) { calib.onChange(render); render(); }
   else box.textContent = '터치 조정 스크립트를 불러오지 못했어요';
+
+  // 다른 탭(색 보정·웹캠 설정)에서 값이 바뀌고 돌아오면 상태를 다시 읽는다
+  addEventListener('pageshow', () => calib && render());
+  addEventListener('storage', () => calib && render());
+
+  // NFC 태그 확인 줄은 2026-11-26 사용자 요청으로 뺐다 (태그 확인은 'NFC 테스트' 화면에서)
+
   // 5:8 상자 크기 맞추기 (kiosk.html 과 같은 계산)
   const fitBox = () => document.documentElement.style.setProperty('--k', Math.min(innerWidth / 900, innerHeight / 1440));
   addEventListener('resize', fitBox);
@@ -146,20 +278,6 @@
   fitBox();
   // 조정 전에는 터치가 어긋나 상자 밖 검은 여백이 눌릴 수도 있다 → 여백을 눌러도 조정 시작
   document.addEventListener('click', (e) => { if (calib && !calib.status().saved && !box.contains(e.target)) calib.startCalib(); });
-</script>
-<script type="module">
-  import { listenNfc, matchTag, resolveTag, normalizeTag, NFC_LABELS } from './js/nfc.js';
-  listenNfc((code) => {
-    const line = window.__nfcLine;
-    if (!line) return;
-    const n = normalizeTag(code);
-    const key = matchTag(n);
-    const id = resolveTag(n);
-    const time = new Date().toLocaleTimeString('ko-KR');
-    line.textContent = `NFC 태그 확인 (${time}): 읽은 번호 ${n} (${n.length}글자)`
-      + (key ? ` → ${NFC_LABELS[key] || key}` + (key === n ? '' : ' (글자 빠짐 감안)') + ` · ${id}`
-        : id ? ` → 제품 ID · ${id}` : ' → 표에 없음 (바코드 번호면 팔레트에서 찾아요)');
-  });
 </script>
 </body>
 </html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TOOK — How Might We 실사 느낌 (레포트북 25쪽 가로 칸용)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Gaegu:wght@400;700&family=Hi+Melody&family=Gamja+Flower&family=Poor+Story&family=Nanum+Brush+Script&family=Amatic+SC:wght@400;700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 2400px; height: 650px; overflow: hidden; background: #7a2d18; }
+
+  /* ── 벽 ── */
+  .wall {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 70% -10%, rgba(255,170,120,.35) 0%, rgba(255,170,120,0) 55%),
+      linear-gradient(180deg, #a2442a 0%, #8e3820 40%, #7a2d18 100%);
+  }
+  .wall::after {
+    content: ""; position: absolute; inset: 0; opacity: .35; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+  }
+
+  /* ── 장면(손에 든 휴대폰으로 찍은 각도) ── */
+  .scene {
+    position: absolute; inset: 0;
+    transform: perspective(3200px) rotateX(2.4deg) rotateY(-3.2deg) rotateZ(-0.45deg) scale(.972);
+    transform-origin: 46% 52%;
+  }
+
+  /* 알루미늄 틀 */
+  .frame {
+    position: absolute; left: -52px; top: 8px; width: 2504px; height: 626px; border-radius: 5px;
+    background: linear-gradient(180deg, #eef0f2 0%, #b9bec3 18%, #d9dde0 50%, #9ea4aa 100%);
+    box-shadow: 0 14px 26px rgba(30,8,0,.45), 0 2px 3px rgba(0,0,0,.4);
+  }
+  .cap { position: absolute; width: 26px; height: 26px; background: #8e9399; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
+
+  /* 화이트보드 면 */
+  .board {
+    position: absolute; left: -40px; top: 20px; width: 2480px; height: 594px; overflow: hidden;
+    background:
+      radial-gradient(ellipse 900px 340px at 90% 4%, rgba(250,251,251,.35) 0%, rgba(250,251,251,0) 70%),
+      radial-gradient(ellipse 1300px 520px at 10% 108%, rgba(178,184,186,.85) 0%, rgba(178,184,186,0) 70%),
+      linear-gradient(176deg, #e9ecea 0%, #e2e5e4 45%, #d5d9d8 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.12), inset 0 6px 10px -6px rgba(0,0,0,.25);
+  }
+  /* 닦은 자국 결 */
+  .wipe {
+    position: absolute; inset: 0; opacity: .15; mix-blend-mode: multiply; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='600'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.0015 0.035' numOctaves='3' seed='8'/><feColorMatrix type='matrix' values='0 0 0 0 .55  0 0 0 0 .58  0 0 0 0 .62  0 0 0 -2.2 1.25'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+  }
+  /* 지운 마커 자국 */
+  .ghost { position: absolute; border-radius: 50%; filter: blur(16px); background: rgba(110,122,140,.075); }
+  .ghost.line { border-radius: 30px; filter: blur(5px); background: rgba(90,110,150,.05); }
+  /* 창문·천장 반사(유광) */
+  .refl { position: absolute; background: rgba(255,255,255,.6); filter: blur(30px); }
+  /* 형광등 반사 */
+  .tube {
+    position: absolute; right: -90px; top: 22px; width: 600px; height: 13px;
+    transform: rotate(-7deg); border-radius: 12px;
+    background: #fff; filter: blur(2px);
+    box-shadow: 0 0 30px 12px rgba(255,255,255,.85), 0 0 90px 40px rgba(255,255,255,.5);
+  }
+  .tube2 {
+    position: absolute; right: -70px; top: 56px; width: 500px; height: 4px;
+    transform: rotate(-7deg); background: rgba(255,255,255,.95); filter: blur(1.4px);
+  }
+
+  /* ── 마커 글씨 ── */
+  .mk { position: absolute; white-space: nowrap; }
+  .mk i { display: inline-block; font-style: normal; }
+  .title {
+    left: 84px; top: 22px; font-family: 'Amatic SC', cursive; font-weight: 700; font-size: 142px;
+    line-height: .93; letter-spacing: 10px;
+  }
+  .title .layer { position: absolute; left: 0; top: 0; }
+  .title .blue { color: rgba(52,128,206,.80); transform: translate(5px, 4px); filter: url(#marker); }
+  .title .ink  { color: rgba(28,32,44,.90); filter: url(#marker); }
+  .sub {
+    left: 90px; top: 446px; font-family: 'Nanum Pen Script', cursive; font-size: 46px; line-height: 1;
+    color: rgba(40,112,196,.86); transform: rotate(-1.6deg); filter: url(#marker);
+  }
+  .label {
+    top: 516px; transform: translateX(-50%) rotate(-1.2deg);
+    font-family: 'Nanum Pen Script', cursive; font-size: 60px; line-height: 1; color: rgba(40,112,196,.88);
+    filter: url(#marker);
+  }
+  .label small { font-size: 34px; color: rgba(40,112,196,.74); margin-left: 12px; }
+
+  /* ── 포스트잇 ── */
+  .nw { position: absolute; width: 136px; height: 136px; }
+  .sh {
+    position: absolute; left: 5px; right: 1px; top: 34%; bottom: calc(-1px * var(--lift));
+    background: linear-gradient(180deg, rgba(40,30,10,0) 0%, rgba(40,30,10,.30) 60%, rgba(40,30,10,.42) 100%);
+    filter: blur(calc(1px * var(--blur)));
+    transform: translateX(calc(1px * var(--sx)));
+  }
+  .note {
+    position: absolute; inset: 0; padding: 12px 11px 10px;
+    background: var(--c);
+    transform: perspective(520px) rotateX(calc(1deg * var(--curl))) rotateY(calc(1deg * var(--tw)));
+    transform-origin: 50% 16%;
+    box-shadow: 0 0 0 .5px rgba(120,100,0,.25), 0 1px 1.5px rgba(0,0,0,.18);
+    color: #1b1c22; line-height: 1.14;
+  }
+  .note::before { /* 종이 결 */
+    content: ""; position: absolute; inset: 0; opacity: .18; mix-blend-mode: multiply; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+  }
+  .note::after { /* 들뜬 아랫부분 음영 + 접착 띠 */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(150,130,0,.025) 0%, rgba(150,130,0,.025) 17%, rgba(255,255,255,.08) 19%, rgba(255,255,255,0) 40%, rgba(60,45,0,0) 62%, rgba(60,45,0,calc(.012 * var(--curl))) 100%);
+  }
+  .note p { position: relative; z-index: 1; filter: url(#ink); transform: rotate(calc(1deg * var(--tilt))); transform-origin: 0 0; }
+  .note .w { white-space: nowrap; }
+  .note i { display: inline-block; font-style: normal; }
+
+  /* 손글씨 7명 */
+  .h1 { font-family: 'Nanum Pen Script'; font-size: 27px; line-height: 1.0; color: #15161c; }
+  .h2 { font-family: 'Gaegu'; font-size: 19.5px; color: #1d2236; }
+  .h3 { font-family: 'Gaegu'; font-weight: 700; font-size: 20px; color: #0e0e10; }
+  .h4 { font-family: 'Hi Melody'; font-size: 21px; color: #222a40; }
+  .h5 { font-family: 'Gamja Flower'; font-size: 19.5px; color: #17181d; }
+  .h6 { font-family: 'Poor Story'; font-size: 18.5px; color: #232a3d; }
+  .h7 { font-family: 'Nanum Brush Script'; font-size: 28px; line-height: .98; color: #0d0d0f; }
+
+  /* 투표 스티커 */
+  .dots { position: absolute; display: flex; gap: 3px; z-index: 2; }
+  .dot {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #FF007B;
+    box-shadow: inset 0 0 0 .6px rgba(150,0,60,.5), inset 1px 1px 1px rgba(255,255,255,.25), 0 .6px .8px rgba(60,0,20,.35);
+  }
+
+  /* ── 받침대 ── */
+  .tray-top {
+    position: absolute; left: -52px; top: 622px; width: 2504px; height: 16px;
+    background: linear-gradient(180deg, #a9afb5 0%, #d6dadd 55%, #c3c8cc 100%);
+  }
+  .tray-front {
+    position: absolute; left: -52px; top: 637px; width: 2504px; height: 14px;
+    background: linear-gradient(180deg, #8f959b 0%, #70767c 100%);
+    box-shadow: 0 6px 12px rgba(0,0,0,.4);
+  }
+  .pen {
+    position: absolute; top: 619px; height: 15px; width: 150px; border-radius: 3px 8px 8px 3px;
+    background: linear-gradient(180deg, #ffffff 0%, #e7e7e7 40%, #b9b9b9 100%);
+    box-shadow: 0 3px 3px rgba(0,0,0,.35);
+  }
+  .pen::before { content: ""; position: absolute; right: -42px; top: -1px; width: 46px; height: 17px; border-radius: 3px 9px 9px 3px; background: linear-gradient(180deg, var(--cap2) 0%, var(--cap) 45%, rgba(0,0,0,.55) 140%); box-shadow: 0 3px 3px rgba(0,0,0,.3); }
+  .pen::after { content: ""; position: absolute; left: 16px; top: 4px; width: 66px; height: 7px; border-radius: 2px; background: var(--cap); opacity: .8; }
+  .eraser {
+    position: absolute; top: 604px; left: 430px; width: 120px; height: 30px; border-radius: 4px;
+    background: linear-gradient(180deg, #3a3d42 0%, #26282c 60%, #1b1c1f 100%);
+    box-shadow: 0 4px 5px rgba(0,0,0,.45);
+  }
+  .eraser::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 9px; border-radius: 0 0 4px 4px; background: #5b5e64; }
+
+  /* ── 전체 조명 ── */
+  .light {
+    position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply;
+    background: radial-gradient(ellipse 1700px 800px at 84% 0%, #ffffff 0%, #f4f4f2 40%, #d2d2ce 100%);
+  }
+  .tint { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light; background: rgba(170,185,200,.10); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <!-- 볼펜·네임펜: 살짝 흔들리고, 잉크가 고르지 않게 -->
+  <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="wob"/>
+    <feDisplacementMap in="SourceGraphic" in2="wob" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="1" seed="9" result="grain"/>
+    <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.3 1.45" result="mask"/>
+    <feComposite in="d" in2="mask" operator="in" result="speck"/>
+    <feGaussianBlur in="speck" stdDeviation="0.28"/>
+  </filter>
+  <!-- 화이트보드 마커: 줄무늬·마른 가장자리 -->
+  <filter id="marker" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="2" result="wob"/>
+    <feDisplacementMap in="SourceGraphic" in2="wob" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.02 0.45" numOctaves="2" seed="5" result="streak"/>
+    <feColorMatrix in="streak" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.8 1.25" result="mask"/>
+    <feComposite in="d" in2="mask" operator="in" result="s"/>
+    <feGaussianBlur in="s" stdDeviation="0.45"/>
+  </filter>
+</svg>
+
+<div class="wall"></div>
+
+<div class="scene">
+  <div class="frame">
+    <div class="cap" style="left:-2px;top:-2px"></div><div class="cap" style="right:-2px;top:-2px"></div>
+  </div>
+  <div class="board" id="board">
+    <div class="wipe"></div>
+    <div class="refl" style="left:980px;top:-40px;width:520px;height:120px"></div>
+    <div class="refl" style="left:1560px;top:-30px;width:300px;height:90px;opacity:.7"></div>
+    <div class="ghost" style="left:300px;top:380px;width:300px;height:90px"></div>
+    <div class="ghost" style="left:1520px;top:440px;width:380px;height:100px"></div>
+    <div class="ghost" style="left:1010px;top:18px;width:300px;height:60px"></div>
+    <div class="ghost line" style="left:1150px;top:470px;width:220px;height:10px;transform:rotate(-3deg)"></div>
+    <div class="ghost line" style="left:640px;top:16px;width:180px;height:8px;transform:rotate(2deg)"></div>
+    <div class="tube"></div>
+    <div class="tube2"></div>
+
+    <div class="mk title" id="title"></div>
+    <div class="mk sub" id="sub"></div>
+  </div>
+  <div class="tray-top"></div>
+  <div class="tray-front"></div>
+  <div class="pen" style="left:150px;--cap:#24272d;--cap2:#4a4f57;transform:rotate(-1deg)"></div>
+  <div class="pen" style="left:610px;--cap:#2a78c8;--cap2:#5aa2e6;transform:rotate(1.2deg)"></div>
+  <div class="eraser" style="left:1960px"></div>
+</div>
+
+<div class="light"></div>
+<div class="tint"></div>
+
+<script>
+  let seed = 20261126;
+  const rnd = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
+  const between = (a, b) => a + rnd() * (b - a);
+
+  // 글자마다 아주 조금씩 다르게 (같은 글꼴이 찍힌 느낌을 없앰)
+  function jitter(text, amt) {
+    return text.split(' ').map(word =>
+      '<span class="w">' + [...word].map(ch =>
+        `<i style="transform:translate(${between(-amt.x, amt.x).toFixed(2)}px,${between(-amt.y, amt.y).toFixed(2)}px) rotate(${between(-amt.r, amt.r).toFixed(2)}deg) scale(${between(1 - amt.s, 1 + amt.s).toFixed(3)})">${ch}</i>`
+      ).join('') + '</span>'
+    ).join(' ');
+  }
+
+  // 제목·부제
+  const tAmt = { x: 1.5, y: 3, r: 2.2, s: .04 };
+  const titleHTML = ['HOW', 'MIGHT', 'WE...'].map(l => jitter(l, tAmt)).join('<br>');
+  const title = document.getElementById('title');
+  title.innerHTML = `<div class="layer blue">${titleHTML}</div><div class="layer ink">${titleHTML}</div>`;
+  document.getElementById('sub').innerHTML =
+    jitter('립 매대 앞에서,', { x: .8, y: 1.6, r: 3, s: .05 }) + '<br>' +
+    jitter('우리가 어떻게 하면…', { x: .8, y: 1.6, r: 3, s: .05 });
+
+  // [문장, 투표 수]
+  const groups = [
+    { label: '고르기', sub: '선택지가 너무 많다', x0: 500, skip: [3, 8], notes: [
+      ['수백 개 립 중에서 내 색을 빨리 찾게', 1],
+      ['입문자도 뭘 기준으로 고를지 알게', 0],
+      ['호수 이름만 봐도 색이 짐작되게', 0],
+      ['브랜드가 달라도 비슷한 색끼리 모아 보게', 1],
+      ['내 피부톤에 어울리는 색을 알게', 0],
+      ['정답 말고 선택지를 좁혀 주게', 3],
+      ['고르다 지쳐서 포기하지 않게', 0],
+      ['원하는 색을 말로 설명 못 해도 찾게', 0],
+      ['유행 색이 나한테도 어울리는지 보게', 0],
+      ['친구 없이 혼자 와도 결정할 수 있게', 0],
+    ]},
+    { label: '바르기', sub: '테스터가 꺼려진다', x0: 1122, skip: [11], notes: [
+      ['테스터 안 바르고도 색을 확인하게', 3],
+      ['남이 쓴 테스터 걱정 없이 체험하게', 0],
+      ['손등 말고 입술 위에서 색 보기', 3],
+      ['바르고 지우는 번거로움 없애기', 0],
+      ['이미 립 바른 날에도 비교해 보게', 0],
+      ['여러 색을 입술에 번갈아 대 보게', 2],
+      ['매트·글로시 질감 차이도 미리 보게', 1],
+      ['화장 안 한 날에도 부담 없이 발라 보게', 0],
+      ['위생 걱정이 구매 포기로 안 이어지게', 0],
+      ['매장 테스터 교체 부담 줄이기', 0],
+      ['바른 색을 내 얼굴 전체에서 보게', 0],
+    ]},
+    { label: '확인하기', sub: '그 자리에서 알 방법이 없다', x0: 1744, skip: [0], notes: [
+      ['립 매대 앞에서 바로 확인하게', 3],
+      ['직원한테 안 물어봐도 되게', 0],
+      ['카메라 앞에서 덜 민망하게', 1],
+      ['기다리지 않고 결과가 툭 나오게', 2],
+      ['화면 색이 실제 발색이랑 같게', 0],
+      ['써 본 테스터를 대기만 하면 정보가 뜨게', 2],
+      ['만든 색이랑 비슷한 실제 제품 찾기', 3],
+      ['가상 체험이 구매로 이어지게', 0],
+      ['거울 보듯 자연스럽게 쓰게', 3],
+      ['매장 공간을 더 차지하지 않게', 0],
+      ['휴대폰 후기 색 말고 내 얼굴로 보게', 0],
+    ]},
+  ];
+
+  const yellows = ['#fbf456', '#f9f150', '#fcf562', '#f7ee4c', '#fbf35b', '#faf254'];
+  const board = document.getElementById('board');
+  const colStep = 140, rowStep = 148, top0 = 34;
+  const colOffsetY = [0, 26, 8, 30];
+  const cAmt = { x: .5, y: 1.1, r: 4, s: .06 };
+
+  groups.forEach(g => {
+    let n = 0;
+    for (let cell = 0; cell < 12 && n < g.notes.length; cell++) {
+      if (g.skip.includes(cell)) continue;
+      const r = Math.floor(cell / 4), c = cell % 4;
+      const [text, votes] = g.notes[n++];
+      const hand = 1 + Math.floor(rnd() * 7);
+      const curl = between(4, 22);           // 아랫부분이 들뜬 정도
+      const wrap = document.createElement('div');
+      wrap.className = 'nw';
+      wrap.style.left = (g.x0 + c * colStep + between(-10, 10)) + 'px';
+      wrap.style.top = (top0 + r * rowStep + colOffsetY[c] + between(-9, 9)) + 'px';
+      wrap.style.transform = `rotate(${between(-4, 4).toFixed(2)}deg)`;
+      wrap.style.setProperty('--lift', (curl * 0.55).toFixed(1));
+      wrap.style.setProperty('--blur', (3 + curl * 0.25).toFixed(1));
+      wrap.style.setProperty('--sx', between(1, 4).toFixed(1));
+      const dotPos = `right:${between(6, 22).toFixed(0)}px;bottom:${between(6, 16).toFixed(0)}px;transform:rotate(${between(-12, 12).toFixed(1)}deg)`;
+      wrap.innerHTML =
+        `<div class="sh"></div>` +
+        `<div class="note h${hand}" style="--c:${yellows[Math.floor(rnd() * yellows.length)]};--curl:${curl.toFixed(1)};--tw:${between(-3, 3).toFixed(1)};--tilt:${between(-2.2, 2.2).toFixed(2)}">` +
+          `<p>${jitter(text, cAmt)}</p>` +
+          (votes ? `<div class="dots" style="${dotPos}">${'<i class="dot"></i>'.repeat(votes)}</div>` : '') +
+        `</div>`;
+      board.appendChild(wrap);
+    }
+    const lab = document.createElement('div');
+    lab.className = 'mk label';
+    lab.style.left = (g.x0 + 278) + 'px';
+    lab.innerHTML = jitter(g.label, { x: 1, y: 2, r: 3, s: .05 }) +
+      `<small>${jitter(g.sub, { x: .6, y: 1.4, r: 3, s: .05 })}</small>`;
+    board.appendChild(lab);
+  });
+</script>
+</body>
+</html>

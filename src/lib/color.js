@@ -83,6 +83,39 @@ export function hexToLab(hex) {
   return rgbToLab(hexToRgb(hex));
 }
 
+// CIE L*a*b* -> sRGB(D65). 범위를 벗어난 색은 0~255 로 자른다
+export function labToRgb({ L, a, b }) {
+  const fy = (L + 16) / 116, fx = fy + a / 500, fz = fy - b / 200;
+  const inv = (t) => (t ** 3 > 216 / 24389 ? t ** 3 : (116 * t - 16) / (24389 / 27));
+  const X = inv(fx) * 0.95047, Y = inv(fy), Z = inv(fz) * 1.08883;
+  const gam = (c) => 255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(Math.max(0, c), 1 / 2.4) - 0.055);
+  return {
+    r: clamp(gam(3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z), 0, 255),
+    g: clamp(gam(-0.969266 * X + 1.8760108 * Y + 0.041556 * Z), 0, 255),
+    b: clamp(gam(0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z), 0, 255),
+  };
+}
+
+export function labToHex(lab) {
+  return rgbToHex(labToRgb(lab));
+}
+
+// ---------- 농도에 따른 '입술에 보이는 색' (2026-11-26 사용자 요청 "같은 색·같은 질감이어도 농도가 바뀌면 입술 색이 변하니 추천 제품도 바뀌게") ----------
+// 거울은 고른 색을 농도만큼 맨입술 위에 덮어 그린다(lip-engine.js). 그래서 농도가 낮으면 맨입술 색에 가깝게, 높으면 고른 색에 가깝게 보인다.
+// 추천은 이 '보이는 색'과 비슷한 제품을 찾는다. 기본 농도(LOOK_REF_INTENSITY, lip-state.js 의 처음 값 80)를 제품 본래 색으로 보고
+//   보이는 색(Lab) = 맨입술 + (고른 색 − 맨입술) × 농도 / 80
+// → 농도 80 = 고른 색 그대로, 낮추면 맨입술 쪽(연하고 누드하게), 80 보다 올리면 고른 색에서 더 나아가 진하게(최대 100/80 = 1.25배).
+// 맨입술 색(BARE_LIP_HEX)은 평균적인 맨입술의 근사값이다 (손님마다 다르다)
+export const BARE_LIP_HEX = '#C68680';
+export const LOOK_REF_INTENSITY = 80;
+export function lookHex(hex, intensity = LOOK_REF_INTENSITY, { bare = BARE_LIP_HEX, ref = LOOK_REF_INTENSITY } = {}) {
+  const c = hexToLab(hex);
+  const k = clamp(Number.isFinite(Number(intensity)) ? Number(intensity) : ref, 0, 100) / ref;
+  if (Math.abs(k - 1) < 1e-9) return normalizeHex(hex);
+  const m = hexToLab(bare);
+  return labToHex({ L: clamp(m.L + (c.L - m.L) * k, 3, 97), a: m.a + (c.a - m.a) * k, b: m.b + (c.b - m.b) * k });
+}
+
 // CIEDE2000 색차
 export function deltaE2000(lab1, lab2) {
   const { L: L1, a: a1, b: b1 } = lab1;

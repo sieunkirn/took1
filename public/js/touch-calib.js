@@ -560,9 +560,6 @@
       html { touch-action: none; }
       button.took-press:not(:disabled), .btn-primary.took-press, .btn-line.took-press, .photo-btn.took-press { transform: scale(0.96); transition-duration: 0.08s; }
       input[type="range"].took-press::-webkit-slider-thumb { transform: scale(1.18); }
-      .tkb-key.took-press { background: var(--line-2); }
-      .tkb-fn.took-press { background: var(--faint); }
-      .tkb-enter.took-press { background: var(--ink-2); }
       html.took-fs-on header.nav { padding-right: 60px; } /* 오른쪽 위 전체화면 버튼 자리 */`;
     function prepareWindow(win) {
       if (!isActive() || win.__tookCalibReady) return;
@@ -888,6 +885,7 @@
       if (act === 'save' && calib.result) {
         saved = { frame: 'screen', m: calib.result.m, rms: calib.result.rms, max: calib.result.max, size: calib.size, at: new Date().toISOString(), source: 'local' };
         const ok = ls.set(storeKey, JSON.stringify(saved));
+        setLast(null); // 새 보정값 → 예전 테스트 결과는 버린다 (바로 다시 테스트한다)
         closeCalib();
         wins.forEach(prepareWindow);
         if (!ok) toast('이 브라우저는 저장이 안 돼서 이번 화면에서만 적용돼요');
@@ -976,8 +974,8 @@
       const n = t.res.filter((v) => v <= HIT_R).length;
       const avg = t.res.reduce((s, v) => s + v, 0) / t.res.length;
       const max = Math.max(...t.res);
-      t.summary = { n, total: TEST_TARGETS.length, avg, max };
-      lastSummary = t.summary;
+      t.summary = { n, total: TEST_TARGETS.length, avg, max, at: new Date().toISOString() };
+      setLast(t.summary);
       tq('[data-msg]').innerHTML = `<b style="font-size:22px">${n === TEST_TARGETS.length ? '모두 맞았어요' : `${TEST_TARGETS.length}개 중 ${n}개 맞음`}</b><br>`
         + `손가락과 눌린 자리 차이: 평균 ${avg.toFixed(0)}px · 최대 ${max.toFixed(0)}px<br><small style="color:#666">검은 점 = 실제로 눌린 자리. 빗나간 곳이 많으면 다시 보정해 주세요</small>`;
       tq('[data-btns]').style.display = 'flex';
@@ -1005,7 +1003,7 @@
     function reset() {
       ls.del(storeKey);
       saved = builtIn; // 이 기기에 저장한 값만 지운다. 웹에 고정한 값이 있으면 그 값으로 돌아간다
-      lastSummary = null;
+      setLast(null);
       toast(sim ? '시뮬레이션 보정값을 지웠어요' : builtIn ? '이 기기의 조정값을 지우고 웹에 고정한 값으로 돌아갔어요' : '터치 보정값을 지웠어요');
       notify();
     }
@@ -1041,7 +1039,7 @@
         if (!o) return false;
         saved = { frame: 'screen', ...o, at: o.at || new Date().toISOString(), imported: true, source: 'local' };
         ls.set(storeKey, JSON.stringify(saved));
-        lastSummary = null;
+        setLast(null);
         wins.forEach(prepareWindow);
         notify();
         return true;
@@ -1086,7 +1084,17 @@
       ov.querySelector('[data-act=close]').addEventListener('click', () => ov.remove());
       rdoc.body.append(ov);
     }
-    let lastSummary = null; // 마지막 정확도 테스트 결과
+    // 마지막 정확도 테스트 결과 { n, total, avg, max, at } (2026-11-26: 관리자 화면에 날짜를 보여 주려고 기기에 저장한다.
+    // 키는 보정값 키 + 'Test'. 새로 보정하거나·초기화·코드로 바꾸면 지운다 — 그 테스트는 예전 보정값을 잰 것이라서)
+    const TEST_KEY = storeKey + 'Test';
+    const loadTest = () => {
+      try {
+        const v = JSON.parse(ls.get(TEST_KEY));
+        return v && Number.isFinite(v.n) && Number.isFinite(v.total) && Number.isFinite(v.avg) ? v : null;
+      } catch { return null; }
+    };
+    let lastSummary = loadTest();
+    const setLast = (v) => { lastSummary = v; if (v) ls.set(TEST_KEY, JSON.stringify(v)); else ls.del(TEST_KEY); };
     function toast(text) {
       const t = rdoc.createElement('div');
       t.textContent = text;

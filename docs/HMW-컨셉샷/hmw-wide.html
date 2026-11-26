@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TOOK — How Might We 컨셉샷 (레포트북 25쪽 가로 칸용)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Gaegu:wght@400;700&family=Hi+Melody&family=Gamja+Flower&family=Poor+Story&family=Nanum+Brush+Script&family=Amatic+SC:wght@400;700&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 2400px; height: 650px; overflow: hidden; background: #7e2f19; }
+
+  /* 벽 */
+  .wall {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, #a9452a 0%, #8c3720 45%, #6a2614 100%);
+  }
+
+  /* 화이트보드 (살짝 기울어진 시점) */
+  .scene {
+    position: absolute; inset: 0;
+    transform: perspective(4200px) rotateX(1.4deg) rotateY(-1.5deg) rotateZ(-0.25deg);
+    transform-origin: 55% 50%;
+  }
+  .board {
+    position: absolute; left: -30px; top: 22px; width: 2460px; height: 598px;
+    background:
+      radial-gradient(ellipse at 82% 8%, #ffffff 0%, rgba(255,255,255,0) 45%),
+      radial-gradient(ellipse at 15% 95%, #dfe0de 0%, rgba(223,224,222,0) 55%),
+      linear-gradient(170deg, #fbfbfa 0%, #f1f1ef 55%, #e6e6e3 100%);
+    border: 10px solid #c9ccce;
+    border-radius: 6px;
+    box-shadow:
+      inset 0 0 0 2px #e9ebec,
+      inset 0 0 60px rgba(0,0,0,.06),
+      0 18px 30px rgba(0,0,0,.35);
+    overflow: hidden;
+  }
+  /* 지운 마커 자국 */
+  .ghost { position: absolute; border-radius: 50%; filter: blur(14px); background: rgba(120,130,150,.06); }
+
+  /* 형광등 반사 */
+  .glare {
+    position: absolute; right: -60px; top: 60px; width: 520px; height: 22px;
+    transform: rotate(-8deg);
+    background: rgba(255,255,255,.95);
+    filter: blur(3px);
+    box-shadow: 0 0 40px 14px rgba(255,255,255,.75);
+    border-radius: 20px;
+    z-index: 0;
+  }
+  .glare2 {
+    position: absolute; right: -40px; top: 100px; width: 420px; height: 6px;
+    transform: rotate(-8deg);
+    background: rgba(255,255,255,.9); filter: blur(2px);
+    z-index: 0;
+  }
+
+  /* 제목 */
+  .title {
+    position: absolute; left: 78px; top: 30px; width: 420px; height: 420px;
+    font-family: 'Amatic SC', cursive; font-weight: 400; font-size: 142px; line-height: .93; letter-spacing: 12px;
+    transform: rotate(-1.2deg);
+  }
+  .title span { position: absolute; left: 0; top: 0; white-space: nowrap; }
+  .title .blue { color: rgba(56,140,214,.78); transform: translate(6px, 4px) rotate(0.4deg); }
+  .title .ink  { color: rgba(30,36,48,.88); }
+  .sub {
+    position: absolute; left: 84px; top: 440px; line-height: 1.0;
+    font-family: 'Nanum Pen Script', cursive; font-size: 46px; color: rgba(46,126,204,.88);
+    transform: rotate(-1.5deg);
+  }
+
+  /* 포스트잇 */
+  .note {
+    position: absolute; width: 136px; height: 136px; padding: 12px 11px 10px;
+    background: var(--c);
+    box-shadow:
+      0 1px 1px rgba(0,0,0,.10),
+      3px 8px 10px -3px rgba(0,0,0,.28),
+      8px 14px 18px -10px rgba(0,0,0,.22);
+    color: #1d1d20;
+    line-height: 1.12;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  /* 아래쪽이 살짝 들린 느낌 */
+  .note::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 22%, rgba(0,0,0,0) 70%, rgba(80,60,0,.10) 100%);
+    pointer-events: none;
+  }
+  .note::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30px;
+    background: rgba(140,120,0,.045);
+    pointer-events: none;
+  }
+  .note p { position: relative; z-index: 1; }
+
+  /* 손글씨 7명 */
+  .h1 { font-family: 'Nanum Pen Script'; font-size: 27px; line-height: 1.0; }
+  .h2 { font-family: 'Gaegu'; font-size: 19.5px; }
+  .h3 { font-family: 'Gaegu'; font-weight: 700; font-size: 20px; color: #111; }
+  .h4 { font-family: 'Hi Melody'; font-size: 21px; color: #242a3a; }
+  .h5 { font-family: 'Gamja Flower'; font-size: 19.5px; }
+  .h6 { font-family: 'Poor Story'; font-size: 18.5px; color: #262b38; }
+  .h7 { font-family: 'Nanum Brush Script'; font-size: 28px; line-height: 0.98; color: #111; }
+
+  /* 투표 스티커 */
+  .dots { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 4px; z-index: 2; }
+  .dot {
+    width: 15px; height: 15px; border-radius: 50%; background: #FF007B;
+    box-shadow: 0 1px 1.5px rgba(0,0,0,.35), inset 0 -1px 0 rgba(0,0,0,.12);
+  }
+
+  /* 아래 이름표 */
+  .label {
+    position: absolute; top: 516px; transform: translateX(-50%) rotate(-1.2deg);
+    font-family: 'Nanum Pen Script'; font-size: 60px; line-height: 1; color: rgba(46,126,204,.88);
+    white-space: nowrap; text-align: center;
+  }
+  .label small { font-size: 34px; color: rgba(46,126,204,.72); margin-left: 12px; }
+
+  /* 받침대 */
+  .tray {
+    position: absolute; left: -30px; top: 618px; width: 2460px; height: 20px;
+    background: linear-gradient(#d9dcdf, #9aa0a6);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  }
+  .marker {
+    position: absolute; top: 606px; height: 16px; width: 130px; border-radius: 4px 9px 9px 4px;
+    background: #ececec; box-shadow: 0 2px 3px rgba(0,0,0,.35);
+  }
+  .marker::before { content: ""; position: absolute; right: -40px; top: -1px; width: 44px; height: 20px; border-radius: 3px 10px 10px 3px; background: var(--cap); box-shadow: 0 2px 3px rgba(0,0,0,.3); }
+  .marker::after { content: ""; position: absolute; left: 14px; top: 4px; width: 60px; height: 10px; border-radius: 2px; background: var(--cap); opacity: .85; }
+  .scene { filter: blur(0.35px) saturate(1.03); }
+
+  /* 사진 질감 */
+  .grain {
+    position: absolute; inset: 0; pointer-events: none; z-index: 100;
+    opacity: .10; mix-blend-mode: multiply;
+  }
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none; z-index: 99;
+    background: radial-gradient(ellipse at 52% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.22) 100%);
+  }
+</style>
+</head>
+<body>
+<div class="wall"></div>
+
+<div class="scene">
+  <div class="board" id="board">
+    <div class="ghost" style="left:260px;top:380px;width:300px;height:90px"></div>
+    <div class="ghost" style="left:1500px;top:430px;width:360px;height:100px"></div>
+    <div class="ghost" style="left:1000px;top:20px;width:260px;height:60px"></div>
+
+    <div class="title">
+      <span class="blue">HOW<br>MIGHT<br>WE...</span>
+      <span class="ink">HOW<br>MIGHT<br>WE...</span>
+    </div>
+    <div class="sub">립 매대 앞에서,<br>우리가 어떻게 하면…</div>
+
+    <div class="glare"></div>
+    <div class="glare2"></div>
+  </div>
+  <div class="tray"></div>
+  <div class="marker" style="left:150px;--cap:#2b2f36;transform:rotate(-1deg)"></div>
+  <div class="marker" style="left:330px;--cap:#2e7fd0;transform:rotate(1.5deg)"></div>
+</div>
+
+<svg class="grain" width="2400" height="650" xmlns="http://www.w3.org/2000/svg">
+  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="100%" height="100%" filter="url(#n)"/>
+</svg>
+<div class="vignette"></div>
+
+<script>
+  // 같은 결과가 나오도록 고정된 난수
+  let seed = 20261126;
+  const rnd = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
+  const between = (a, b) => a + rnd() * (b - a);
+
+  // [문장, 투표 수]
+  const groups = [
+    { label: '고르기', sub: '선택지가 너무 많다', x0: 500, skip: [3, 8], notes: [
+      ['수백 개 립 중에서 내 색을 빨리 찾게', 1],
+      ['입문자도 뭘 기준으로 고를지 알게', 0],
+      ['호수 이름만 봐도 색이 짐작되게', 0],
+      ['브랜드가 달라도 비슷한 색끼리 모아 보게', 1],
+      ['내 피부톤에 어울리는 색을 알게', 0],
+      ['정답 말고 선택지를 좁혀 주게', 3],
+      ['고르다 지쳐서 포기하지 않게', 0],
+      ['원하는 색을 말로 설명 못 해도 찾게', 0],
+      ['유행 색이 나한테도 어울리는지 보게', 0],
+      ['친구 없이 혼자 와도 결정할 수 있게', 0],
+    ]},
+    { label: '바르기', sub: '테스터가 꺼려진다', x0: 1122, skip: [11], notes: [
+      ['테스터 안 바르고도 색을 확인하게', 3],
+      ['남이 쓴 테스터 걱정 없이 체험하게', 0],
+      ['손등 말고 입술 위에서 색 보기', 3],
+      ['바르고 지우는 번거로움 없애기', 0],
+      ['이미 립 바른 날에도 비교해 보게', 0],
+      ['여러 색을 입술에 번갈아 대 보게', 2],
+      ['매트·글로시 질감 차이도 미리 보게', 1],
+      ['화장 안 한 날에도 부담 없이 발라 보게', 0],
+      ['위생 걱정이 구매 포기로 안 이어지게', 0],
+      ['매장 테스터 교체 부담 줄이기', 0],
+      ['바른 색을 내 얼굴 전체에서 보게', 0],
+    ]},
+    { label: '확인하기', sub: '그 자리에서 알 방법이 없다', x0: 1744, skip: [0], notes: [
+      ['립 매대 앞에서 바로 확인하게', 3],
+      ['직원한테 안 물어봐도 되게', 0],
+      ['카메라 앞에서 덜 민망하게', 1],
+      ['기다리지 않고 결과가 툭 나오게', 2],
+      ['화면 색이 실제 발색이랑 같게', 0],
+      ['써 본 테스터를 대기만 하면 정보가 뜨게', 2],
+      ['만든 색이랑 비슷한 실제 제품 찾기', 3],
+      ['가상 체험이 구매로 이어지게', 0],
+      ['거울 보듯 자연스럽게 쓰게', 3],
+      ['매장 공간을 더 차지하지 않게', 0],
+      ['휴대폰 후기 색 말고 내 얼굴로 보게', 0],
+    ]},
+  ];
+
+  const yellows = ['#f9f262', '#f7ef58', '#fbf46e', '#f6ee5c', '#faf366'];
+  const board = document.getElementById('board');
+  const colStep = 140, rowStep = 148, top0 = 34;
+  const colOffsetY = [0, 26, 8, 30];
+
+  groups.forEach((g, gi) => {
+    let n = 0;
+    for (let cell = 0; cell < 12 && n < g.notes.length; cell++) {
+      if (g.skip.includes(cell)) continue;
+      const r = Math.floor(cell / 4), c = cell % 4;
+      const [text, votes] = g.notes[n++];
+      const el = document.createElement('div');
+      const hand = 1 + Math.floor(rnd() * 7);
+      el.className = 'note h' + hand;
+      el.style.setProperty('--c', yellows[Math.floor(rnd() * yellows.length)]);
+      const x = g.x0 + c * colStep + between(-10, 10);
+      const y = top0 + r * rowStep + colOffsetY[c] + between(-9, 9);
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.transform = `rotate(${between(-4, 4).toFixed(2)}deg)`;
+      const dotPos = `right:${between(6, 22).toFixed(0)}px;bottom:${between(6, 16).toFixed(0)}px;transform:rotate(${between(-12, 12).toFixed(1)}deg)`;
+      el.innerHTML = `<p>${text}</p>` +
+        (votes ? `<div class="dots" style="${dotPos}">${'<i class="dot"></i>'.repeat(votes)}</div>` : '');
+      board.appendChild(el);
+    }
+    const lab = document.createElement('div');
+    lab.className = 'label';
+    lab.style.left = (g.x0 + 278) + 'px';
+    lab.innerHTML = `${g.label}<small>${g.sub}</small>`;
+    board.appendChild(lab);
+  });
+</script>
+</body>
+</html>

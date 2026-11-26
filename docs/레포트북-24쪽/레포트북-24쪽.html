@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TOOK 레포트북 24쪽 · 2.3 Definition</title>
+<style>
+  /* B5(JIS) 182×257mm · 흰 바탕 · 한글 8pt · 영어 7pt */
+  @page { size: 182mm 257mm; margin: 0; }
+  :root {
+    --accent: #D32C3E;   /* 레포트북 빨강 */
+    --ink: #111;
+    --en: #8c8c8c;
+    --rule: #d9d9d9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #e9e9e9; }
+  body { font-family: "Noto Sans KR", "Malgun Gothic", sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .page {
+    position: relative; width: 182mm; height: 257mm; background: #fff;
+    margin: 10mm auto; overflow: hidden;
+    padding: 21.5mm 12mm 12mm 14mm;
+    display: flex; flex-direction: column;
+  }
+  @media print { html, body { background: #fff; } .page { margin: 0; } }
+
+  /* 위 색 띠: 짝수 쪽이라 안쪽(오른쪽) 위 */
+  .bar { position: absolute; top: 13mm; right: 0; width: 66mm; height: 3mm; background: var(--accent); }
+
+  /* 한 꼭지: 왼쪽 제목 칸 + 오른쪽 본문 칸 */
+  .sec { display: grid; grid-template-columns: 40mm 1fr; column-gap: 6mm; }
+  .sec + .sec { margin-top: 3mm; padding-top: 3mm; border-top: .25mm solid var(--rule); }
+
+  .head .no { font-size: 9.5pt; line-height: 1; font-weight: 800; color: var(--accent); letter-spacing: .01em; }
+  .head h2 { font-size: 11pt; line-height: 1.3; font-weight: 700; margin-top: 1.6mm; letter-spacing: -.025em; word-break: keep-all; }
+  .head .sub { font-size: 6.5pt; line-height: 1.35; color: var(--accent); margin-top: 1mm; font-weight: 500; }
+  .head svg { display: block; width: 8mm; height: 8mm; margin-top: 2mm; margin-left: -.5mm; }
+  .head svg * { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .body { padding-top: .2mm; }
+  .body .ko { font-size: 8pt; line-height: 1.58; letter-spacing: -.01em; word-break: keep-all; }
+  .body .ko em { font-style: normal; color: var(--accent); font-weight: 500; }
+  .body .en { font-size: 7pt; line-height: 1.5; color: var(--en); margin-top: 1.6mm; }
+  .body .en b { font-weight: 700; color: #6e6e6e; }
+
+  /* 아래 설문 그림 두 개 */
+  .figs { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; padding-top: 3.2mm; border-top: .25mm solid var(--rule); }
+  figure { display: flex; flex-direction: column; }
+  .figs .n { display: inline-block; font-size: 6pt; line-height: 1; border: .25mm solid #bbb; padding: .45mm 1mm; margin-right: 1.4mm; color: #555; vertical-align: .15mm; }
+  .bars { list-style: none; }
+  .bars li { display: grid; grid-template-columns: 1fr auto; row-gap: .6mm; font-size: 6.5pt; line-height: 1.1; }
+  .bars li + li { margin-top: 1.15mm; }
+  .bars .v { color: #777; font-variant-numeric: tabular-nums; }
+  .bars .v b { color: var(--ink); font-weight: 700; margin-left: .6mm; }
+  .bars i { grid-column: 1 / -1; position: relative; height: 1mm; background: #ececec; }
+  .bars i::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--p); background: #262626; }
+  .bars li.top .l { color: var(--accent); font-weight: 700; }
+  .bars li.top .v b { color: var(--accent); }
+  .bars li.top i::after { background: var(--accent); }
+  figcaption { font-size: 6.5pt; line-height: 1.4; color: #777; margin-top: 2.4mm; word-break: keep-all; }
+  figcaption b { color: var(--ink); font-weight: 700; margin-right: 1mm; }
+  figcaption .en { display: block; font-size: 6pt; color: #a3a3a3; margin-top: .3mm; }
+</style>
+</head>
+<body>
+
+<!-- ───────────── 24쪽 ───────────── -->
+<section class="page even">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">2.3 Definition</div>
+      <h2>문제 원인 분석</h2>
+      <div class="sub">Problem Definition<br>Root Cause Analysis</div>
+    </div>
+    <div class="body">
+      <p class="ko">조사 결과를 모으면, 매장에서 립 제품을 고르는 소비자는 <em>세 가지 문제를 동시에 겪는다.</em></p>
+      <p class="en">Putting the research together, consumers choosing lip products in stores face three problems at the same time.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">01.</div>
+      <h2>선택지가<br>너무 많다</h2>
+      <div class="sub">Too Many Choices</div>
+      <svg viewBox="0 0 40 40"><rect x="5" y="23" width="8" height="13" rx="1"/><path d="M6.5 23v-8.5l5-2.5v11"/><rect x="16" y="23" width="8" height="13" rx="1"/><path d="M17.5 23V10.5l5-2.5v15"/><rect x="27" y="23" width="8" height="13" rx="1"/><path d="M28.5 23v-5.5l5-2.5v8"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">1차 설문에서 가장 간편해졌으면 하는 과정은 “나에게 맞는 제품 찾기”(72.4%)였다. 립&nbsp;제품은 한 제품 안에서도 색상이 열 가지를 넘는 경우가 흔하고, 매대에는 여러 브랜드가 함께 놓인다. <em>입문자는 무엇을 기준으로 골라야 하는지부터 모른다.</em></p>
+      <p class="en"><b>Problem 1. There are too many choices.</b> In the first survey, the step people most wanted simplified was “finding products that suit me” (72.4%). A single lip product often comes in more than ten shades, and many brands sit side by side on the shelf. Beginners do not even know what to base their choice on.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">02.</div>
+      <h2>확인하려면<br>발라야 하는데,<br>바르기가 꺼려진다</h2>
+      <div class="sub">Apply to Check, Hesitate to Apply</div>
+      <svg viewBox="0 0 40 40"><rect x="8" y="22" width="11" height="14" rx="1.2"/><path d="M9.8 22v-8.5l7.4-3.6V22"/><circle cx="29" cy="12" r="6.5"/><path d="M29 8.7v4.1"/><path d="M29 15.5v.1"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">소비자 10명 중 9명이 테스터의 오염을 걱정하고, 실제로 개봉 테스터의 60%에서 세균이 검출되었다. 그래서 63.8%가 손등에 바른다. 그러나 손등은 입술과 피부색도 질감도 다르다. <em>손등에서 예뻤던 색이 입술에서는 다르게 보인다.</em></p>
+      <p class="en"><b>Problem 2. You have to apply it to check, but people hesitate to apply it.</b> Nine in ten consumers worry about tester contamination, and bacteria were in fact found on 60% of opened testers. So 63.8% swatch on the back of the hand. But the hand differs from the lips in both skin tone and texture, and a color that looked good on the hand can look different on the lips.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">03.</div>
+      <h2>그 자리에서 확인할<br>방법이 마땅치 않다</h2>
+      <div class="sub">No Good Way to Check on the Spot</div>
+      <svg viewBox="0 0 40 40"><path d="M20 36s-11-10.6-11-19a11 11 0 0 1 22 0c0 8.4-11 19-11 19z"/><path d="M16.6 14.3a3.5 3.5 0 1 1 4.9 3.2c-1 .45-1.5 1.1-1.5 2.1"/><path d="M20 23v.1"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">직원에게 묻는 일을 부담스러워하는 소비자가 있고, 직원을 찾지 못하는 경우도 있다. <em>그&nbsp;자리에서 휴대폰으로 후기를 검색하지만, 화면 속 색은 기기마다 다르다.</em></p>
+      <p class="en"><b>Problem 3. There is no good way to check on the spot.</b> Some consumers feel uneasy asking staff, and sometimes staff cannot be found. They search reviews on their phones right there, but on-screen colors vary from device to device.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">Key Point</div>
+      <h2>같은 순간,<br>같은 장소</h2>
+      <div class="sub">Same Moment, Same Place</div>
+      <svg viewBox="0 0 40 40"><circle cx="15" cy="15.5" r="9"/><circle cx="25" cy="15.5" r="9"/><circle cx="20" cy="24.5" r="9"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">핵심은 이 세 문제가 같은 순간, 같은 장소(립 매대 앞)에서 겹친다는 점이다. <em>따라서 해결책도 그 자리에 있어야 한다.</em> 집에서 쓰는 앱이나 매장 입구의 키오스크는 이 순간에 닿지 못한다.</p>
+      <p class="en">The key point is that these three problems overlap at the same moment and in the same place: in front of the lip shelf. The solution must therefore be there too. An app used at home or a kiosk at the store entrance cannot reach this moment.</p>
+    </div>
+  </div>
+
+  <div class="figs">
+    <figure>
+
+      <ol class="bars">
+        <li class="top"><span class="l">나에게 맞는 제품 찾기</span><span class="v">55명<b>72.4%</b></span><i style="--p:72.4%"></i></li>
+        <li><span class="l">제품 비교</span><span class="v">33명<b>43.4%</b></span><i style="--p:43.4%"></i></li>
+        <li><span class="l">제품 테스트</span><span class="v">31명<b>40.8%</b></span><i style="--p:40.8%"></i></li>
+        <li><span class="l">색상 선택</span><span class="v">13명<b>17.1%</b></span><i style="--p:17.1%"></i></li>
+        <li><span class="l">메이크업 스타일 선택</span><span class="v">11명<b>14.5%</b></span><i style="--p:14.5%"></i></li>
+        <li><span class="l">제품 정보 확인</span><span class="v">11명<b>14.5%</b></span><i style="--p:14.5%"></i></li>
+        <li><span class="l">구매 결정</span><span class="v">6명<b>7.9%</b></span><i style="--p:7.9%"></i></li>
+      </ol>
+      <figcaption><span class="n">1</span><b>그림 1</b>뷰티 제품 선택에서 가장 간단해졌으면 하는 과정 (1차&nbsp;설문,&nbsp;76명)<span class="en">Figure 1. The step in choosing beauty products people most want simplified (first&nbsp;survey,&nbsp;n=76)</span></figcaption>
+    </figure>
+    <figure>
+
+      <ol class="bars">
+        <li class="top"><span class="l">정보가 너무 많아서 오히려 선택하기 어렵다</span><span class="v">32명<b>42.1%</b></span><i style="--p:42.1%"></i></li>
+        <li><span class="l">어떤 스타일이 어울리는지 모른다</span><span class="v">29명<b>38.2%</b></span><i style="--p:38.2%"></i></li>
+        <li><span class="l">내 피부나 얼굴 특징을 잘 모르겠다</span><span class="v">26명<b>34.2%</b></span><i style="--p:34.2%"></i></li>
+        <li><span class="l">직접 시도해보기가 부담스럽다</span><span class="v">24명<b>31.6%</b></span><i style="--p:31.6%"></i></li>
+        <li><span class="l">제품을 고르기 어렵다</span><span class="v">19명<b>25.0%</b></span><i style="--p:25.0%"></i></li>
+        <li><span class="l">색상을 고르기 어렵다</span><span class="v">16명<b>21.1%</b></span><i style="--p:21.1%"></i></li>
+        <li><span class="l">특별히 어렵지 않다</span><span class="v">6명<b>7.9%</b></span><i style="--p:7.9%"></i></li>
+      </ol>
+      <figcaption><span class="n">2</span><b>그림 2</b>나에게 어울리는 스타일을 찾을 때 가장 어려운 점 (1차&nbsp;설문,&nbsp;76명)<span class="en">Figure 2. The hardest part of finding a style that suits me (first&nbsp;survey,&nbsp;n=76)</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+</body>
+</html>

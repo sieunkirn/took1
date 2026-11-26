@@ -6,7 +6,7 @@
 //  1 제품 장면(3.45~4.95초) + 가운데 로고. 1.5초 뒤(또는 누르면) 2로
 //  2 입술 영상 + 같은 로고. 1.5초 뒤(또는 누르면) 3으로
 //  3 2번 + 로고 아래 "Tap The Screen". 입술 영상 반복. 누르면 4번으로 (2026-11-21 사용자 요청)
-//  4 (2026-11-21 Figma GP 1667:704) 로고가 위로 올라가고 알약 버튼이 세로로: 1 스캔 = 거울 · 2 NFC = 거울에서 태그 기다리기 (가운데 음성 = 챗봇 버튼은 2026-11-22 챗봇과 함께 삭제)
+//  4 (2026-11-21 Figma GP 1667:704) 로고가 위로 올라가고 알약 버튼이 세로로: 1 스캔 = 거울 · 2 NFC = 거울에서 태그 기다리기
 // 예전 홈(점선 얼굴·시계·버튼 두 개·다크 모드·언어 버튼)은 프로토타입에 없어 뺐다 (git 기록 a840e68 에 있음)
 import { store } from './common.js';
 import { t, lang, langToggle } from './i18n.js';
@@ -80,18 +80,19 @@ function watchCut() {
   if (video.currentTime >= LIPS_AT) { go(2); return; }
   requestAnimationFrame(watchCut);
 }
-// 1·2번 화면은 아무 곳이나 누르면 다음으로, 3번("Tap The Screen")은 누르면 4번 버튼 화면으로 (2026-11-21 사용자 요청. 손을 뗄 때 한 번만)
+// 1·2번 화면은 아무 곳이나 누르면 다음으로, 3번("Tap The Screen")은 누르면 바로 거울로 (2026-11-24 사용자 요청. 손을 뗄 때 한 번만).
+// 예전(2026-11-21)엔 4번 버튼 화면(거울·NFC)으로 갔다. 4번 화면 코드는 남겨 둠 (?step=4 로만 보인다)
 function next() {
   if (leaving) return;
   if (step === 1 || step === 2) go(step + 1);
-  else if (step === 3) go(4);
+  else if (step === 3) { leaving = true; clearTimeout(autoTimer); start('scan'); }
 }
 stage.addEventListener('pointerup', next);
 document.addEventListener('keydown', (e) => {
   if ((e.key === 'Enter' || e.key === ' ') && step < 4) { e.preventDefault(); next(); }
 });
 
-// ---------- 4번 버튼 (2026-11-21, 챗봇 버튼은 2026-11-22 삭제): 1 거울 · 2 NFC ----------
+// ---------- 4번 버튼 (?step=4 로만 보인다): 1 거울 · 2 NFC ----------
 // 톡 누르거나, 손잡이를 오른쪽으로 끌어서 연다 (스위치). 끝까지의 60% 넘게 끌고 놓으면 열리고, 덜 끌면 제자리로 돌아간다
 const KNOB_RUN = 153.48; // 손잡이가 움직이는 거리 (무대 px, took-ui.css .hs-mb.is-on 과 같은 값)
 const OPEN_AT = 0.6;

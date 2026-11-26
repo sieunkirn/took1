@@ -1,4 +1,4 @@
-// DOM 도우미: 요소 찾기($), 요소 만들기(el).
+// DOM 도우미: 요소 찾기($), 요소 만들기(el), 잠깐 기다리기(sleep).
 /** id 로 요소 찾기 */
 export const $ = (id) => document.getElementById(id);
 
@@ -14,3 +14,6 @@ export function el(tag, attrs = {}, ...children) {
   for (const c of children.flat()) if (c !== null && c !== undefined) node.append(c);
   return node;
 }
+
+/** ms 밀리초 기다리기 */
+export const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));

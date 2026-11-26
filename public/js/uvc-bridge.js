@@ -10,6 +10,7 @@
 //  - 고른 카메라가 없거나(자동) 이 웹캠을 고르면 USB 로 열고, 다른 카메라를 고르면 원래대로 연다
 //  - Chrome(웹)에서는 window.TookUvc 가 없어서 아무것도 하지 않는다
 // camera-settings.js 가 불러온다 (카메라를 쓰는 화면은 모두 camera-settings.js 를 불러온다)
+import { sleep } from './dom.js';
 
 export const UVC_ID = 'took-uvc';
 export const UVC_LABEL = 'USB 웹캠 (툭 앱 직접 연결, facing external)';
@@ -23,7 +24,6 @@ export function uvcStatus() {
 }
 export const uvcInApp = () => !!B;
 
-const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 const err = (name, message) => Object.assign(new Error(message), { name });
 
 let users = 0;        // 지금 이 웹캠 스트림을 쓰는 곳 수

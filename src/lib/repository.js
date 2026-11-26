@@ -38,6 +38,7 @@ function loadProducts(file = dataFile()) {
 // 실제 호수 데이터 (올리브영 제품의 호수별 바코드·색상, scripts/import-shades.js 로 만든다). 올리브영 데이터를 쓸 때만 넣는다
 export const SHADES_FILE = new URL('../data/products.shades.json', import.meta.url);
 export const useShades = (source = dataSource()) => source === 'oliveyoung' && existsSync(SHADES_FILE);
+// (질감별 가짜 시연용 제품 products.texture-demo.json 은 2026-11-26 뺐다: 사진이 없어서. 새틴·시어·쉬머는 실제 제품에 시연용 질감을 배정한다, src/data/finish-demo.json)
 
 loadProducts();
 setDemoProducts(JSON.parse(readFileSync(DEMO_FILE, 'utf8')));

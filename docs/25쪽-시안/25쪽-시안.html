@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TOOK 레포트북 25쪽 시안 · How Might We (참고 스타일)</title>
+<style>
+  /* 25쪽 시안: 위는 흰 여백에 제목·설명, 아래는 워크숍 사진을 꽉 채우고 위쪽만 흰색으로 흐려지게 */
+  :root { --ink: #111; --gray: #6b6b6b; --en: #9a9a9a; --pink: #FF007B; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #d9d9d9; }
+  body { font-family: "Noto Sans KR", "Malgun Gothic", sans-serif; color: var(--ink); }
+  .page { position: relative; width: 690px; height: 971px; background: #fff; overflow: hidden; }
+
+  /* 사진: 아래 절반 이상을 꽉 채움 (빨간 벽은 잘라냄), 채도를 낮춰 글이 앞에 서게 */
+  .photo { position: absolute; left: 0; right: 0; top: 330px; bottom: 0;
+    background: url("photo1.png") 46% -89px / auto 833px no-repeat;
+    filter: saturate(.55) brightness(1.04) contrast(.96); }
+  .fade { position: absolute; left: 0; right: 0; top: 330px; height: 230px;
+    background: linear-gradient(#fff 0%, rgba(255,255,255,.92) 30%, rgba(255,255,255,.55) 65%, rgba(255,255,255,0) 100%); }
+
+  .label { position: absolute; left: 36px; top: 34px; font-size: 11px; font-weight: 500; color: var(--gray); letter-spacing: .01em; }
+
+  .title { position: absolute; left: 72px; top: 86px; }
+  .title .bar { width: 22px; height: 3px; background: var(--pink); margin-bottom: 12px; }
+  .title h1 { font-size: 31px; line-height: 1.08; font-weight: 800; letter-spacing: -.01em; }
+  .title .ko { font-size: 13px; font-weight: 400; color: var(--gray); margin-top: 8px; }
+
+  .desc { position: absolute; left: 300px; right: 40px; top: 98px; }
+  .desc .lead { font-size: 9px; color: var(--gray); font-weight: 500; }
+  .desc .hmw { font-size: 13px; line-height: 1.55; font-weight: 700; margin-top: 6px; letter-spacing: -.01em; word-break: keep-all; }
+  .desc .hmw b { color: var(--pink); font-weight: 700; }
+  .desc .en { font-size: 8.5px; line-height: 1.5; color: var(--en); margin-top: 8px; }
+
+  /* 세 부분: 사진 위 흐려진 영역에 얇은 선과 글만 */
+  .parts { position: absolute; left: 72px; right: 40px; top: 262px; display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 22px; }
+  .part { border-top: 1.5px solid var(--ink); padding-top: 9px; }
+  .part .no { font-size: 9px; font-weight: 700; color: var(--pink); }
+  .part h3 { font-size: 13px; font-weight: 800; margin-top: 2px; }
+  .part .q { font-size: 8.5px; color: var(--gray); margin-top: 3px; }
+  .part p { font-size: 9px; line-height: 1.55; font-weight: 700; margin-top: 6px; word-break: keep-all; }
+  .part .pen { font-size: 7.5px; line-height: 1.45; color: var(--en); font-weight: 400; margin-top: 4px; }
+
+  .cap { position: absolute; left: 36px; bottom: 22px; font-size: 8.5px; color: #fff; font-weight: 500;
+    background: rgba(17,17,17,.72); padding: 4px 8px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="photo"></div>
+  <div class="fade"></div>
+
+  <div class="label">2.3 Definition</div>
+
+  <div class="title">
+    <div class="bar"></div>
+    <h1>HOW<br>MIGHT WE</h1>
+    <div class="ko">우리가 어떻게 하면</div>
+  </div>
+
+  <div class="desc">
+    <div class="lead">팀은 문제를 다음 한 문장으로 정의했다.</div>
+    <div class="hmw">우리가 어떻게 하면 화장품 구매 고객이 자신의 피부와 취향에 맞는 제품을 쉽게 찾고, 위생적인 환경에서 안심하고 체험할 수 있도록 도울 수 있을까?</div>
+    <div class="en">How might we help cosmetics shoppers easily find products that fit their skin and taste, and try them with confidence in a hygienic way?</div>
+  </div>
+
+  <div class="parts">
+    <div class="part">
+      <div class="no">01</div><h3>How Might We</h3><div class="q">무엇을 해결하나?</div>
+      <p>개인에게 적합한 화장품을 찾기 어려운 문제와 공용 테스터 사용에 대한 위생 부담</p>
+      <div class="pen">The difficulty of finding cosmetics that suit each person, and hygiene concerns with shared testers</div>
+    </div>
+    <div class="part">
+      <div class="no">02</div><h3>So That</h3><div class="q">해결하면 어떤 가치가 발생하나?</div>
+      <p>고객이 제품 선택에 대한 불확실성을 줄이고, 더욱 편리하고 안심할 수 있는 뷰티 쇼핑 경험을 얻을 수 있다.</p>
+      <div class="pen">Customers can reduce uncertainty in choosing products and enjoy a more convenient, reassuring beauty shopping experience.</div>
+    </div>
+    <div class="part">
+      <div class="no">03</div><h3>Can</h3><div class="q">핵심 이해관계자는 누구인가?</div>
+      <p>화장품 구매 고객</p>
+      <div class="pen">Cosmetics shoppers</div>
+    </div>
+  </div>
+
+  <div class="cap">[사진] 팀이 진행한 How Might We 워크숍</div>
+</div>
+</body>
+</html>

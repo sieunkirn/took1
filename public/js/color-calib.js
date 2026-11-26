@@ -1,7 +1,6 @@
-// 카메라 색 보정 (2026-11-20): 관리자 화면 → '카메라 색 보정'(color-calib.html)에서 흰 종이를 한 번 찍어 맞춘다.
-//  - 흰 종이는 원래 흰색이니, 종이가 노랗게/파랗게 찍힌 만큼 빨강·초록·파랑에 곱할 값(이득, 선형 RGB)을 구한다
+// 카메라 색 보정 (2026-11-20): 관리자 화면 → '카메라 색 보정'(color-calib.html)에서 컬러체커의 흰색 칸을 한 번 찍어 맞춘다 (2026-11-26 흰 종이 → 컬러체커 흰색 칸).
+//  - 흰색 칸은 원래 흰색(무채색)이니, 그 칸이 노랗게/파랗게 찍힌 만큼 빨강·초록·파랑에 곱할 값(이득, 선형 RGB)을 구한다
 //  - 웹캠이 지원하면 그때의 화이트밸런스·노출을 고정해 둔다(자동 색 맞춤이 손님마다 바뀌지 않게)
-//  - 내 톤 추천(lip-engine.js classifyTone)은 이 값이 있으면 눈 흰자 대신 이 값으로 조명을 되돌린다
 //  - 값은 이 기기 localStorage 에 남고, '보정값 복사'로 받은 코드(C1.…)를 BUILT_IN_CODE 에 넣으면 어느 기기에서나 같은 값을 쓴다
 //    (터치 보정 touch-calib.js 의 T1 코드와 같은 방식)
 // DOM 없이 불러와도 되는 순수 모듈이다 (node 단위 테스트에서 씀)
@@ -10,16 +9,16 @@ const KEY = 'took.colorCalib';
 // 관리자 화면 '보정값 복사'로 받은 코드(C1.…)를 여기에 붙여 넣으면 웹에 고정된다. 비어 있으면 기기에 저장한 값만 쓴다
 export const BUILT_IN_CODE = '';
 
-const REF_WHITE = 235; // 노출을 고정했을 때 흰 종이를 이 밝기(sRGB)의 흰색으로 맞춘다 (눈 흰자 기준색과 비슷한 밝기)
+const REF_WHITE = 235; // 노출을 고정했을 때 흰색 칸을 이 밝기(sRGB)의 흰색으로 맞춘다 (눈 흰자 기준색과 비슷한 밝기)
 const GAIN_MIN = 0.25, GAIN_MAX = 8;
 
 export const toLinear = (v) => { const c = Math.max(0, Math.min(255, v)) / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
 const lum = (lin) => 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
 
 /**
- * 흰 종이를 찍은 평균색(sRGB 0~255)으로 채널별 이득(선형 RGB에 곱하는 값)을 구한다.
+ * 흰색 칸을 찍은 평균색(sRGB 0~255)으로 채널별 이득(선형 RGB에 곱하는 값)을 구한다.
  * 노출을 고정했으면 밝기까지 기준 흰색에 맞추고, 아니면 밝기는 그대로 두고 색 틀어짐만 없앤다
- * (노출이 자동이면 손님 얼굴을 찍을 때 밝기가 또 바뀌므로 종이 밝기에 맞추는 건 의미가 없다)
+ * (노출이 자동이면 손님 얼굴을 찍을 때 밝기가 또 바뀌므로 흰 칸 밝기에 맞추는 건 의미가 없다)
  */
 export function computeGain(rgb, { exposureLocked = false } = {}) {
   const lin = rgb.map(toLinear);
@@ -28,7 +27,7 @@ export function computeGain(rgb, { exposureLocked = false } = {}) {
 }
 
 /**
- * 측정한 네모 칸이 흰 종이로 쓸 만한지 본다.
+ * 측정한 네모 칸이 흰색 기준으로 쓸 만한지 본다.
  * @param {{ mean: number[], std: number, clipped: number }} s mean=평균 sRGB, std=밝기 표준편차, clipped=하얗게 날아간 픽셀 비율
  * @returns {null | 'dark' | 'bright' | 'uneven' | 'colored'} 문제 없으면 null
  */
@@ -38,7 +37,7 @@ export function checkSample({ mean, std, clipped = 0 }) {
   if (clipped > 0.25 || Math.min(...mean) > 252) return 'bright';
   if (std > 22) return 'uneven';
   const hi = Math.max(...mean), lo = Math.min(...mean);
-  if ((hi - lo) / hi > 0.6) return 'colored'; // 조명 색으로는 이만큼 틀어지지 않는다 → 흰 종이가 아니다
+  if ((hi - lo) / hi > 0.6) return 'colored'; // 조명 색으로는 이만큼 틀어지지 않는다 → 흰색 칸이 아니다
   return null;
 }
 

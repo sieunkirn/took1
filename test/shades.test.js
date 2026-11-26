@@ -5,10 +5,10 @@ const { test } = await import('node:test');
 const assert = (await import('node:assert/strict')).default;
 const { readFileSync } = await import('node:fs');
 const repo = await import('../src/lib/repository.js');
-const { recommendByColor } = await import('../src/lib/recommend.js');
+const { recommendByColor, recommendByTexture } = await import('../src/lib/recommend.js');
 const { loadAndBuild } = await import('../scripts/import-shades.js');
 
-const shades = repo.allShades();
+const shades = repo.allShades().filter((s) => s.source === 'oliveyoung'); // 실제 호수만
 const ean13 = (b) => /^\d{13}$/.test(b) && (10 - ([...b.slice(0, 12)].reduce((s, d, i) => s + Number(d) * (i % 2 ? 3 : 1), 0) % 10)) % 10 === Number(b[12]);
 
 test('호수 데이터: 원본을 고친 뒤 npm run import:shades 를 실행해 products.shades.json 이 원본과 같다', () => {
@@ -185,3 +185,76 @@ test('추천: 제형 여러 개·가격 상한', () => {
   assert.ok(cheap.length > 0 && cheap.every((p) => p.price > 0 && p.price <= 12000));
 });
 
+
+test('질감 추천: 같은 색이라도 질감마다 다른 제품, 고른 질감 먼저·모자라면 다른 질감으로 채움', () => {
+  const hex = '#C8102E';
+  const ids = (t) => recommendByTexture(hex, t, { limit: 6 }).products.map((p) => p.id).join(' ');
+  assert.notEqual(ids('matte'), ids('glossy'));
+  assert.notEqual(ids('glossy'), ids('sheer'));
+  const matte = recommendByTexture(hex, 'matte', { limit: 6 });
+  assert.equal(matte.products.length, 6);
+  assert.ok(matte.products.every((p) => p.texture_match && ['matte', 'velvet'].includes(p.finish)), 'matte 는 벨벳 포함');
+  // 실데이터가 적은 질감(새틴·시어·쉬머)은 실제 제품에 시연용 질감을 배정해(finish-demo.json) 6개 모두 그 질감
+  for (const t of ['satin', 'sheer', 'shimmer']) {
+    const r = recommendByTexture(hex, t, { limit: 6 });
+    assert.equal(r.matched, 6, t);
+    assert.ok(r.products.every((p) => p.finish === t), t);
+    assert.equal(new Set(r.products.map((p) => p.line || p.id)).size, 6, '같은 제품이 두 번 나오지 않는다');
+  }
+  // 고른 질감 제품이 모자라면 다른 질감으로 채운다 (가상의 제품 목록으로)
+  const oneSatin = repo.allProducts().find((p) => p.finish === 'satin');
+  const few = repo.allProducts().filter((p) => (p.finish !== 'satin' && !p.finish_also?.includes('satin')) || p === oneSatin); // also 로 새틴에 나오는 제품도 뺀다
+  const fill = recommendByTexture(hex, 'satin', { limit: 6, products: few });
+  assert.equal(fill.matched, 1);
+  assert.equal(fill.products.length, 6);
+  assert.ok(fill.products.slice(1).every((p) => !p.texture_match));
+  assert.ok(repo.allProducts().filter((p) => p.finish_source === 'guess').length > 0, '추정 질감(finish-guess.json)이 데이터에 들어가 있다');
+});
+
+test('질감 추천: 다이얼 28색 × 질감 5개 = 140 조합의 추천 목록이 모두 다르고, 모두 사진 있는 실제 제품이다', () => {
+  const DIAL = ['#EB8283', '#E47270', '#E65157', '#DA3B52', '#BA2D3E', '#A52837', '#8A2D37', '#EBA1B4', '#DFA3A7', '#E77492', '#D56287', '#CA3D71', '#AA3D55', '#95314B',
+    '#EBA798', '#E2825C', '#E07667', '#E56A3B', '#D94D3A', '#B8483F', '#9A4F38', '#E9B1AE', '#DA9E95', '#DF918D', '#D6867E', '#C67867', '#B66A55', '#A0554A'];
+  const lists = new Set();
+  for (const hex of DIAL) for (const t of ['matte', 'glossy', 'satin', 'sheer', 'shimmer']) {
+    const r = recommendByTexture(hex, t, { limit: 6 });
+    assert.equal(r.matched, 6, hex + ' ' + t + ' 는 그 질감 제품 6개');
+    // 2026-11-26: 가짜(사진 없는) 질감 제품은 모두 뺐다. 새틴·시어·쉬머는 질감이 애매한 실제 제품에 시연용 질감을 배정(finish-demo.json)
+    assert.ok(r.products.every((p) => p.source === 'oliveyoung' && p.image_url), hex + ' ' + t + ': 실제 제품·사진 있음');
+    lists.add(t + ':' + r.products.map((p) => p.id).join(','));
+  }
+  assert.equal(lists.size, 140);
+  assert.equal(repo.allProducts().filter((p) => p.id.startsWith('TX-')).length, 0, '가짜 질감 제품 없음');
+  const assigned = repo.allProducts().filter((p) => p.finish_source === 'demo');
+  assert.ok(['satin', 'sheer', 'shimmer'].every((t) => assigned.some((p) => p.finish === t)), '새틴·시어·쉬머 시연용 배정이 데이터에 들어가 있다');
+});
+
+test('질감 추천 + 농도 (2026-11-26): 같은 색·같은 질감이어도 농도가 바뀌면 추천 목록이 바뀐다', async () => {
+  const { lookHex } = await import('../src/lib/color.js');
+  for (const [hex, t] of [['#DA3B52', 'matte'], ['#EBA1B4', 'glossy'], ['#A0554A', 'sheer'], ['#CA3D71', 'shimmer'], ['#E2825C', 'satin']]) {
+    const lists = [20, 50, 80, 100].map((i) => recommendByTexture(lookHex(hex, i), t, { limit: 6 }).products.map((p) => p.id).join(','));
+    // 새틴·시어·쉬머는 제품이 12~17개뿐이라 이웃한 농도(80·100)끼리 같은 목록이 나올 때가 있다 → 4단계 중 3개 이상 다르면 된다
+    assert.ok(new Set(lists).size >= 3, hex + ' ' + t + ': 농도 20·50·80·100 목록이 3가지 이상');
+    assert.notEqual(lists[0], lists[2], hex + ' ' + t + ': 농도 20 과 80 은 다르다');
+  }
+});
+
+test('질감 추천 빈칸 없음 (2026-11-26 "가짜여도 좋으니까 빈칸이 있어선 안돼"): 다이얼 28색 × 질감 5 × 농도 11단계 = 1,540칸 모두 질감 맞는 비슷한 색(색차 5 이하) 제품이 있다', async () => {
+  const { lookHex } = await import('../src/lib/color.js');
+  const DIAL = ['#EB8283', '#E47270', '#E65157', '#DA3B52', '#BA2D3E', '#A52837', '#8A2D37', '#EBA1B4', '#DFA3A7', '#E77492', '#D56287', '#CA3D71', '#AA3D55', '#95314B',
+    '#EBA798', '#E2825C', '#E07667', '#E56A3B', '#D94D3A', '#B8483F', '#9A4F38', '#E9B1AE', '#DA9E95', '#DF918D', '#D6867E', '#C67867', '#B66A55', '#A0554A'];
+  const empty = [];
+  for (const hex of DIAL) for (const t of ['matte', 'glossy', 'satin', 'sheer', 'shimmer']) for (let d = 0; d <= 100; d += 10) {
+    const best = recommendByTexture(lookHex(hex, d), t, { limit: 6 }).products.find((p) => p.texture_match);
+    if (!best || best.delta_e > 5) empty.push(`${hex} ${t} ${d}% (${best?.delta_e})`);
+  }
+  assert.deepEqual(empty, [], '빈칸이 생기면 src/data/finish-demo.json 에 also 를 더한다');
+  // also(시연용으로 더 나오는 질감) 제품: 원래 질감은 그대로, 그 질감 목록에서는 그 질감으로 보인다 (발라 보면 거울도 그 질감)
+  const p = repo.allProducts().find((x) => x.finish_also?.includes('shimmer') && x.finish === 'glossy');
+  assert.ok(p, 'finish-demo.json 의 also 가 데이터에 들어가 있다');
+  const s = repo.shadesOf(p)[0];
+  const got = recommendByTexture(s.color_hex, 'shimmer', { limit: 6 }).products.find((x) => (x.line || x.id) === p.id);
+  assert.ok(got && got.texture_match, '쉬머 목록에 나온다');
+  assert.equal(got.finish, 'shimmer');
+  assert.equal(got.finish_source, 'demo');
+  assert.ok(recommendByTexture(s.color_hex, 'glossy', { limit: 6 }).products.some((x) => (x.line || x.id) === p.id && x.finish === 'glossy'), '원래 질감(글로시) 목록에도 그대로 나온다');
+});

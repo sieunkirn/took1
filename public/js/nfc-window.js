@@ -30,9 +30,9 @@ const BASKET_LIVE_MS = 10 * 60 * 1000; // 카드를 마지막으로 댄 뒤 이�
 /**
  * NFC 시트 만들기. stage = 팔레트 900×1440 무대.
  * onWear(p): 그 색을 입술에 바르기 · onSimilar(): 지금 색과 비슷한 립(거울 추천 제품) · onOpen(): 시트가 올라올 때
- * onTake(p): 가져가기 화면 (고른 호수, 2026-11-19 진입 흐름의 마지막 화면)
  */
-export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
+// onProduct(p) (2026-11-24): '인식했어요' 다음 화면을 검정 제품 시트 대신 바깥(거울의 흰 호수 보기 화면)에 맡긴다
+export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onProduct }) {
   let shelf = (store.get(SHELF_KEY) || []).filter((p) => p && p.id && p.color_hex).slice(-SHELF_MAX);
   let current = null; // 태그한 제품
   let picked = null; // 입술에 바른 호수 (null = 대표 색)
@@ -79,8 +79,7 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   const shadeBox = el('div', { class: 'nt-shades' }, el('div', { class: 'nt-shades-head' }, pickLabel, pickNow), chips);
 
   const actions = el('div', { class: 'nt-actions' },
-    el('button', { type: 'button', class: 'nt-btn', onclick: () => { api_.close(); onSimilar(); } }, t('nw.similar')),
-    onTake ? el('button', { type: 'button', class: 'nt-btn nt-btn-pink', onclick: () => { const x = picked || current; api_.close(); onTake(x); } }, t('nw.take')) : null);
+    el('button', { type: 'button', class: 'nt-btn', onclick: () => { api_.close(); onSimilar(); } }, t('nw.similar')));
 
   const unknown = el('div', { class: 'nt-unknown' },
     el('span', { class: 'nt-q', 'aria-hidden': 'true', text: '?' }),
@@ -104,9 +103,9 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   const waitBox = el('div', { class: 'nm-wait' }, art,
     el('h2', { class: 'nm-title', id: 'nm-title', text: t('nm.title') }),
     el('p', { class: 'nm-sub', text: t('nm.sub') }),
-    el('ol', { class: 'nm-steps' }, step(1), step(2), step(3)),
-    el('p', { class: 'nm-status' }, el('i'), el('span', { text: t('nm.waiting') })),
-    el('button', { type: 'button', class: 'nm-btn', onclick: () => fakeTag() }, t('nm.dial')));
+    el('ol', { class: 'nm-steps' }, step(1), step(2), step(3)));
+  // 테스트 (2026-11-25): 큰 '다이얼로 고르기' 버튼 대신 닫기(X)와 대칭인 왼쪽 위 작은 버튼. 안내(wait) 중에만 보인다
+  const mTest = el('button', { type: 'button', class: 'nm-test', onclick: () => fakeTag() }, t('nm.dial'));
   const hPhotoWrap = el('div', { class: 'nm-photo' });
   const hImg = el('img', { alt: '', draggable: 'false', referrerpolicy: 'no-referrer' });
   const hBrand = el('span', { class: 'nm-brand' });
@@ -114,16 +113,20 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   const hDot = el('i');
   const hMeta = el('span');
   const hBar = el('i');
+  // 남은 시간 (2026-11-25 시안 C): 막대 대신 버튼 글자 옆 작은 원이 HIT_MS 동안 비워진다
+  const hRing = el('span', { class: 'nm-ring-time', 'aria-hidden': 'true' });
+  hRing.innerHTML = '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><circle class="nm-ring-arc" cx="10" cy="10" r="7.5" pathLength="100"/></svg>';
+  const hArc = hRing.querySelector('.nm-ring-arc');
   const badgeText = el('span', { text: t('nm.hit') });
   const badge = el('span', { class: 'nm-badge' }, el('b'), badgeText);
   badge.querySelector('b').innerHTML = CHECK_SVG;
   const hitBox = el('div', { class: 'nm-hitbox' }, badge, hPhotoWrap, hBrand, hName, el('p', { class: 'nm-shade' }, hDot, hMeta),
     el('p', { class: 'nm-status' }, el('i'), el('span', { text: t('nm.applied') })),
     el('div', { class: 'nm-bar', 'aria-hidden': 'true' }, hBar),
-    el('button', { type: 'button', class: 'nm-btn nm-btn-pink', onclick: () => toCard() }, t('nm.toCard')));
+    el('button', { type: 'button', class: 'nm-btn nm-btn-pink', onclick: () => toCard() }, el('span', { text: t('nm.toCard') }), hRing));
   const unkBox = el('div', { class: 'nm-unk' }, el('span', { class: 'nt-q', 'aria-hidden': 'true', text: '?' }),
     el('strong', { text: t('nw.unknown') }), el('span', { text: t('nw.unknownSub') }));
-  const mBox = el('section', { class: 'nm-box', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'nm-title' }, mClose, waitBox, hitBox, unkBox);
+  const mBox = el('section', { class: 'nm-box', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'nm-title' }, mClose, mTest, waitBox, hitBox, unkBox);
   const modal = el('div', { class: 'nm', id: 'nfc-modal', hidden: '', 'data-state': 'wait' }, el('div', { class: 'nm-back', onclick: () => modalTap() }), mBox);
   stage.append(modal);
   const modalOpen = () => !modal.hidden;
@@ -142,7 +145,7 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     if (reduce) { done(); return; }
     mBox.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-50%) scale(.96)' }], { duration: 200, easing: 'ease-in' }).finished.then(done, done);
   }
-  // 테스트용 (2026-11-22 사용자 요청): 안내 모달의 '다이얼로 고르기 (테스트용)' 버튼 = 리더기 없이 NFC 가 인식된 척.
+  // 테스트용 (2026-11-22 사용자 요청): 안내 모달 왼쪽 위 '테스트' 버튼 = 리더기 없이 NFC 가 인식된 척.
   // 화면 목록(/api/products, 호수 있는 실제 제품)에서 아무 제품이나 하나 골라 실제 태그와 같은 길('인식했어요' → 제품 카드)로 보낸다
   let testPool = null;
   async function fakeTag() {
@@ -163,7 +166,9 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
   function toCard() {
     const p = hitProduct;
     modalClose();
-    if (p) showProduct(p, { fromTag: true, worn: true });
+    if (!p) return;
+    if (onProduct) { onProduct(p); return; } // 흰 호수 보기 화면으로 (검정 시트는 안 씀)
+    showProduct(p, { fromTag: true, worn: true });
   }
   function showHit(p, label = t('nm.hit')) {
     clearTimeout(hitTimer);
@@ -180,6 +185,8 @@ export function createNfcWindow({ stage, onWear, onSimilar, onOpen, onTake }) {
     if (!reduce) {
       hBar.getAnimations().forEach((a) => a.cancel());
       hBar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: HIT_MS, easing: 'linear', fill: 'forwards' });
+      hArc.getAnimations().forEach((a) => a.cancel());
+      hArc.animate([{ strokeDashoffset: '0px' }, { strokeDashoffset: '100px' }], { duration: HIT_MS, easing: 'linear', fill: 'forwards' });
     }
     hitTimer = setTimeout(toCard, HIT_MS);
   }

@@ -47,7 +47,6 @@
 .tui-stage .nt .nt-btn, .tui-stage .nt .nt-btn:hover:not(:disabled) { flex: 1 1 0; height: 80px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px;
   font-size: 21px; font-weight: 700; letter-spacing: -0.02em; color: #fff; text-align: center; border: 1.2px solid transparent;
   background: linear-gradient(#1b1b1b, #1b1b1b) padding-box, var(--glass-edge) border-box; box-shadow: 0 -1px 4px rgba(255, 255, 255, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.1); }
-.tui-stage .nt .nt-btn-pink, .tui-stage .nt .nt-btn-pink:hover:not(:disabled) { border: 0; background: var(--pink-pill); box-shadow: 0 0 24px rgba(232, 24, 111, 0.45), inset 0 2px 6px rgba(255, 255, 255, 0.26); }
 .tui-stage .nt .nt-btn:active { transform: scale(.97); }
 
 /* ---------- 등록되지 않은 태그 (작게, 저절로 내려간다) ---------- */
@@ -72,8 +71,6 @@
 /* 색 통일 (2026-11-20, README '색'): 시트·버튼 단색, 빛 번짐 없음 */
 .nt { background: #141416; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .tui-stage .nt .nt-btn, .tui-stage .nt .nt-btn:hover:not(:disabled) { background: #1e1e21; border: 1px solid #2e2e33; box-shadow: none; }
-.tui-stage .nt .nt-btn-pink, .tui-stage .nt .nt-btn-pink:hover:not(:disabled) { background: #ff007b; border: 0; box-shadow: none; }
-.tui-stage .nt .nt-btn-pink:active { background: #d60067; }
 @keyframes nt-edge { 0%, 100% { box-shadow: none; } }
 
 /* ---------- NFC 안내·인식 모달 (2026-11-22, Figma 'NFC 버튼 시안' D·F · '제품 인식 후 시안' H) ----------
@@ -144,3 +141,52 @@
 .nt-recent.nt-recent-basket { max-width: 300px; overflow-x: auto; padding: 4px; scrollbar-width: none; }
 .nt-recent.nt-recent-basket::-webkit-scrollbar { display: none; }
 .nt-recent-basket .nt-rec { flex: none; }
+
+/* ---------- 반투명 시안 (2026-11-24 사용자 요청: NFC 모달 색깔 없이 반투명 느낌) ----------
+   뒤 거울 화면이 흐리게 비치는 유리 상자. 핑크 대신 흰색 투명도만 쓴다 (제품 호수 점 .nm-shade i 는 실제 색이라 그대로).
+   원래 단색 디자인으로 돌리려면 이 블록만 지우면 된다 */
+.nm-back { background: rgba(0, 0, 0, 0.28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.nm[data-state="hit"] .nm-back { background: rgba(0, 0, 0, 0.18); }
+.nm-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
+  -webkit-backdrop-filter: blur(36px) saturate(1.1); backdrop-filter: blur(36px) saturate(1.1); }
+.nm-ring { border-color: rgba(255, 255, 255, 0.3); }
+.nm-dot { background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.4); }
+.nm-sub, .nm-brand, .nm-unk > span:not(.nt-q) { color: rgba(255, 255, 255, 0.68); }
+.nm-steps li { background: rgba(255, 255, 255, 0.1); }
+.nm-steps b { background: rgba(255, 255, 255, 0.2); }
+.nm-status i, .nm-bar i { background: #fff; }
+.nm-bar { background: rgba(255, 255, 255, 0.18); }
+.tui-stage .nm .nm-btn, .tui-stage .nm .nm-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.24); }
+.tui-stage .nm .nm-btn-pink, .tui-stage .nm .nm-btn-pink:hover:not(:disabled) { background: rgba(255, 255, 255, 0.9); color: #111; border: 0; }
+.tui-stage .nm .nm-btn:active { background: rgba(255, 255, 255, 0.24); }
+.tui-stage .nm .nm-btn-pink:active { background: rgba(255, 255, 255, 0.75); }
+.nm-badge { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.nm-badge b { background: rgba(255, 255, 255, 0.28); }
+.nm-photo { background: rgba(255, 255, 255, 0.1); }
+
+/* 디벨롭 (2026-11-25, Figma 2161-70 · 2163-79): '리더기 기다리는 중' 줄 삭제 → 버튼을 단계 목록 아래로 조금 띄움.
+   제품 사진은 흰 테두리(흰 바탕+여백) 없이 사진이 둥근 칸을 꽉 채운다 */
+.tui-stage .nm .nm-wait .nm-btn { margin-top: 40px; }
+.nm-hitbox .nm-shade, .nm-hitbox .nm-status { display: none; } /* 호수·가격 줄, '입술에 바로 발라드릴게요' 없앰 (2026-11-25) */
+.nm-hitbox .nm-bar { display: none; } /* 남은 시간 막대 → 버튼 속 작은 원 (시안 C, 2026-11-25) */
+.tui-stage .nm .nm-hitbox .nm-btn { margin-top: 36px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+.nm-ring-time { width: 30px; height: 30px; flex: none; }
+.nm-ring-time svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+.nm-ring-time circle { fill: none; stroke: rgba(0, 0, 0, 0.14); stroke-width: 2.6; }
+.nm-ring-time .nm-ring-arc { stroke: #111; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 0; }
+/* 테스트 버튼 (2026-11-25): 닫기(X, 오른쪽 28px·위 28px·60px)와 대칭으로 왼쪽 위 작은 유리 알약. 안내(wait) 중에만 */
+.tui-stage .nm .nm-test, .tui-stage .nm .nm-test:hover:not(:disabled) { position: absolute; left: 28px; top: 36px; height: 44px; min-height: 0; padding: 0 20px;
+  border-radius: 999px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.24); box-shadow: none;
+  color: rgba(255, 255, 255, 0.8); font: inherit; font-size: 19px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer; }
+.tui-stage .nm .nm-test:active { background: rgba(255, 255, 255, 0.22); }
+.nm:not([data-state="wait"]) .nm-test { display: none; }
+/* 버튼 시안 E (2026-11-25): 흰 버튼 대신 유리 버튼 + 흰 원, 원은 글자 앞 */
+.tui-stage .nm .nm-hitbox .nm-btn-pink, .tui-stage .nm .nm-hitbox .nm-btn-pink:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.32); color: #fff; }
+.tui-stage .nm .nm-hitbox .nm-btn-pink:active { background: rgba(255, 255, 255, 0.24); }
+.nm-hitbox .nm-ring-time { order: -1; }
+.nm-hitbox .nm-ring-time circle { stroke: rgba(255, 255, 255, 0.25); }
+.nm-hitbox .nm-ring-time .nm-ring-arc { stroke: #fff; }
+.nm-badge { display: none; } /* '인식했어요' 알약 문구 없앰 (2026-11-25) */
+.nm-photo { width: 300px; height: 300px; margin-top: 48px; background: none; } /* 사진 뒤 동그라미 없앰 (2026-11-25) */
+.nm-photo img { width: 300px; height: 300px; padding: 0; border-radius: 40px; object-fit: cover; background: rgba(255, 255, 255, 0.08); }

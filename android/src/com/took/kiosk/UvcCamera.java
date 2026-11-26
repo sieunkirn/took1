@@ -13,11 +13,13 @@ package com.took.kiosk;
 // 웹 화면은 https://appassets.androidplatform.net/__uvc/frame?after=N 으로 다음 장을 받아 캔버스에 그리고
 // canvas.captureStream() 으로 가짜 카메라 스트림을 만든다 (js/uvc-bridge.js). 그래서 거울·색 보정·웹캠 설정 화면이 그대로 쓴다.
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -169,6 +171,13 @@ public class UvcCamera {
         exec.execute(new Runnable() { @Override public void run() { startInternal(); } });
     }
 
+    /** 카메라 권한 결과 (MainActivity) */
+    void onCameraPermission(final boolean granted) {
+        note("카메라 권한 " + (granted ? "허용" : "거부"));
+        if (granted) exec.execute(new Runnable() { @Override public void run() { startInternal(); } });
+        else { state = "error"; lastError = "카메라 권한이 거부됐어요. 설정 → 애플리케이션 → 툭 → 권한에서 카메라를 허용해 주세요"; }
+    }
+
     void startInternal() {
         if (streaming && conn != null && curW > 0) {
             // 이미 켜져 있고 해상도가 크게 다르지 않으면 그대로 쓴다
@@ -177,6 +186,16 @@ public class UvcCamera {
         if (!nativeOk) note("네이티브 등시 전송 라이브러리 없음: " + nativeError + " (벌크 전송 웹캠만 가능)");
         UsbDevice d = findUvc();
         if (d == null) { close(); state = "no-device"; lastError = "USB 웹캠이 안 보여요. OTG 젠더·허브·케이블을 확인해 주세요"; return; }
+        // Android 는 앱에 카메라 권한이 없으면 USB 영상 장치 권한을 창도 띄우지 않고 바로 거부한다 (2026-11-23 갤탭 레노보 웹캠).
+        // uvc-bridge.js 가 getUserMedia 를 가로채서 WebView 카메라 권한 요청이 안 생기므로 여기서 먼저 묻는다
+        if (!um.hasPermission(d) && Build.VERSION.SDK_INT >= 23
+                && ctx.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            state = "need-permission";
+            lastError = "카메라 권한을 허용해 주세요 (USB 웹캠은 카메라 권한이 있어야 열려요)";
+            note("카메라 권한 요청 (USB 웹캠 권한 전에 필요)");
+            listener.onUsbEvent("need-camera");
+            return;
+        }
         if (!um.hasPermission(d)) {
             state = "need-permission";
             note("USB 권한 요청: " + name(d));

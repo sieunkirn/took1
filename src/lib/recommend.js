@@ -30,11 +30,36 @@ export function recommendByColor(hex, { finish = null, maxPrice = null, limit = 
   const excluded = new Set(excludeIds);
   const finishes = (Array.isArray(finish) ? finish : String(finish || '').split(',')).map((f) => f.trim()).filter(Boolean);
   const cap = Number(maxPrice) > 0 ? Number(maxPrice) : null;
+  // 시연용으로 다른 질감 목록에도 나오는 제품(finish_also, src/data/finish-demo.json 의 also, 2026-11-26)도 그 질감으로 친다
+  const alsoFits = (p) => (p.finish_also || []).some((f) => finishes.includes(f));
   return products
-    .filter((p) => !finishes.length || finishes.includes(p.finish))
+    .filter((p) => !finishes.length || finishes.includes(p.finish) || alsoFits(p))
     .filter((p) => !cap || (Number(p.price) > 0 && Number(p.price) <= cap))
-    .map((p) => bestOf(p, refLab, excluded))
+    .map((p) => {
+      const r = bestOf(p, refLab, excluded);
+      // also 로 들어온 제품은 찾은 질감으로 보여 준다: 카드에서 발라 보면 거울도 그 질감 그대로 (원래 질감으로 바뀌지 않게)
+      return r && finishes.length && !finishes.includes(p.finish) ? { ...r, finish: finishes[0], finish_source: 'demo' } : r;
+    })
     .filter(Boolean)
     .sort(byDelta)
     .slice(0, limit);
+}
+
+// 거울의 질감(matte·glossy·satin·sheer·shimmer) → 제품 제형. matte 는 벨벳도 같이 (벨벳 제품을 바르면 거울도 matte 가 된다)
+export const TEXTURE_FINISHES = { matte: ['matte', 'velvet'], glossy: ['glossy'], satin: ['satin'], sheer: ['sheer'], shimmer: ['shimmer'] };
+
+/**
+ * 색 + 질감 추천 (2026-11-24 사용자 요청 "같은 색에 질감을 달리해도 제품이 다 똑같이 나온다"):
+ * 고른 질감의 제품을 색 순서로 먼저, 모자라면 질감이 다른(또는 질감 정보 없는) 비슷한 색 제품으로 채운다.
+ * 각 제품에 texture_match(질감이 맞는지)를 붙이고, matched = 질감이 맞는 수. 질감이 없거나 모르는 값이면 색만 본다
+ */
+export function recommendByTexture(hex, texture, { limit = 10, excludeIds = [], products } = {}) {
+  const finish = TEXTURE_FINISHES[texture];
+  const opts = products ? { products } : {};
+  if (!finish) return { matched: 0, products: recommendByColor(hex, { ...opts, limit, excludeIds }) };
+  const hit = recommendByColor(hex, { ...opts, finish, limit, excludeIds }).map((p) => ({ ...p, texture_match: true }));
+  const rest = hit.length < limit
+    ? recommendByColor(hex, { ...opts, limit: limit - hit.length, excludeIds: [...excludeIds, ...hit.map((p) => p.id)] }).map((p) => ({ ...p, texture_match: false }))
+    : [];
+  return { matched: hit.length, products: [...hit, ...rest] };
 }

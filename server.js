@@ -8,7 +8,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { join, extname, normalize, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { allProducts, allDemoProducts, shadesOf, findById, findByBarcode, normalizeBarcode } from './src/lib/repository.js';
-import { recommendByColor } from './src/lib/recommend.js';
+import { recommendByColor, recommendByTexture } from './src/lib/recommend.js';
 import { normalizeHex } from './src/lib/color.js';
 import { BROWSER_LIBS } from './src/lib/browser-libs.js';
 import { setRealOnlyGetter } from './src/lib/catalog.js';
@@ -149,6 +149,8 @@ async function handleApi(req, res, url) {
     if (!hex) return sendJson(res, 400, { error: 'hex 파라미터(예: #B3122E)가 필요합니다.' });
     const limit = Math.min(30, Math.max(1, Number(q.get('limit')) || 10));
     const excludeIds = (q.get('exclude') || '').split(',').filter(Boolean);
+    // texture = 거울에서 고른 질감 (그 질감 제품 먼저, 모자라면 비슷한 색 다른 질감으로 채움)
+    if (q.get('texture')) return sendJson(res, 200, { hex, texture: q.get('texture'), ...recommendByTexture(hex, q.get('texture'), { limit, excludeIds }) });
     const products = recommendByColor(hex, { finish: q.get('finish') || null, maxPrice: Number(q.get('maxPrice')) || null, limit, excludeIds });
     return sendJson(res, 200, { hex, products });
   }

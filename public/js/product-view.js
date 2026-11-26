@@ -1,31 +1,15 @@
 // 제품을 화면에 보여 주는 부품: 이름·가격 표기, 제품 카드, 상세 표, 올리브영 링크.
 import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
-import { t, isEn, brandOf, nameOf, displayName, storeUrlOf, priceText, finishText as finishName } from './i18n.js';
+import { t, isEn, brandOf, nameOf, displayName, priceText } from './i18n.js';
 import { el } from './dom.js';
-import { isDemo, demoBadgeFor } from './demo.js';
-import { go } from './store.js';
+import { demoBadgeFor } from './demo.js';
 import { api } from './api.js';
 
 // 화면에 보이는 제품 이름: 영어 화면이면 글로벌 올리브영 영어 이름(없으면 한국어 이름), 한국어면 그대로
 export const fullName = (p) => (isEn() ? displayName(p) : koFullName(p));
 export const shortName = (p) => (isEn() ? `${brandOf(p)} ${nameOf(p)}` : koShortName(p));
 
-// 수집하지 않은 정보는 비워 두고, 추정한 값은 추정이라고 표시한다 (올리브영 데이터)
-const shadeText = (p) => shadeLabelOf(p) || (p.color_options ? t('detail.shadeOf', { n: p.color_options }) : t('detail.shadeRep'));
-const finishText = (p) => (p.finish ? finishName(p.finish) + (p.finish_source === 'product_name' ? t('detail.byName') : '') : t('detail.none'));
-const familyText = (p) => t('family.' + p.color_family) + (p.color_family_source === 'estimated_from_color' ? t('detail.byColor') : '');
-
-/** 올리브영 상세 페이지 링크 (새 창) */
-export function storeLink(p, text = t('card.store')) {
-  const url = storeUrlOf(p); // 영어면 글로벌 올리브영
-  return url ? el('a', { href: url, text, target: '_blank', rel: 'noopener noreferrer' }) : null;
-}
-
 export const won = priceText; // 한국어 '13,000원', 영어 '₩13,000'
-
-export function detailLink(product, from, text = t('card.detail')) {
-  return el('a', { href: 'product.html', text, onclick: (e) => { e.preventDefault(); go('product.html', { id: product.id, from }); } });
-}
 
 /**
  * 제품 카드. 색상은 칠하지 않고 텍스트로만 표시한다.
@@ -35,14 +19,64 @@ export function detailLink(product, from, text = t('card.detail')) {
 // 카드에는 브랜드·제품명·색상값·제형·가격과 올리브영 링크만 보여 준다 (나머지 정보는 제품 상세 화면에)
 // extraActions: 화면마다 필요한 버튼 (예: 립 컬러 매핑의 '입술에 발라보기')
 /** '입술에 발라보기' 버튼이 붙은 제품 카드. 누르면 onTry(제품) */
-// 카드 안에서 호수(옵션)를 바꾸면 '발라보기'도 고른 호수로 한다 (옆의 '챗봇에 담기'는 2026-11-22 챗봇과 함께 삭제)
-export function tryOnCard(product, onTry, { onTake } = {}) { // onTake: 거울의 '가져가기' (2026-11-19)
+// 카드 안에서 호수(옵션)를 바꾸면 '발라보기'도 고른 호수로 한다
+// lipIcon (2026-11-24 거울 추천 카드): 발라보기 글자 앞 입술 아이콘. 지금 입술에 바른 제품이면 아이콘이 그 색으로 채워진다 (palette.js markWorn)
+// onMoreShades (2026-11-24): 호수 드롭다운 대신 '지금 호수'(색 점 + 이름) + [다른 호수 보기 ›]. 누르면 onMoreShades(제품, 카드, 호수 바꾸기)
+//   호수 바꾸기(s) = 호수 화면에서 고른 호수를 카드에 반영 (지금 호수 표시·발라보기 대상·아이콘 색)
+// onShades: [호수 보기] 버튼을 따로 두는 방식 (2026-11-24 잠깐 썼다가 되돌림, 지금은 안 씀)
+// 입술 아이콘은 2026-11-24 사용자 요청으로 잠시 꺼 둠 (주석). 다시 켜려면 아래 기본값을 !!(onShades || onMoreShades) 로
+export function tryOnCard(product, onTry, { onShades, onMoreShades, lipIcon = false /* !!(onShades || onMoreShades) */ } = {}) {
   let current = product;
-  return productCard(product, {
-    extraActions: [el('button', { type: 'button', text: t('lip.tryOn'), onclick: () => onTry(current) }),
-      onTake ? el('button', { type: 'button', class: 'take-btn', text: t('nw.take'), onclick: () => onTake(current) }) : null].filter(Boolean),
-    onShade: (s) => { current = s; },
+  let card = null;
+  // 거울 추천 카드(onMoreShades·onShades): 지금 바른 제품인지 palette.js markWorn 이 aria-pressed 로 표시한다 (data-hex 로 비교)
+  const mirror = !!(onShades || onMoreShades || lipIcon);
+  const tryBtn = mirror
+    ? el('button', { type: 'button', class: 'try-btn', 'aria-pressed': 'false', 'data-hex': product.color_hex || '', style: `--c: ${product.color_hex || '#888'}`, onclick: () => onTry(current, card) })
+    : el('button', { type: 'button', text: t('lip.tryOn'), onclick: () => onTry(current) });
+  if (lipIcon) {
+    tryBtn.innerHTML = '<svg class="try-lip" viewBox="0 0 24 24" aria-hidden="true">'
+      + '<path class="try-lip-fill" d="M1.8 12.2C4.3 8.9 6.9 7 9 7c1.2 0 2.2.6 3 1.5.8-.9 1.8-1.5 3-1.5 2.1 0 4.7 1.9 7.2 5.2-2.6 3.6-6.1 5.9-10.2 5.9S4.4 15.8 1.8 12.2Z"/>'
+      + '<path class="try-lip-line" d="M2.6 12.3c3.1.8 6.2 1.2 9.4 1.2s6.3-.4 9.4-1.2"/></svg>';
+  }
+  if (mirror) tryBtn.append(el('span', { class: 'try-label', text: t('lip.tryOn') }));
+  const setShade = (s) => {
+    current = s;
+    if (mirror && s.color_hex) { tryBtn.dataset.hex = s.color_hex; tryBtn.style.setProperty('--c', s.color_hex); }
+    if (nowBox) renderNow();
+  };
+  // 지금 호수 + 다른 호수 보기
+  let nowBox = null;
+  const nowDot = el('i', { 'aria-hidden': 'true' });
+  const nowName = el('span', { class: 'cur-shade-name' });
+  function renderNow() {
+    const label = shadeLabelOf(current);
+    nowBox.querySelector('.cur-shade-now').hidden = !label;
+    nowDot.style.background = current.color_hex; // 호수 색은 실제 색 (CLAUDE.md 예외)
+    nowName.textContent = label;
+  }
+  if (onMoreShades) {
+    const more = product.shade_count > 1
+      ? el('button', { type: 'button', class: 'more-shades', onclick: () => onMoreShades(current, card, setShade) },
+        // '호수 보기' ……… '12가지 ›' (2026-11-24 사용자 요청, 예전 '다른 호수 N가지')
+        el('span', { text: t('card.moreShades') }), el('span', { class: 'more-shades-n', text: t('nw.shadeCount', { n: product.shade_count }) }))
+      : null;
+    if (more) more.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg>');
+    nowBox = el('div', { class: 'cur-shade' }, el('div', { class: 'cur-shade-now' }, nowDot, nowName), more);
+    renderNow();
+  }
+  card = productCard(product, {
+    extraActions: [tryBtn,
+      onShades ? el('button', { type: 'button', class: 'shades-btn', text: t('card.seeShades'), onclick: () => onShades(current, card) }) : null].filter(Boolean),
+    onShade: (s) => setShade(s),
+    noPicker: !!(onShades || onMoreShades),
+    noShadeRow: !!onMoreShades,
   });
+  if (nowBox) {
+    card.querySelector('.actions').before(nowBox);
+    // 브랜드 옆 제형 태그(매트·글로시…)는 2026-11-24 사용자 요청으로 뺐다
+    // if (product.finish) card.querySelector('dd')?.append(el('span', { class: 'card-fin', text: finishName(product.finish) }));
+  }
+  return card;
 }
 
 // ---------- 카드 안의 호수 고르기 (2026-11-17, 아코디언) ----------
@@ -142,9 +176,9 @@ function shadeCell(p) {
   return t('detail.none');
 }
 
-export function productCard(product, { extraActions = [], from = null, onShade = null } = {}) {
-  // 호수 데이터가 있는 제품은 '호수' 줄 대신 카드 안의 옵션 고르기(shadePicker)를 둔다
-  const picker = product.shade_count > 1 ? shadePicker(product, { onSelect: onShade }) : null;
+export function productCard(product, { extraActions = [], from = null, onShade = null, noPicker = false, noShadeRow = false } = {}) {
+  // 호수 데이터가 있는 제품은 '호수' 줄 대신 카드 안의 옵션 고르기(shadePicker)를 둔다 (noPicker: 호수는 따로 '호수 보기' 버튼으로)
+  const picker = !noPicker && product.shade_count > 1 ? shadePicker(product, { onSelect: onShade }) : null;
   const rows = [
     [t('card.brand'), brandOf(product)],
     [t('card.name'), nameOf(product)],
@@ -154,7 +188,7 @@ export function productCard(product, { extraActions = [], from = null, onShade =
       ? [el('span', { 'data-count': String(product.price), text: won(product.price) })]
       : (product.price == null ? t('detail.none') : won(product.price))], // 가격이 없는 테스트 제품은 '정보 없음'
     // 호수 줄은 가격 다음(네 번째): 팔레트의 작은 카드 CSS 가 1~3번째 줄(브랜드·제품명·가격) 순서에 맞춰져 있다
-    picker ? null : [t('card.shade'), shadeCell(product)],
+    picker || noShadeRow ? null : [t('card.shade'), shadeCell(product)],
   ].filter(Boolean);
   // 대표 이미지 자리: 모든 카드에 같은 크기로 두어 줄이 맞게 한다.
   // 이미지 주소가 없거나 불러오지 못하면(외부 사이트 이미지 차단 등) '이미지 준비 중' 자리로 바꾼다
@@ -173,20 +207,4 @@ export function productCard(product, { extraActions = [], from = null, onShade =
     el('div', { class: 'actions' },
       ...extraActions),
   );
-}
-
-export function productDetailTable(p) {
-  const rows = [
-    ['ID', p.id], [t('detail.source'), isDemo(p) ? t('detail.sourceVirtual') : t('detail.sourceOy')],
-    [t('detail.barcode'), p.barcode || t('detail.none')], [t('card.brand'), brandOf(p)], [t('card.name'), nameOf(p)], [t('detail.type'), t('type.' + p.type)],
-    [t('detail.shade'), shadeText(p)], [t('detail.hex'), p.color_hex],
-    ...(p.color_source === 'oliveyoung_color_chip' ? [[t('detail.colorSource'), t('detail.colorChip')]] : []),
-    [t('detail.lab'), `L* ${p.color_lab.L} / a* ${p.color_lab.a} / b* ${p.color_lab.b}`],
-    [t('detail.family'), familyText(p)],
-    [t('card.finish'), finishText(p)], [t('card.price'), won(p.price) + (p.list_price && p.list_price !== p.price ? ` (${t('detail.listPrice', { price: won(p.list_price) })})` : '')],
-    [t('detail.desc'), p.description || t('detail.none')],
-  ];
-  if (p.original_name) rows.push([t('detail.originalName'), p.original_name]); // 한국 올리브영 원래 상품명 (영어 화면에서도 그대로)
-  return el('table', {}, el('tbody', {}, rows.map(([k, v]) => el('tr', {}, el('th', { text: k }), el('td', { text: v }))),
-    storeUrlOf(p) ? el('tr', {}, el('th', { text: t('detail.store') }), el('td', {}, storeLink(p, t('detail.storeOpen')))) : null));
 }

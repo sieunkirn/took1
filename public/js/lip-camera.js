@@ -1,21 +1,16 @@
-// 립 매핑 화면: 입술을 비추는 쪽. 카메라 켜고 끄기·멈춤 감시·입술 추적 루프, 아바타 그림, 화면 그리기.
+// 립 매핑 화면: 입술을 비추는 쪽. 카메라 켜고 끄기·멈춤 감시·입술 추적 루프, 화면 그리기.
 import { $, el } from './common.js';
+import { sleep } from './dom.js';
 import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
 import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
 import { getCamSettings, videoConstraints, isExternalCamera, widestZoom } from './camera-settings.js';
-import { attachWideView, wideAmount } from './wide-view.js';
 import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
-import { PALETTE, video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
-import { collectSkin } from './lip-look.js';
+import { video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
 
 // ---------- 그리기 ----------
-// 지금 보여 주는 원본: 아바타 그림 또는 카메라 영상
+// 지금 보여 주는 원본: 카메라 영상
 export function sourceFrame() {
-  if (state.source === 'avatar') {
-    const img = state.avatar?.img;
-    return img ? { src: img, w: img.naturalWidth, h: img.naturalHeight, mirror: false } : null;
-  }
   const cam = getCamSettings();
   return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: cam.mirror, rotate: cam.rotate };
 }
@@ -26,7 +21,7 @@ function render() {
   drawLipFrame(viewCtx, f, state.lips, state);
 }
 
-// ---------- 카메라 ('카메라로 테스트하기'를 누르면 켜지고, 아바타로 바꾸거나 나갈 때 꺼진다) ----------
+// ---------- 카메라 (화면에 들어오면 켜지고, 나갈 때 꺼진다) ----------
 function stopCamera() {
   state.gen++; // 지금 await 중인 루프가 깨어나도 다음 프레임을 예약하지 않는다
   if (state.rafId) cancelAnimationFrame(state.rafId);
@@ -37,13 +32,6 @@ function stopCamera() {
   state.stream = null;
   video.srcObject = null;
 }
-// 광각 보기 (0.5배 줌처럼 배경 넓게, 2026-11-23): 웹캠 영상일 때만, 세기는 관리자 → 웹캠 연결 설정 '광각'.
-// 얼굴 틀 자리는 palette.js toView 가 window.tookWideView.mapPoint 로 맞춘다
-export const wideView = attachWideView(view, {
-  getAmount: () => (state.source === 'camera' ? wideAmount(getCamSettings().wide) : 0),
-  visible: () => !view.classList.contains('hidden'),
-});
-window.tookWideView = wideView;
 
 // ---------- 웹캠 연결 안정화 (2026-11-13) ----------
 // 1) 켤 때 '사용 중'(NotReadableError·AbortError)이면 잠깐 기다렸다 다시 요청한다
@@ -54,7 +42,6 @@ window.tookWideView = wideView;
 const BUSY_RETRIES = 4;
 const BUSY_WAIT_MS = 700;
 const WAIT_POLL_MS = 3000;
-const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
 // 5) 터치 필름(USB 터치 컨트롤러)처럼 다른 USB 장치를 같이 꽂으면 웹캠이 켜지지 않거나(NotReadableError)
 //    켜진 뒤 프레임이 멈추는 일이 있다. 같은 USB 컨트롤러·허브의 대역폭(또는 전원)이 모자라
 //    큰 해상도 스트림을 못 여는 경우가 대부분이라, 두 번 실패하면 640×480 으로 낮춰 연다.
@@ -161,7 +148,6 @@ async function startCamera({ auto = false } = {}) {
   stopCamera();
   const gen = state.gen;
   state.source = 'camera';
-  state.analyze = null;
   view.classList.add('hidden');
   $('placeholder').classList.remove('hidden');
   showError('');
@@ -187,7 +173,7 @@ async function startCamera({ auto = false } = {}) {
     state.stream = await openStream(gen);
   } catch (e) {
     clearTimeout(noAnswer);
-    if (gen !== state.gen) return; // 기다리는 동안 다른 카메라·아바타로 바뀌었다
+    if (gen !== state.gen) return; // 기다리는 동안 다른 카메라로 바뀌었다
     setGuide('');
     if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') { waitForCamera(); return; } // 웹캠이 아직 안 꽂혔다 → 꽂히면 저절로
     showError(cameraErrorMessage(e));
@@ -196,7 +182,7 @@ async function startCamera({ auto = false } = {}) {
   clearTimeout(noAnswer);
   if (gen === state.gen) showError('');
   const stream = state.stream;
-  if (gen !== state.gen || state.source !== 'camera') { stopStream(stream); return; } // 권한을 기다리는 동안 아바타로 바꿨거나 다시 켰다
+  if (gen !== state.gen || state.source !== 'camera') { stopStream(stream); return; } // 권한을 기다리는 동안 껐거나 다시 켰다
   // 카메라가 도중에 끊기면(USB 분리 등) 연결 대기로: 다시 꽂히면 저절로 켠다
   stream.getVideoTracks()[0]?.addEventListener('ended', () => {
     if (state.stream !== stream) return; // 우리가 끈 예전 스트림
@@ -281,18 +267,6 @@ function scheduleNext(gen) {
 async function loop(gen = state.gen) {
   if (gen !== state.gen) return;
   state.lastLoopAt = performance.now();
-  if (state.source === 'avatar') {
-    try {
-      if (state.analyze) collectSkin();
-      render();
-      setGuide(guideText());
-      if ($('match')) $('match').disabled = false; // 아바타는 톤을 재지 않는다: 누르면 '카메라로 테스트해 주세요' 안내 (lip-look.js)
-    } catch (e) {
-      console.warn('[took] 아바타 그리기 오류:', e);
-    }
-    scheduleNext(gen);
-    return;
-  }
   if (!state.stream) return;
   // 어떤 오류가 나도 다음 프레임은 반드시 예약한다 (예전에는 오류 한 번에 화면이 굳었다)
   try {
@@ -315,7 +289,6 @@ async function loop(gen = state.gen) {
           if (gen === state.gen) state.loopBusy = false;
         }
         if (gen !== state.gen) return;
-        if (state.analyze) collectSkin();
       }
     } else if (performance.now() - state.lastFrameAt > STALL_MS && !document.hidden) {
       handleStall();
@@ -324,8 +297,6 @@ async function loop(gen = state.gen) {
     if (video.readyState >= 2) {
       render();
       setGuide(guideText());
-      // 거울(팔레트)은 시트를 열면 늘 누를 수 있게 둔다: 얼굴이 없으면 재는 쪽(palette.js)이 안내한다 (2026-11-20)
-      if ($('match')) $('match').disabled = PALETTE ? !!state.analyze : (!state.lips || !!state.analyze);
     }
   } catch (e) {
     console.warn('[took] 카메라 프레임 처리 오류:', e);
@@ -366,5 +337,5 @@ $('cam-retry').addEventListener('click', () => startCamera());
 // 저장한 설정(웹캠 고르기·해상도·프레임·좌우 반전·회전, camera-settings.js localStorage)이 여기 그대로 적용된다 (getCamSettings·videoConstraints)
 window.addEventListener('pagehide', stopCamera);
 
-// 아바타 테스트 버튼과 '카메라로 테스트하기' 버튼은 2026-11-15 뺐다 (카메라는 화면에 들어오면 자동으로 켜지고, 못 쓰면 '카메라 다시 연결')
+// 카메라는 화면에 들어오면 자동으로 켜지고, 못 쓰면 '카메라 다시 연결'
 startCamera({ auto: true });

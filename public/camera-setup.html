@@ -45,14 +45,6 @@
   .cs-actions .primary { grid-column: 1 / -1; background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .cs-tips { margin: 0; padding-left: 22px; line-height: 1.6; font-size: 15px; color: var(--mute); }
   .cs-log { width: 100%; height: 160px; box-sizing: border-box; padding: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--soft); color: var(--ink); font: 12px/1.45 ui-monospace, monospace; resize: vertical; }
-  .cs-wide { display: flex; align-items: center; gap: 14px; }
-  .cs-wide input { flex: 1; height: 44px; accent-color: var(--ink); }
-  .cs-wide output { flex: none; min-width: 64px; font-size: 22px; font-weight: 800; text-align: right; }
-  .cs-fe { display: flex; gap: 14px; align-items: flex-start; }
-  .cs-fe-prev { flex: none; position: relative; width: 200px; aspect-ratio: 5 / 8; background: #000; border-radius: var(--r-s); overflow: hidden; }
-  .cs-fe-prev canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .cs-fe-ctl { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-  .cs-wide-ends { display: flex; justify-content: space-between; font-size: 14px; color: var(--mute); margin-top: -6px; }
   .cs-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 12px 20px; border-radius: 999px; font-size: 16px; z-index: 10; pointer-events: none; }
 </style>
 </head>
@@ -97,21 +89,6 @@
     <div class="cs-opts" id="cs-rotate"></div>
   </section>
 
-  <section class="cs-box">
-    <h2>광각 (0.5배 줌처럼 배경 넓게)</h2>
-    <div class="cs-fe">
-      <div class="cs-fe-prev" aria-label="거울 화면 미리보기"><canvas id="cs-fe-src"></canvas></div>
-      <div class="cs-fe-ctl">
-        <p class="muted small" style="margin:0">세로 거울 화면에서 잘리던 양옆 배경까지 담아요. 얼굴(가운데)은 그대로, 가장자리로 갈수록 눌려 보여요. 왼쪽 끝은 지금처럼 꽉 채움. 왼쪽 그림이 거울 화면에 보이는 모습이에요</p>
-        <div class="cs-wide">
-          <input type="range" id="cs-wide" min="0" max="100" step="5" aria-label="광각 세기">
-          <output id="cs-wide-val"></output>
-        </div>
-        <div class="cs-wide-ends"><span>1배 (꽉 채움)</span><span>가장 넓게</span></div>
-      </div>
-    </div>
-  </section>
-
   <div class="cs-actions">
     <button type="button" class="primary" id="cs-save">저장</button>
     <button type="button" id="cs-reset">처음 값으로</button>
@@ -152,7 +129,6 @@
 
 <script type="module">
   import { getCamSettings, saveCamSettings, clearCamSettings, videoConstraints, isExternalCamera, widestZoom, CAM_DEFAULTS, CAM_RES } from './js/camera-settings.js';
-  import { attachWideView, wideAmount, wideZoomLabel } from './js/wide-view.js';
   import { uvcStatus, uvcInApp, UVC_ID } from './js/uvc-bridge.js';
 
   const $ = (id) => document.getElementById(id);
@@ -191,7 +167,7 @@
     toastTimer = setTimeout(() => t.remove(), 2600);
   }
   const sleep = (ms) => new Promise((ok) => setTimeout(ok, ms));
-  const same = (a, b) => ['deviceId', 'res', 'fps', 'mirror', 'rotate', 'wide'].every((k) => String(a[k]) === String(b[k]));
+  const same = (a, b) => ['deviceId', 'res', 'fps', 'mirror', 'rotate'].every((k) => String(a[k]) === String(b[k]));
 
   const ERR = {
     NotAllowedError: '카메라 권한이 거부됐어요 (아래 \'갤탭에서 안 잡힐 때\' 4번)',
@@ -221,7 +197,7 @@
       ['찾은 카메라', cams.length ? `${cams.length}대 (외장으로 보이는 것 ${ext}대)` : '없음', !cams.length],
       ['지금 연결', tr ? `${tr.label || '?'} · ${st.width || '?'}×${st.height || '?'} · 화면 ${fpsSeen}fps` : (lastError || '연결 안 됨'), !tr],
       ['화각(줌)', tr ? (zoomInfo || '확인 중') : '-', false],
-      ['저장된 값', `${saved.deviceId ? (saved.label || '고른 카메라') : '자동(외장 우선)'} · ${CAM_RES[saved.res]?.join('×') || saved.res} · ${Number(saved.fps) || '기본'}fps · 반전 ${saved.mirror ? '켬' : '끔'} · 회전 ${saved.rotate}° · 광각 ${saved.wide}`
+      ['저장된 값', `${saved.deviceId ? (saved.label || '고른 카메라') : '자동(외장 우선)'} · ${CAM_RES[saved.res]?.join('×') || saved.res} · ${Number(saved.fps) || '기본'}fps · 반전 ${saved.mirror ? '켬' : '끔'} · 회전 ${saved.rotate}°`
         + (same(saved, cur) ? '' : '  ← 바꾼 값 저장 안 됨'), !same(saved, cur)],
     ];
     renderUvc();
@@ -293,22 +269,10 @@
       (it) => Number(cur.fps) === it.v, (it) => { cur.fps = it.v; changed(true); });
     optButtons('cs-mirror', [{ v: true, title: '좌우 반전 켬', sub: '거울처럼' }, { v: false, title: '좌우 반전 끔', sub: '찍힌 그대로' }],
       (it) => !!cur.mirror === it.v, (it) => { cur.mirror = it.v; changed(false); });
-    optButtons('cs-rotate', [0, 90, 180, 270].map((d) => ({ v: d, title: `회전 ${d}°`, sub: d ? '웹캠을 돌려 달았을 때' : '' })),
+    optButtons('cs-rotate', [0, 90, 180, 270].map((d) => ({ v: d, title: `회전 ${d}°`, sub: d ? '웹캠을 돌려 달았을 때' : '기본값' })),
       (it) => Number(cur.rotate) === it.v, (it) => { cur.rotate = it.v; changed(false); });
   }
-  // 광각 세기: 왼쪽 5:8 미리보기에 바로 보인다 (저장하면 거울 화면에). 숫자는 '몇 배 줌'으로 (거울 화면 900×1440 기준)
-  function renderWide() {
-    $('cs-wide').value = String(cur.wide);
-    const z = wideZoomLabel(wideAmount(cur.wide), feSrc.width, feSrc.height, 900, 1440);
-    $('cs-wide-val').textContent = z && feSrc.width > 1 ? `${(Math.round(z * 100) / 100)}배` : String(cur.wide);
-  }
-  $('cs-wide').addEventListener('input', () => {
-    cur.wide = Number($('cs-wide').value);
-    renderWide();
-    renderState();
-  });
   function changed(reopen) {
-    renderWide();
     renderOpts();
     renderState();
     if (reopen) openCamera();
@@ -412,9 +376,6 @@
     renderState();
   }
 
-  const feSrc = $('cs-fe-src');
-  const feCtx = feSrc.getContext('2d');
-  attachWideView(feSrc, { getAmount: () => (stream ? wideAmount(cur.wide) : 0), fit: () => 'cover' });
   // 미리보기 그리기: 거울 화면과 같은 반전·회전
   function draw() {
     requestAnimationFrame(draw);
@@ -430,9 +391,6 @@
     if (cur.mirror) vctx.scale(-1, 1);
     vctx.drawImage(video, -w / 2, -h / 2, w, h);
     vctx.restore();
-    // 광각 효과 미리보기용 원본 (테두리 없이)
-    if (feSrc.width !== cw || feSrc.height !== ch) { feSrc.width = cw; feSrc.height = ch; renderWide(); }
-    feCtx.drawImage(view, 0, 0);
     // 거울 화면(세로 5:8, 꽉 채움)에 보이는 부분 = 흰 테두리
     let vw = cw, vh = cw * 8 / 5;
     if (vh > ch) { vh = ch; vw = ch * 5 / 8; }
@@ -559,7 +517,6 @@
   window.addEventListener('pagehide', () => { gen++; stopCamera(); });
 
   // ---------- 시작 ----------
-  renderWide();
   log(`시작 · ${navigator.userAgent}`);
   (async () => {
     await afterChange();

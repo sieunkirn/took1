@@ -30,7 +30,9 @@ export function buildShades(source, products, reference) {
     const p = products.find((x) => x.id === entry.product_id);
     if (!p) throw new Error(`제품 데이터에 없는 product_id: ${entry.product_id}`);
     const count = entry.shades.length;
-    entry.shades.forEach((s, i) => {
+    entry.shades.forEach((s0, i) => {
+      // 올리브영 옵션 이름 끝의 '*'(올리브영 내부 표시, 손님에게 의미 없음)은 뺀다 (2026-11-24 사용자 요청)
+      const s = { ...s0, name: String(s0.name ?? '').replace(/\s*\*+\s*$/, '').trim() };
       const hex = normalizeHex(s.hex);
       if (!hex) throw new Error(`${entry.product_id} ${s.no || s.name}: 색상값이 잘못됨 (${s.hex})`);
       // 한 상품 페이지에 여러 라인이 묶여 같은 번호가 두 번 나오면 뒤의 것에 -2, -3 을 붙인다
@@ -63,6 +65,7 @@ export function buildShades(source, products, reference) {
         swatch_url: s.chip ? (source.chip_base || '') + s.chip : null,
         finish: p.finish,
         finish_source: p.finish_source,
+        ...(p.finish_also?.length ? { finish_also: p.finish_also } : {}), // 시연용으로 더 나오는 질감 (finish-demo.json 의 also)
         price: p.price,
         list_price: p.list_price,
         image_url: p.image_url,

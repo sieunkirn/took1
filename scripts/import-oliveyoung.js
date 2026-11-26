@@ -8,11 +8,14 @@
 //   없으면 크롤링 데이터의 이미지 주소(src·image_url)나 같은 폴더의 oliveyoung_image_manifest.json 의 주소를 쓴다 (주소를 추측하지 않는다)
 // - 색상 계열: 대표 색상값과 가장 가까운 기준 색(가상 데이터의 계열 라벨)으로 추정 → color_family_source: 'estimated_from_color'
 // - 제형: 상품명의 단어(벨벳·매트·블러·글로우 등)로 추정, 단서가 없으면 null → finish_source: 'product_name' | null
+//   단서가 없던 제품은 사람이 정한 추정(src/data/finish-guess.json)을 넣는다 → finish_source: 'guess'
+//   그중 일부는 시연용으로 시어·쉬머에 배정한다(src/data/finish-demo.json, 2026-11-26) → finish_source: 'demo'
 // - 대표 색상값이 없는 상품은 색 비교·추천에 쓸 수 없어 제외한다
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { basename, dirname, join } from 'node:path';
 import { hexToLab, roundLab, normalizeHex, deltaE2000 } from '../src/lib/color.js';
+import { applyFinishGuess, applyFinishDemo } from './apply-finish-guess.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -40,6 +43,7 @@ export function parseName(raw) {
     .replace(/(\d+)\s*(?:colors?|컬러|종)(\s*택\s*\d+)?/gi, ' ')
     .replace(/\d+(?:\.\d+)?\s*(?:ml|g)\b/gi, ' ')
     .replace(/단품\s*\/\s*기획|기획\s*\/\s*단품|단품|기획|택\s*\d+/g, ' ')
+    .replace(/\*+/g, ' ') // '*' 는 올리브영 내부 표시라 뺀다 (2026-11-24)
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^NEW\s+/i, '');
@@ -165,6 +169,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { skipped } = converted;
   if (removed.size) console.log(`지운 제품 목록에 있어 뺀 것: ${converted.products.length - products.length}개`);
   const out = join(root, 'src/data/products.oliveyoung.json');
+  console.log('추정 질감(finish-guess.json) 넣음:', applyFinishGuess(products));
+  console.log('시연용 질감 배정(finish-demo.json) 넣음:', applyFinishDemo(products));
   writeFileSync(out, JSON.stringify(products, null, 2) + '\n');
   const finishes = products.reduce((m, p) => ((m[p.finish || '정보 없음'] = (m[p.finish || '정보 없음'] || 0) + 1), m), {});
   console.log(`올리브영 상품 ${rows.length}개 → ${products.length}개 저장 (${out})`);

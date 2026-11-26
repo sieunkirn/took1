@@ -1,5 +1,5 @@
 // 가상 립 컬러 합성 엔진: 입술 윤곽 경로, 텍스처별 색 합성, 프레임 간 평활.
-// 립 컬러 매핑 카메라(lip.js)가 쓰고, 팔레트는 프리셋 색(PRESETS)을 물감으로 쓴다.
+// 립 컬러 매핑 카메라(lip.js)가 쓴다.
 import { hexToRgb } from '../lib/color.js';
 
 const supportsCanvasFilter = (() => {
@@ -40,9 +40,6 @@ export const TEXTURES = {
   shimmer: { label: '쉬머', contrast: 0.85, gloss: 0.35, shimmer: 1, opacity: 0.85 },
 };
 
-// 프리셋 색상 (가상 체험용 예시 색상이며 등록 제품이 아님)
-export const PRESETS = ['#D2321E', '#C8323F', '#A0202C', '#7A2635', '#D05A9C', '#B8457A', '#B83A4B', '#8E2E22', '#A85A5E', '#E06090',
-  '#CC88A8', '#C08A94', '#E0A0A8', '#E07070', '#D06A80', '#E05050', '#D06A5A', '#D89A78', '#702050', '#8E3070', '#94607A', '#A04060'];
 
 const maskCanvas = document.createElement('canvas');
 const maskCtx = maskCanvas.getContext('2d', { willReadFrequently: true });
@@ -89,6 +86,7 @@ const REF_SKIN = { L: 65, a: 14, b: 18 }; // 조명 보정 기준: 고른 백색
 // 입 주변 피부색으로 조명 밝기·색온도를 추정해 선택 색에 반영한다.
 // lips: 0~1 정규화 입술 좌표, look: { hex, texture, intensity(0~100) }
 export function applyLipColor(ctx, lips, w, h, mirror, look) {
+  if (!look.hex) return; // 색 없음 = 맨입술 (거울에 처음 들어왔을 때, 2026-11-24)
   const tex = TEXTURES[look.texture] || TEXTURES.matte;
   const xs = lips.outer.map((p) => (mirror ? 1 - p.x : p.x) * w), ys = lips.outer.map((p) => p.y * h);
   const mouthW = Math.max(...xs) - Math.min(...xs);
@@ -168,140 +166,4 @@ export function smoothLips(prev, next) {
   const k = Math.min(1, 0.4 + (move / mouthW) * 20); // 입 너비의 3% 이상 움직이면 평활 없음
   const mix = (a, b) => b.map((p, i) => ({ x: a[i].x + (p.x - a[i].x) * k, y: a[i].y + (p.y - a[i].y) * k }));
   return { outer: mix(prev.outer, next.outer), inner: mix(prev.inner, next.inner), tone: next.tone, box: next.box };
-}
-
-// ---------- 어울리는 컬러 추정 (규칙 기반 참고용, 진단 아님) ----------
-// 1) 조명 보정: 눈 흰자를 기준 흰색으로 삼아 카메라의 색 틀어짐·노출을 되돌린다 (von Kries 방식, 선형 RGB 채널별 이득)
-// 2) 보정한 피부색(Lab)의 색상각으로 웜/쿨, 피부 밝기와 피부-눈썹 명도 대비로 밝은/깊은 톤을 나눠 4계절 톤으로 분류
-// 3) 톤별 대표 립 컬러(Lab 색상각·명도·채도)에 가까운 프리셋을 고른다
-// 기준값은 일반적인 퍼스널 컬러 분류를 단순화한 근사값이다. 실제 카메라 측정값을 보고 조정할 수 있도록 결과에 측정값을 함께 돌려준다.
-const SEASONS = {
-  spring: { label: '봄 웜', desc: '밝고 따뜻한 톤', lip: { h: 40, L: 58, C: 55 } },
-  summer: { label: '여름 쿨', desc: '밝고 부드러운 쿨 톤', lip: { h: -8, L: 58, C: 35 } },
-  autumn: { label: '가을 웜', desc: '깊고 따뜻한 톤', lip: { h: 38, L: 40, C: 40 } },
-  winter: { label: '겨울 쿨', desc: '깊고 선명한 쿨 톤', lip: { h: -5, L: 38, C: 50 } },
-};
-export const TONE_THRESHOLDS = {
-  warmHue: 56, // 보정한 피부 Lab 색상각(°)이 이 값 이상이면 웜(노란 기), 미만이면 쿨(붉은 기)
-  lightL: 63, // 보정한 피부 L* 기준 (높을수록 밝은 톤)
-  contrast: 30, // 피부 L* − 눈썹 L* 기준 (클수록 깊고 선명한 톤)
-};
-const REF_SCLERA = [230, 222, 212]; // 눈 흰자의 기준색(약간 따뜻한 흰색, 근사값)
-
-const toneCanvas = document.createElement('canvas');
-const toneCtx = toneCanvas.getContext('2d', { willReadFrequently: true });
-
-// 원 안의 픽셀을 밝기순으로 정렬해 [from, to) 구간 평균 RGB 를 구한다 (흰자는 밝은 쪽, 눈썹은 어두운 쪽, 피부는 가운데)
-function patchColor(cx, cy, r, from, to) {
-  r = Math.max(1, Math.round(r));
-  const x0 = Math.round(cx) - r, y0 = Math.round(cy) - r;
-  if (x0 < 0 || y0 < 0 || x0 + 2 * r >= toneCanvas.width || y0 + 2 * r >= toneCanvas.height) return null;
-  const d = toneCtx.getImageData(x0, y0, 2 * r + 1, 2 * r + 1).data;
-  const px = [];
-  for (let y = -r, i = 0; y <= r; y++) {
-    for (let x = -r; x <= r; x++, i += 4) {
-      if (x * x + y * y <= r * r) px.push([d[i], d[i + 1], d[i + 2], 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]]);
-    }
-  }
-  px.sort((a, b) => a[3] - b[3]);
-  const sel = px.slice(Math.floor(px.length * from), Math.max(Math.floor(px.length * from) + 1, Math.floor(px.length * to)));
-  return [0, 1, 2].map((k) => sel.reduce((s, p) => s + p[k], 0) / sel.length);
-}
-
-const meanRgb = (list) => {
-  const ok = list.filter(Boolean);
-  return ok.length ? [0, 1, 2].map((k) => ok.reduce((s, c) => s + c[k], 0) / ok.length) : null;
-};
-
-// 한 프레임(원본, 좌우 반전 전)에서 피부·눈 흰자·눈썹 색(sRGB 평균)을 잰다. tone 은 lip-tracker 의 측정 지점
-export function measureTone(src, w, h, tone) {
-  if (!tone?.skin?.length || !w || !h) return null;
-  if (toneCanvas.width !== w || toneCanvas.height !== h) { toneCanvas.width = w; toneCanvas.height = h; }
-  toneCtx.drawImage(src, 0, 0, w, h);
-  const P = (p) => [p.x * w, p.y * h];
-  let irisR = w * 0.012;
-  const sclera = [];
-  for (const eye of tone.eyes || []) {
-    const [ix, iy] = P(eye.iris);
-    const [ex, ey] = P(eye.irisEdge);
-    irisR = Math.max(1.5, Math.hypot(ex - ix, ey - iy));
-    for (const corner of eye.corners) {
-      const [cx, cy] = P(corner);
-      const D = Math.hypot(cx - ix, cy - iy);
-      if (D < irisR * 1.5) continue; // 눈을 감았거나 너무 작음
-      const t = Math.min(0.75, (irisR * 1.7) / D); // 홍채 바깥, 눈꼬리 안쪽
-      sclera.push(patchColor(ix + (cx - ix) * t, iy + (cy - iy) * t, irisR * 0.35, 0.6, 1));
-    }
-  }
-  return {
-    skin: meanRgb(tone.skin.map((p) => patchColor(...P(p), Math.max(2, w * 0.012), 0.2, 0.8))),
-    sclera: meanRgb(sclera),
-    brow: meanRgb((tone.brow || []).map((p) => patchColor(...P(p), irisR * 0.5, 0, 0.4))),
-  };
-}
-
-function linearToLab(R, G, B) {
-  const [L, a, b] = linearToLabInto(R, G, B, [0, 0, 0]);
-  return { L, a, b };
-}
-const toLinear = (v) => SRGB_TO_LINEAR[Math.max(0, Math.min(255, Math.round(v)))];
-
-// 여러 프레임 측정값(중앙값)으로 톤을 추정한다
-// opts.gain: 관리자 화면 '카메라 색 보정'(흰 종이)으로 구한 채널별 이득(color-calib.js). 있으면 눈 흰자 대신 이 값으로 조명을 되돌린다
-export function classifyTone(measurements, { gain: calibGain = null } = {}) {
-  const median = (key) => {
-    const list = measurements.map((m) => m?.[key]).filter(Boolean);
-    if (!list.length) return null;
-    return [0, 1, 2].map((k) => list.map((c) => c[k]).sort((a, b) => a - b)[Math.floor(list.length / 2)]);
-  };
-  const skin = median('skin'), sclera = median('sclera'), brow = median('brow');
-  if (!skin) return null;
-
-  // 흰자가 피부보다 밝고(눈을 감았거나 그림자가 지면 아님), 보정한 피부색이 실제 피부색 범위에 들 때만 보정을 쓴다.
-  // 강한 노란/푸른 조명에서는 흰자에도 색이 끼므로 흰자 자체의 채도로는 판단하지 않는다
-  const rawSkin = linearToLab(...skin.map(toLinear));
-  const rawSclera = sclera && linearToLab(...sclera.map(toLinear));
-  const gain = REF_SCLERA.map((ref, k) => Math.min(8, Math.max(0.25, toLinear(ref) / Math.max(1e-4, toLinear(sclera?.[k] ?? ref)))));
-  const fixWith = (g) => (c) => linearToLab(...c.map((v, k) => Math.min(1, toLinear(v) * g[k])));
-  const skinLike = (c) => {
-    const h = (Math.atan2(c.b, c.a) * 180) / Math.PI, C = Math.hypot(c.a, c.b);
-    return h > 25 && h < 90 && C > 6 && C < 45 && c.L > 20 && c.L < 92;
-  };
-  const calibOk = Array.isArray(calibGain) && calibGain.length === 3 && calibGain.every((g) => Number.isFinite(g) && g > 0);
-  // 흰 종이 보정값이 있으면 그걸 쓴다('calib'). 없으면 예전처럼 눈 흰자로(true), 그것도 안 되면 보정 없이(false)
-  const wb = calibOk ? 'calib' : (!!rawSclera && rawSclera.L > rawSkin.L + 5 && skinLike(fixWith(gain)(skin)));
-  const fix = fixWith(calibOk ? calibGain : (wb ? gain : [1, 1, 1]));
-
-  const s = fix(skin);
-  const hue = (Math.atan2(s.b, s.a) * 180) / Math.PI;
-  const browL = brow ? fix(brow).L : null;
-  const contrast = browL === null ? null : s.L - browL;
-  const T = TONE_THRESHOLDS;
-  const warmScore = (hue - T.warmHue) / 4; // +: 웜, −: 쿨
-  // +: 깊은 톤, −: 밝은 톤. 눈썹 대비는 조명에 따라 크게 흔들려 피부 밝기보다 약하게 반영한다
-  const deepScore = (T.lightL - s.L) / 8 + (contrast === null ? 0 : (contrast - T.contrast) / 25);
-  const pick = (warm, deep) => (warm ? (deep ? 'autumn' : 'spring') : (deep ? 'winter' : 'summer'));
-  const season = pick(warmScore >= 0, deepScore >= 0);
-  // 기준에 가까우면(경계) 다음 후보도 알려준다
-  const runnerUp = Math.abs(warmScore) < Math.abs(deepScore)
-    ? (Math.abs(warmScore) < 0.5 ? pick(warmScore < 0, deepScore >= 0) : null)
-    : (Math.abs(deepScore) < 0.5 ? pick(warmScore >= 0, deepScore < 0) : null);
-  return {
-    season, runnerUp, ...SEASONS[season],
-    metrics: { hue, L: s.L, contrast, wb, frames: measurements.length },
-  };
-}
-
-// 톤의 대표 립 컬러에 가까운 순으로 프리셋을 고른다
-export function matchPresets(season, count = 3) {
-  const target = SEASONS[season].lip;
-  const lab = [0, 0, 0];
-  return PRESETS.map((hex) => {
-    const { r, g, b } = hexToRgb(hex);
-    rgbToLabFast(r, g, b, lab);
-    const h = (Math.atan2(lab[2], lab[1]) * 180) / Math.PI;
-    const C = Math.hypot(lab[1], lab[2]);
-    const score = ((h - target.h) / 15) ** 2 + ((lab[0] - target.L) / 12) ** 2 + ((C - target.C) / 15) ** 2;
-    return { hex, score };
-  }).sort((x, y) => x.score - y.score).slice(0, count).map((x) => x.hex);
 }

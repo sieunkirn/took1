@@ -13,14 +13,15 @@
 //       옆으로 밀면 넘어가고 가운데 큰 동그라미가 고른 질감. 그 아래 matte 알약(이름, 누르면 다음 질감)은 예전 그대로
 // 얼굴 프레임: 네 모서리 괄호가 카메라에서 찾은 얼굴을 따라가 감싼다 (스마트미러의 얼굴 트래킹 표시). 얼굴이 없으면 제자리에서 숨 쉬듯 빛난다
 //       카메라는 화면 전체 (2026-11-17)
-// 예전 팔레트 기능도 이 디자인 안에: 내 톤으로 추천받기(타원 아래 알약 → 제목 아래 결과·추천 컬러 3개), 텍스처,
-//       추천 카드 '입술에 발라보기'. 언어 버튼은 홈에만 (2026-11-17). 챗봇·플로팅 퀵 추천은 2026-11-22 삭제
+// 예전 팔레트 기능도 이 디자인 안에: 텍스처,
+//       추천 카드 '입술에 발라보기'. 언어 버튼은 홈에만 (2026-11-17).
 // 카메라·입술 추적·색 입히기는 lip.js 그대로 (took:apply 이벤트로 색을 보낸다)
-import { $, store, api, skeletonCards, tryOnCard, shortName } from './common.js';
+import { $, el, store, api, skeletonCards, tryOnCard, shortName, won, shadeLabelOf } from './common.js';
+import { brandOf, nameOf } from './i18n.js';
 import { t as tr } from './i18n.js';
 import { createNfcWindow } from './nfc-window.js'; // NFC 태그 시트 (세 번째 창, 2026-11-19)
-import { listenNfc, findTagProduct, createNfcHint } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
-import { hexToRgb } from '../lib/color.js';
+import { listenNfc, createNfcHint } from './nfc.js'; // 제품 NFC 태그 → 그 제품 색을 입술에
+import { hexToRgb, lookHex } from '../lib/color.js';
 import { state as lip, video } from './lip-state.js';
 import { applyLook } from './lip-look.js';
 import { sourceFrame } from './lip-camera.js';
@@ -28,7 +29,6 @@ import { mapPoint } from './lip-view.js';
 import { REDUCE_MOTION as reduce } from './motion.js';
 import { markSvg } from './brand.js';
 import { fitStage, toStage } from './ui-stage.js';
-// import { createTakeaway } from './takeaway.js'; // 가져가기 (진입 흐름의 마지막 화면, 2026-11-19) — 2026-11-20 사용자 요청으로 가져가기 기능 전체 주석 처리 (되살리려면 '가져가기 주석' 표시가 있는 곳을 모두 벗긴다)
 
 const RECOMMEND_COUNT = 6; // 고른 색과 비슷한 제품을 몇 개 보여 줄지
 const stage = $('stage');
@@ -58,7 +58,7 @@ function pickOf(seg) { // 칸 번호(한 바퀴 넘어도 된다) → 계열·�
   return { fam, k: fam % 2 ? STOPS - 1 - j : j };
 }
 const segHex = (seg) => { const p = pickOf(seg); return FAMILIES[p.fam].stops[p.k]; };
-/** hex 와 가장 가까운 계열·칸 (NFC·내 톤 추천 색 쪽으로 다이얼을 돌릴 때) */
+/** hex 와 가장 가까운 계열·칸 (NFC·추천 제품 색 쪽으로 다이얼을 돌릴 때) */
 function nearestPick(hex) {
   const c = hexToRgb(hex);
   let best = { fam: 1, k: 3 };
@@ -85,6 +85,10 @@ const TEXTURES = ['matte', 'glossy', 'satin', 'sheer', 'shimmer']; // lip-engine
 
 // ---------- 상태 ----------
 const saved = store.get('fcSel') || {};
+// 처음 들어왔을 때(시작 화면 → 거울, 초기화 뒤)는 아무 제품도 입히지 않은 맨입술 (2026-11-24 사용자 요청, README '거울 첫 화면').
+// 고른 기록(fcSel)이 없거나, 있어도 아직 아무것도 고르지 않았으면(bare) 처음이다. 다이얼을 돌리거나 제품을 발라 보면 그때부터 색이 입혀진다
+const bareStart = !store.get('fcSel') || !!store.get('fcSel').bare;
+let isBare = bareStart;
 const savedFam = FAMILIES.findIndex((f) => f.key === saved.fam);
 const savedK = Number.isInteger(saved.k) && saved.k >= 0 && saved.k < STOPS ? saved.k
   : Number.isFinite(saved.phi) ? Math.max(0, Math.min(STOPS - 1, Math.round((saved.phi + 46) / (92 / 6)))) : 3; // 예전 저장값(손잡이 각도 ±46°)도 읽는다
@@ -92,20 +96,21 @@ const sel = {
   fam: savedFam >= 0 ? savedFam : 1, // 고른 계열 (처음 = 핑크)
   k: savedK, // 진하기 칸 0(연함)~6(진함). 손잡이 아래 칸 = 입술 색
   texture: TEXTURES.includes(saved.texture) ? saved.texture : 'matte', // 텍스처 줄을 밀면 바뀐다. 추천 제품을 발라 보면 그 제형
-  exact: saved.exact || null, // NFC·추천 제품·내 톤 추천처럼 그대로 입힐 색
+  exact: saved.exact || null, // NFC·추천 제품처럼 그대로 입힐 색
 };
 let mode = 'arc';
 // 다이얼이 돌아간 각도 (시계 방향 +). 칸 s 의 가운데 = 위(손잡이) 기준 s*SEG + rot → 손잡이 아래 칸 = -rot/SEG
 let rot = -segOf(sel.fam, sel.k) * SEG;
 const dialHex = () => FAMILIES[sel.fam].stops[sel.k];
 const chosen = () => sel.exact || dialHex();
-function save() { store.set('fcSel', { fam: FAMILIES[sel.fam].key, k: sel.k, texture: sel.texture, exact: sel.exact }); }
+function save() { store.set('fcSel', { fam: FAMILIES[sel.fam].key, k: sel.k, texture: sel.texture, exact: sel.exact, bare: isBare }); }
 /** 칸 s 와 같은 칸 중 지금 다이얼에서 가장 가까운 번호 (짧은 쪽으로 돌게) */
 const nearestSeg = (s) => s + SEGS * Math.round((-rot / SEG - s) / SEGS);
 
 // 입술에 입히기 (lip.js). 끄는 동안 매 프레임 보내지 않도록 다음 화면 갱신에 한 번만
 let applyPending = false;
 function toLips() {
+  if (isBare) { isBare = false; save(); } // 손님이 색을 고르면 맨입술 끝
   if (applyPending) return;
   applyPending = true;
   requestAnimationFrame(() => {
@@ -113,8 +118,9 @@ function toLips() {
     window.dispatchEvent(new CustomEvent('took:apply', { detail: { hex: chosen(), finish: null, quiet: true, source: 'Find Your Color' } }));
   });
 }
-/** 텍스처 바꾸기. move = 질감 동그라미 줄도 그 자리로 옮길지 (줄을 밀어서 바꾼 때는 이미 그 자리) */
-function setTexture(name, { move = true } = {}) {
+/** 텍스처 바꾸기. move = 질감 동그라미 줄도 그 자리로 옮길지 (줄을 밀어서 바꾼 때는 이미 그 자리).
+ * recs = 추천 목록도 이 질감으로 다시 찾을지 (제품을 발라 보며 바뀐 질감은 보고 있던 목록을 바꾸지 않는다) */
+function setTexture(name, { move = true, recs = true } = {}) {
   if (!TEXTURES.includes(name)) name = 'matte';
   sel.texture = name;
   lip.texture = name;
@@ -124,6 +130,7 @@ function setTexture(name, { move = true } = {}) {
   swatches.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tex === name)));
   save();
   if (move && !texDrag) texGo(TEXTURES.indexOf(name));
+  if (recs) colorChanged();
 }
 // 텍스처 알약 (예전 그대로): 누를 때마다 matte → glossy → satin → sheer → shimmer. 가운데 질감 동그라미도 같이 넘어간다
 $('fc-tex').addEventListener('click', () => setTexture(TEXTURES[(TEXTURES.indexOf(sel.texture) + 1) % TEXTURES.length]));
@@ -335,7 +342,7 @@ function tintHandle() {
   handle.style.setProperty('--h3', segHex(c + 1));
 }
 
-/** 질감 동그라미 색 = 지금 고른 색 (다이얼·추천 제품·내 톤 추천) */
+/** 질감 동그라미 색 = 지금 고른 색 (다이얼·추천 제품) */
 function placeSwatches() {
   const hex = chosen();
   swatches.forEach((b) => b.style.setProperty('--c', hex));
@@ -364,90 +371,7 @@ sbtn.innerHTML = `<span class="fc-sbtn-logo">${markSvg()}</span><span class="fc-
 sbtn.addEventListener('click', () => setMode(mode === 'arc' ? 'recs' : 'arc'));
 // (오른쪽 위 다크/화이트 모드 동그라미는 2026-11-16 사용자 요청으로 뺐다)
 // (언어 버튼은 2026-11-17 사용자 요청으로 홈에만 — 여기서 바꾸지 않는다)
-// 왼쪽 세로 메뉴 (GP-홈화면 2026-11-18): 스캔 = 이 화면(추천 결과면 다이얼로 돌아오기), 9점 = 지금 색의 추천 제품 열기/닫기(가운데 로고 버튼과 같은 일),
-// 집 = 처음으로(로고와 같은 일). 음성(챗봇) 버튼은 2026-11-22 삭제
-$('fc-mb-scan').addEventListener('click', () => { moveKnob('scan'); if (mode !== 'arc') setMode('arc'); });
-// 세로 알약 (2026-11-22 Figma 1653:469): 늘 펼친 4칸. 2번 = NFC(옛 음성 자리): 태그 안내 모달을 띄운다(리더기는 늘 듣고 있다),
-$('fc-mb-nfc').addEventListener('click', () => { moveKnob('nfc'); nfcWin.wait(); watchNfcModal(); }); // 손잡이는 안내가 닫힐 때까지 NFC 에 (syncKnob).  가운데 세로 모달로 '제품을 리더기에 대 주세요' (js/nfc-window.js)
-// 3번(9점) = 알약 접기/펼치기 (2026-11-22 사용자 요청): 접으면 9점 동그라미 하나만 남고, 다시 누르면 4칸으로 펼친다. 추천 제품은 아래 로고 버튼으로
-$('fc-mb-grid').addEventListener('click', () => {
-  const menu = $('fc-menu');
-  const folded = menu.classList.toggle('folded');
-  $('fc-mb-grid').setAttribute('aria-expanded', String(!folded));
-  for (const id of ['fc-mb-scan', 'fc-mb-nfc', 'fc-mb-home']) $(id).tabIndex = folded ? -1 : 0;
-});
-$('fc-mb-home').addEventListener('click', (e) => {
-  e.preventDefault();
-  store.clear();
-  moveKnob('home');
-  setTimeout(() => { location.href = 'index.html'; }, reduce ? 0 : 320); // 손잡이가 집까지 가는 걸 보여 주고 넘어간다
-});
-// NFC 안내 모달이 닫히면 손잡이는 알약 맨 위(스캔)로 돌아온다 (2026-11-22 사용자 요청). 모달은 nfc-window.js 가 나중에 만들므로 처음 누를 때 붙인다
-let nfcWatch = null;
-function watchNfcModal() {
-  const m = document.getElementById('nfc-modal');
-  if (!m || nfcWatch) return;
-  nfcWatch = new MutationObserver(() => { if (m.hidden && document.getElementById('fc-menu')?.dataset.focus === 'nfc') moveKnob('scan'); }); // 닫으면 늘 맨 위(스캔)로
-  nfcWatch.observe(m, { attributes: true, attributeFilter: ['hidden'] });
-}
-syncKnob(true);
-// 내 톤 추천 컬러를 누르면(lip-look.js took:pick) 그 색을 그대로 입히고 다이얼도 가장 가까운 칸으로 돌린다
-window.addEventListener('took:pick', (e) => {
-  const hex = e.detail?.hex;
-  if (!hex) return;
-  const near = nearestPick(hex);
-  const s = nearestSeg(segOf(near.fam, near.k));
-  sel.fam = near.fam;
-  sel.k = near.k;
-  sel.exact = hex.toUpperCase();
-  save();
-  placeSwatches();
-  spinTo(-s * SEG, 460, false);
-  window.dispatchEvent(new CustomEvent('took:apply', { detail: { hex, finish: null, quiet: true, source: '내 톤 추천 컬러' } }));
-  colorChanged();
-  for (const b of document.querySelectorAll('#match-swatches button')) b.setAttribute('aria-pressed', String(b.dataset.hex?.toUpperCase() === sel.exact));
-});
-
-// ---------- 내 톤으로 추천받기 (2026-11-20 사용자 요청, 시트 왼쪽 위 #match) ----------
-// 톤 재기·추천 색 3개는 lip-look.js 가 한다. 거울은: 결과 상자를 얼굴 위가 아니라 시트 안 버튼 오른쪽 한 줄로 옮기고,
-// 재는 동안 버튼을 '재는 중…'으로, 결과가 나오면 첫 번째 추천 색을 바로 입술에 바르고 그 색의 제품으로 목록을 바꾼다
-const toneBtn = $('match');
-const matchBox = $('fc-matchbox');
-if (toneBtn && matchBox) {
-  toneBtn.after(matchBox); // 시트 안으로 (위치는 took-ui.css '.fc-sheet .fc-matchbox')
-  toneBtn.disabled = false; // 시트를 열면 늘 누를 수 있다 (재는 동안만 꺼짐, lip-camera.js). 얼굴·카메라가 없으면 아래에서 안내
-  const TONE_GIVE_UP_MS = 8000; // 그래도 끝나지 않으면(카메라 화면이 멈춤 등) 멈추고 안내
-  let measuring = 0;
-  let giveUp = 0;
-  const done = () => {
-    clearInterval(measuring); clearTimeout(giveUp); measuring = giveUp = 0;
-    toneBtn.textContent = tr('pal.toneBtn'); toneBtn.classList.remove('is-busy'); toneBtn.disabled = false;
-  };
-  toneBtn.addEventListener('click', () => {
-    // lip-look.js 가 먼저 듣고 재기를 시작한다 (아바타 그림이면 재지 않고 안내만)
-    if (!lip.analyze) return;
-    if (lip.source !== 'camera' || !lip.stream) { // 카메라가 안 켜져 있으면 재기가 시작되지 않는다
-      lip.analyze = null;
-      $('match-result').textContent = tr('pal.toneNoCam');
-      done();
-      return;
-    }
-    toneBtn.textContent = tr('pal.toneBusy');
-    toneBtn.classList.add('is-busy');
-    clearInterval(measuring); clearTimeout(giveUp);
-    measuring = setInterval(() => { if (!lip.analyze) done(); }, 150); // 끝나면(성공·실패 모두) 버튼 글자를 되돌린다
-    giveUp = setTimeout(() => { if (lip.analyze) { lip.analyze = null; $('match-result').textContent = tr('lip.matchFaceFail'); } done(); }, TONE_GIVE_UP_MS);
-  });
-  window.addEventListener('took:match', (e) => {
-    const { season, picks } = e.detail || {};
-    done();
-    if (!season || !picks?.length) return;
-    // 긴 설명 대신 한 줄: '내 톤 · 여름 쿨' (경계에 가까우면 lip-look 이 붙인 '…일 수도'는 뺀다)
-    $('match-result').textContent = tr('pal.toneResult', { label: tr('season.' + season) });
-    window.dispatchEvent(new CustomEvent('took:pick', { detail: { hex: picks[0] } }));
-  });
-}
-
+// (왼쪽 세로 메뉴 = 스캔·NFC·9점·집 알약은 2026-11-26 사용자 요청으로 뺐다. 처음으로 = 위 로고, 추천 = 가운데 로고 버튼)
 // ---------- 상태 바꾸기 (4번 ↔ 추천 결과) ----------
 function setMode(m, { instant = false } = {}) {
   mode = m === 'recs' || m === 'sheet' ? 'recs' : 'arc'; // 예전 주소 ?mode=sheet 도 추천 결과로
@@ -462,50 +386,15 @@ function setMode(m, { instant = false } = {}) {
   placeSwatches();
   const [top, btnY] = SHEET_AT[mode];
   sheet.style.top = top + 'px';
-  sbtn.style.top = btnY - (mode === 'arc' ? 67.53 : 59.41) + 'px'; // 반지름: 다이얼 가운데 135.06 / 추천 결과 오른쪽 118.823 (2026-11-20)
-  sbtn.classList.toggle('logo', mode === 'arc');
+  sbtn.style.top = btnY - (mode === 'arc' ? 67.53 : 59.41) + 'px'; // 반지름: 다이얼 가운데 135.06 / 추천 결과 가운데 118.823 (2026-11-20)
+  sbtn.classList.add('logo'); // 2026-11-24 사용자 요청: 시트가 열려도 9점(런치박스) 대신 늘 툭 로고 (예전: toggle('logo', mode === 'arc'))
   const open = mode !== 'arc';
   sbtn.setAttribute('aria-expanded', String(open));
   sbtn.setAttribute('aria-label', tr(open ? 'fc.sheetClose' : 'fc.sheet'));
   sheet.inert = !open;
+  if (!open) window.dispatchEvent(new Event('took:shades-close')); // 시트를 내리면 호수 화면도 닫힌 채로
   wheel.setAttribute('aria-valuetext', chosen());
   if (open) queueRecs(0); // 로고 버튼을 누르면 바로 지금 색의 추천 제품
-  syncKnob();
-}
-
-// ---------- 세로 알약 포커스 이동 (2026-11-22) ----------
-// 흰 손잡이(.fc-menu-knob)가 누른 버튼으로 0.3초 동안 미끄러져 옮겨 간다 (크기만 새 버튼에 맞춤). 손잡이 위 아이콘만 검정(.is-focus).
-// 함수 선언으로 둔다: setMode 가 이 아래 상수보다 먼저 불려도 되게 상태는 #fc-menu 의 data-focus 에만 둔다
-function knobBox(k) {
-  const b = document.getElementById('fc-mb-' + k);
-  return { x: b.offsetLeft, y: b.offsetTop, s: b.offsetWidth };
-}
-function moveKnob(k, instant = false) {
-  const menu = document.getElementById('fc-menu');
-  const knob = menu?.querySelector('.fc-menu-knob');
-  if (!knob) return;
-  const from = menu.dataset.focus || 'scan';
-  if (from === k && !instant) return;
-  menu.dataset.focus = k;
-  for (const key of ['scan', 'nfc', 'grid', 'home']) document.getElementById('fc-mb-' + key)?.classList.toggle('is-focus', key === k);
-  const a = knobBox(from);
-  const b = knobBox(k);
-  const px = (v) => v + 'px';
-  Object.assign(knob.style, { left: px(b.x), top: px(b.y), width: px(b.s), height: px(b.s) });
-  knob.getAnimations().forEach((an) => an.cancel());
-  if (instant || reduce || from === k) return;
-  // 늘어나거나 튕기지 않고 그대로 미끄러진다 (2026-11-22 사용자 요청 "쫀득하지 않게 깔끔하게")
-  knob.animate([
-    { left: px(a.x), top: px(a.y), width: px(a.s), height: px(a.s) },
-    { left: px(b.x), top: px(b.y), width: px(b.s), height: px(b.s) },
-  ], { duration: 300, easing: 'cubic-bezier(.4, 0, .2, 1)' });
-}
-/** 손잡이는 스캔으로 (9점은 접기 버튼이라 손잡이가 가지 않는다). NFC 를 누른 뒤엔 안내가 닫힐 때(force)까지 그대로 */
-function syncKnob(instant = false, force = false) {
-  const menu = document.getElementById('fc-menu');
-  if (!menu) return;
-  if (menu.dataset.focus === 'nfc' && !instant && !force) return;
-  moveKnob('scan', instant);
 }
 
 // ---------- 농도 (흰 점 바, 2026-11-20) ----------
@@ -525,10 +414,13 @@ function setDose(v) {
   lip.intensity = v;
   applyLook(); // 입술 다시 그리기 + 저장(lipDisplay)
   showDose();
+  colorChanged(); // 농도가 바뀌면 입술에 보이는 색이 바뀌므로 추천 제품도 다시 찾는다 (2026-11-26)
 }
 const doseAt = (p) => ((relOf(p) + DOSE_SPAN) / (2 * DOSE_SPAN)) * 100;
-intensityInput?.addEventListener('input', showDose);
-window.addEventListener('took:color', () => { if (doseOut && doseOut.textContent !== String(lip.intensity)) showDose(); }); // lip.js 가 저장된 농도를 늦게 불러와도 맞춘다
+intensityInput?.addEventListener('input', () => { showDose(); colorChanged(); });
+// lip.js 가 저장된 농도를 늦게 불러와도 숫자·추천 기준을 맞춘다
+// (추천 쪽 want 가 아래에서 선언되므로 화면을 처음 읽는 중에 불려도 되게 한 박자 뒤에)
+window.addEventListener('took:color', () => { if (doseOut && doseOut.textContent !== String(lip.intensity)) { showDose(); setTimeout(colorChanged, 0); } });
 showDose();
 
 // ---------- 다이얼 돌리기 (2026-11-17) ----------
@@ -644,7 +536,7 @@ const HOME = [251.08, 359.32, 651.08, 838.32];
 // 가이드 그림(face-guide.svg 432×521.693) 안에서 괄호 네모가 있는 자리 (그림 좌표)
 const GUIDE_BOX = { x: 16, y: 26.306, w: 400, h: 479 };
 // 괄호가 다닐 수 있는 화면 범위 (카메라가 화면 꽉 차므로 제목 아래 ~ 색 동그라미 위, 2026-11-17). 추천 결과에서는 시트 위 카메라 창 안
-// 2026-11-18 GP-홈화면: 왼쪽 세로 메뉴(x ~90)·'내 톤으로 추천받기'(y ~294) 를 비켜서. recs 아래 = 가운데 버튼(y 652~) 위
+// 2026-11-18 GP-홈화면: 왼쪽 세로 메뉴(x ~90, 2026-11-26 삭제)를 비켜서 잡은 범위 그대로. recs 아래 = 가운데 버튼(y 652~) 위
 const TRACK_AREA = { arc: [104, 304, 876, 900], recs: [104, 304, 876, 860] };
 const MIN_BOX = [200, 236]; // 괄호(66×66)끼리 겹치지 않는 최소 크기
 const guideImg = $('fc-guide-img'); // 괄호+타원 격자 그림 한 장 (괄호 네모가 fb 에 맞게 옮기고 늘린다)
@@ -676,16 +568,13 @@ function toView(points) {
   const cw = viewEl.width;
   const ch = viewEl.height;
   const s = Math.max(W / cw, H / ch);
-  const fe = window.tookWideView; // 광각 보기가 켜져 있으면 눌린 자리로 (lip-camera.js, wide-view.js)
   return points.map((q) => {
     const p = mapPoint(q, !!f.mirror, turn);
     const x = (W - cw * s) / 2 + p.x * cw * s, y = (H - ch * s) / 2 + p.y * ch * s;
-    const m = fe ? fe.mapPoint(x, y, W, H) : { x, y };
-    return { x: camArea.offsetLeft + m.x, y: camArea.offsetTop + m.y };
+    return { x: camArea.offsetLeft + x, y: camArea.offsetTop + y };
   });
 }
 // 카메라는 항상 화면 꽉 채움(cover). 11-21 축소 슬라이더(took.camZoom)는 2026-11-22 사용자 요청으로 뺐다
-// 11-23 광각 보기(0.5배 줌처럼): wide-view.js 가 가장자리를 누른 만큼 toView 도 따라 옮긴다
 function faceGoal() {
   const b = lip.lips?.box;
   const pts = b && toView([{ x: b.x0, y: b.y0 }, { x: b.x1, y: b.y0 }, { x: b.x0, y: b.y1 }, { x: b.x1, y: b.y1 }]);
@@ -759,17 +648,22 @@ logo.addEventListener('click', (e) => {
 
 // ---------- 추천 제품 (실시간) ----------
 // 로고 버튼을 누르면 바로 지금 색과 비슷한 제품을 찾는다 (예전 '이 컬러로 제품 찾기' 단계 없음).
-// 시트가 열려 있는 동안 색이 바뀌면(내 톤 추천·NFC 등) 목록도 잠깐 뒤 다시 찾는다. 같은 색이면 다시 열어도 그대로 바로 보인다.
+// 시트가 열려 있는 동안 색이 바뀌면(NFC 등) 목록도 잠깐 뒤 다시 찾는다. 같은 색이면 다시 열어도 그대로 바로 보인다.
 // 카드에서 '입술에 발라보기'한 제품 색은 목록을 바꾸지 않는다 (보고 있던 목록이 사라지지 않게)
 const recList = $('rec-list');
 const recStatus = $('rec-status');
 const recDots = $('fc-rec-dots');
-let want = chosen(); // 추천할 색: 바·동그라미·내 톤 추천·NFC 로 고른 색
-let shown = null; // 지금 목록이 보여 주는 색
+const results = $('fc-results');
+// 추천 기준 = 색 + 질감 (2026-11-24 사용자 요청 "같은 색에 질감을 달리해도 제품이 다 똑같이 나온다"): 질감을 바꿔도 목록을 다시 찾는다
+// + 농도 (2026-11-26 사용자 요청 "같은 색·같은 질감이어도 농도가 바뀌면 입술 위 색이 변하니 제품도 바뀌게"):
+//   농도를 반영한 '입술에 보이는 색'(src/lib/color.js lookHex)으로 찾는다. 농도 80(처음 값) = 고른 색 그대로
+const recKey = () => chosen() + '|' + sel.texture + '|' + lip.intensity;
+let want = recKey(); // 추천할 색·질감·농도: 바·동그라미·NFC 로 고른 색 + 질감 동그라미 + 농도 점 바
+let shown = null; // 지금 목록이 보여 주는 색·질감·농도
 let recTimer = 0;
 let recSeq = 0; // 늦게 온 이전 응답은 버린다
 function colorChanged() {
-  want = chosen();
+  want = recKey();
   if (mode === 'recs') queueRecs(250);
 }
 function queueRecs(ms) {
@@ -785,7 +679,7 @@ function showDots(products) {
     b.style.setProperty('--c', p.color_hex || '#888');
     b.setAttribute('aria-label', tr('lip.tryOn') + ' · ' + shortName(p));
     b.addEventListener('click', () => {
-      tryProduct(p);
+      tryFromCard(p, recList.children[i]); // 위 색 동그라미로 고르면 그 카드가 바른 카드
       for (const d of recDots.children) d.setAttribute('aria-pressed', String(d === b));
       recList.children[i]?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
     });
@@ -796,13 +690,15 @@ function status(text) {
   recStatus.textContent = text;
 }
 async function loadRecs() {
-  const hex = want;
+  const key = want;
+  const [picked, texture, intensity] = key.split('|');
+  const hex = lookHex(picked, Number(intensity)); // 농도를 반영해 입술에 보이는 색
   const seq = ++recSeq;
-  shown = hex;
+  shown = key;
   status(tr('fc.searching'));
   recDots.replaceChildren();
   recList.replaceChildren(...skeletonCards(4));
-  const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, limit: RECOMMEND_COUNT }));
+  const { ok, body } = await api('api/recommend?' + new URLSearchParams({ hex, texture, limit: RECOMMEND_COUNT }));
   if (seq !== recSeq) return; // 그새 색이 또 바뀌었다
   if (!ok) {
     shown = null; // 다음에 열면 다시 찾는다
@@ -810,36 +706,153 @@ async function loadRecs() {
     recList.replaceChildren();
     return;
   }
-  status(!body.products.length ? tr('fc.none') : tr('fc.guide', { n: body.products.length }));
+  // 고른 질감 제품이 먼저, 모자라면 비슷한 색의 다른 질감 제품으로 채운다 (recommend.js recommendByTexture)
+  const n = body.matched ?? body.products.length;
+  const m = body.products.length - n;
+  const tex = tr('texture.' + texture);
+  status(!body.products.length ? tr('fc.none') : !m ? tr('fc.guideTex', { n, tex }) : n ? tr('fc.guideMix', { n, m, tex }) : tr('fc.noTex', { m, tex }));
   showDots(body.products);
   recList.scrollTop = 0;
-  recList.replaceChildren(...body.products.map((product) => tryOnCard(product, tryProduct /* 가져가기 주석: , { onTake: takeIt } */)));
+  recList.replaceChildren(...body.products.map((product) => tryOnCard(product, tryFromCard, { onMoreShades: (p, card, setShade) => seeShades(p, card, setShade) })));
+  markWorn();
 }
-// 추천 카드: '입술에 발라보기'
+// 추천 카드: 지금 호수(색 점 + 이름) + [다른 호수 보기 ›] + [입술에 발라보기] (2026-11-24 사용자 요청, 호수 드롭다운 대신).
+// [다른 호수 보기] = 아래 '호수 보기' 화면. 거기서 고른 호수는 카드에도 반영된다(setShade)
+// '호수 보기' (2026-11-24 사용자 요청 "추천 카드와 비슷한 디자인, 자연스러운 전환"): 같은 흰 시트 안에서 추천 목록이 왼쪽으로 밀려나고
+// 호수 화면이 오른쪽에서 들어온다. 누른 카드의 제품 사진은 호수 화면 사진 자리로 날아간다(FLIP). 뒤로 = 반대로.
+// 위: 뒤로 버튼 + '호수 보기 · N가지' / 연회색 제품 카드(사진·브랜드·이름·가격·지금 입은 호수) / 아래: 호수 동그라미 격자 (누르면 바로 입술에)
+const shadeView = el('div', { class: 'fc-shades', 'aria-hidden': 'true', inert: '' });
+sheet.append(shadeView);
+let shadeSeq = 0;
+function seeShades(p, from, onPick) {
+  const my = ++shadeSeq;
+  let picked = p.shade_no ? p : null;
+  const back = el('button', { type: 'button', class: 'fc-sh-back', 'aria-label': tr('fc.shadesBack'), onclick: () => closeShades() });
+  back.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6"/></svg>';
+  const count = el('span', { class: 'fc-sh-count' });
+  const img = p.image_url ? el('img', { class: 'fc-sh-img', src: p.image_url, alt: '', draggable: 'false', referrerpolicy: 'no-referrer' }) : el('div', { class: 'fc-sh-img' });
+  const nowDot = el('i');
+  const nowName = el('strong');
+  // 지금 바른 호수 (2026-11-24 다듬기): 큰 색 점 + [작은 제목 / 호수 이름]. 호수를 바꾸면 점이 톡 튀고 이름이 아래에서 올라온다
+  const now = el('div', { class: 'fc-sh-now' }, nowDot, el('div', { class: 'fc-sh-now-t' }, el('span', { text: tr('nw.wearing') }), nowName));
+  let nowShown = null;
+  const grid = el('div', { class: 'fc-sh-grid', role: 'listbox', 'aria-label': tr('card.seeShades') },
+    ...Array.from({ length: 8 }, () => el('span', { class: 'fc-sh-chip wait', 'aria-hidden': 'true' }, el('i'))));
+  const renderNow = () => {
+    now.hidden = !picked;
+    if (picked) {
+      nowDot.style.background = picked.color_hex;
+      nowName.textContent = shadeLabelOf(picked) || picked.shade_no || '';
+      if (nowShown && nowShown !== picked.id && !reduce) {
+        nowDot.animate([{ transform: 'scale(.82)' }, { transform: 'scale(1.08)', offset: .6 }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.3, 1.4, .5, 1)' });
+        nowName.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
+      }
+      nowShown = picked.id;
+    }
+    for (const c of grid.children) if (c.dataset.id) c.setAttribute('aria-selected', String(!!picked && c.dataset.id === picked.id));
+  };
+  shadeView.replaceChildren(
+    el('div', { class: 'fc-sh-top' }, back, el('strong', { class: 'fc-sh-title', text: tr('card.seeShades') }), count),
+    el('div', { class: 'fc-sh-card' }, img,
+      el('div', { class: 'fc-sh-info' }, el('span', { class: 'fc-sh-brand', text: brandOf(p) }), el('strong', { class: 'fc-sh-name', text: nameOf(p) }),
+        el('span', { class: 'fc-sh-price', text: p.price != null ? won(p.price) : '' })),
+      now),
+    el('p', { class: 'fc-sh-hint', text: tr('nw.browseShade') }),
+    grid);
+  renderNow();
+  // 전환: 목록 ← 밀려나고 호수 화면이 → 에서 들어온다 (CSS .fc-shading). 사진은 누른 카드 자리에서 호수 화면 사진 자리로 날아간다:
+  // 호수 화면이 움직이는 중이라 진짜 사진은 잠깐 숨기고, 시트 위에 띄운 복사본을 옮긴 뒤 바꿔 낀다
+  let flyFrom = null;
+  const fromImg = from?.querySelector('.card-img');
+  if (!reduce && fromImg?.tagName === 'IMG' && img.tagName === 'IMG') flyFrom = fromImg.getBoundingClientRect();
+  shadeView.style.transition = 'none';
+  shadeView.style.transform = 'none';
+  const flyTo = img.getBoundingClientRect(); // 도착 자리 (호수 화면이 다 들어온 뒤)
+  shadeView.style.transform = '';
+  void shadeView.offsetWidth;
+  shadeView.style.transition = '';
+  stage.classList.add('fc-shading');
+  shadeView.removeAttribute('inert');
+  shadeView.setAttribute('aria-hidden', 'false');
+  results.inert = true;
+  if (!reduce) {
+    if (flyFrom?.width && flyTo.width) {
+      const sr = sheet.getBoundingClientRect();
+      const k = sr.width / sheet.offsetWidth; // 화면 px → 무대 px
+      const fly = el('img', { class: 'fc-sh-fly', src: img.src, alt: '', referrerpolicy: 'no-referrer' });
+      Object.assign(fly.style, { left: (flyTo.left - sr.left) / k + 'px', top: (flyTo.top - sr.top) / k + 'px', width: flyTo.width / k + 'px', height: flyTo.height / k + 'px' });
+      sheet.append(fly);
+      img.style.visibility = 'hidden';
+      const dx = (flyFrom.left - flyTo.left) / k;
+      const dy = (flyFrom.top - flyTo.top) / k;
+      fly.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${flyFrom.width / flyTo.width})` }, { transform: 'none' }],
+        { duration: 560, easing: 'cubic-bezier(.2, .8, .2, 1)' }).finished.finally(() => { img.style.visibility = ''; fly.remove(); });
+    }
+    grid.animate([{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 180, easing: 'cubic-bezier(.2, .8, .2, 1)', fill: 'backwards' });
+  }
+  back.focus({ preventScroll: true });
+  api('api/shades?id=' + encodeURIComponent(p.line || p.id)).then((r) => {
+    if (my !== shadeSeq) return;
+    const shades = (r?.ok && r.body?.shades || []).filter((s) => s.color_hex);
+    count.textContent = shades.length ? tr('nw.shadeCount', { n: shades.length }) : '';
+    if (!shades.length) { grid.replaceChildren(el('p', { class: 'fc-sh-empty', text: tr('nw.noShades') })); return; }
+    grid.replaceChildren(...shades.map((s, i) => {
+      const dot = el('i', { 'aria-hidden': 'true' });
+      dot.style.background = s.color_hex; // 호수 색은 실제 색 (CLAUDE.md 예외)
+      return el('button', { type: 'button', class: 'fc-sh-chip', role: 'option', 'data-id': s.id, 'aria-label': shadeLabelOf(s), style: `--i: ${Math.min(i, 20)}`,
+        onclick: () => { picked = s; const worn = { ...s, finish: s.finish || p.finish, image_url: s.image_url || p.image_url }; onPick?.(worn); if (from) wornCard = from; tryProduct(worn, { quiet: true }); renderNow(); } },
+      dot, el('span', { text: shadeLabelOf(s) || s.shade_no })); // S1 (2026-11-24): 번호만이 아니라 호수 이름까지 다 (길면 두 줄)
+    }));
+    renderNow();
+  });
+}
+function closeShades(instant = false) {
+  if (!stage.classList.contains('fc-shading')) return;
+  shadeSeq++;
+  if (instant) stage.classList.add('fc-instant');
+  stage.classList.remove('fc-shading');
+  shadeView.setAttribute('inert', '');
+  shadeView.setAttribute('aria-hidden', 'true');
+  results.inert = false;
+  if (instant) requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('fc-instant')));
+}
+window.addEventListener('took:shades-close', () => closeShades(true));
 // '입술에 발라보기': 그 제품 색·제형을 그대로 입힌다
-// 가져가기: 고른 립(호수)을 입술에 바른 채로 매장 재고·폰 QR 시트를 띄운다
-// 가져가기 주석 (2026-11-20):
-// let takeaway = null;
-// function takeIt(p) {
-//   takeaway ||= createTakeaway({ stage });
-//   tryProduct(p, { quiet: true });
-//   takeaway.show(p);
-// }
+// 지금 입술에 바른 제품 카드의 발라보기 버튼 = 입술 아이콘이 색으로 채워진다 (product-view.js tryOnCard)
+// 바른 카드 = 검정 그림자로 떠오름 + 버튼 '지금 바르고 있어요' (2026-11-24 사용자 선택, took-ui.css .card.is-worn)
+// 늘 한 장만 (2026-11-24 오류 수정): 색이 같은 카드(같은 호수가 목록에 여러 번)가 함께 켜지지 않게, 누른 카드(wornCard)를 기억해 그 카드만 켠다.
+// 누른 카드가 목록에 없으면(NFC·새 목록) 바른 색과 같은 첫 카드 하나만. 다이얼 등으로 색이 바뀌면 모두 끈다
+let wornCard = null;
+function tryFromCard(p, card) {
+  wornCard = card || null;
+  tryProduct(p);
+}
+function markWorn() {
+  const now = (sel.exact || '').toUpperCase();
+  const btns = [...document.querySelectorAll('#rec-list .try-btn')];
+  const same = (b) => !!now && (b.dataset.hex || '').toUpperCase() === now;
+  const mine = wornCard && btns.find((b) => b.closest('.card') === wornCard && same(b));
+  const pick = mine || btns.find(same) || null;
+  for (const b of btns) {
+    const on = b === pick;
+    b.setAttribute('aria-pressed', String(on));
+    b.closest('.card')?.classList.toggle('is-worn', on);
+    const label = b.querySelector('.try-label');
+    if (label) label.textContent = tr(on ? 'lip.wearingNow' : 'lip.tryOn');
+  }
+}
 function tryProduct(p, { quiet = false } = {}) { // quiet: 아래 알림 없이 (NFC 시트는 입술 색이 바뀌는 것으로 충분하고, 알림이 시트 버튼을 가린다)
+  isBare = false; // 제품을 바르면 맨입술 끝
   sel.exact = p.color_hex;
-  if (p.finish) setTexture(p.finish === 'velvet' ? 'matte' : p.finish); // 제품 제형 → 가장 가까운 텍스처
+  if (p.finish) setTexture(p.finish === 'velvet' ? 'matte' : p.finish, { recs: false }); // 제품 제형 → 가장 가까운 텍스처
   save();
   placeSwatches();
   window.dispatchEvent(new CustomEvent('took:apply', { detail: { hex: p.color_hex, finish: p.finish, quiet, source: shortName(p) } }));
+  markWorn();
 }
 
 // ---------- NFC 태그: 립 제품을 리더기에 올리면 그 제품 색을 바로 입술에 바르고 시트에 제품 카드 ----------
 const nfcFlash = createNfcHint($('nfc-hint'), { ms: 3000 });
-async function showTagProduct(code) {
-  const p = await findTagProduct(code, api); // 태그 표·제품 ID·바코드 번호(호수까지) 순서로 찾는다
-  if (!p?.color_hex) { nfcFlash(tr('pal.nfcUnknown')); return; }
-  wearProduct(p);
-}
 // 제품 하나를 거울에서 바로 바르고(다이얼도 가장 가까운 칸으로) 시트에 그 제품 카드 (태그·NFC 창의 '거울에 발라보기' 공통)
 function wearProduct(p) {
   const near = nearestPick(p.color_hex);
@@ -850,11 +863,12 @@ function wearProduct(p) {
   nfcFlash(tr('pal.nfcApplied', { name: shortName(p) }));
   clearTimeout(recTimer);
   recSeq++; // 찾는 중이던 추천은 버리고 이 제품 카드를 보여 준다
-  want = shown = chosen();
+  want = shown = recKey();
   setMode('recs');
   status(tr('pal.nfcRead'));
   showDots([p]);
-  recList.replaceChildren(tryOnCard(p, tryProduct /* 가져가기 주석: , { onTake: takeIt } */));
+  recList.replaceChildren(tryOnCard(p, tryFromCard, { onMoreShades: (p, card, setShade) => seeShades(p, card, setShade) }));
+  markWorn();
 }
 // NFC 태그 시트 (세 번째 창, js/nfc-window.js, 2026-11-19): 메뉴 버튼 없이 리더기가 태그를 읽으면 그 제품 색을 바로 입술에 바르고,
 // 아래(다이얼 자리)에 시트를 올려 실제 호수 줄을 보여 준다(누를 때마다 입술 색이 바뀜). 얼굴은 가리지 않는다.
@@ -870,7 +884,13 @@ const nfcWin = createNfcWindow({
     tryProduct(p, { quiet: true });
   },
   onSimilar: () => { colorChanged(); setMode('recs'); },
-  // onTake: (p) => takeIt(p), // 가져가기 주석 (NFC 창의 '가져가기' 버튼도 같이 사라진다)
+  // NFC 인식 후 (2026-11-24 사용자 요청): 검정 제품 시트 대신 흰 추천 시트의 '호수 보기' 화면으로.
+  // 뒤로 가면 이 색과 비슷한 추천 립 목록. 입술에는 '인식했어요' 때 이미 발랐다
+  onProduct: (p) => {
+    colorChanged();
+    setMode('recs');
+    seeShades(p, null);
+  },
 });
 const tagToWindow = (code) => nfcWin.show(code);
 listenNfc(tagToWindow);
@@ -884,7 +904,6 @@ listenNfc(tagToWindow);
   try { nfcWait = !!sessionStorage.getItem('took.nfcWait'); sessionStorage.removeItem('took.nfcWait'); } catch { /* 저장 불가 환경 */ }
   if (nfcWait && !pending) nfcWin.wait();
 }
-// 거울 웹캠으로 바코드를 읽던 기능은 2026-11-20 사용자 요청으로 뺐다 (제품은 NFC 리더기로 올린다)
 
 // ---------- 시작 ----------
 lip.texture = sel.texture;
@@ -892,6 +911,7 @@ setTexture(sel.texture, { move: false });
 drawTex();
 tintHandle();
 setMode(new URLSearchParams(location.search).get('mode'), { instant: true }); // 화면 확인용 ?mode=recs
-toLips();
+if (bareStart) { lip.hex = null; applyLook(); } // 맨입술로 시작 (위 bareStart)
+else toLips();
 // 자동 테스트·화면 확인용
 window.tookFind = { setMode, spinTo, setTexture, sel, chosen, FAMILIES, SEG, rot: () => rot, segHex, texPos: () => texPos };

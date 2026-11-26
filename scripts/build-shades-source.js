@@ -25,7 +25,8 @@ const SET_WORDS = /기획|세트|SET|\+|증정|에디션|EDITION|키링|캡|LIMI
 
 /** 옵션 이름 → { no, name }: '[NEW] 45 밀크 베리', '[두유][단품]41소이아몬드', '01호 애플소르베', '#레이다운(웜 베스트)' */
 export function parseOptionName(alt) {
-  const raw = String(alt).replace(/\[[^\]]*\]/g, ' ').replace(/\([^)]*\)/g, ' ').replace(/\+.*$/, '').replace(/\s+/g, ' ').trim();
+  const raw = String(alt).replace(/\*+/g, ' ').replace(/\[[^\]]*\]/g, ' ') // '*' 는 올리브영 내부 표시라 뺀다 (2026-11-24)
+    .replace(/\([^)]*\)/g, ' ').replace(/\+.*$/, '').replace(/\s+/g, ' ').trim();
   const m = raw.match(/^#?\s*(?:No\.?\s*)?([A-Z]{0,3}\d{1,4})(?!\d)\s*호?\s*[.\-_]?\s*(.+)$/i);
   if (m) return { no: m[1].toUpperCase().replace(/^(\d)$/, '0$1'), name: m[2].trim() };
   return { no: null, name: raw.replace(/^#\s*/, '') };

@@ -37,7 +37,7 @@
     const W = innerWidth, H = innerHeight;
     const scale = Math.min(W / BASE[0], H / BASE[1]);
     // 화면 속은 늘 900×1440 으로 그리고 통째로 줄이거나 키운다 (2026-11-15 QA: 기기마다 레이아웃 폭이 달라져
-    // 작은 화면에서 챗봇 키보드가 밀려나고 메뉴가 두 줄이 되던 문제). 가운데를 축으로 scale 한다
+    // 작은 화면에서 메뉴가 두 줄이 되던 문제). 가운데를 축으로 scale 한다
     // 로고 붙잡기 층(kiosk-hold)도 iframe 과 똑같은 자리·크기·배율로 둔다
     for (const el of [frame, hold]) {
       el.style.width = BASE[0] + 'px';

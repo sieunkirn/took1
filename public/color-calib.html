@@ -12,9 +12,10 @@
 <script src="js/theme-boot.js"></script>
 <style>
   /* 카메라 색 보정 (2026-11-20): 직원용 화면. 관리자 화면의 '카메라 색 보정'으로 온다 (터치 범위 조정처럼 설치할 때 한 번).
-     흰 종이를 네모 안에 대고 측정 → 카메라가 어떤 색 쪽으로 틀어져 찍는지 재서 되돌릴 값을 저장한다 (js/color-calib.js).
-     저장한 값은 '내 톤 추천'이 피부색을 잴 때 쓴다. 웹캠이 지원하면 자동 색·밝기도 고정한다.
-     무채색 화면. 예외: 카메라 영상과 측정한 종이 색 견본은 실제 색 */
+     컬러체커의 흰색 칸을 네모 안에 대고 측정 → 카메라가 어떤 색 쪽으로 틀어져 찍는지 재서 되돌릴 값을 저장한다 (js/color-calib.js).
+     (2026-11-26 흰 종이 → 컬러체커 흰색 칸. 흰 칸은 작아서 네모를 화면 너비 36% → 20% 로 줄였다. 계산은 그대로)
+     웹캠이 지원하면 자동 색·밝기도 고정한다.
+     무채색 화면. 예외: 카메라 영상과 측정한 흰 칸 색 견본은 실제 색 */
   html, body { background: var(--bg); }
   .cc { max-width: 900px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; font-size: 17px; }
   .cc-head { display: flex; gap: 14px; align-items: center; }
@@ -22,12 +23,12 @@
   .cc-head button { flex: none; min-height: 52px; border-radius: var(--r-s); }
   .cc-box { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
   .cc-steps { margin: 6px 0 0; padding-left: 22px; line-height: 1.6; }
-  /* 카메라 화면 + 가운데 네모(여기에 흰 종이) */
-  .cc-cam { position: relative; aspect-ratio: 4 / 3; background: #000; border-radius: var(--r); overflow: hidden; }
+  /* 카메라 화면 + 가운데 네모(여기에 컬러체커 흰색 칸) */
+  .cc-cam { --box: 20%; position: relative; aspect-ratio: 4 / 3; background: #000; border-radius: var(--r); overflow: hidden; }
   .cc-cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .cc-cam video.mirror { transform: scaleX(-1); }
   .cc-cam video.fx { filter: url(#cc-fx); }
-  .cc-guide { position: absolute; left: 50%; top: 50%; width: 36%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 4px dashed #fff; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35); pointer-events: none; }
+  .cc-guide { position: absolute; left: 50%; top: 50%; width: var(--box); aspect-ratio: 1; transform: translate(-50%, -50%); border: 4px dashed #fff; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35); pointer-events: none; }
   .cc-guide span { position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); text-align: center; color: #fff; font-weight: 700; font-size: 18px; }
   .cc-tag { position: absolute; left: 12px; top: 12px; padding: 6px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 15px; font-weight: 700; }
   .cc-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; color: #fff; font-size: 20px; }
@@ -47,7 +48,7 @@
 </style>
 </head>
 <body data-idle-reset="off">
-<!-- 보정 전/후 미리보기: 선형 RGB 에서 채널별로 곱한다 (내 톤 추천이 피부색에 하는 계산과 같다) -->
+<!-- 보정 전/후 미리보기: 선형 RGB 에서 채널별로 곱한다 -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <filter id="cc-fx" color-interpolation-filters="linearRGB">
     <feComponentTransfer>
@@ -70,14 +71,14 @@
     <strong>이렇게 해 주세요</strong>
     <ol class="cc-steps">
       <li>매장 조명을 손님이 쓸 때처럼 켜 주세요</li>
-      <li>흰 종이(A4 복사 용지)를 거울 앞, 얼굴이 올 자리쯤에 들고 아래 네모 안이 종이로 가득 차게 해 주세요</li>
+      <li>컬러체커를 거울 앞, 얼굴이 올 자리쯤에 들고 <b>맨 아래 줄의 흰색 칸</b>이 아래 네모 안에 가득 차게 해 주세요. 칸이 작으면 카메라 쪽으로 조금 더 가까이 들어 주세요</li>
       <li><b>측정하기</b>를 누르고 1초 동안 가만히 있어 주세요 → 결과를 보고 <b>저장</b></li>
     </ol>
   </section>
 
   <div class="cc-cam">
     <video id="cc-video" autoplay playsinline muted></video>
-    <div class="cc-guide"><span>여기에 흰 종이</span></div>
+    <div class="cc-guide"><span>컬러체커 흰색 칸</span></div>
     <div class="cc-tag" id="cc-tag">보정 전</div>
     <div class="cc-msg" id="cc-msg">카메라를 켜는 중…</div>
   </div>
@@ -123,23 +124,24 @@
   let pending = null; // 측정했지만 아직 저장 안 한 값
   let showFx = false;
 
+  const BOX = 0.2; // 네모 크기(보이는 화면 너비 대비). CSS .cc-cam --box 와 같게
   const fmt = (g) => g.map((v) => '×' + v.toFixed(2)).join(' · ');
   const when = (iso) => (iso ? new Date(iso).toLocaleString('ko-KR') : '');
   const REASON = {
-    dark: '너무 어두워요. 조명을 켜거나 종이를 빛 쪽으로 돌려 주세요',
-    bright: '종이가 하얗게 날아갔어요. 종이를 조금 비스듬히 들어 반사를 줄여 주세요',
-    uneven: '네모 안에 종이가 아닌 게 섞였거나 그림자가 졌어요. 네모가 종이로 가득 차게 해 주세요',
-    colored: '흰 종이가 아닌 것 같아요. 흰 종이를 대 주세요',
+    dark: '너무 어두워요. 조명을 켜거나 컬러체커를 빛 쪽으로 돌려 주세요',
+    bright: '흰 칸이 하얗게 날아갔어요. 컬러체커를 조금 비스듬히 들어 반사를 줄여 주세요',
+    uneven: '네모 안에 다른 칸이 섞였거나 그림자가 졌어요. 흰색 칸만 네모에 가득 차게 해 주세요',
+    colored: '흰색 칸이 아닌 것 같아요. 컬러체커 맨 아래 줄의 흰색 칸을 대 주세요',
   };
 
-  // 가운데 네모(화면 너비 36%)의 픽셀을 읽는다. 거울 반전은 가운데라 상관없다
+  // 가운데 네모(화면 너비 BOX)의 픽셀을 읽는다. 거울 반전은 가운데라 상관없다
   function readBox() {
     const w = video.videoWidth, h = video.videoHeight;
     if (!w || !h) return null;
     // 화면은 4:3 으로 잘라(cover) 보여 주므로, 보이는 영역 기준 네모를 원본 좌표로 바꾼다
     const viewAR = 4 / 3, srcAR = w / h;
     const vw = srcAR > viewAR ? h * viewAR : w; // 보이는 원본 너비
-    const side = Math.round(vw * 0.36 * 0.85); // 테두리 안쪽만
+    const side = Math.round(vw * BOX * 0.85); // 테두리 안쪽만
     const x = Math.round((w - side) / 2), y = Math.round((h - side) / 2);
     const n = 64;
     canvas.width = canvas.height = n;
@@ -210,7 +212,7 @@
         showResult(false, `${describeCast(gain)}<br>되돌릴 값: 빨강 ${gain[0].toFixed(2)} · 초록 ${gain[1].toFixed(2)} · 파랑 ${gain[2].toFixed(2)} 배`
           + `<br><span class="muted small">${lock ? `웹캠 고정: ${[lock.wb && '색', lock.exposure && '밝기'].filter(Boolean).join('·')}` : '웹캠 고정 안 함'}`
           + `${exposureLocked ? ' · 밝기도 맞춤' : ' · 밝기는 웹캠 자동에 맡김(색만 맞춤)'}</span>`
-          + '<br><b>저장</b>을 눌러야 적용돼요. <b>보정 후 화면 보기</b>로 종이가 하얗게 보이는지 확인해 보세요');
+          + '<br><b>저장</b>을 눌러야 적용돼요. <b>보정 후 화면 보기</b>로 흰색 칸이 하얗게 보이는지 확인해 보세요');
         setFx(pending.gain, true);
       }
     } catch (e) {
@@ -243,7 +245,7 @@
   function renderStatus() {
     const c = getColorCalib();
     const built = builtInCalib();
-    $('cc-status').textContent = !c ? '저장된 보정값 없음 → 내 톤 추천은 눈 흰자로 조명을 맞춰요'
+    $('cc-status').textContent = !c ? '저장된 보정값 없음'
       : (c.source === 'builtin' ? '웹에 고정한 값 사용 중' : '이 기기에 저장한 값 사용 중' + (built ? '' : ' (아직 웹에 고정 안 됨 → 복사해서 Claude 에게 붙여 넣으세요)'))
         + ` · ${when(c.at)} · ${fmt(c.gain)}` + (c.lock ? ' · 웹캠 고정' : '');
     const code = c ? encodeCode(c) : null;
@@ -296,7 +298,7 @@
     if (!pending || !saveColorCalib(pending)) { alertLine('저장하지 못했어요'); return; }
     pending = null;
     $('cc-save').disabled = true;
-    showResult(false, '저장했어요. 이제 <b>내 톤 추천</b>이 이 값으로 조명을 맞춰요');
+    showResult(false, '저장했어요');
     renderStatus();
     setFx(fxGain(), showFx);
   });

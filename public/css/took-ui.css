@@ -47,7 +47,7 @@ body.tui { max-width: none; width: 100%; color: #fff; }
 .hs-instant, .hs-instant * { transition: none !important; }
 
 /* 4번 (2026-11-21 Figma GP 1667:704): 3번에서 누르면 로고가 위(y 380.77)로 올라가고 알약 버튼 3개가 세로로 나온다.
-   1 스캔 = 거울(palette.html) · 2 NFC = 거울에서 NFC 태그 기다리기 (가운데 음성 = 챗봇 버튼은 2026-11-22 삭제, NFC 가 그 자리로).
+   1 스캔 = 거울(palette.html) · 2 NFC = 거울에서 NFC 태그 기다리기.
    버튼 333.24×79.07 (x 286.85), y 812.81 / 1018.89 / 1203.80, 손잡이 153.5×58.03 (+13.13, +10.64).
    색은 원본 프로토타입 알약의 세 모양 그대로: 1 어두운 분홍 · 2 분홍 · 3 흰색(아이콘 빨강) */
 .hs-menu { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s ease .25s; }
@@ -114,7 +114,6 @@ body.tui { max-width: none; width: 100%; color: #fff; }
 .fc-cam { position: absolute !important; inset: 0; width: auto !important; aspect-ratio: auto !important; border: 0 !important; border-radius: 0 !important;
   background: transparent !important; overflow: hidden; }
 .fc-cam #view { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: var(--cam); transition: opacity .4s ease; }
-/* 카메라는 항상 화면 꽉 채움(cover). 11-21 축소 슬라이더는 2026-11-22 사용자 요청으로 뺐다 (여백이 생겨서) */
 /* 준비 중·못 쓸 때 안내(placeholder): 흰 글씨로, 아래 오류 안내(.fc-camerr)와 겹치지 않게 얼굴 자리 위쪽(y 470~)에 */
 .tui-stage .fc-cam .placeholder { flex-direction: column; justify-content: flex-start; gap: 12px; padding: 470px 290px 0; border: 0; border-radius: 0; background: transparent;
   color: #fff; font-size: 16px; line-height: 1.5; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); }
@@ -231,78 +230,25 @@ html.enter-fx .fc .fc-sheet, html.enter-fx .fc .fc-sbtn { animation-delay: .24s;
 
 /* ================= 예전 기능을 이 디자인으로 (2026-11-16) ================= */
 /* 유리 알약 공통: Find Your Color 의 matte 버튼 모양 (위가 밝은 흰 테두리 + 짙은 바탕) */
-.fc-lang, .hs-lang, .fc-match, .fc-tex {
+.hs-lang, .fc-tex {
   position: absolute !important; box-sizing: border-box; border: 1.2px solid transparent; border-radius: 999px; color: #fff; text-align: center;
   background: linear-gradient(#171717, #171717) padding-box, linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.25) 80%, rgba(255, 255, 255, 0.04) 100%) border-box;
   box-shadow: 0 -1px 4px rgba(255, 255, 255, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.14);
   transition: opacity .3s ease, transform .45s cubic-bezier(.65, 0, .35, 1);
 }
-.tui .tui-stage button.fc-lang:hover:not(:disabled), .tui .tui-stage button.hs-lang:hover:not(:disabled),
-.tui .tui-stage button.fc-match:hover:not(:disabled), .tui .tui-stage button.fc-tex:hover:not(:disabled) {
+.tui .tui-stage button.hs-lang:hover:not(:disabled), .tui .tui-stage button.fc-tex:hover:not(:disabled) {
   color: #fff; background: linear-gradient(#171717, #171717) padding-box, linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.25) 80%, rgba(255, 255, 255, 0.04) 100%) border-box; }
 /* 언어: 홈 3번 화면 오른쪽 위에서만 (2026-11-17 사용자 요청: 언어는 홈에서만 바꾼다. 팔레트 버튼은 뺐다) */
-.fc-lang, .hs-lang { top: 66.5px; height: 42px; min-width: 84px; padding: 0 16px; font-size: 17px; line-height: 39px; font-weight: 600; z-index: 6; }
+.hs-lang { top: 66.5px; height: 42px; min-width: 84px; padding: 0 16px; font-size: 17px; line-height: 39px; font-weight: 600; z-index: 6; }
 .hs-lang { right: 40px; opacity: 0; pointer-events: none; transition: opacity .6s ease .25s; }
 .tui-stage[data-step="4"] .hs-lang { opacity: 1; pointer-events: auto; }
 .tui-stage.hs-leaving .hs-lang { opacity: 0; }
-/* 내 톤으로 추천받기: 부제 아래 · 얼굴 프레임 위 (y 252~294). GP-홈화면 Figma 에는 없는 예전 기능 (2026-11-18 자리만 옮김) */
-.fc-match { left: 330px; top: 252px; width: 240px; height: 42px; font-size: 18px; line-height: 39px; font-weight: 600; z-index: 3; letter-spacing: -0.01em; }
-.fc-match:disabled { opacity: .38; cursor: default; }
-.fc .fc-match:active:not(:disabled) { box-shadow: 0 -1px 4px rgba(255, 255, 255, 0.3), 0 0 0 7px #353535; }
-/* 톤 측정 결과 + 추천 컬러 3개: 제목 아래 유리 상자 (결과가 있을 때만) */
-.fc-matchbox { position: absolute; left: 150px; width: 600px; top: 304px; z-index: 6; display: none; box-sizing: border-box; padding: 12px 18px 14px; border-radius: 22px; text-align: center;
-  background: rgba(18, 18, 18, 0.9); border: 1px solid rgba(255, 255, 255, 0.16); border-top-color: rgba(255, 255, 255, 0.4); }
-.fc-matchbox:has(#match-result:not(:empty)) { display: block; }
-.fc-matchbox p { margin: 0; font-size: 15px; line-height: 1.45; color: rgba(255, 255, 255, 0.9); }
-.fc-match-sw { display: flex; justify-content: center; gap: 18px; margin-top: 10px; }
-.fc-match-sw.hidden { display: none; }
-.fc-match-sw button { all: unset; box-sizing: border-box; cursor: pointer; width: 46px; height: 46px; border-radius: 50%; border: 2px solid #fff;
-  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.35), inset 0 0 8px rgba(255, 255, 255, 0.45); }
 /* 텍스처 알약: 질감 동그라미와 다이얼 사이 (원본 7번 matte 버튼 모양) — 가운데 질감 동그라미의 이름.
    세로 간격 같게 (2026-11-22 사용자 요청): 가운데 큰 동그라미 아래 1037.6 ~ 다이얼 링 위 1147.39(cy 1577.47 − ro 430.08) 사이 가운데 → 위아래 36.6씩 */
 .fc-tex { left: 386px; top: 1074.25px; width: 128px; height: 36.5px; z-index: 3; font-size: 25.5px; line-height: 28px; font-weight: 400; letter-spacing: -0.025em; }
 .fc .fc-tex:active { box-shadow: 0 -1px 4px rgba(255, 255, 255, 0.3), 0 0 0 8px #353535; }
-.fc[data-mode="recs"] .fc-tex { opacity: 0; pointer-events: none; } /* 내 톤 버튼·결과 상자는 추천 결과(시트)에서 쓴다 (2026-11-20) */
-/* 왼쪽 세로 메뉴 (Figma 2026-IPD GP-홈화면 1653:469, 2026-11-22, 흰색·검정만). 늘 펼친 4칸.
-   바깥 유리 알약 x 40 y 563.3 70×261.16 흰 37%, 위 흰 48% 알약(63×121) 안에 손잡이(흰 44% 원 53) = 스캔 · 그 아래 NFC(옛 음성 자리),
-   9점 = 검정 원 62.1, 집 = 흰 44% 원 62.1 */
-.fc-menu { position: absolute; left: 40px; top: 563.3px; width: 70px; height: 261.16px; z-index: 6; box-sizing: border-box; border-radius: 200px;
-  background: rgba(255, 255, 255, 0.37); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), inset 0 -1px 1px rgba(0, 0, 0, 0.08);
-  transform: translateY(calc(var(--fold, 0px) + var(--lift, 0px)));
-  transition: transform .3s cubic-bezier(.4, 0, .2, 1), height .3s cubic-bezier(.4, 0, .2, 1); }
-.fc[data-mode="recs"] .fc-menu { --lift: -140px; } /* 추천 결과: 시트(y 720~) 위로 */
-.fc-menu > * { position: absolute; box-sizing: border-box; border-radius: 50%; }
-.fc-menu-pair { left: 3.56px; top: 3.42px; width: 62.87px; height: 120.85px; border-radius: 200px; background: rgba(255, 255, 255, 0.48); pointer-events: none; }
-.fc-menu .fc-menu-knob { border-radius: 200px; } /* 늘어날 때 알약 모양 (원일 땐 그대로 원) */
-.fc-menu-knob { left: 9.06px; top: 7.46px; width: 52.96px; height: 52.96px; pointer-events: none; background: rgba(255, 255, 255, 0.44);
-  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.6); }
-.fc-menu .fc-mb { display: block; cursor: pointer; color: #fff; text-decoration: none; -webkit-tap-highlight-color: transparent; }
-.fc-menu .fc-mb svg { width: 100%; height: 100%; }
-.fc-mb-scan { left: 9.06px; top: 7.46px; width: 52.96px; height: 52.96px; }
-.tui .tui-stage .fc-menu .fc-mb.is-focus { color: #000; } /* 손잡이 위 아이콘 = 검정 선 (손잡이가 옮겨 가면 같이, js/palette.js moveKnob) */
-.fc-mb-nfc { left: 9.06px; top: 64.44px; width: 52.96px; height: 52.96px; } /* 아이콘 가운데 = Figma 옛 음성 아이콘 자리 (75, 654.2) */
-.fc-mb-grid { left: 3.95px; top: 128.34px; width: 62.11px; height: 62.11px; background: #000;
-  box-shadow: inset 0 0 0 1px rgba(255, 247, 247, 0.34), 0 4px 4px rgba(0, 0, 0, 0.25); }
-.fc-mb-home { left: 3.95px; top: 194.66px; width: 62.11px; height: 62.11px; background: rgba(255, 255, 255, 0.44); box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25); }
-.fc-menu .fc-mb-home:link, .fc-menu .fc-mb-home:visited { color: #fff; }
-.fc[data-mode="recs"] .fc-mb-grid { box-shadow: inset 0 0 0 2px #fff, 0 4px 4px rgba(0, 0, 0, 0.25); } /* 추천 제품이 열려 있음 */
-.tui .tui-stage .fc-menu button.fc-mb:hover:not(:disabled) { background: transparent; }
-.tui .tui-stage .fc-menu button.fc-mb-grid, .tui .tui-stage .fc-menu button.fc-mb-grid:hover:not(:disabled) { background: #000; color: #fff; }
-.tui .tui-stage .fc-menu button.fc-mb-grid.is-focus, .tui .tui-stage .fc-menu button.fc-mb-grid.is-focus:hover:not(:disabled),
-.tui .tui-stage .fc-menu .fc-mb-home.is-focus { background: transparent; color: #000; } /* 손잡이가 올라오면 자기 바탕은 비우고 손잡이를 보인다 */
-.fc-menu .fc-mb:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-/* 접힌 알약 (2026-11-22 사용자 요청 "위에서 세 번째 누르면 알약이 닫힌다"): 9점 동그라미(62.11)만 남은 70 원.
-   9점은 제자리에 있고(바깥 알약이 124.39 내려가고 9점은 그만큼 거꾸로), 나머지 칸은 9점 쪽으로 모이며 사라진다. 다시 누르면 펼친다 */
-.fc-menu > * { transition: transform .3s cubic-bezier(.4, 0, .2, 1), opacity .2s ease, color .2s ease .1s, background-color .2s ease; }
-.fc-menu.folded { --fold: 124.39px; height: 70px; }
-.fc-menu.folded .fc-mb-grid { transform: translateY(-124.39px); }
-.fc-menu.folded > :not(.fc-mb-grid) { opacity: 0; pointer-events: none; }
-.fc-menu.folded .fc-mb-scan, .fc-menu.folded .fc-menu-knob { transform: translateY(0) scale(.5); }
-.fc-menu.folded .fc-mb-nfc { transform: translateY(-56px) scale(.5); }
-.fc-menu.folded .fc-menu-pair { transform: translateY(-29px) scale(.5); }
-.fc-menu.folded .fc-mb-home { transform: translateY(-190.7px) scale(.5); }
-@media (prefers-reduced-motion: reduce) { .fc-menu, .fc-menu > * { transition-duration: .01s; } }
+.fc[data-mode="recs"] .fc-tex { opacity: 0; pointer-events: none; }
+/* 왼쪽 세로 메뉴(.fc-menu 알약)는 2026-11-26 사용자 요청으로 뺐다 */
 
 /* ---------- 추천 결과 (recs): 시트가 화면 아래 절반 (y 720~1440), 위에 제품 색 동그라미 줄, 아래 카드 2열 (사용자 레퍼런스) ---------- */
 /* 입술이 시트에 가리지 않게 카메라를 올리는 건 js/palette.js (입술 위치를 따라 .fc-face transform, 2026-11-17 카메라 전체 화면) */
@@ -316,7 +262,7 @@ html[data-theme="dark"] .fc-rec-dots button[aria-pressed="true"] { box-shadow: 0
 .fc[data-mode="recs"] .fc-rec-status { margin: 10px 44px 8px; font-size: 15px; }
 /* 추천 제품 카드 = 385.48 × 289.11 (2026-11-16 사용자 지정 크기), 2열 사이 41 → 양옆 여백 44 */
 .fc[data-mode="recs"] .fc-rec-list { display: grid; grid-template-columns: repeat(2, 385.48px); column-gap: 41px; row-gap: 32px; justify-content: center;
-  overflow-x: hidden; overflow-y: auto; height: calc(100% - 59px - 46px); box-sizing: border-box; padding: 4px 0 40px; scroll-snap-type: y proximity; }
+  overflow-x: hidden; overflow-y: auto; height: calc(100% - 59px - 46px); box-sizing: border-box; padding: 14px 0 48px; /* 위·아래 여백: 바른 카드 그림자가 잘리지 않게 */ scroll-snap-type: y proximity; }
 /* 카드 안 (2026-11-16 사용자 요청 "제품 사진 더 크게"): 왼쪽 큰 정사각 사진 200 · 오른쪽 브랜드/제품명/가격 · 아래 버튼 두 개 (예전: 위 사진 120 + 표) */
 .fc[data-mode="recs"] .fc-rec-list .card { width: 385.48px; height: 289.11px; box-sizing: border-box; flex: none; scroll-snap-align: start; padding: 14px; border-radius: 24px;
   display: grid; grid-template-columns: 200px 1fr; grid-template-rows: 200px auto; column-gap: 16px; row-gap: 13px; align-content: start; }
@@ -330,9 +276,16 @@ html[data-theme="dark"] .fc-rec-dots button[aria-pressed="true"] { box-shadow: 0
 .fc[data-mode="recs"] .fc-rec-list .card dd:nth-of-type(3) { margin-top: 8px; font-size: 18px; font-weight: 700; }
 .fc[data-mode="recs"] .fc-rec-list .card .actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1fr; gap: 8px; margin: 0; padding: 0; }
 .fc[data-mode="recs"] .fc-rec-list .card .actions button { min-height: 0; padding: 10px 8px; font-size: 14.5px; text-align: center; }
+/* [입술에 발라보기] [호수 보기] 두 버튼 나란히 (2026-11-24). 호수 보기는 흰 바탕 + 테두리 */
+.fc[data-mode="recs"] .fc-rec-list .card .actions:has(.shades-btn) { grid-template-columns: 1fr 1fr; }
+.fc-rec-list .card .actions button.shades-btn { background: #fff; color: #000; box-shadow: inset 0 0 0 1.5px #000; }
+html[data-theme="dark"] .fc-rec-list .card .actions button.shades-btn { background: transparent; color: #fff; box-shadow: inset 0 0 0 1.5px #fff; }
 /* 카드 안 호수 고르기 (2026-11-17): 카드 크기가 고정이라 오른쪽 칸(가격 아래) 맨 밑에 머리 칸을 두고,
    목록은 머리 칸 아래로 카드 위에 떠서 펼친다 (카드 높이는 그대로) */
 .fc[data-mode="recs"] .fc-rec-list .card { position: relative; }
+/* 시연용 배지 (2026-11-26): 카드 격자(사진·글자·버튼)에 자리가 없어 카드 아래 새 줄로 200px 넓게 밀려나던 것 → 사진 왼쪽 위에 작게 얹는다 */
+.fc[data-mode="recs"] .fc-rec-list .card > .demo-badge { position: absolute; left: 24px; top: 24px; z-index: 1; margin: 0;
+  background: #fff; color: #000; border-color: rgba(0, 0, 0, 0.3); opacity: 1; }
 .fc[data-mode="recs"] .fc-rec-list .card > .opt { grid-column: 2; grid-row: 1; align-self: end; position: relative; z-index: 2; margin: 0; overflow: visible;
   border: 0; border-radius: 12px; background: #fff; color: #000; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
 .fc[data-mode="recs"] .fc-rec-list .card > .opt.open { border-radius: 12px 12px 0 0; }
@@ -351,8 +304,6 @@ html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card > .opt, html[da
 
 /* 시작 화면에서 넘어올 때 wireframe.css 의 "화면 전체(main) 떠오르기"(html.enter-fx main)를 끈다: 무대·로고는 그대로 있고 나머지만 떠오른다 (깜빡임 없이 이어지게) */
 html.enter-fx main.tui-stage, html main.tui-stage { animation: none; }
-/* 비활성 "내 톤으로 추천받기": wireframe.css 의 button:disabled(흰 바탕)가 덮지 않게 */
-.tui .tui-stage button.fc-match:disabled { color: #fff; background: linear-gradient(#171717, #171717) padding-box, linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.85) 45%, rgba(255, 255, 255, 0.25) 80%, rgba(255, 255, 255, 0.04) 100%) border-box; }
 /* 카메라 안내 ("얼굴이 화면 가운데에 오도록 맞춰 주세요" 등): 타원 아래쪽 안에 작게 */
 .fc-camerr #guide { position: static !important; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; margin: 0; }
 .fc-guide { position: absolute; left: 254px; width: 392px; top: 788px; z-index: 2; margin: 0; text-align: center; font-size: 15px; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9); pointer-events: none; }
@@ -360,55 +311,127 @@ html.enter-fx main.tui-stage, html main.tui-stage { animation: none; }
 
 /* ---------- 색 통일 (2026-11-20 사용자 요청 "팔레트 조절 바 빼고는 다 통일", README '색') ----------
    핑크는 #FF007B 한 가지(눌림 #D60067), 그라데이션·빛 번짐·유리 테두리 없이 단색. 면 #1E1E21 · 선 #2E2E33.
-   그대로 두는 것: 다이얼(색 칸 canvas·유리 손잡이 .fc-handle), 질감 동그라미(.fc-sw, 실제 립 색의 질감 표현), 카메라 위·아래 어둡게(글자 읽히게), 왼쪽 세로 메뉴(Figma 원본) */
-/* 거울의 알약 버튼(내 톤으로 추천받기 · matte) */
-.fc-lang, .fc-match, .fc-tex,
-.tui .tui-stage button.fc-lang:hover:not(:disabled),
-.tui .tui-stage button.fc-match:hover:not(:disabled), .tui .tui-stage button.fc-tex:hover:not(:disabled),
-.tui .tui-stage button.fc-match:disabled {
+   그대로 두는 것: 다이얼(색 칸 canvas·유리 손잡이 .fc-handle), 질감 동그라미(.fc-sw, 실제 립 색의 질감 표현), 카메라 위·아래 어둡게(글자 읽히게) */
+/* 거울의 matte 알약 버튼 */
+.fc-tex, .tui .tui-stage button.fc-tex:hover:not(:disabled) {
   background: #1e1e21; border: 1px solid #2e2e33; box-shadow: none; }
 .fc .fc-tex:active { box-shadow: none; background: #2a2a2e; }
 
 /* ---------- 추천 결과 시트 = GP-홈화면 Figma (2026-11-20 사용자 요청) ----------
    회색 네모 900×508 (y 932.24~1440), 가운데 동그라미는 오른쪽 핑크 동그라미 자리(검정 원 x 741.18 y 877.8 지름 118.8 → 흰 테 포함 733.06, 869.7),
-   맨 아래 긴 버튼 820×78.37 (x 40, y 1318.36 → 시트 안 386.12) = '내 톤으로 추천받기 →'. 위 선택자는 앞의 알약 규칙(.tui .tui-stage button.fc-match…)을 덮는다 */
+   맨 아래 긴 버튼 820×78.37 (x 40, y 1318.36 → 시트 안 386.12) */
 .fc-sbtn { transition: top .45s cubic-bezier(.65, 0, .35, 1), left .45s cubic-bezier(.65, 0, .35, 1), width .45s cubic-bezier(.65, 0, .35, 1), height .45s cubic-bezier(.65, 0, .35, 1); }
-.fc[data-mode="recs"] .fc-sbtn { left: 741.177px; width: 118.823px; height: 118.823px; } /* Figma Ellipse 39: x 741.18 y 877.8, 118.823 (2026-11-20 사용자 지정 크기) */
+.fc[data-mode="recs"] .fc-sbtn { left: 390.589px; width: 118.823px; height: 118.823px; } /* 2026-11-24 사용자 요청: 오른쪽(741.18) → 가운데 */
+.fc[data-mode="recs"] .fc-sbtn-logo svg { width: 70px; height: 70px; transition: width .45s cubic-bezier(.65, 0, .35, 1), height .45s cubic-bezier(.65, 0, .35, 1); } /* 작아진 동그라미에 맞춘 툭 로고 (2026-11-24) */ /* Figma Ellipse 39: x 741.18 y 877.8, 118.823 (2026-11-20 사용자 지정 크기) */
+/* 올라올 때 (2026-11-24 사용자 요청 "올릴 때 부자연스러움"): 천천히 출발했다 확 붙던 ease-in-out 대신, 빠르게 나와 부드럽게 멈추는 ease-out.
+   시트와 로고 버튼이 같은 시간·같은 곡선으로 함께 올라온다. 내려갈 때는 위의 원래 움직임 그대로 */
+.fc[data-mode="recs"] .fc-sheet { transition: top .5s cubic-bezier(.22, 1, .36, 1), background .2s ease, visibility 0s; }
+.fc[data-mode="recs"] .fc-sbtn { transition: top .5s cubic-bezier(.22, 1, .36, 1), left .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1); }
+.fc[data-mode="recs"] .fc-sbtn-logo svg { transition: width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1); }
 .fc[data-mode="recs"] .fc-results { top: 84px !important; bottom: 0; } /* 위 84 = 오른쪽 위 동그라미 아래부터. 아래는 시트 끝까지 (2026-11-22: 둘째 줄 카드가 이어서 보여 밀어 볼 수 있게) */
 /* 제품 색 동그라미 줄 · '이 컬러와 비슷한 제품 n개' 문구는 2026-11-20 사용자 요청으로 화면에서 뺐다 (문구는 화면 읽기용으로만 남김) */
 .fc[data-mode="recs"] .fc-rec-dots { display: none; }
 .fc[data-mode="recs"] .fc-rec-status { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.fc[data-mode="recs"] .fc-rec-list { height: 100%; padding-bottom: 40px; }
-.tui .tui-stage .fc-sheet button.fc-match, .tui .tui-stage .fc-sheet button.fc-match:hover:not(:disabled), .tui .tui-stage .fc-sheet button.fc-match:disabled {
-  position: absolute !important; left: 40px; top: 386.12px; width: 820px; height: 78.37px; min-height: 0; margin: 0; padding: 0; z-index: 2;
-  box-sizing: border-box; border: 0; border-radius: 43px; background: #FFF; color: #000; box-shadow: none; /* 2026-11-20 사용자 지정 background #FFF */ /* Figma 레이어 속성: 820×78.37, 모서리 43 */
-  display: flex; align-items: center; justify-content: center; /* line-height normal 에서도 세로 가운데 */
-  font-family: Inter, "Pretendard Variable", Pretendard, system-ui, sans-serif; font-size: 24px; font-style: normal; font-weight: 700; line-height: normal; text-align: center; letter-spacing: 0; }
-.fc-sheet .fc-match::after { white-space: pre; }
-.tui .tui-stage .fc-sheet button.fc-match:active:not(:disabled) { background: #E6E6E6; box-shadow: none; }
-.tui .tui-stage .fc-sheet button.fc-match:disabled { opacity: 1; cursor: default; } /* 얼굴을 못 찾아 아직 못 누를 때도 흐리게 하지 않는다 (2026-11-20 사용자 요청) */
-.fc-sheet .fc-match::after { content: ' →'; }
+.fc[data-mode="recs"] .fc-rec-list { height: 100%; padding-bottom: 40px; } /* 얼굴을 못 찾아 아직 못 누를 때도 흐리게 하지 않는다 (2026-11-20 사용자 요청) */
 /* 하단 시트 바탕 = GP-홈화면 Figma 회색 네모(Rectangle 57) #7A7A7A (2026-11-20 사용자 요청: 흰 '이 컬러로 제품 찾기' 버튼이 보이게). 다크 모드는 그대로 #474747 */
 html:not([data-theme="dark"]) .fc-sheet { background: #fff; } /* 2026-11-22 사용자 시안: 흰 시트 위 연회색 카드 (흰 긴 버튼은 이미 빠짐) */
 
-/* 시트 왼쪽 위 '내 톤으로 추천받기' (2026-11-20 사용자 요청, palette.html #match): 카드 위 빈자리(시트 윗변 + 20px), 오른쪽 동그라미 버튼 맞은편.
-   검정 알약 · 흰 글자 (카드의 '입술에 발라보기'와 같은 모양). 얼굴을 찾기 전(disabled)엔 흐리게 */
-.fc-sheet .fc-tone { position: absolute; left: 44px; top: 20px; z-index: 1; }
-.tui .tui-stage .fc-sheet #match, .tui .tui-stage .fc-sheet #match:hover:not(:disabled) { height: 48px; min-height: 0; padding: 0 22px; border: 0; border-radius: 999px;
-  background: #000; color: #fff; box-shadow: none; font-size: 17px; font-weight: 700; line-height: 48px; letter-spacing: -0.01em; cursor: pointer; }
-.tui .tui-stage .fc-sheet #match:active:not(:disabled) { background: #2a2a2e; }
-.tui .tui-stage .fc-sheet #match:disabled { opacity: .45; cursor: default; }
+/* ---------- 호수 보기 (2026-11-24, js/palette.js seeShades): 같은 흰 시트 안에서 추천 목록 ← 밀려나고 호수 화면 → 에서 들어온다 ----------
+   추천 카드와 같은 연회색(#f3f3f3)·모서리 24 카드. 누른 카드 사진은 복사본(.fc-sh-fly)이 사진 자리로 날아간다. 호수 동그라미 색은 실제 색 */
+.fc-sheet { overflow: hidden; }
+.fc[data-mode="recs"] .fc-results { transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .32s ease; }
+.fc.fc-shading .fc-results { transform: translateX(-28%); opacity: 0; pointer-events: none; }
+.fc-shades { position: absolute; inset: 0; z-index: 2; visibility: hidden; opacity: 0; transform: translateX(100%);
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .3s ease, visibility 0s .5s; }
+.fc.fc-shading .fc-shades { visibility: visible; opacity: 1; transform: none; transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .3s ease .05s, visibility 0s; }
+.fc-sh-top { position: absolute; left: 44px; top: 20px; height: 48px; display: flex; align-items: center; gap: 14px; }
+.tui .tui-stage .fc-shades .fc-sh-back, .tui .tui-stage .fc-shades .fc-sh-back:hover:not(:disabled) { width: 48px; height: 48px; min-height: 0; padding: 0; margin: 0; border: 0; border-radius: 50%;
+  display: grid; place-items: center; background: #f3f3f3; color: #000; box-shadow: none; cursor: pointer; }
+.tui .tui-stage .fc-shades .fc-sh-back:active { background: #e4e4e4; }
+.fc-sh-back svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.fc-sh-title { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+.fc-sh-count { font-size: 16px; font-weight: 600; opacity: .5; }
+.fc-sh-card { position: absolute; left: 44px; right: 44px; top: 86px; height: 128px; box-sizing: border-box; padding: 14px; border-radius: 24px; background: #f3f3f3;
+  display: grid; grid-template-columns: 100px 1fr auto; column-gap: 16px; align-items: center; }
+.fc-sh-img, .fc-sh-fly { width: 100px; height: 100px; box-sizing: border-box; border-radius: 16px; object-fit: contain; background: #fff; }
+.fc-sh-fly { position: absolute; z-index: 5; transform-origin: 0 0; pointer-events: none; }
+.fc-sh-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.fc-sh-brand { font-size: 14px; font-weight: 500; opacity: .55; }
+.fc-sh-name { font-size: 18px; line-height: 1.3; font-weight: 700; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.fc-sh-price { margin-top: 4px; font-size: 17px; font-weight: 700; }
+.fc-sh-now { display: flex; align-items: center; gap: 12px; min-width: 196px; max-width: 270px; padding: 10px 20px 10px 10px; border-radius: 999px; background: #fff; } /* 지금 바른 호수 (2026-11-24 다듬기) */
+.fc-sh-now[hidden] { display: none; }
+.fc-sh-now > i { flex: none; width: 46px; height: 46px; border-radius: 50%; box-shadow: inset 0 0 0 3px #fff, 0 0 0 1px rgba(0, 0, 0, 0.1); }
+.fc-sh-now-t { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fc-sh-now-t > span { font-size: 12px; font-weight: 600; color: #8a8a8e; letter-spacing: -0.01em; }
+.fc-sh-now-t > strong { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fc-sh-hint { position: absolute; left: 44px; top: 230px; margin: 0; font-size: 15px; font-weight: 600; opacity: .6; }
+.fc-sh-grid { position: absolute; left: 44px; right: 44px; top: 266px; bottom: 0; box-sizing: border-box; padding: 4px 4px 36px;
+  display: grid; grid-template-columns: repeat(6, 1fr); align-content: start; gap: 16px 8px; /* S1: 이름이 다 보이게 6열 */ overflow-y: auto; scrollbar-width: none; }
+.fc-sh-grid::-webkit-scrollbar { display: none; }
+.tui .tui-stage .fc-shades .fc-sh-chip, .tui .tui-stage .fc-shades .fc-sh-chip:hover:not(:disabled) { all: unset; box-sizing: border-box; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; }
+.fc-sh-chip span { max-width: 118px; text-align: center; font-size: 14px; line-height: 1.3; font-weight: 600; word-break: keep-all; overflow-wrap: anywhere; }
+.fc-sh-chip[aria-selected="true"] span { font-weight: 800; }
+.fc-sh-chip i { display: block; width: 64px; height: 64px; border-radius: 50%; box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.35); transition: box-shadow .2s ease, transform .2s ease; }
+.fc-sh-chip:active i { transform: scale(.94); }
+.fc-sh-chip[aria-selected="true"] i { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #000; } /* 추천 색 동그라미 줄의 고른 표시와 같은 테 */
+.fc-sh-chip.wait i { background: #ececec; animation: fc-sh-wait 1.1s ease-in-out infinite; }
+@keyframes fc-sh-wait { 50% { opacity: .5; } }
+.fc.fc-shading .fc-sh-chip:not(.wait) { animation: took-up .4s cubic-bezier(.2, .8, .2, 1) backwards; animation-delay: calc(var(--i, 0) * 22ms); }
+.fc-sh-empty { grid-column: 1 / -1; margin: 10px 0 0; font-size: 15px; opacity: .6; }
+html[data-theme="dark"] .fc-sh-card { background: #5a5a5a; }
+html[data-theme="dark"] .fc-sh-now { background: #474747; }
+html[data-theme="dark"] .fc-sh-now > i { box-shadow: inset 0 0 0 3px #474747, 0 0 0 1px rgba(255, 255, 255, 0.2); }
+html[data-theme="dark"] .fc-sh-now-t > span { color: rgba(255, 255, 255, 0.6); }
+html[data-theme="dark"] .tui .tui-stage .fc-shades .fc-sh-back { background: #5a5a5a; color: #fff; }
+html[data-theme="dark"] .fc-sh-chip[aria-selected="true"] i { box-shadow: 0 0 0 3px #474747, 0 0 0 5px #fff; }
+@media (prefers-reduced-motion: reduce) { .fc-results, .fc-shades, .fc-sh-chip { transition: none !important; animation: none !important; } }
 
-/* 내 톤 결과 (2026-11-20): 시트 안 '내 톤으로 추천받기' 오른쪽 한 줄 = '내 톤 · 여름 쿨' + 추천 색 3개 (예전엔 제목 아래 상자가 얼굴을 덮었다).
-   palette.js 가 #fc-matchbox 를 시트 안으로 옮긴다. 고른 추천 색은 흰 테 두껍게 */
-.fc-sheet .fc-matchbox { left: 230px; top: 20px; width: 500px; min-height: 48px; height: auto; padding: 0; border: 0; border-radius: 0; background: none; text-align: left; z-index: 1; }
-.fc-sheet .fc-matchbox:has(#match-result:not(:empty)) { display: flex; align-items: center; gap: 16px; }
-.fc-sheet .fc-matchbox p { flex: 0 1 auto; font-size: 17px; font-weight: 700; line-height: 1.25; color: #000; word-break: keep-all; }
-.fc-sheet .fc-match-sw { flex: none; margin: 0; gap: 12px; }
-.fc-sheet .fc-match-sw button { width: 40px; height: 40px; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); }
-.fc-sheet .fc-match-sw button[aria-pressed="true"] { box-shadow: 0 0 0 3px #000; }
-.tui .tui-stage .fc-sheet #match.is-busy { opacity: 1; }
+/* ---------- 추천 카드 발라보기 버튼 (2026-11-24): 가로 = 제품 사진(200px), 글자 앞 입술 아이콘.
+   지금 입술에 바른 제품이면(aria-pressed) 아이콘 속이 그 제품 색(--c, 실제 색)으로 채워진다 ---------- */
+.fc[data-mode="recs"] .fc-rec-list .card .actions:has(.shades-btn) { grid-template-columns: 200px 1fr; column-gap: 16px; }
+.fc-rec-list .card .actions button.try-btn { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.try-lip { flex: none; width: 26px; height: 26px; overflow: visible; }
+.try-lip-fill { fill: transparent; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; transition: fill .35s ease; }
+.try-lip-line { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; }
+.try-btn[aria-pressed="true"] .try-lip-fill { fill: var(--c); }
+.try-btn[aria-pressed="true"] .try-lip { animation: try-lip-pop .45s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes try-lip-pop { 0% { transform: scale(.8); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .try-btn .try-lip { animation: none !important; } }
 
-/* 내 톤 버튼·결과는 동그라미 버튼으로 시트를 열었을 때만 (2026-11-20 사용자 요청). 닫힌 시트가 화면 아래로 살짝 보일 때 버튼이 삐져나오지 않게 */
-.fc-sheet .fc-tone, .fc-sheet .fc-matchbox { transition: opacity .25s ease; }
-.fc:not([data-mode="recs"]) .fc-sheet .fc-tone, .fc:not([data-mode="recs"]) .fc-sheet .fc-matchbox { opacity: 0 !important; pointer-events: none; }
+/* ---------- 추천 카드 A-1 정돈형 (2026-11-24 사용자 선택, 호수 드롭다운 자리) ----------
+   오른쪽 칸: 브랜드 + 제형 태그 / 제품명(두 줄) / 가격 — 맨 아래 지금 호수(색 점 + 이름, 이름은 줄이지 않고 두 줄까지) · 얇은 선 · 다른 호수 N가지 ›
+   흰 상자 없이 선 하나로 나눈다. 발라보기 버튼 높이 46 고정 */
+.fc[data-mode="recs"] .fc-rec-list .card > .cur-shade { grid-column: 2; grid-row: 1; align-self: end; min-width: 0; display: flex; flex-direction: column; }
+.cur-shade-now { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cur-shade-now[hidden] { display: none; }
+.cur-shade-now i { flex: none; width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08); }
+.cur-shade-name { min-width: 0; font-size: 14px; font-weight: 700; line-height: 1.4; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* 길면 한 줄 + … (2026-11-24 사용자 요청) */
+.tui .tui-stage .fc-rec-list .card .more-shades, .tui .tui-stage .fc-rec-list .card .more-shades:hover:not(:disabled) { all: unset; box-sizing: border-box; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-top: 10px; padding: 8px 0 2px; border-top: 1px solid #e2e2e5;
+  font-size: 13px; font-weight: 600; color: #6b6b70; }
+.cur-shade-now[hidden] + .more-shades { margin-top: 0 !important; border-top: 0 !important; }
+.tui .tui-stage .fc-rec-list .card .more-shades:active { color: #111; }
+.more-shades-n { margin-left: auto; font-weight: 600; color: #8a8a8e; }
+.tui .tui-stage .fc-rec-list .card .more-shades > span:first-child { color: #111; font-weight: 700; }
+.more-shades svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+/* 글씨 세 단계: 브랜드(작은 회색 + 제형 태그) · 제품명(굵게 두 줄) · 가격(가장 크게) */
+.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dl { padding-top: 4px; }
+.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(1) { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #8a8a8e; opacity: 1; }
+.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(2) { font-size: 17px; line-height: 1.32; letter-spacing: -0.02em; -webkit-line-clamp: 2; }
+.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(3) { margin-top: 4px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.card-fin { flex: none; font-size: 11px; font-weight: 600; line-height: 16px; color: #6b6b70; border: 1px solid #d6d6da; border-radius: 6px; padding: 0 6px; }
+/* 발라보기 버튼 (2026-11-24 사용자 선택 'C4 색 + C5 모양'): 카드보다 한 단계 진한 회색 #E4E4E7 · 알약 · 높이 46 · 테두리·그림자 없음 · 검정 글자 */
+.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) .actions button { height: 46px; padding: 0 8px; border-radius: 999px; background: #e4e4e7; color: #111; box-shadow: none;
+  font-size: 15px; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; justify-content: center; }
+.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) .actions button:active { background: #d6d6da; }
+html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) .actions button { background: rgba(255, 255, 255, 0.14); color: #fff; }
+html[data-theme="dark"] .tui .tui-stage .fc-rec-list .card .more-shades { color: rgba(255, 255, 255, 0.7); border-top-color: rgba(255, 255, 255, 0.15); }
+html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(1), html[data-theme="dark"] .card-fin { color: rgba(255, 255, 255, 0.65); border-color: rgba(255, 255, 255, 0.25); }
+
+/* ---------- 바른 카드 (2026-11-24 사용자 선택 'G1 빛 번짐 · 검정 그림자'): 검정 그림자로 살짝 떠오르고 버튼은 '지금 바르고 있어요' (palette.js markWorn) ---------- */
+.fc[data-mode="recs"] .fc-rec-list .card { transition: box-shadow .35s ease; }
+.fc[data-mode="recs"] .fc-rec-list .card.is-worn { z-index: 1;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 10px 34px -6px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 0, 0, 0.35); }
+html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card.is-worn { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 10px 34px -6px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 0, 0, 0.6); }

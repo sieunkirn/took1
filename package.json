@@ -11,6 +11,7 @@
     "import:oliveyoung": "node scripts/import-oliveyoung.js",
     "match:global": "node scripts/match-oliveyoung-global.js --apply",
     "import:shades": "node scripts/import-shades.js",
+    "finish:guess": "node scripts/apply-finish-guess.js",
     "shades:server": "node scripts/shades-server.js",
     "shades:build": "node scripts/build-shades-source.js",
     "shades:import-raw": "node scripts/import-shades-raw.js",
@@ -26,8 +27,7 @@
     "e2e:static": "node scripts/build-static.js && MODE=static node test/e2e.mjs"
   },
   "dependencies": {
-    "@mediapipe/tasks-vision": "0.10.14",
-    "@zxing/library": "0.21.3"
+    "@mediapipe/tasks-vision": "0.10.14"
   },
   "engines": {
     "node": ">=18"

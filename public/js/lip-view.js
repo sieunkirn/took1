@@ -6,7 +6,7 @@ import { applyLipColor, smoothLips } from './lip-engine.js';
 import { t as tr } from './i18n.js';
 
 // 제품 제형 → 가장 가까운 가상 텍스처
-export const FINISH_TO_TEXTURE = { glossy: 'glossy', matte: 'matte', satin: 'satin', velvet: 'matte' };
+export const FINISH_TO_TEXTURE = { glossy: 'glossy', matte: 'matte', satin: 'satin', velvet: 'matte', sheer: 'sheer', shimmer: 'shimmer' };
 
 /**
  * 입술 좌표(원본 프레임 기준 0~1)를 반전·회전한 캔버스 기준 좌표로 옮긴다.

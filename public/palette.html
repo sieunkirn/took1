@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="css/wireframe.css">
 <link rel="stylesheet" href="css/took-ui.css">
 <link rel="stylesheet" href="css/took-nfc.css">
-<link rel="stylesheet" href="css/took-take.css"><!-- 가져가기 (js/takeaway.js, 2026-11-19) --><!-- 세 번째 창: NFC 태그 (js/nfc-window.js, 2026-11-18) -->
+<!-- 세 번째 창: NFC 태그 (js/nfc-window.js, 2026-11-18) -->
 <link rel="manifest" href="manifest.webmanifest">
 <script src="js/touch-calib.js"></script>
 <script src="js/fullscreen-keep.js"></script><!-- 전체화면 고정: 빠져도 다음 터치에서 다시 -->
@@ -46,7 +46,7 @@
      프레임 안 = 립 매핑 카메라(lip.js), 프레임은 얼굴을 따라간다.
      아래 = 색 계열 동그라미 4개·농도 바·하단 시트(js/palette.js). 상태(data-mode): arc 4번 · recs 추천 결과(시트가 화면 절반, 카드 2열).
      5~9번(링·접힌 다이얼)과 10·11번 시트(농도·제품 찾기 버튼)는 2026-11-16 사용자 요청으로 뺐다.
-     예전 팔레트 기능(내 톤 추천·텍스처·농도·언어)은 이 디자인 안에 다시 넣었다 -->
+     예전 팔레트 기능(텍스처·농도)은 이 디자인 안에 다시 넣었다 -->
 <body data-layout="palette" data-nav="none" class="tui tui-fc palette-page">
 <main class="tui-stage fc" id="stage" data-mode="arc" data-dim="1">
   <!-- 로고는 첫 화면부터 그려지게 HTML 에 바로 둔다: 홈에서 날아온 로고가 이 자리에서 그대로 이어진다 (js/brand.js logoFull 과 같은 그림) -->
@@ -80,13 +80,6 @@
     </div>
   </section>
 
-  <!-- 나에게 어울리는 컬러: 카메라로 피부 톤을 재 추천 컬러 3개 (lip-look.js). 결과는 제목 아래 유리 상자.
-       '내 톤으로 추천받기' 버튼은 2026-11-20 하단 시트 맨 아래 긴 버튼으로 옮겼다 (아래 fc-sheet 안) -->
-  <div class="fc-matchbox" id="fc-matchbox">
-    <p id="match-result" aria-live="polite"></p>
-    <div class="fc-match-sw hidden" id="match-swatches" role="group" aria-label="추천 컬러" data-i18n-aria="pal.matchSwatches"></div>
-  </div>
-
   <!-- 컬러 다이얼 (canvas) + 유리 손잡이 (2026-11-17 사용자 요청): 원형 그래프(색 28칸 = 계열 4개 × 7칸)가 다이얼처럼 돌아가고,
        유리 손잡이(블러)와 가운데 로고 버튼은 제자리. 손잡이 아래 칸 색이 입술 색이 된다 -->
   <canvas class="fc-wheel" id="fc-wheel" role="slider" tabindex="0" data-i18n-aria="fc.dial" aria-label="컬러 다이얼"></canvas>
@@ -101,9 +94,6 @@
   <!-- 하단 시트: 가운데 로고 버튼을 누르면 바로 올라와 지금 색과 비슷한 추천 제품 (색이 바뀌면 목록도 바로 바뀐다).
        2026-11-16 사용자 요청으로 시트 안 농도 슬라이더·'이 컬러로 제품 찾기' 버튼은 뺐다 -->
   <section class="fc-sheet" id="fc-sheet" aria-label="추천 제품" data-i18n-aria="pal.result">
-    <!-- 내 톤으로 추천받기 (2026-11-20 사용자 요청: 시트를 열었을 때 왼쪽 위): 카메라로 피부 톤을 재 추천 컬러 3개 (lip-look.js #match).
-         결과는 버튼 오른쪽 상자(#fc-matchbox). 얼굴을 찾기 전엔 꺼져 있다 (lip-camera.js) -->
-    <button type="button" class="fc-tone" id="match" disabled data-i18n="pal.toneBtn">내 톤으로 추천받기</button>
     <div class="fc-results" id="fc-results">
       <div class="fc-rec-dots" id="fc-rec-dots" role="group" aria-label="추천 제품 색" data-i18n-aria="pal.result"></div>
       <p id="rec-status" class="fc-rec-status" aria-live="polite"></p>
@@ -111,16 +101,7 @@
     </div>
   </section>
   <button type="button" class="fc-sbtn" id="fc-sbtn" aria-expanded="false" data-i18n-aria="fc.sheet" aria-label="제품 찾기 열기"></button>
-  <!-- 왼쪽 세로 메뉴 (Figma 2026-IPD GP-홈화면 1653:469, 2026-11-22): 늘 펼친 4칸. 위 흰 알약 = 스캔(이 화면) · NFC(태그 안내, 옛 음성 자리),
-       아래 = 9점(알약 접기/펼치기, 접으면 9점만 남는다. 처음엔 접힌 채로 시작) · 집(처음으로). -->
-  <nav class="fc-menu folded" id="fc-menu" data-focus="scan" aria-label="메뉴" data-i18n-aria="fc.menu">
-    <span class="fc-menu-pair" aria-hidden="true"></span>
-    <span class="fc-menu-knob" aria-hidden="true"></span>
-    <button type="button" class="fc-mb fc-mb-scan is-focus" id="fc-mb-scan" tabindex="-1" aria-current="page" data-i18n-aria="fc.menuScan" aria-label="컬러 찾기 (지금 화면)"><svg viewBox="0 0 46.83 46.83" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M14.66 18.75Q14.66 15.09 18.71 15.09"/><path d="M31.22 18.75Q31.22 15.09 27.17 15.09"/><path d="M14.66 28.08Q14.66 31.75 18.71 31.75"/><path d="M31.22 28.08Q31.22 31.75 27.17 31.75"/></g></svg></button>
-    <button type="button" class="fc-mb fc-mb-nfc" id="fc-mb-nfc" tabindex="-1" data-i18n-aria="fc.menuNfc" aria-label="NFC 태그로 제품 올리기"><svg viewBox="0 0 52.96 52.96" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-linecap="round" transform="translate(14.4 14.9) scale(0.73)"><path d="M7.78 13.44C10.04 15.1 10.04 16.76 7.78 18.42" stroke-width="2.6"/><path d="M12.64 8.96C16.85 13.61 16.85 18.26 12.64 22.9" stroke-width="2.8"/><path d="M17.01 4.98C23.17 12.28 23.17 19.58 17.01 26.89" stroke-width="2.8"/><path d="M21.38 1.99C29.48 11.29 29.48 20.58 21.38 29.87" stroke-width="2.8"/></g></svg></button>
-    <button type="button" class="fc-mb fc-mb-grid" id="fc-mb-grid" data-i18n-aria="fc.menuToggle" aria-label="메뉴 펼치기/접기" aria-expanded="false" aria-controls="fc-menu"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="currentColor"><circle cx="20.36" cy="19.49" r="2.09"/><circle cx="27.94" cy="19.49" r="2.09"/><circle cx="35.53" cy="19.49" r="2.09"/><circle cx="20.36" cy="27.46" r="2.09"/><circle cx="27.94" cy="27.46" r="2.09"/><circle cx="35.53" cy="27.46" r="2.09"/><circle cx="20.36" cy="35.44" r="2.09"/><circle cx="27.94" cy="35.44" r="2.09"/><circle cx="35.53" cy="35.44" r="2.09"/></g></svg></button>
-    <a class="fc-mb fc-mb-home" id="fc-mb-home" tabindex="-1" href="index.html" data-i18n-aria="nav.reset" aria-label="took(초기화)"><svg viewBox="0 0 54.93 54.93" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.99 26.89L27.46 18.99L36.94 26.89"/><path d="M20.62 24.88V35.94H34.31V24.88"/><path d="M24.83 35.94V29.62H30.1V35.94"/></g></svg></a>
-  </nav>
+  <!-- 왼쪽 세로 메뉴(스캔·NFC·9점·집 알약)는 2026-11-26 사용자 요청으로 뺐다. 처음으로 = 위 로고, 추천 = 가운데 로고 버튼, NFC = 리더기에 대면 바로 -->
   <p id="nfc-hint" class="fc-toast" aria-live="polite"></p>
 
   <!-- lip.js 가 쓰는 텍스처 버튼 묶음 (화면에는 위 matte 알약 하나로 보인다)과 입술 색 진하기(저장된 값 그대로, 화면에는 없음) -->
