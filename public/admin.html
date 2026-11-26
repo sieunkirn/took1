@@ -15,6 +15,7 @@
      - 터치 범위 조정: 정전식 터치 필름을 꽂은 뒤 십자 5개를 눌러 터치 좌표를 화면에 맞춘다 (js/touch-calib.js)
      - 조정값은 이 기기 브라우저에 저장된다 (조정값 복사·초기화 버튼은 2026-11-26 사용자 요청으로 뺐다. touch-calib.js 의 BUILT_IN_CODE·exportCode 는 그대로)
      - 카메라 색 보정(2026-11-20, 11-26 컬러체커 흰색 칸) · 웹캠 연결 설정(11-22) · NFC 테스트(11-18) · 호수 검수(11-18)
+     - 화면 고정(2026-11-26): 안드로이드 앱(APK)에서만 제목 줄에 '화면 고정 켜기/끄기' 버튼이 보인다. 웹에서는 할 수 있는 일이 없어 그리지 않는다
      디자인 (2026-11-26 사용자 지정, docs/관리자-시안/시안2 D·E): 왼쪽 메뉴 + 대시보드.
        제목·날짜시간 알약 → 검은 큰 칸(터치 범위 조정) → 기능 점검 카드 2×2(색 보정·웹캠 카드 태그 = 지금 상태) → 터치 조정 정보
        - 왼쪽 메뉴와 기능 점검 카드는 이름·순서가 같다
@@ -53,6 +54,12 @@
   .ad-pill .reload { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; box-shadow: 0 0 0 1px var(--line); color: var(--ink); }
   .ad-pill .reload svg.i { width: 18px; height: 18px; }
   .ad-pill .reload:active { opacity: 0.7; }
+  /* 화면 고정 버튼 (2026-11-26, 안드로이드 앱에서만 보인다): 날짜 알약 왼쪽. 꺼짐 = 흰 알약 '켜기', 켜짐 = 검은 알약 '끄기' */
+  .ad-head-r { display: flex; align-items: center; gap: 10px; }
+  .ad .ad-lock { height: 46px; padding: 0 18px 0 14px; border-radius: 23px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; white-space: nowrap; --b: var(--paper); --c: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+  .ad .ad-lock.on { --b: var(--ink); --c: var(--paper); box-shadow: none; }
+  .ad .ad-lock svg.i { width: 18px; height: 18px; }
+  .ad .ad-lock:active { opacity: 0.7; }
 
   /* 검은 큰 칸: 조정 전에는 칸 전체가 버튼, 조정 뒤에는 '다시 조정'·'정확도 테스트' 두 버튼 */
   .ad .ad-hero { height: 600px; flex: none; width: 100%; border-radius: 28px; background: var(--ink); color: var(--paper); --b: var(--ink); --c: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; }
@@ -120,6 +127,8 @@
     check: '<circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 10"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
     mirror: '<rect x="6" y="2.5" width="12" height="16" rx="3"/><path d="M12 18.5v3M8.5 21.5h7"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>',
+    unlock: '<rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 7.7-1.5"/>',
   };
   const ic = (k) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
   const el = (tag, cls, html, onclick) => {
@@ -172,6 +181,29 @@
 
   // 카드 태그(색 보정 '측정 안 함'·웹캠 '자동 선택'·호수 검수 'shades 서버 필요 · 새 탭')는 2026-11-26 사용자 요청으로 뺐다 (버튼처럼 보여서)
 
+  // ── 화면 고정 (2026-11-26, 안드로이드 앱에서만) ──
+  // 앱이 window.TookKiosk 를 넣어 준다 (android/src/com/took/kiosk/MainActivity.java 의 KioskBridge). 웹(Chrome)에는 없어서 버튼을 그리지 않는다.
+  // 안드로이드 '앱 고정'을 켜고 끈다: 켜져 있는 동안 홈·최근 앱·알림 창이 막힌다.
+  // - 켜기를 누르면 시스템이 '앱을 고정할까요?' 창을 띄운다 → 확인하면 켜진다 (결과는 아래 0.7초마다 확인이 알아챈다)
+  // - 끄기: 이 버튼, 또는 뒤로 + 최근 앱 버튼을 함께 길게 누르기
+  const kiosk = () => window.TookKiosk || null;
+  const pinned = () => { try { return !!kiosk()?.isPinned(); } catch { return false; } };
+  let lockShown = false; // 지금 화면에 그려 둔 상태
+  const toggleLock = () => {
+    const k = kiosk();
+    if (!k) return;
+    const was = pinned();
+    try { if (was) k.unpin(); else k.pin(); } catch { return; }
+    // 최근 앱 화면에서 손으로 켠 고정은 앱이 풀 수 없다 → 손으로 푸는 법을 알려 준다
+    if (was) setTimeout(() => { if (pinned()) calib?.toast('이 버튼으로 풀 수 없는 고정이에요. 뒤로 + 최근 앱 버튼을 함께 길게 눌러 주세요'); }, 1500);
+  };
+  const lockButton = () => {
+    lockShown = pinned();
+    const b = el('button', 'ad-lock' + (lockShown ? ' on' : ''), ic(lockShown ? 'lock' : 'unlock') + (lockShown ? '화면 고정 끄기' : '화면 고정 켜기'), toggleLock);
+    b.setAttribute('aria-pressed', String(lockShown));
+    return b;
+  };
+
 
   const render = () => {
     const s = calib.status();
@@ -198,7 +230,11 @@
     const reload = el('button', 'reload', ic('refresh'), () => location.reload());
     reload.setAttribute('aria-label', '새로고침');
     pill.append(el('span', 'clock'), reload);
-    head.append(pill);
+    // 화면 고정 버튼은 앱에서만 (웹에서는 알약 하나만 있는 예전 모양 그대로)
+    const headRight = el('div', 'ad-head-r');
+    if (kiosk()) headRight.append(lockButton());
+    headRight.append(pill);
+    head.append(headRight);
 
     // 큰 칸
     let hero;
@@ -261,6 +297,8 @@
     c.textContent = `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
   };
   setInterval(tick, 5000);
+  // 화면 고정 상태가 바뀌면(시스템 창에서 확인·취소, 손으로 풀기) 버튼을 다시 그린다. 앱이 아니면 아무 일도 하지 않는다
+  setInterval(() => { if (calib && kiosk() && pinned() !== lockShown) render(); }, 700);
 
   if (calib) { calib.onChange(render); render(); }
   else box.textContent = '터치 조정 스크립트를 불러오지 못했어요';

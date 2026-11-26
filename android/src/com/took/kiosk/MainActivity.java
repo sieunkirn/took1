@@ -10,11 +10,15 @@ package com.took.kiosk;
 // - USB 웹캠 직접 연결 (2026-11-22): 갤탭이 USB 웹캠을 카메라로 등록하지 않아 getUserMedia 로 못 여는 문제 때문에
 //   UvcCamera 가 USB 로 웹캠을 직접 열고, 페이지는 window.TookUvc 와 /__uvc/frame 으로 영상을 받는다 (js/uvc-bridge.js)
 //   웹 주소에서도 USB 웹캠(window.TookUvc, /__uvc/frame)·카메라 권한은 그 주소에만 준다. 첫 화면을 못 열면(인터넷 끊김) 앱 안 화면으로 연다
+// - 화면 고정 (2026-11-26): 관리자 화면의 '화면 고정 켜기' 버튼이 안드로이드 '앱 고정'을 켠다 (window.TookKiosk, 아래 KioskBridge).
+//   켜면 홈·최근 앱·알림 창이 막힌다. 끄기는 같은 버튼, 또는 뒤로+최근 앱 버튼을 함께 길게 누르기
 // - 콘솔 로그는 logcat 태그 "took" 로 남는다 (adb logcat -s took). chrome://inspect 로 원격 디버깅도 된다.
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -30,6 +34,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebChromeClient;
@@ -48,6 +53,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
     static final String TAG = "took";
@@ -83,6 +90,8 @@ public class MainActivity extends Activity {
                 if ("need-camera".equals(type)) runOnUiThread(new Runnable() {
                     @Override public void run() { requestPermissions(new String[] { Manifest.permission.CAMERA }, REQ_UVC_CAMERA); }
                 });
+                else if ("usb-ask".equals(type)) unpinForUsbDialog();   // USB 허용 창을 띄우기 직전
+                else if ("usb-answer".equals(type)) repinSoon();        // 허용 창에서 답했다
             }
         });
         createWebView();
@@ -100,6 +109,7 @@ public class MainActivity extends Activity {
         web.setBackgroundColor(Color.BLACK);
         root.addView(web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         web.addJavascriptInterface(uvc.bridge, "TookUvc"); // 앱 안 화면(appassets)만 쓴다
+        web.addJavascriptInterface(new KioskBridge(this), "TookKiosk"); // 화면 고정 (관리자 화면 버튼)
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -192,6 +202,95 @@ public class MainActivity extends Activity {
                 hideSystemBars();
             }
         });
+    }
+
+    // ---------- 화면 고정 (앱 고정, 2026-11-26): 관리자 화면(admin.html)의 '화면 고정' 버튼이 부른다 (window.TookKiosk) ----------
+    // 안드로이드의 '앱 고정'을 앱이 직접 켠다. 켜져 있는 동안 홈·최근 앱·알림 창이 막혀 이 앱 밖으로 나갈 수 없다.
+    // - 켤 때마다 시스템이 '앱을 고정할까요?' 창을 한 번 띄운다 (기기 소유자로 등록한 앱이 아니라서 건너뛸 수 없다)
+    // - 끄기: 같은 버튼(unpin), 또는 뒤로+최근 앱 버튼을 함께 길게 누르기(제스처 방식이면 아래에서 쓸어 올려 멈추기)
+    // - 기기를 껐다 켜면 풀린다. 최근 앱 화면에서 손으로 켠 고정은 앱이 못 풀 수 있다 → 그때는 버튼 두 개 길게 누르기
+    boolean pinned() {
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        return am != null && am.getLockTaskModeState() != ActivityManager.LOCK_TASK_MODE_NONE;
+    }
+
+    // 지금 떠 있는 화면이 앱 안 화면일 때만 (앱 안에서 연 다른 사이트는 고정을 켜고 끌 수 없다)
+    boolean onOurPage() {
+        String url = web == null ? null : web.getUrl();
+        return url != null && ourHost(Uri.parse(url).getHost());
+    }
+
+    void setPinned(final boolean on) {
+        runOnUiThread(new Runnable() {
+            @Override public void run() {
+                if (!onOurPage()) return;
+                if (!on) repinAfterUsb = false; // 끄기를 눌렀으면 웹캠 허용 뒤 다시 걸지 않는다
+                if (pinned() == on) return;
+                try {
+                    // 고정 중에는 USB 허용 창이 못 뜬다 → 꽂힌 웹캠의 권한이 아직 없으면 그 창부터 띄우고, 답을 받은 뒤 고정한다 (repinSoon)
+                    if (on && uvc != null && uvc.askPermissionFirst()) { repinAfterUsb = true; return; }
+                    if (on) startLockTask(); else stopLockTask();
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "screen pin " + (on ? "on" : "off") + " failed: " + e);
+                }
+                hideSystemBars();
+            }
+        });
+    }
+
+    // ---------- 화면 고정과 USB 웹캠 허용 창 (2026-11-26) ----------
+    // 앱 고정이 켜져 있으면 안드로이드가 다른 화면을 못 띄우게 막아서 'USB 기기 접근 허용' 창도 뜨지 않는다 → 웹캠이 안 잡힌다.
+    // (고정을 켠 뒤 처음 거울을 열거나, 고정 중에 웹캠을 뽑았다 꽂으면 생긴다)
+    // 그래서 그 창을 띄워야 할 때만 고정을 잠깐 풀고, 허용·거부를 누르면 다시 건다 (다시 걸 때 시스템 확인 창이 한 번 더 뜬다)
+    volatile boolean repinAfterUsb;
+    int repinTries;
+
+    // UvcCamera 의 작업 스레드에서 부른다: 고정이 풀릴 때까지(최대 2초) 기다렸다가 돌아가야 허용 창이 뜬다
+    void unpinForUsbDialog() {
+        if (!pinned()) return;
+        final CountDownLatch done = new CountDownLatch(1);
+        runOnUiThread(new Runnable() {
+            @Override public void run() {
+                try {
+                    if (pinned()) { stopLockTask(); repinAfterUsb = true; Log.i(TAG, "screen pin off for USB permission dialog"); }
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "screen pin off for USB dialog failed: " + e);
+                }
+                done.countDown();
+            }
+        });
+        try { done.await(2, TimeUnit.SECONDS); } catch (InterruptedException ignored) { }
+    }
+
+    void repinSoon() {
+        if (!repinAfterUsb) return;
+        repinTries = 0;
+        root.postDelayed(repin, 600); // 허용 창이 닫힐 시간을 준다
+    }
+
+    final Runnable repin = new Runnable() {
+        @Override public void run() {
+            if (!repinAfterUsb) return;
+            if (pinned()) { repinAfterUsb = false; return; }
+            try {
+                startLockTask();
+                repinAfterUsb = false;
+                hideSystemBars();
+            } catch (RuntimeException e) {
+                // 허용 창이 아직 앞에 있으면 '앞에 있는 앱이 아님' 으로 실패한다 → 조금 뒤 다시 (5번까지)
+                if (++repinTries < 5) root.postDelayed(this, 600);
+                else { repinAfterUsb = false; Log.w(TAG, "screen pin back on failed: " + e); }
+            }
+        }
+    };
+
+    // WebView 가 리플렉션으로 부르므로 public 클래스·public 메서드여야 한다. 페이지는 다른 스레드에서 부른다 → 화면 일은 setPinned 가 넘긴다
+    public static class KioskBridge {
+        final MainActivity app;
+        KioskBridge(MainActivity app) { this.app = app; }
+        @JavascriptInterface public boolean isPinned() { return app.pinned(); }
+        @JavascriptInterface public void pin() { app.setPinned(true); }
+        @JavascriptInterface public void unpin() { app.setPinned(false); }
     }
 
     // ---------- 카메라 권한: 페이지가 요청하면 안드로이드 권한을 묻고 그 결과대로 허락한다 ----------
@@ -325,6 +424,9 @@ public class MainActivity extends Activity {
     @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
+        // 화면 고정 중에는 뒤로가기도 막는다 (2026-11-26 사용자 요청: 홈·최근 앱은 시스템이 막지만 뒤로가기는 앱이 받아서 앞 화면으로 돌아갔다).
+        // 고정을 손으로 푸는 '뒤로 + 최근 앱 길게 누르기'는 시스템이 처리하므로 그대로 된다
+        if (pinned()) return;
         if (customCallback != null) { customCallback.onCustomViewHidden(); return; }
         if (web != null && web.canGoBack()) { web.goBack(); return; }
         super.onBackPressed();

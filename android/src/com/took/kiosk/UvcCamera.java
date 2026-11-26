@@ -143,8 +143,11 @@ public class UvcCamera {
             if (ACTION_PERMISSION.equals(a)) {
                 boolean ok = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
                 note("USB 권한 " + (ok ? "허용" : "거부") + (d != null ? " · " + name(d) : ""));
-                if (ok) exec.execute(new Runnable() { @Override public void run() { openAndStream(); } });
-                else { state = "error"; lastError = "USB 권한이 거부됐어요. 웹캠을 다시 꽂고 '허용'을 눌러 주세요"; }
+                final boolean prime = primeOnly; // 화면 고정 전에 미리 받은 권한이면 영상은 켜지 않는다 (화면이 달라고 할 때 켠다)
+                primeOnly = false;
+                if (ok) { if (!prime) exec.execute(new Runnable() { @Override public void run() { openAndStream(); } }); }
+                else if (!prime) { state = "error"; lastError = "USB 권한이 거부됐어요. 웹캠을 다시 꽂고 '허용'을 눌러 주세요"; }
+                listener.onUsbEvent("usb-answer"); // 허용 창이 닫혔다 → 화면 고정을 풀어 뒀으면 다시 건다 (MainActivity)
             } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(a)) {
                 if (d != null && isUvc(d)) { note("USB 웹캠 꽂힘: " + name(d)); listener.onUsbEvent("attached"); }
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(a)) {
@@ -178,7 +181,27 @@ public class UvcCamera {
         else { state = "error"; lastError = "카메라 권한이 거부됐어요. 설정 → 애플리케이션 → 툭 → 권한에서 카메라를 허용해 주세요"; }
     }
 
+    // 화면 고정(앱 고정)이 켜져 있으면 안드로이드가 USB 허용 창을 띄우지 못한다 (2026-11-26, 고정 뒤 웹캠이 안 잡히던 원인).
+    // 그래서 ① 허용 창을 띄우기 직전에 "usb-ask" 를 보내 MainActivity 가 고정을 잠깐 풀게 하고, 답("usb-answer")이 오면 다시 건다
+    //        ② 고정을 켜기 전에 askPermissionFirst 로 권한을 미리 받는다
+    volatile boolean primeOnly; // ②로 띄운 허용 창: 허용돼도 영상은 켜지 않는다
+
+    /** 화면 고정을 켜기 직전에 부른다. 꽂힌 웹캠의 USB 권한이 아직 없으면 허용 창을 먼저 띄우고 true (답은 "usb-answer") */
+    boolean askPermissionFirst() {
+        UsbDevice d = findUvc();
+        if (d == null || um.hasPermission(d)) return false;
+        // 카메라 권한이 없으면 USB 허용 창이 뜨지 않고 바로 거부된다 → 여기서는 건너뛴다 (거울 화면에서 카메라 권한부터 묻는다)
+        if (Build.VERSION.SDK_INT >= 23 && ctx.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) return false;
+        primeOnly = true;
+        note("USB 권한 요청 (화면 고정 전에 미리): " + name(d));
+        Intent i = new Intent(ACTION_PERMISSION).setPackage(ctx.getPackageName());
+        int flags = Build.VERSION.SDK_INT >= 31 ? PendingIntent.FLAG_MUTABLE : 0;
+        um.requestPermission(d, PendingIntent.getBroadcast(ctx, 0, i, flags));
+        return true;
+    }
+
     void startInternal() {
+        primeOnly = false; // 화면이 영상을 달라고 했다: 허용되면 바로 켠다
         if (streaming && conn != null && curW > 0) {
             // 이미 켜져 있고 해상도가 크게 다르지 않으면 그대로 쓴다
             if (Math.abs(curW * curH - reqW * reqH) < reqW * reqH / 3) return;
@@ -199,6 +222,7 @@ public class UvcCamera {
         if (!um.hasPermission(d)) {
             state = "need-permission";
             note("USB 권한 요청: " + name(d));
+            listener.onUsbEvent("usb-ask"); // 화면 고정 중이면 여기서 고정이 풀릴 때까지 기다린다 (풀지 않으면 허용 창이 안 뜬다)
             Intent i = new Intent(ACTION_PERMISSION).setPackage(ctx.getPackageName());
             int flags = Build.VERSION.SDK_INT >= 31 ? PendingIntent.FLAG_MUTABLE : 0;
             um.requestPermission(d, PendingIntent.getBroadcast(ctx, 0, i, flags));
