@@ -215,11 +215,12 @@
   // 켜면 거울(palette.html)이 카메라 영상 대신 검정 바탕 위에 입술만 보여 준다 (js/lip-view.js lipsOnlyOn · js/lip-engine.js keepLipsOnly).
   // 값은 이 기기 브라우저에 남는다. 키는 js/lip-view.js 의 LIPS_ONLY_KEY 와 같아야 한다
   const LIPS_ONLY_KEY = 'took.lipsOnly';
-  const lipsOnly = () => { try { return localStorage.getItem(LIPS_ONLY_KEY) === '1'; } catch { return false; } };
+  // 기본은 켜짐 (2026-11-27 사용자 요청): 끈 기기만 '0' 을 저장한다
+  const lipsOnly = () => { try { return localStorage.getItem(LIPS_ONLY_KEY) !== '0'; } catch { return true; } };
   const lipsButton = () => {
     const on = lipsOnly();
     const b = el('button', 'ad-lips' + (on ? ' on' : ''), ic('lips') + (on ? '입술만 보기 켜짐' : '입술만 보기 꺼짐'), () => {
-      try { if (on) localStorage.removeItem(LIPS_ONLY_KEY); else localStorage.setItem(LIPS_ONLY_KEY, '1'); }
+      try { if (on) localStorage.setItem(LIPS_ONLY_KEY, '0'); else localStorage.removeItem(LIPS_ONLY_KEY); }
       catch { calib?.toast('이 브라우저에는 저장할 수 없어요'); return; }
       render();
     });

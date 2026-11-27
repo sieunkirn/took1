@@ -8,7 +8,8 @@ import { applyLipColor, keepLipsOnly, smoothLips } from './lip-engine.js';
 // 켜면 거울이 카메라 영상 대신 검정 바탕 위에 입술만 보여 준다. 기기에 계속 남도록 localStorage 에 둔다
 export const LIPS_ONLY_KEY = 'took.lipsOnly';
 export function lipsOnlyOn() {
-  try { return localStorage.getItem(LIPS_ONLY_KEY) === '1'; } catch { return false; }
+  // 기본은 켜짐 (2026-11-27 사용자 요청). 관리자에서 끈 기기만 '0' 이 저장돼 있다
+  try { return localStorage.getItem(LIPS_ONLY_KEY) !== '0'; } catch { return true; }
 }
 import { t as tr } from './i18n.js';
 
