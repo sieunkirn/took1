@@ -2,7 +2,14 @@
 // 영상 프레임 → #view 캔버스: 좌우 반전·회전해서 그린 뒤 같은 프레임의 입술 위치에 선택 색을 입힌다.
 // 캔버스 내부 해상도는 원본(영상) 해상도 그대로 두고, 화면 크기는 CSS 로만 맞춘다 (DPR 배율로 키우지 않는다: 성능)
 import { detectVideo } from './lip-tracker.js';
-import { applyLipColor, smoothLips } from './lip-engine.js';
+import { applyLipColor, keepLipsOnly, smoothLips } from './lip-engine.js';
+
+// 입술만 보기 (2026-11-27): 관리자 대시보드 '기능 점검' 줄 오른쪽 스위치가 이 값을 켜고 끈다 (admin.html 의 LIPS_ONLY_KEY 와 같은 키).
+// 켜면 거울이 카메라 영상 대신 검정 바탕 위에 입술만 보여 준다. 기기에 계속 남도록 localStorage 에 둔다
+export const LIPS_ONLY_KEY = 'took.lipsOnly';
+export function lipsOnlyOn() {
+  try { return localStorage.getItem(LIPS_ONLY_KEY) === '1'; } catch { return false; }
+}
 import { t as tr } from './i18n.js';
 
 // 제품 제형 → 가장 가까운 가상 텍스처
@@ -26,7 +33,7 @@ export function mapPoint(p, mirror, rotate) {
 /**
  * 한 프레임 그리기
  * @param {CanvasRenderingContext2D} ctx #view 캔버스
- * @param {{ src: CanvasImageSource, w: number, h: number, mirror?: boolean, rotate?: 0|90|180|270 }} frame 원본과 크기
+ * @param {{ src: CanvasImageSource, w: number, h: number, mirror?: boolean, rotate?: 0|90|180|270, lipsOnly?: boolean }} frame 원본과 크기 (lipsOnly: 검정 바탕에 입술만)
  * @param {object|null} lips 입술 윤곽 (lip-tracker.js detectVideo 결과)
  * @param {{ hex: string, texture: string, intensity: number }} look 입힐 색
  */
@@ -45,6 +52,7 @@ export function drawLipFrame(ctx, frame, lips, look) {
     ctx.drawImage(src, 0, 0, w, h);
     ctx.restore();
     if (lips) applyLipColor(ctx, lips, w, h, mirror, look);
+    if (frame.lipsOnly) keepLipsOnly(ctx, lips, w, h, mirror);
     return;
   }
   // 웹캠을 돌려 달았을 때: 가운데를 축으로 돌린 뒤 그린다
@@ -53,10 +61,10 @@ export function drawLipFrame(ctx, frame, lips, look) {
   if (mirror) ctx.scale(-1, 1);
   ctx.drawImage(src, -w / 2, -h / 2, w, h);
   ctx.restore();
-  if (lips) {
-    const map = (pts) => pts.map((p) => mapPoint(p, mirror, rotate));
-    applyLipColor(ctx, { outer: map(lips.outer), inner: map(lips.inner) }, cw, ch, false, look);
-  }
+  const map = (pts) => pts.map((p) => mapPoint(p, mirror, rotate));
+  const turned = lips && { outer: map(lips.outer), inner: map(lips.inner) };
+  if (turned) applyLipColor(ctx, turned, cw, ch, false, look);
+  if (frame.lipsOnly) keepLipsOnly(ctx, turned, cw, ch, false);
 }
 
 /** 새 카메라 프레임에서 입술을 찾고 이전 프레임과 부드럽게 잇는다 */

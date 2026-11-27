@@ -2,7 +2,7 @@
 import { $, el } from './common.js';
 import { sleep } from './dom.js';
 import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
-import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
+import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode, lipsOnlyOn } from './lip-view.js';
 import { getCamSettings, videoConstraints, isExternalCamera, widestZoom } from './camera-settings.js';
 import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
@@ -12,8 +12,10 @@ import { video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RA
 // 지금 보여 주는 원본: 카메라 영상
 export function sourceFrame() {
   const cam = getCamSettings();
-  return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: cam.mirror, rotate: cam.rotate };
+  return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: cam.mirror, rotate: cam.rotate, lipsOnly };
 }
+// 입술만 보기(관리자 스위치): 거울 화면을 열 때 한 번 읽는다. 관리자에서 바꾸고 돌아오면 화면이 새로 열리므로 그때 반영된다
+const lipsOnly = lipsOnlyOn();
 
 function render() {
   const f = sourceFrame();

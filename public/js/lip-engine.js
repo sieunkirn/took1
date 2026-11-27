@@ -157,6 +157,29 @@ export function applyLipColor(ctx, lips, w, h, mirror, look) {
   ctx.putImageData(img, x0, y0);
 }
 
+// ---------- 입술만 보기 (2026-11-27, 관리자 스위치) ----------
+// 이미 그린 화면(영상 + 입힌 색)에서 입술 윤곽 안쪽만 남기고 나머지는 검정으로 덮는다. 입 안(안쪽 윤곽)도 검정.
+// 가장자리는 색 입힐 때와 같은 폭으로 흐리게 해서 누끼 선이 딱딱하지 않게 한다. lips 가 없으면(얼굴 못 찾음) 전부 검정.
+export function keepLipsOnly(ctx, lips, w, h, mirror) {
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if (lips) {
+    const xs = lips.outer.map((p) => p.x * w);
+    const feather = Math.max(1, (Math.max(...xs) - Math.min(...xs)) / 60);
+    ctx.globalCompositeOperation = 'destination-in'; // 새로 칠한 곳(입술)에 있던 그림만 남는다
+    if (supportsCanvasFilter) ctx.filter = `blur(${feather}px)`;
+    ctx.fillStyle = '#000';
+    ctx.fill(lipsPath(lips, w, h, mirror), 'evenodd');
+    if (supportsCanvasFilter) ctx.filter = 'none';
+  } else {
+    ctx.clearRect(0, 0, w, h);
+  }
+  ctx.globalCompositeOperation = 'destination-over'; // 비워진 곳 뒤에 검정 레이어
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+}
+
 // 프레임 간 랜드마크 떨림을 줄이는 평활. 움직임이 크면 평활을 끄고 바로 따라가 위치가 밀리지 않게 한다.
 export function smoothLips(prev, next) {
   if (!prev || !next || prev.outer.length !== next.outer.length) return next;
