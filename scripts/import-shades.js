@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { hexToLab, roundLab, normalizeHex } from '../src/lib/color.js';
 import { familyFinder } from './import-oliveyoung.js';
+import { applyProductI18n } from './apply-product-i18n.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const SOURCE_FILE = join(root, 'src/data/shades.oliveyoung.json');
@@ -84,7 +85,7 @@ export function loadAndBuild() {
   const source = JSON.parse(readFileSync(SOURCE_FILE, 'utf8'));
   const products = JSON.parse(readFileSync(join(root, 'src/data/products.oliveyoung.json'), 'utf8'));
   const reference = JSON.parse(readFileSync(join(root, 'src/data/products.json'), 'utf8'));
-  return buildShades(source, products, reference);
+  return applyProductI18n(buildShades(source, products, reference)); // 호수 이름 영어·중국어·일본어 (src/data/product-i18n.json)
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

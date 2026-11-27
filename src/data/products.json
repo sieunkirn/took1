@@ -16,7 +16,19 @@
     "finish": "velvet",
     "price": 18000,
     "image_url": "",
-    "description": "선명한 정통 레드. 부드럽게 블러 처리되는 벨벳 마무리."
+    "description": "선명한 정통 레드. 부드럽게 블러 처리되는 벨벳 마무리.",
+    "brand_en": "MonoLab",
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "description_en": "A vivid true red. Velvet finish that blurs softly.",
+    "description_zh": "鲜明的正红色。柔和晕染的丝绒妆效。",
+    "description_ja": "鮮やかな正統派レッド。やわらかくぼかしたベルベット仕上げ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Velvet Lip Mousse",
+    "name_zh": "丝绒唇部慕斯",
+    "name_ja": "ベルベットリップムース"
   },
   {
     "id": "P002",
@@ -35,7 +47,19 @@
     "finish": "velvet",
     "price": 18000,
     "image_url": "",
-    "description": "붉은 벽돌빛 브라운 레드."
+    "description": "붉은 벽돌빛 브라운 레드.",
+    "brand_en": "MonoLab",
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "description_en": "A brick-toned brown red.",
+    "description_zh": "红砖色调的棕红色。",
+    "description_ja": "赤レンガ色のブラウンレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Velvet Lip Mousse",
+    "name_zh": "丝绒唇部慕斯",
+    "name_ja": "ベルベットリップムース"
   },
   {
     "id": "P003",
@@ -54,7 +78,19 @@
     "finish": "velvet",
     "price": 18000,
     "image_url": "",
-    "description": "차분한 모브 톤 로즈."
+    "description": "차분한 모브 톤 로즈.",
+    "brand_en": "MonoLab",
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "description_en": "A calm mauve-toned rose.",
+    "description_zh": "沉稳的藕紫调玫瑰色。",
+    "description_ja": "落ち着いたモーブトーンのローズ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Velvet Lip Mousse",
+    "name_zh": "丝绒唇部慕斯",
+    "name_ja": "ベルベットリップムース"
   },
   {
     "id": "P004",
@@ -73,7 +109,19 @@
     "finish": "glossy",
     "price": 15000,
     "image_url": "",
-    "description": "투명하게 비치는 연한 핑크 오일."
+    "description": "투명하게 비치는 연한 핑크 오일.",
+    "brand_en": "MonoLab",
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "description_en": "A sheer, light pink oil.",
+    "description_zh": "清透的浅粉色唇油。",
+    "description_ja": "透けるように色づく淡いピンクのオイル。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Glow Lip Oil",
+    "name_zh": "水光唇油",
+    "name_ja": "グロウリップオイル"
   },
   {
     "id": "P005",
@@ -92,7 +140,19 @@
     "finish": "glossy",
     "price": 15000,
     "image_url": "",
-    "description": "촉촉한 광택의 체리 레드."
+    "description": "촉촉한 광택의 체리 레드.",
+    "brand_en": "MonoLab",
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "description_en": "A cherry red with a dewy shine.",
+    "description_zh": "水润光泽的樱桃红。",
+    "description_ja": "うるおいのあるツヤのチェリーレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Glow Lip Oil",
+    "name_zh": "水光唇油",
+    "name_ja": "グロウリップオイル"
   },
   {
     "id": "P006",
@@ -111,7 +171,19 @@
     "finish": "glossy",
     "price": 9900,
     "image_url": "",
-    "description": "물처럼 가볍게 발리는 코랄 틴트."
+    "description": "물처럼 가볍게 발리는 코랄 틴트.",
+    "brand_en": "Ripple",
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "description_en": "A coral tint that glides on as light as water.",
+    "description_zh": "如水般轻盈上唇的珊瑚色唇釉。",
+    "description_ja": "水のように軽く塗れるコーラルティント。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Water Tint",
+    "name_zh": "水感唇釉",
+    "name_ja": "ウォーターティント"
   },
   {
     "id": "P007",
@@ -130,7 +202,19 @@
     "finish": "glossy",
     "price": 9900,
     "image_url": "",
-    "description": "생기 있는 비비드 핑크."
+    "description": "생기 있는 비비드 핑크.",
+    "brand_en": "Ripple",
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "description_en": "A lively vivid pink.",
+    "description_zh": "充满生气的亮粉色。",
+    "description_ja": "いきいきとしたビビッドピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Water Tint",
+    "name_zh": "水感唇釉",
+    "name_ja": "ウォーターティント"
   },
   {
     "id": "P008",
@@ -149,7 +233,19 @@
     "finish": "glossy",
     "price": 9900,
     "image_url": "",
-    "description": "진한 베리 계열 글로시 틴트."
+    "description": "진한 베리 계열 글로시 틴트.",
+    "brand_en": "Ripple",
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "description_en": "A deep berry glossy tint.",
+    "description_zh": "浓郁的莓果色系亮泽唇釉。",
+    "description_ja": "濃いベリー系のグロッシーティント。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Water Tint",
+    "name_zh": "水感唇釉",
+    "name_ja": "ウォーターティント"
   },
   {
     "id": "P009",
@@ -168,7 +264,19 @@
     "finish": "matte",
     "price": 11000,
     "image_url": "",
-    "description": "데일리용 누드 피치."
+    "description": "데일리용 누드 피치.",
+    "brand_en": "Ripple",
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "description_en": "A nude peach for everyday wear.",
+    "description_zh": "适合日常的裸桃色。",
+    "description_ja": "デイリー使いのヌードピーチ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Blur Matte Tint",
+    "name_zh": "柔雾哑光唇釉",
+    "name_ja": "ブラーマットティント"
   },
   {
     "id": "P010",
@@ -187,7 +295,19 @@
     "finish": "matte",
     "price": 11000,
     "image_url": "",
-    "description": "붉은 기 도는 칠리 오렌지."
+    "description": "붉은 기 도는 칠리 오렌지.",
+    "brand_en": "Ripple",
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "description_en": "A chili orange with a hint of red.",
+    "description_zh": "带红调的辣椒橘色。",
+    "description_ja": "赤みのあるチリオレンジ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Blur Matte Tint",
+    "name_zh": "柔雾哑光唇釉",
+    "name_ja": "ブラーマットティント"
   },
   {
     "id": "P011",
@@ -206,7 +326,19 @@
     "finish": "matte",
     "price": 11000,
     "image_url": "",
-    "description": "깊은 플럼 와인 컬러."
+    "description": "깊은 플럼 와인 컬러.",
+    "brand_en": "Ripple",
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "description_en": "A deep plum wine color.",
+    "description_zh": "深邃的梅子酒红色。",
+    "description_ja": "深みのあるプラムワインカラー。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Blur Matte Tint",
+    "name_zh": "柔雾哑光唇釉",
+    "name_ja": "ブラーマットティント"
   },
   {
     "id": "P012",
@@ -225,7 +357,19 @@
     "finish": "satin",
     "price": 32000,
     "image_url": "",
-    "description": "입술 본연의 색에 가까운 누드."
+    "description": "입술 본연의 색에 가까운 누드.",
+    "brand_en": "On the Lip",
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "description_en": "A nude close to your natural lip color.",
+    "description_zh": "接近嘴唇原本颜色的裸色。",
+    "description_ja": "唇本来の色に近いヌード。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Satin Lipstick",
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "P013",
@@ -244,7 +388,19 @@
     "finish": "satin",
     "price": 32000,
     "image_url": "",
-    "description": "우디한 로즈 브라운."
+    "description": "우디한 로즈 브라운.",
+    "brand_en": "On the Lip",
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "description_en": "A woody rose brown.",
+    "description_zh": "木质调的玫瑰棕。",
+    "description_ja": "ウッディなローズブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Satin Lipstick",
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "P014",
@@ -263,7 +419,19 @@
     "finish": "satin",
     "price": 32000,
     "image_url": "",
-    "description": "은은한 윤기의 클래식 레드."
+    "description": "은은한 윤기의 클래식 레드.",
+    "brand_en": "On the Lip",
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "description_en": "A classic red with a subtle sheen.",
+    "description_zh": "带柔和光泽的经典红。",
+    "description_ja": "ほのかなツヤのクラシックレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Satin Lipstick",
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "P015",
@@ -282,7 +450,19 @@
     "finish": "satin",
     "price": 32000,
     "image_url": "",
-    "description": "깊고 어두운 버건디."
+    "description": "깊고 어두운 버건디.",
+    "brand_en": "On the Lip",
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "description_en": "A deep, dark burgundy.",
+    "description_zh": "深沉浓暗的勃艮第红。",
+    "description_ja": "深く暗いバーガンディ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Satin Lipstick",
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "P016",
@@ -301,7 +481,19 @@
     "finish": "matte",
     "price": 34000,
     "image_url": "",
-    "description": "따뜻한 테라코타 브라운."
+    "description": "따뜻한 테라코타 브라운.",
+    "brand_en": "On the Lip",
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "description_en": "A warm terracotta brown.",
+    "description_zh": "温暖的陶土棕。",
+    "description_ja": "あたたかみのあるテラコッタブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Matte Lipstick",
+    "name_zh": "哑光口红",
+    "name_ja": "マットリップスティック"
   },
   {
     "id": "P017",
@@ -320,7 +512,19 @@
     "finish": "matte",
     "price": 34000,
     "image_url": "",
-    "description": "핑크 기가 도는 누드."
+    "description": "핑크 기가 도는 누드.",
+    "brand_en": "On the Lip",
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "description_en": "A nude with a hint of pink.",
+    "description_zh": "带粉调的裸色。",
+    "description_ja": "ピンクみのあるヌード。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Matte Lipstick",
+    "name_zh": "哑光口红",
+    "name_ja": "マットリップスティック"
   },
   {
     "id": "P018",
@@ -339,7 +543,19 @@
     "finish": "glossy",
     "price": 7000,
     "image_url": "",
-    "description": "맑은 피치 코랄 글로스."
+    "description": "맑은 피치 코랄 글로스.",
+    "brand_en": "Dailytone",
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "description_en": "A clear peach coral gloss.",
+    "description_zh": "清透的蜜桃珊瑚色唇蜜。",
+    "description_ja": "澄んだピーチコーラルのグロス。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Jelly Gloss",
+    "name_zh": "果冻唇蜜",
+    "name_ja": "ジェリーグロス"
   },
   {
     "id": "P019",
@@ -358,7 +574,19 @@
     "finish": "glossy",
     "price": 7000,
     "image_url": "",
-    "description": "라즈베리 색 젤리 글로스."
+    "description": "라즈베리 색 젤리 글로스.",
+    "brand_en": "Dailytone",
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "description_en": "A raspberry-colored jelly gloss.",
+    "description_zh": "树莓色果冻唇蜜。",
+    "description_ja": "ラズベリー色のジェリーグロス。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Jelly Gloss",
+    "name_zh": "果冻唇蜜",
+    "name_ja": "ジェリーグロス"
   },
   {
     "id": "P020",
@@ -377,7 +605,19 @@
     "finish": "glossy",
     "price": 7000,
     "image_url": "",
-    "description": "쿨톤 라벤더 핑크."
+    "description": "쿨톤 라벤더 핑크.",
+    "brand_en": "Dailytone",
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "description_en": "A cool-toned lavender pink.",
+    "description_zh": "冷调薰衣草粉。",
+    "description_ja": "クールトーンのラベンダーピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Jelly Gloss",
+    "name_zh": "果冻唇蜜",
+    "name_ja": "ジェリーグロス"
   },
   {
     "id": "P021",
@@ -396,7 +636,19 @@
     "finish": "matte",
     "price": 8500,
     "image_url": "",
-    "description": "말린 장미 MLBB 컬러."
+    "description": "말린 장미 MLBB 컬러.",
+    "brand_en": "Dailytone",
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "description_en": "A dried rose MLBB color.",
+    "description_zh": "干燥玫瑰MLBB色。",
+    "description_ja": "ドライローズのMLBBカラー。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Soft Matte",
+    "name_zh": "柔雾哑光唇膏",
+    "name_ja": "ソフトマット"
   },
   {
     "id": "P022",
@@ -415,7 +667,19 @@
     "finish": "matte",
     "price": 8500,
     "image_url": "",
-    "description": "시나몬 브라운."
+    "description": "시나몬 브라운.",
+    "brand_en": "Dailytone",
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "description_en": "Cinnamon brown.",
+    "description_zh": "肉桂棕。",
+    "description_ja": "シナモンブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Soft Matte",
+    "name_zh": "柔雾哑光唇膏",
+    "name_ja": "ソフトマット"
   },
   {
     "id": "P023",
@@ -434,7 +698,19 @@
     "finish": "satin",
     "price": 22000,
     "image_url": "",
-    "description": "보습감 있는 코랄 컬러 밤."
+    "description": "보습감 있는 코랄 컬러 밤.",
+    "brand_en": "Nova Beauty",
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "description_en": "A moisturizing coral color balm.",
+    "description_zh": "滋润的珊瑚色润唇膏。",
+    "description_ja": "保湿感のあるコーラルカラーバーム。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Silk Lip Balm",
+    "name_zh": "丝滑润唇膏",
+    "name_ja": "シルクリップバーム"
   },
   {
     "id": "P024",
@@ -453,7 +729,19 @@
     "finish": "satin",
     "price": 22000,
     "image_url": "",
-    "description": "무화과빛 플럼."
+    "description": "무화과빛 플럼.",
+    "brand_en": "Nova Beauty",
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "description_en": "A fig-toned plum.",
+    "description_zh": "无花果色调的梅子色。",
+    "description_ja": "いちじく色のプラム。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Silk Lip Balm",
+    "name_zh": "丝滑润唇膏",
+    "name_ja": "シルクリップバーム"
   },
   {
     "id": "P025",
@@ -472,7 +760,19 @@
     "finish": "satin",
     "price": 22000,
     "image_url": "",
-    "description": "선셋 오렌지."
+    "description": "선셋 오렌지.",
+    "brand_en": "Nova Beauty",
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "description_en": "Sunset orange.",
+    "description_zh": "日落橘。",
+    "description_ja": "サンセットオレンジ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Silk Lip Balm",
+    "name_zh": "丝滑润唇膏",
+    "name_ja": "シルクリップバーム"
   },
   {
     "id": "P026",
@@ -491,7 +791,19 @@
     "finish": "velvet",
     "price": 16000,
     "image_url": "",
-    "description": "포근한 벨벳 핑크."
+    "description": "포근한 벨벳 핑크.",
+    "brand_en": "Nova Beauty",
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "description_en": "A cozy velvet pink.",
+    "description_zh": "柔暖的丝绒粉。",
+    "description_ja": "ふんわりとしたベルベットピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Velvet Tint",
+    "name_zh": "丝绒唇釉",
+    "name_ja": "ベルベットティント"
   },
   {
     "id": "P027",
@@ -510,6 +822,18 @@
     "finish": "velvet",
     "price": 16000,
     "image_url": "",
-    "description": "다크 체리 버건디."
+    "description": "다크 체리 버건디.",
+    "brand_en": "Nova Beauty",
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "description_en": "A dark cherry burgundy.",
+    "description_zh": "黑樱桃勃艮第红。",
+    "description_ja": "ダークチェリーバーガンディ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_en": "Velvet Tint",
+    "name_zh": "丝绒唇釉",
+    "name_ja": "ベルベットティント"
   }
 ]

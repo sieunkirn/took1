@@ -25,7 +25,19 @@
     "image_url": "",
     "description": "선명한 정통 레드. 부드럽게 블러 처리되는 벨벳 마무리.",
     "stock": 12,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "shade_color_zh": "招牌红",
+    "shade_color_ja": "シグネチャーレッド",
+    "description_en": "A vivid true red. Velvet finish that blurs softly.",
+    "description_zh": "鲜明的正红色。柔和晕染的丝绒妆效。",
+    "description_ja": "鮮やかな正統派レッド。やわらかくぼかしたベルベット仕上げ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝绒唇部慕斯",
+    "name_ja": "ベルベットリップムース"
   },
   {
     "id": "D002",
@@ -64,7 +76,19 @@
         "name_en": "Test Store C",
         "stock": 1
       }
-    ]
+    ],
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "shade_color_zh": "玫瑰砖红",
+    "shade_color_ja": "ロージーブリック",
+    "description_en": "A brick-toned brown red.",
+    "description_zh": "红砖色调的棕红色。",
+    "description_ja": "赤レンガ色のブラウンレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝绒唇部慕斯",
+    "name_ja": "ベルベットリップムース"
   },
   {
     "id": "D003",
@@ -92,7 +116,19 @@
     "image_url": "",
     "description": "차분한 모브 톤 로즈.",
     "stock": 7,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "shade_color_zh": "藕紫玫瑰",
+    "shade_color_ja": "モーヴローズ",
+    "description_en": "A calm mauve-toned rose.",
+    "description_zh": "沉稳的藕紫调玫瑰色。",
+    "description_ja": "落ち着いたモーブトーンのローズ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝绒唇部慕斯",
+    "name_ja": "ベルベットリップムース"
   },
   {
     "id": "D004",
@@ -120,7 +156,19 @@
     "image_url": "",
     "description": "투명하게 비치는 연한 핑크 오일.",
     "stock": 1,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "shade_color_zh": "清透粉",
+    "shade_color_ja": "クリアピンク",
+    "description_en": "A sheer, light pink oil.",
+    "description_zh": "清透的浅粉色唇油。",
+    "description_ja": "透けるように色づく淡いピンクのオイル。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "水光唇油",
+    "name_ja": "グロウリップオイル"
   },
   {
     "id": "D005",
@@ -148,7 +196,19 @@
     "image_url": "",
     "description": "촉촉한 광택의 체리 레드.",
     "stock": 9,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "MonoLab",
+    "brand_ja": "モノラボ",
+    "shade_color_zh": "樱桃汁",
+    "shade_color_ja": "チェリージュース",
+    "description_en": "A cherry red with a dewy shine.",
+    "description_zh": "水润光泽的樱桃红。",
+    "description_ja": "うるおいのあるツヤのチェリーレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "水光唇油",
+    "name_ja": "グロウリップオイル"
   },
   {
     "id": "D006",
@@ -176,7 +236,19 @@
     "image_url": "",
     "description": "물처럼 가볍게 발리는 코랄 틴트.",
     "stock": 5,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "shade_color_zh": "珊瑚海滩",
+    "shade_color_ja": "コーラルビーチ",
+    "description_en": "A coral tint that glides on as light as water.",
+    "description_zh": "如水般轻盈上唇的珊瑚色唇釉。",
+    "description_ja": "水のように軽く塗れるコーラルティント。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "水感唇釉",
+    "name_ja": "ウォーターティント"
   },
   {
     "id": "D007",
@@ -204,7 +276,19 @@
     "image_url": "",
     "description": "생기 있는 비비드 핑크.",
     "stock": 12,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "shade_color_zh": "粉色苏打",
+    "shade_color_ja": "ピンクソーダ",
+    "description_en": "A lively vivid pink.",
+    "description_zh": "充满生气的亮粉色。",
+    "description_ja": "いきいきとしたビビッドピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "水感唇釉",
+    "name_ja": "ウォーターティント"
   },
   {
     "id": "D008",
@@ -243,7 +327,19 @@
         "name_en": "Test Store C",
         "stock": 1
       }
-    ]
+    ],
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "shade_color_zh": "莓果宾治",
+    "shade_color_ja": "ベリーパンチ",
+    "description_en": "A deep berry glossy tint.",
+    "description_zh": "浓郁的莓果色系亮泽唇釉。",
+    "description_ja": "濃いベリー系のグロッシーティント。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "水感唇釉",
+    "name_ja": "ウォーターティント"
   },
   {
     "id": "D009",
@@ -271,7 +367,19 @@
     "image_url": "",
     "description": "데일리용 누드 피치.",
     "stock": 7,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "shade_color_zh": "裸蜜桃",
+    "shade_color_ja": "ヌードピーチ",
+    "description_en": "A nude peach for everyday wear.",
+    "description_zh": "适合日常的裸桃色。",
+    "description_ja": "デイリー使いのヌードピーチ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "柔雾哑光唇釉",
+    "name_ja": "ブラーマットティント"
   },
   {
     "id": "D010",
@@ -299,7 +407,19 @@
     "image_url": "",
     "description": "붉은 기 도는 칠리 오렌지.",
     "stock": 1,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "shade_color_zh": "辣椒橙",
+    "shade_color_ja": "チリオレンジ",
+    "description_en": "A chili orange with a hint of red.",
+    "description_zh": "带红调的辣椒橘色。",
+    "description_ja": "赤みのあるチリオレンジ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "柔雾哑光唇釉",
+    "name_ja": "ブラーマットティント"
   },
   {
     "id": "D011",
@@ -327,7 +447,19 @@
     "image_url": "",
     "description": "깊은 플럼 와인 컬러.",
     "stock": 9,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Ripple",
+    "brand_ja": "リップル",
+    "shade_color_zh": "梅子酒",
+    "shade_color_ja": "プラムワイン",
+    "description_en": "A deep plum wine color.",
+    "description_zh": "深邃的梅子酒红色。",
+    "description_ja": "深みのあるプラムワインカラー。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "柔雾哑光唇釉",
+    "name_ja": "ブラーマットティント"
   },
   {
     "id": "D012",
@@ -355,7 +487,19 @@
     "image_url": "",
     "description": "입술 본연의 색에 가까운 누드.",
     "stock": 5,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "shade_color_zh": "素颜裸色",
+    "shade_color_ja": "ベアヌード",
+    "description_en": "A nude close to your natural lip color.",
+    "description_zh": "接近嘴唇原本颜色的裸色。",
+    "description_ja": "唇本来の色に近いヌード。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "D013",
@@ -383,7 +527,19 @@
     "image_url": "",
     "description": "우디한 로즈 브라운.",
     "stock": 12,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "shade_color_zh": "玫瑰木",
+    "shade_color_ja": "ローズウッド",
+    "description_en": "A woody rose brown.",
+    "description_zh": "木质调的玫瑰棕。",
+    "description_ja": "ウッディなローズブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "D014",
@@ -422,7 +578,19 @@
         "name_en": "Test Store C",
         "stock": 1
       }
-    ]
+    ],
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "shade_color_zh": "经典红",
+    "shade_color_ja": "クラシックレッド",
+    "description_en": "A classic red with a subtle sheen.",
+    "description_zh": "带柔和光泽的经典红。",
+    "description_ja": "ほのかなツヤのクラシックレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "D015",
@@ -450,7 +618,19 @@
     "image_url": "",
     "description": "깊고 어두운 버건디.",
     "stock": 7,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "shade_color_zh": "勃艮第之夜",
+    "shade_color_ja": "バーガンディナイト",
+    "description_en": "A deep, dark burgundy.",
+    "description_zh": "深沉浓暗的勃艮第红。",
+    "description_ja": "深く暗いバーガンディ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "缎光口红",
+    "name_ja": "サテンリップスティック"
   },
   {
     "id": "D016",
@@ -478,7 +658,19 @@
     "image_url": "",
     "description": "따뜻한 테라코타 브라운.",
     "stock": 1,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "shade_color_zh": "陶土色",
+    "shade_color_ja": "テラコッタ",
+    "description_en": "A warm terracotta brown.",
+    "description_zh": "温暖的陶土棕。",
+    "description_ja": "あたたかみのあるテラコッタブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "哑光口红",
+    "name_ja": "マットリップスティック"
   },
   {
     "id": "D017",
@@ -506,7 +698,19 @@
     "image_url": "",
     "description": "핑크 기가 도는 누드.",
     "stock": 9,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "On the Lip",
+    "brand_ja": "オンザリップ",
+    "shade_color_zh": "粉裸色",
+    "shade_color_ja": "ピンクヌード",
+    "description_en": "A nude with a hint of pink.",
+    "description_zh": "带粉调的裸色。",
+    "description_ja": "ピンクみのあるヌード。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "哑光口红",
+    "name_ja": "マットリップスティック"
   },
   {
     "id": "D018",
@@ -534,7 +738,19 @@
     "image_url": "",
     "description": "맑은 피치 코랄 글로스.",
     "stock": 5,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "蜜桃果冻",
+    "shade_color_ja": "ピーチゼリー",
+    "description_en": "A clear peach coral gloss.",
+    "description_zh": "清透的蜜桃珊瑚色唇蜜。",
+    "description_ja": "澄んだピーチコーラルのグロス。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "果冻唇蜜",
+    "name_ja": "ジェリーグロス"
   },
   {
     "id": "D019",
@@ -562,7 +778,19 @@
     "image_url": "",
     "description": "라즈베리 색 젤리 글로스.",
     "stock": 12,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "树莓",
+    "shade_color_ja": "ラズベリー",
+    "description_en": "A raspberry-colored jelly gloss.",
+    "description_zh": "树莓色果冻唇蜜。",
+    "description_ja": "ラズベリー色のジェリーグロス。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "果冻唇蜜",
+    "name_ja": "ジェリーグロス"
   },
   {
     "id": "D020",
@@ -590,7 +818,19 @@
     "image_url": "",
     "description": "쿨톤 라벤더 핑크.",
     "stock": 0,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "薰衣草粉",
+    "shade_color_ja": "ラベンダーピンク",
+    "description_en": "A cool-toned lavender pink.",
+    "description_zh": "冷调薰衣草粉。",
+    "description_ja": "クールトーンのラベンダーピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "果冻唇蜜",
+    "name_ja": "ジェリーグロス"
   },
   {
     "id": "D021",
@@ -618,7 +858,19 @@
     "image_url": "",
     "description": "말린 장미 MLBB 컬러.",
     "stock": 7,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "干枯玫瑰",
+    "shade_color_ja": "ドライローズ",
+    "description_en": "A dried rose MLBB color.",
+    "description_zh": "干燥玫瑰MLBB色。",
+    "description_ja": "ドライローズのMLBBカラー。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "柔雾哑光唇膏",
+    "name_ja": "ソフトマット"
   },
   {
     "id": "D022",
@@ -646,7 +898,19 @@
     "image_url": "",
     "description": "시나몬 브라운.",
     "stock": 1,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "肉桂棕",
+    "shade_color_ja": "シナモンブラウン",
+    "description_en": "Cinnamon brown.",
+    "description_zh": "肉桂棕。",
+    "description_ja": "シナモンブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "柔雾哑光唇膏",
+    "name_ja": "ソフトマット"
   },
   {
     "id": "D023",
@@ -674,7 +938,19 @@
     "image_url": "",
     "description": "보습감 있는 코랄 컬러 밤.",
     "stock": 9,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "shade_color_zh": "珊瑚花开",
+    "shade_color_ja": "コーラルブロッサム",
+    "description_en": "A moisturizing coral color balm.",
+    "description_zh": "滋润的珊瑚色润唇膏。",
+    "description_ja": "保湿感のあるコーラルカラーバーム。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝滑润唇膏",
+    "name_ja": "シルクリップバーム"
   },
   {
     "id": "D024",
@@ -702,7 +978,19 @@
     "image_url": "",
     "description": "무화과빛 플럼.",
     "stock": 5,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "shade_color_zh": "无花果李子",
+    "shade_color_ja": "フィグプラム",
+    "description_en": "A fig-toned plum.",
+    "description_zh": "无花果色调的梅子色。",
+    "description_ja": "いちじく色のプラム。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝滑润唇膏",
+    "name_ja": "シルクリップバーム"
   },
   {
     "id": "D025",
@@ -730,7 +1018,19 @@
     "image_url": "",
     "description": "선셋 오렌지.",
     "stock": 12,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "shade_color_zh": "橙色日落",
+    "shade_color_ja": "オレンジサンセット",
+    "description_en": "Sunset orange.",
+    "description_zh": "日落橘。",
+    "description_ja": "サンセットオレンジ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝滑润唇膏",
+    "name_ja": "シルクリップバーム"
   },
   {
     "id": "D026",
@@ -758,7 +1058,19 @@
     "image_url": "",
     "description": "포근한 벨벳 핑크.",
     "stock": 3,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "shade_color_zh": "粉色丝绒",
+    "shade_color_ja": "ピンクベルベット",
+    "description_en": "A cozy velvet pink.",
+    "description_zh": "柔暖的丝绒粉。",
+    "description_ja": "ふんわりとしたベルベットピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝绒唇釉",
+    "name_ja": "ベルベットティント"
   },
   {
     "id": "D027",
@@ -786,7 +1098,19 @@
     "image_url": "",
     "description": "다크 체리 버건디.",
     "stock": 7,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Nova Beauty",
+    "brand_ja": "ノバビューティー",
+    "shade_color_zh": "黑樱桃",
+    "shade_color_ja": "ダークチェリー",
+    "description_en": "A dark cherry burgundy.",
+    "description_zh": "黑樱桃勃艮第红。",
+    "description_ja": "ダークチェリーバーガンディ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "丝绒唇釉",
+    "name_ja": "ベルベットティント"
   },
   {
     "id": "D101",
@@ -814,7 +1138,19 @@
     "image_url": "",
     "description": "맑고 연한 피치.",
     "stock": 6,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "宝贝蜜桃",
+    "shade_color_ja": "ベビーピーチ",
+    "description_en": "A clear, light peach.",
+    "description_zh": "清透浅淡的蜜桃色。",
+    "description_ja": "澄んだ淡いピーチ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D102",
@@ -842,7 +1178,19 @@
     "image_url": "",
     "description": "우유를 섞은 듯 부드러운 살구색.",
     "stock": 2,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "杏子牛奶",
+    "shade_color_ja": "あんずミルク",
+    "description_en": "A soft apricot, as if blended with milk.",
+    "description_zh": "仿佛掺了牛奶般柔和的杏色。",
+    "description_ja": "ミルクを混ぜたようなやわらかいアプリコット。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D103",
@@ -870,7 +1218,19 @@
     "image_url": "",
     "description": "상큼한 자몽빛 코랄.",
     "stock": 11,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "西柚气泡饮",
+    "shade_color_ja": "グレープフルーツエード",
+    "description_en": "A fresh grapefruit-toned coral.",
+    "description_zh": "清新的西柚色珊瑚。",
+    "description_ja": "さわやかなグレープフルーツ色のコーラル。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D104",
@@ -898,7 +1258,19 @@
     "image_url": "",
     "description": "또렷한 귤빛 오렌지.",
     "stock": 4,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "橘子皮",
+    "shade_color_ja": "みかんの皮",
+    "description_en": "A bright tangerine orange.",
+    "description_zh": "鲜明的橘子色。",
+    "description_ja": "くっきりとしたみかん色のオレンジ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D105",
@@ -926,7 +1298,19 @@
     "image_url": "",
     "description": "따뜻한 캐러멜 브라운.",
     "stock": 6,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "焦糖拿铁",
+    "shade_color_ja": "キャラメルラテ",
+    "description_en": "A warm caramel brown.",
+    "description_zh": "温暖的焦糖棕。",
+    "description_ja": "あたたかみのあるキャラメルブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D106",
@@ -954,7 +1338,19 @@
     "image_url": "",
     "description": "볼터치처럼 연한 복숭아 핑크.",
     "stock": 2,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "蜜桃脸颊",
+    "shade_color_ja": "桃のほっぺ",
+    "description_en": "A peach pink as soft as blush.",
+    "description_zh": "如腮红般浅淡的蜜桃粉。",
+    "description_ja": "チークのように淡いピーチピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D107",
@@ -993,7 +1389,19 @@
         "name_en": "Test Store C",
         "stock": 1
       }
-    ]
+    ],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "草莓牛奶",
+    "shade_color_ja": "いちごミルク",
+    "description_en": "A sweet strawberry milk pink.",
+    "description_zh": "甜美的草莓牛奶粉。",
+    "description_ja": "甘いいちごミルクピンク。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D108",
@@ -1021,7 +1429,19 @@
     "image_url": "",
     "description": "차분한 장미 꽃잎 색.",
     "stock": 4,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "玫瑰花瓣",
+    "shade_color_ja": "バラの花びら",
+    "description_en": "A calm rose petal color.",
+    "description_zh": "沉稳的玫瑰花瓣色。",
+    "description_ja": "落ち着いたバラの花びら色。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D109",
@@ -1049,7 +1469,19 @@
     "image_url": "",
     "description": "진한 오디잼 베리.",
     "stock": 6,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "桑葚果酱",
+    "shade_color_ja": "桑の実ジャム",
+    "description_en": "A deep mulberry jam berry.",
+    "description_zh": "浓郁的桑葚果酱莓果色。",
+    "description_ja": "濃い桑の実ジャムのベリー。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D110",
@@ -1077,7 +1509,19 @@
     "image_url": "",
     "description": "새콤한 자두 빛 플럼.",
     "stock": 2,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "糖渍李子",
+    "shade_color_ja": "すもも漬け",
+    "description_en": "A tangy plum shade.",
+    "description_zh": "酸甜的李子色。",
+    "description_ja": "甘酸っぱいすもも色のプラム。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D111",
@@ -1105,7 +1549,19 @@
     "image_url": "",
     "description": "붉은 토마토 레드.",
     "stock": 11,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "番茄酱",
+    "shade_color_ja": "トマトソース",
+    "description_en": "A ripe tomato red.",
+    "description_zh": "红润的番茄红。",
+    "description_ja": "赤いトマトレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D112",
@@ -1133,7 +1589,19 @@
     "image_url": "",
     "description": "반짝이는 체리 사탕 레드.",
     "stock": 4,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "樱桃糖",
+    "shade_color_ja": "チェリーキャンディ",
+    "description_en": "A sparkling cherry candy red.",
+    "description_zh": "闪亮的樱桃糖果红。",
+    "description_ja": "きらめくチェリーキャンディレッド。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D113",
@@ -1172,7 +1640,19 @@
         "name_en": "Test Store C",
         "stock": 1
       }
-    ]
+    ],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "红酒杯",
+    "shade_color_ja": "ワイングラス",
+    "description_en": "A wine-toned burgundy.",
+    "description_zh": "酒红色调的勃艮第红。",
+    "description_ja": "ワイン色のバーガンディ。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D114",
@@ -1200,7 +1680,19 @@
     "image_url": "",
     "description": "쌉쌀한 코코아 브라운.",
     "stock": 2,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "可可粉",
+    "shade_color_ja": "ココアパウダー",
+    "description_en": "A bittersweet cocoa brown.",
+    "description_zh": "微苦的可可棕。",
+    "description_ja": "ほろ苦いココアブラウン。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   },
   {
     "id": "D115",
@@ -1228,6 +1720,18 @@
     "image_url": "",
     "description": "깊은 무화과 빛.",
     "stock": 11,
-    "other_stores": []
+    "other_stores": [],
+    "brand_zh": "Dailytone",
+    "brand_ja": "デイリートーン",
+    "shade_color_zh": "无花果干",
+    "shade_color_ja": "ドライいちじく",
+    "description_en": "A deep fig shade.",
+    "description_zh": "深邃的无花果色。",
+    "description_ja": "深みのあるいちじく色。",
+    "en_translated": [
+      "description_en"
+    ],
+    "name_zh": "玩色唇釉",
+    "name_ja": "カラープレイティント"
   }
 ]

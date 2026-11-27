@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { basename, dirname, join } from 'node:path';
 import { hexToLab, roundLab, normalizeHex, deltaE2000 } from '../src/lib/color.js';
 import { applyFinishGuess, applyFinishDemo } from './apply-finish-guess.js';
+import { applyProductI18n } from './apply-product-i18n.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -171,6 +172,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const out = join(root, 'src/data/products.oliveyoung.json');
   console.log('추정 질감(finish-guess.json) 넣음:', applyFinishGuess(products));
   console.log('시연용 질감 배정(finish-demo.json) 넣음:', applyFinishDemo(products));
+  applyProductI18n(products); // 영어·중국어·일본어 이름 (src/data/product-i18n.json)
   writeFileSync(out, JSON.stringify(products, null, 2) + '\n');
   const finishes = products.reduce((m, p) => ((m[p.finish || '정보 없음'] = (m[p.finish || '정보 없음'] || 0) + 1), m), {});
   console.log(`올리브영 상품 ${rows.length}개 → ${products.length}개 저장 (${out})`);

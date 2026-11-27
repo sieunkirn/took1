@@ -1,6 +1,7 @@
 // 시연용 가상 제품 데이터를 생성해 src/data/products.json 에 저장한다.
 // 실제 브랜드/제품이 아닌 가상 데이터이다. color_lab 과 EAN-13 체크 디지트는 자동 계산된다.
 import { writeFileSync } from 'node:fs';
+import { applyProductI18n } from './apply-product-i18n.js';
 import { fileURLToPath } from 'node:url';
 import { hexToLab, roundLab, normalizeHex } from '../src/lib/color.js';
 
@@ -68,7 +69,7 @@ function buildProducts() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const products = buildProducts();
+  const products = applyProductI18n(buildProducts()); // 영어·중국어·일본어 이름
   const out = new URL('../src/data/products.json', import.meta.url);
   writeFileSync(out, JSON.stringify(products, null, 2) + '\n');
   console.log(`${products.length}개 제품 저장: ${fileURLToPath(out)}`);

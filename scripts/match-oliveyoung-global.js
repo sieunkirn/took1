@@ -9,6 +9,7 @@
 // - 사람이 보고 정한 짝은 MANUAL 에 적는다 (null = 글로벌에 같은 상품이 없다고 확인)
 // import-oliveyoung.js 로 데이터를 다시 만들면 이 스크립트를 --apply 로 다시 돌린다
 import { readFileSync, writeFileSync } from 'node:fs';
+import { applyProductI18n } from './apply-product-i18n.js';
 import { editDistance } from '../src/lib/spoken.js';
 
 const KO_FILE = new URL('../src/data/products.oliveyoung.json', import.meta.url);
@@ -234,6 +235,7 @@ if (process.argv.includes('--apply')) {
     r.p.url_en = g ? GLOBAL_URL(g.id) : null;
     r.p.name_en_source = g ? (r.status === 'manual' ? 'oliveyoung_global_manual' : 'oliveyoung_global_auto') : null;
   }
+  applyProductI18n(ko); // 글로벌에 짝이 없는 제품은 번역 사전의 영어로 채운다 (en_translated 에 표시)
   writeFileSync(KO_FILE, JSON.stringify(ko, null, 2) + '\n');
   console.log(`\nproducts.oliveyoung.json 에 넣었어요 (영어 상품명 ${results.filter((r) => r.p.name_en).length}개, 영어 브랜드 ${results.filter((r) => r.p.brand_en).length}개)`);
 }

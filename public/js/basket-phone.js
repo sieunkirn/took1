@@ -7,7 +7,7 @@
 // 다만 제품 ID·바코드를 글자로 써 둔 태그는 분명한 제품 태그라 카드로 쓰지 않는다. 카드가 있을 때는 제품이면 담고, 제품이 아니면 다른 카드로 바꾼다.
 import { api } from './api.js';
 import { el, $ } from './dom.js';
-import { t, applyI18n, langToggle, brandOf, nameOf } from './i18n.js';
+import { t, applyI18n, langToggle, brandOf, nameOf, shadeOf } from './i18n.js';
 import { normalizeTag, resolveTag, findTagProduct } from './nfc.js';
 import { getBasket, addToBasket, removeFromBasket, clearBasket, sendToMirror, getSent } from './basket.js';
 
@@ -58,7 +58,7 @@ function itemRow(p, button) {
   if (p.color_hex) dot.style.background = p.color_hex; // 립 색은 실제 색
   return el('li', { class: 'bk-item' + (p.id === lastNew ? ' new' : '') }, pic,
     el('span', { class: 'bk-t' }, el('span', { class: 'bk-b', text: brandOf(p) }),
-      el('span', { class: 'bk-n' }, dot, nameOf(p) + (p.shade_name ? ' · ' + p.shade_name : ''))),
+      el('span', { class: 'bk-n' }, dot, nameOf(p) + (p.shade_name ? ' · ' + shadeOf(p) : ''))),
     button);
 }
 
@@ -280,7 +280,7 @@ async function search() {
     const r = await api('api/products').catch(() => null);
     pool = (r?.ok && r.body?.products) || [];
   }
-  const hits = pool.filter((p) => [p.brand, p.name, p.brand_en, p.name_en, p.shade_name].filter(Boolean).join(' ').toLowerCase().includes(q)).slice(0, 20);
+  const hits = pool.filter((p) => [p.brand, p.name, p.brand_en, p.name_en, p.brand_zh, p.name_zh, p.brand_ja, p.name_ja, p.shade_name, p.shade_color_en, p.shade_color_zh, p.shade_color_ja].filter(Boolean).join(' ').toLowerCase().includes(q)).slice(0, 20);
   box.replaceChildren(...(hits.length
     ? hits.map((p) => itemRow(p, el('button', { type: 'button', 'aria-label': '+ ' + nameOf(p), onclick: () => add(p) }, '+')))
     : [el('li', { class: 'bk-empty', text: t('bk.noResult') })]));

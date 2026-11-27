@@ -3,7 +3,8 @@
 // - 언어는 브라우저 탭 저장소(sessionStorage 'took.lang')에 둔다. 키오스크 자동 초기화(store.clear)가 'took.*' 를 지우므로
 //   다음 손님은 항상 한국어로 시작한다
 // - 화면 문구는 STRINGS 에 키로 두고 t('키') 로 꺼낸다. HTML 에서는 data-i18n="키" (글자), data-i18n-aria="키" (aria-label)
-// - 제품 이름: 영어일 때 글로벌 올리브영에서 짝지은 brand_en·name_en 을 쓰고, 없으면 한국어 이름을 그대로 둔다 (지어내지 않는다)
+// - 제품·브랜드·호수 이름: 제품 데이터의 언어별 칸(name_en · name_zh · name_ja …)을 쓴다 (2026-11-27, 번역 사전 src/data/product-i18n.json → npm run import:i18n).
+//   그 언어 칸이 없으면 영어, 영어도 없으면 한국어 이름을 그대로 둔다
 // 아직 영어 문구가 없는 화면은 한국어로 보인다 (STRINGS.en 에 없는 키는 한국어로 대신한다)
 import { zh, ja } from './i18n-more.js';
 
@@ -22,7 +23,7 @@ export function lang() {
   } catch { /* 저장 불가 환경: 한국어 */ }
   return 'ko';
 }
-// isEn = '한국어가 아닌 화면' (2026-11-27 중국어·일본어 추가): 제품·브랜드·호수·매장 이름과 가격 표기는 외국어 화면이면 영어 자료를 쓴다
+// isEn = '한국어가 아닌 화면' (2026-11-27 중국어·일본어 추가): 가격 표기(₩)처럼 외국어 화면이 함께 쓰는 것에 쓴다. 제품 글자는 아래 localized 가 언어별로 고른다
 export const isEn = () => lang() !== 'ko';
 
 /** 언어를 바꾸고 지금 화면을 새 언어로 다시 연다 (홈은 인트로 없이. 인트로 대기 화면에서 바꿀 땐 skipIntro: false) */
@@ -381,11 +382,21 @@ export function themeToggle() {
 }
 
 // ---------- 제품 표시 ----------
-/** 브랜드: 영어면 글로벌 표기(brand_en), 없으면 한국어 */
-export const brandOf = (p) => (isEn() && p.brand_en) || p.brand;
-/** 제품명: 영어면 글로벌 상품명(name_en), 짝이 없으면 한국어 이름 그대로 */
-export const nameOf = (p) => (isEn() && p.name_en) || p.name;
-export const displayName = (p) => [brandOf(p), nameOf(p), isEn() && p.name_en ? null : p.shade_name].filter(Boolean).join(' ');
+/** 제품 데이터의 글자를 지금 언어로: 중국어면 name_zh, 일본어면 name_ja … 그 칸이 없으면 영어(name_en), 영어도 없으면 한국어 */
+export function localized(p, field) {
+  const l = lang();
+  if (l === 'ko') return p[field];
+  return p[`${field}_${l}`] || p[`${field}_en`] || p[field];
+}
+/** 브랜드 (brand_en · brand_zh · brand_ja) */
+export const brandOf = (p) => localized(p, 'brand');
+/** 제품명 (name_en · name_zh · name_ja) */
+export const nameOf = (p) => localized(p, 'name');
+/** 호수 이름: 번호 + 지금 언어의 색 이름 ('04 피그피그'). 호수 레코드가 아닌 가상 제품은 shade_name 그대로 */
+export const shadeOf = (p) => (p.shade_color ? [p.shade_no, localized(p, 'shade_color')].filter(Boolean).join(' ') : p.shade_name || '');
+/** 제품 설명 (description_en · description_zh · description_ja) */
+export const descriptionOf = (p) => localized(p, 'description') || '';
+export const displayName = (p) => [brandOf(p), nameOf(p), p.shade_color ? shadeOf(p) : (isEn() && p.name_en ? null : p.shade_name)].filter(Boolean).join(' ');
 /** 가격: 원화 그대로 (영어면 ₩13,000) */
 export const priceText = (n) => (isEn() ? '₩' + Number(n).toLocaleString('en-US') : Number(n).toLocaleString('ko-KR') + '원');
 export const finishText = (f) => t(f ? 'finish.' + f : 'finish.none');

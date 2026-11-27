@@ -1,11 +1,11 @@
 // 제품을 화면에 보여 주는 부품: 이름·가격 표기, 제품 카드, 상세 표, 올리브영 링크.
 import { fullName as koFullName, shortName as koShortName } from '../lib/catalog.js';
-import { t, isEn, brandOf, nameOf, displayName, priceText } from './i18n.js';
+import { t, isEn, brandOf, nameOf, shadeOf, displayName, priceText } from './i18n.js';
 import { el } from './dom.js';
 import { demoBadgeFor } from './demo.js';
 import { api } from './api.js';
 
-// 화면에 보이는 제품 이름: 영어 화면이면 글로벌 올리브영 영어 이름(없으면 한국어 이름), 한국어면 그대로
+// 화면에 보이는 제품 이름: 외국어 화면이면 그 언어 이름(없으면 영어, 영어도 없으면 한국어 이름), 한국어면 그대로
 export const fullName = (p) => (isEn() ? displayName(p) : koFullName(p));
 export const shortName = (p) => (isEn() ? `${brandOf(p)} ${nameOf(p)}` : koShortName(p));
 
@@ -164,11 +164,8 @@ export function shadePicker(product, { onSelect } = {}) {
   return box;
 }
 
-/** 호수 이름: '04 피그피그' (영어 이름이 없으면 한국어 이름). 호수 레코드가 아닌 가상 제품은 shade_name 그대로 */
-export function shadeLabelOf(p) {
-  if (p.shade_color) return [p.shade_no, isEn() ? (p.shade_color_en || p.shade_color) : p.shade_color].filter(Boolean).join(' ');
-  return p.shade_name || '';
-}
+/** 호수 이름: '04 피그피그' (화면 언어의 이름, 없으면 영어, 영어도 없으면 한국어 이름). 호수 레코드가 아닌 가상 제품은 shade_name 그대로 */
+export const shadeLabelOf = shadeOf;
 
 // 카드의 '호수' 칸 (2026-11-17). 호수가 여럿인 제품은 이 칸 대신 카드 안의 호수 고르기(shadePicker)를 쓴다
 //  - 호수 하나뿐인 제품·가상 제품: 작은 색 견본 + 호수 이름 (누르는 곳 없음)

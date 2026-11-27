@@ -11,6 +11,7 @@
     "import:oliveyoung": "node scripts/import-oliveyoung.js",
     "match:global": "node scripts/match-oliveyoung-global.js --apply",
     "import:shades": "node scripts/import-shades.js",
+    "import:i18n": "node scripts/apply-product-i18n.js",
     "finish:guess": "node scripts/apply-finish-guess.js",
     "shades:server": "node scripts/shades-server.js",
     "shades:build": "node scripts/build-shades-source.js",
