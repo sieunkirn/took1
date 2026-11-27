@@ -22,6 +22,12 @@ async function getLocalApi() {
   return localApi;
 }
 
+/** 제품 데이터 미리 읽기 (2026-11-27 "제품 시트 열 때 로딩이 오래 걸림"): 정적 모드(앱)는 첫 추천 때에야 제품·호수 데이터(2.4MB)를 읽고 풀어서
+ * 시트를 처음 열 때마다(자동 초기화로 화면이 새로 열린 뒤에도) 오래 걸렸다. 거울이 화면을 연 직후 미리 불러 둔다. 서버 모드는 할 일이 없다 */
+export function warmApi() {
+  if (STATIC) getLocalApi().catch(() => {});
+}
+
 // server.js 의 /api 라우트와 같은 응답을 브라우저에서 만든다
 async function staticApi(path, options) {
   const { catalog, rec, color } = await getLocalApi();

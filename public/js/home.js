@@ -9,32 +9,50 @@
 //  4 (2026-11-21 Figma GP 1667:704) 로고가 위로 올라가고 알약 버튼이 세로로: 1 스캔 = 거울 · 2 NFC = 거울에서 태그 기다리기
 // 예전 홈(점선 얼굴·시계·버튼 두 개·다크 모드·언어 버튼)은 프로토타입에 없어 뺐다 (git 기록 a840e68 에 있음)
 import { store } from './common.js';
-import { t, lang, langToggle } from './i18n.js';
+import { t, htmlLang, langSwitch } from './i18n.js';
 import { REDUCE_MOTION as reduce } from './motion.js';
 import { logoFull } from './brand.js';
 import { fitStage } from './ui-stage.js';
 import { listenNfc } from './nfc.js';
 
-document.documentElement.lang = lang(); // 홈은 applyI18n 을 부르지 않아 <html lang> 을 직접 맞춘다
+document.documentElement.lang = htmlLang(); // 홈은 applyI18n 을 부르지 않아 <html lang> 을 직접 맞춘다
 try { sessionStorage.removeItem('took.homeSkipIntro'); } catch { /* 저장 불가 환경 */ }
 
 const stage = document.getElementById('stage');
 fitStage(stage);
 // 쌓는 순서: 배경 영상(소리 없음) → 어두운 덮개 → 로고 → 문구
 stage.innerHTML = `<video class="hs-video" src="videos/home.mp4" autoplay muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video><div class="hs-dim" aria-hidden="true"></div>${logoFull('hs-logo')}
-  <p class="hs-tap" aria-hidden="true">Tap The Screen</p>
+  <p class="hs-tap" aria-hidden="true">${t('home.tap')}</p>
   <nav class="hs-menu">
     <button type="button" class="hs-mb hs-mb-mirror" data-go="scan"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-scan.svg" width="36.0482" height="34.8636" alt="" draggable="false"></button>
     <button type="button" class="hs-mb hs-mb-nfc" data-go="nfc"><i class="hs-mb-glow" aria-hidden="true"></i><i class="hs-mb-track" aria-hidden="true"></i><i class="hs-mb-knob" aria-hidden="true"></i><img src="images/home-menu/ico-nfc.svg" width="33.0483" height="31.8636" alt="" draggable="false"></button>
   </nav>
   <p class="sr-only" id="hs-help"></p>`;
-stage.append(langToggle('hs-lang')); // 한국어/영어 (4번 시작 화면 오른쪽 위에서만 보인다)
+// 언어 네 칸 (2026-11-27): 3번 'Tap The Screen' 화면 오른쪽 위. 여기를 누른 것은 '화면 누르기'(거울로 넘어가기)로 치지 않는다
+// 언어를 바꿔도 화면을 다시 열지 않는다 (2026-11-27 "깜빡임 없이"): 영상·로고는 그대로 두고 글자만 그 자리에서 바꾼다 (applyLang)
+const langs = langSwitch('hs-langs', { onChange: () => applyLang(true) });
+for (const ev of ['pointerdown', 'pointerup']) langs.addEventListener(ev, (e) => e.stopPropagation());
+stage.append(langs);
 const video = stage.querySelector('.hs-video');
 const menu = stage.querySelector('.hs-menu');
-menu.setAttribute('aria-label', t('home.choose'));
-stage.querySelector('.hs-mb-mirror').setAttribute('aria-label', t('home.toPalette'));
-stage.querySelector('.hs-mb-nfc').setAttribute('aria-label', t('home.toTag'));
-stage.querySelector('#hs-help').textContent = t('home.tapToStart');
+// 지금 언어로 글자 맞추기. fade = 언어를 바꿨을 때: 'Tap The Screen' 문구가 살짝 사라졌다가 새 글자로 나타난다
+const tapText = stage.querySelector('.hs-tap');
+function applyLang(fade = false) {
+  document.documentElement.lang = htmlLang();
+  menu.setAttribute('aria-label', t('home.choose'));
+  stage.querySelector('.hs-mb-mirror').setAttribute('aria-label', t('home.toPalette'));
+  stage.querySelector('.hs-mb-nfc').setAttribute('aria-label', t('home.toTag'));
+  stage.querySelector('#hs-help').textContent = t('home.tapToStart');
+  const next = t('home.tap');
+  if (!fade || reduce || !tapText.animate) { tapText.textContent = next; return; }
+  tapText.getAnimations().forEach((a) => a.cancel());
+  tapText.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: 'ease-in', fill: 'forwards' }).finished.then((a) => {
+    tapText.textContent = next;
+    a.cancel();
+    tapText.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'ease-out' });
+  }).catch(() => { tapText.textContent = t('home.tap'); });
+}
+applyLang();
 
 // ---------- 1 → 2 → 3 (배경 영상 장면에 맞춘다) ----------
 const LIPS_AT = 4.95; // home.mp4 에서 제품 장면이 끝나고 입술 장면이 시작하는 시각(초)

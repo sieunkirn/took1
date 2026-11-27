@@ -101,7 +101,8 @@ async function openUvc(v) {
 
   function release() {
     if (live.has(entry)) { live.delete(entry); users = Math.max(0, users - 1); }
-    // 화면을 옮길 때 바로 다시 여는 경우가 많아 조금 기다렸다 끈다
+    // 화면을 옮길 때 바로 다시 여는 경우가 많아 조금 기다렸다 끈다.
+    // 화면(문서)이 아예 바뀌면 이 타이머는 사라져서 웹캠은 켜진 채로 남는다 (2026-11-27 사용자 요청으로 그대로 둔다: 거울에 다시 들어오면 바로 보인다)
     clearTimeout(releaseTimer);
     releaseTimer = setTimeout(() => { if (users === 0) B.stop(); }, 3000);
   }

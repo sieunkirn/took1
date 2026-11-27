@@ -243,6 +243,22 @@ html.enter-fx .fc .fc-sheet, html.enter-fx .fc .fc-sbtn { animation-delay: .24s;
 .hs-lang { right: 40px; opacity: 0; pointer-events: none; transition: opacity .6s ease .25s; }
 .tui-stage[data-step="4"] .hs-lang { opacity: 1; pointer-events: auto; }
 .tui-stage.hs-leaving .hs-lang { opacity: 0; }
+/* 언어 네 칸 (2026-11-27 사용자 선택 'A 오른쪽 위 네 칸', i18n.js langSwitch): 한국어 | English | 中文 | 日本語.
+   반투명 검정 알약(색 없음·테두리 없음) 안에 네 칸, 지금 언어만 흰 칸. 3번 'Tap The Screen' 화면에서 보인다 */
+.hs-langs { position: absolute; z-index: 6; right: 40px; top: 56px; height: 56px; box-sizing: border-box; padding: 5px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); display: flex;
+  opacity: 0; pointer-events: none; transition: opacity .6s ease .25s; }
+.tui-stage:is([data-step="3"], [data-step="4"]) .hs-langs { opacity: 1; pointer-events: auto; }
+.tui-stage.hs-leaving .hs-langs { opacity: 0; transition: opacity .35s ease; }
+.tui .tui-stage .hs-langs button, .tui .tui-stage .hs-langs button:hover:not(:disabled) { all: unset; box-sizing: border-box; cursor: pointer; height: 46px; padding: 0 18px; border-radius: 999px;
+  display: flex; align-items: center; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; color: rgba(255, 255, 255, 0.75); }
+/* :hover 도 함께 적는다: 위의 all: unset 줄이 :hover 까지 잡고 있어, 누른 뒤 손가락·마우스가 올라가 있으면 아래 값이 지워져 글자가 흰 칸 밑에 깔린다 */
+.tui .tui-stage .hs-langs button, .tui .tui-stage .hs-langs button:hover:not(:disabled) { position: relative; z-index: 1; transition: color .25s ease; }
+/* 굵기는 모든 칸이 같다(600): 고른 칸만 굵게 하면 칸 너비가 달라져 알약 전체가 옆으로 밀린다 */
+.tui .tui-stage .hs-langs button[aria-pressed="true"], .tui .tui-stage .hs-langs button[aria-pressed="true"]:hover:not(:disabled) { color: #111; cursor: default; }
+/* 흰 칸(손잡이): 누른 언어 칸으로 미끄러진다. 예전 시작 알약 손잡이(.hs-mb-knob)와 같은 곡선·시간 */
+.hs-langs .lang-thumb { position: absolute; left: 0; top: 5px; height: 46px; width: 0; border-radius: 999px; background: #fff; transition: transform .32s cubic-bezier(.3, .7, .2, 1), width .32s cubic-bezier(.3, .7, .2, 1); }
+@media (prefers-reduced-motion: reduce) { .hs-langs .lang-thumb { transition: none; } }
+.tui .tui-stage .hs-langs button:not([aria-pressed="true"]):active { background: rgba(255, 255, 255, 0.18); }
 /* 텍스처 알약: 질감 동그라미와 다이얼 사이 (원본 7번 matte 버튼 모양) — 가운데 질감 동그라미의 이름.
    세로 간격 같게 (2026-11-22 사용자 요청): 가운데 큰 동그라미 아래 1037.6 ~ 다이얼 링 위 1147.39(cy 1577.47 − ro 430.08) 사이 가운데 → 위아래 36.6씩 */
 .fc-tex { left: 386px; top: 1074.25px; width: 128px; height: 36.5px; z-index: 3; font-size: 25.5px; line-height: 28px; font-weight: 400; letter-spacing: -0.025em; }
@@ -252,44 +268,46 @@ html.enter-fx .fc .fc-sheet, html.enter-fx .fc .fc-sbtn { animation-delay: .24s;
 
 /* ---------- 추천 결과 (recs): 시트가 화면 아래 절반 (y 720~1440), 위에 제품 색 동그라미 줄, 아래 카드 2열 (사용자 레퍼런스) ---------- */
 /* 입술이 시트에 가리지 않게 카메라를 올리는 건 js/palette.js (입술 위치를 따라 .fc-face transform, 2026-11-17 카메라 전체 화면) */
+/* 시트를 내리는 동안(.fc-closing, js/palette.js setMode)에도 추천 목록은 그대로 보인다 (2026-11-27 "시트 내릴 때 애니메이션이 이상함":
+   예전엔 누르자마자 목록이 사라지고 빈 흰 시트만 내려갔다). 그래서 아래 목록 규칙은 recs 와 fc-closing 둘 다에 건다 */
 .fc-results { display: none; }
-.fc[data-mode="recs"] .fc-results { display: block; position: absolute; left: 0; right: 0; top: 86px !important; bottom: 0; height: auto !important; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-results { display: block; position: absolute; left: 0; right: 0; top: 86px !important; bottom: 0; height: auto !important; }
 .fc-rec-dots { display: flex; gap: 28px; padding: 0 44px; height: 59px; align-items: center; } /* 왼쪽 끝 = 카드 왼쪽 끝 (44px) */
 .fc-rec-dots button { all: unset; box-sizing: border-box; cursor: pointer; flex: none; width: 59px; height: 59px; border-radius: 50%; background: var(--c);
   box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.35); transition: box-shadow .2s ease; }
 .fc-rec-dots button[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #000, 0 0 12px 4px rgba(255, 255, 255, 0.45); }
 html[data-theme="dark"] .fc-rec-dots button[aria-pressed="true"] { box-shadow: 0 0 0 3px #474747, 0 0 0 5px #fff, 0 0 12px 4px rgba(255, 255, 255, 0.45); }
-.fc[data-mode="recs"] .fc-rec-status { margin: 10px 44px 8px; font-size: 15px; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-status { margin: 10px 44px 8px; font-size: 15px; }
 /* 추천 제품 카드 = 385.48 × 289.11 (2026-11-16 사용자 지정 크기), 2열 사이 41 → 양옆 여백 44 */
-.fc[data-mode="recs"] .fc-rec-list { display: grid; grid-template-columns: repeat(2, 385.48px); column-gap: 41px; row-gap: 32px; justify-content: center;
-  overflow-x: hidden; overflow-y: auto; height: calc(100% - 59px - 46px); box-sizing: border-box; padding: 14px 0 48px; /* 위·아래 여백: 바른 카드 그림자가 잘리지 않게 */ scroll-snap-type: y proximity; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list { display: grid; grid-template-columns: repeat(2, 385.48px); column-gap: 41px; row-gap: 32px; justify-content: center;
+  overflow-x: hidden; overflow-y: auto; height: calc(100% - 59px - 46px); box-sizing: border-box; padding: 14px 0 48px; /* 위·아래 여백: 바른 카드 그림자가 잘리지 않게 */ scroll-snap-type: y proximity; scroll-padding-top: 14px; /* 맞춰 설 때도 위 여백 14px 는 남긴다 (2026-11-27) */ }
 /* 카드 안 (2026-11-16 사용자 요청 "제품 사진 더 크게"): 왼쪽 큰 정사각 사진 200 · 오른쪽 브랜드/제품명/가격 · 아래 버튼 두 개 (예전: 위 사진 120 + 표) */
-.fc[data-mode="recs"] .fc-rec-list .card { width: 385.48px; height: 289.11px; box-sizing: border-box; flex: none; scroll-snap-align: start; padding: 14px; border-radius: 24px;
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card { width: 385.48px; height: 289.11px; box-sizing: border-box; flex: none; scroll-snap-align: start; padding: 14px; border-radius: 24px;
   display: grid; grid-template-columns: 200px 1fr; grid-template-rows: 200px auto; column-gap: 16px; row-gap: 13px; align-content: start; }
-.fc[data-mode="recs"] .fc-rec-list .card-img { grid-column: 1; grid-row: 1; width: 200px !important; height: 200px !important; margin: 0; border: 0; border-radius: 16px;
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card-img { grid-column: 1; grid-row: 1; width: 200px !important; height: 200px !important; margin: 0; border: 0; border-radius: 16px;
   object-fit: contain; background: #fff; }
-.fc[data-mode="recs"] .fc-rec-list .card dl { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 4px; margin: 0; padding-top: 6px; min-width: 0; }
-.fc[data-mode="recs"] .fc-rec-list .card dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* '브랜드·제품명·가격' 글자는 화면 읽기용으로만 */
-.fc[data-mode="recs"] .fc-rec-list .card dd { margin: 0; }
-.fc[data-mode="recs"] .fc-rec-list .card dd:nth-of-type(1) { font-size: 14px; font-weight: 500; opacity: .55; }
-.fc[data-mode="recs"] .fc-rec-list .card dd:nth-of-type(2) { font-size: 17px; line-height: 1.35; font-weight: 700; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
-.fc[data-mode="recs"] .fc-rec-list .card dd:nth-of-type(3) { margin-top: 8px; font-size: 18px; font-weight: 700; }
-.fc[data-mode="recs"] .fc-rec-list .card .actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1fr; gap: 8px; margin: 0; padding: 0; }
-.fc[data-mode="recs"] .fc-rec-list .card .actions button { min-height: 0; padding: 10px 8px; font-size: 14.5px; text-align: center; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card dl { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 4px; margin: 0; padding-top: 6px; min-width: 0; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* '브랜드·제품명·가격' 글자는 화면 읽기용으로만 */
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card dd { margin: 0; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card dd:nth-of-type(1) { font-size: 14px; font-weight: 500; opacity: .55; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card dd:nth-of-type(2) { font-size: 17px; line-height: 1.35; font-weight: 700; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card dd:nth-of-type(3) { margin-top: 8px; font-size: 18px; font-weight: 700; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card .actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1fr; gap: 8px; margin: 0; padding: 0; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card .actions button { min-height: 0; padding: 10px 8px; font-size: 14.5px; text-align: center; }
 /* [입술에 발라보기] [호수 보기] 두 버튼 나란히 (2026-11-24). 호수 보기는 흰 바탕 + 테두리 */
-.fc[data-mode="recs"] .fc-rec-list .card .actions:has(.shades-btn) { grid-template-columns: 1fr 1fr; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card .actions:has(.shades-btn) { grid-template-columns: 1fr 1fr; }
 .fc-rec-list .card .actions button.shades-btn { background: #fff; color: #000; box-shadow: inset 0 0 0 1.5px #000; }
 html[data-theme="dark"] .fc-rec-list .card .actions button.shades-btn { background: transparent; color: #fff; box-shadow: inset 0 0 0 1.5px #fff; }
 /* 카드 안 호수 고르기 (2026-11-17): 카드 크기가 고정이라 오른쪽 칸(가격 아래) 맨 밑에 머리 칸을 두고,
    목록은 머리 칸 아래로 카드 위에 떠서 펼친다 (카드 높이는 그대로) */
-.fc[data-mode="recs"] .fc-rec-list .card { position: relative; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card { position: relative; }
 /* 시연용 배지 (2026-11-26): 카드 격자(사진·글자·버튼)에 자리가 없어 카드 아래 새 줄로 200px 넓게 밀려나던 것 → 사진 왼쪽 위에 작게 얹는다 */
-.fc[data-mode="recs"] .fc-rec-list .card > .demo-badge { position: absolute; left: 24px; top: 24px; z-index: 1; margin: 0;
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card > .demo-badge { position: absolute; left: 24px; top: 24px; z-index: 1; margin: 0;
   background: #fff; color: #000; border-color: rgba(0, 0, 0, 0.3); opacity: 1; }
-.fc[data-mode="recs"] .fc-rec-list .card > .opt { grid-column: 2; grid-row: 1; align-self: end; position: relative; z-index: 2; margin: 0; overflow: visible;
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card > .opt { grid-column: 2; grid-row: 1; align-self: end; position: relative; z-index: 2; margin: 0; overflow: visible;
   border: 0; border-radius: 12px; background: #fff; color: #000; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
-.fc[data-mode="recs"] .fc-rec-list .card > .opt.open { border-radius: 12px 12px 0 0; }
-.fc[data-mode="recs"] .fc-rec-list .card:has(.opt.open) { z-index: 3; } /* 펼친 목록이 아래 카드 위로 */
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card > .opt.open { border-radius: 12px 12px 0 0; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.opt.open) { z-index: 3; } /* 펼친 목록이 아래 카드 위로 */
 .fc .opt .opt-head { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 8px; width: 100%; min-height: 46px; padding: 6px 10px; cursor: pointer; font-size: 14px; }
 .fc .opt .opt-head .opt-count { display: none; } /* 오른쪽 칸이 좁아 'N가지'는 빼고 호수 이름을 두 줄까지 */
 .fc .opt .opt-head .opt-name { white-space: normal; line-height: 1.25; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
@@ -300,7 +318,7 @@ html[data-theme="dark"] .fc-rec-list .card .actions button.shades-btn { backgrou
 .fc .opt .opt-cell { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; cursor: pointer; }
 .fc .opt .opt-cell-dot { width: 34px; height: 34px; }
 .fc .opt .opt-cell-no { font-size: 12px; }
-html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card > .opt, html[data-theme="dark"] .fc .opt .opt-list { background: #474747; color: #fff; }
+html[data-theme="dark"] .fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card > .opt, html[data-theme="dark"] .fc .opt .opt-list { background: #474747; color: #fff; }
 
 /* 시작 화면에서 넘어올 때 wireframe.css 의 "화면 전체(main) 떠오르기"(html.enter-fx main)를 끈다: 무대·로고는 그대로 있고 나머지만 떠오른다 (깜빡임 없이 이어지게) */
 html.enter-fx main.tui-stage, html main.tui-stage { animation: none; }
@@ -328,18 +346,18 @@ html.enter-fx main.tui-stage, html main.tui-stage { animation: none; }
 .fc[data-mode="recs"] .fc-sheet { transition: top .5s cubic-bezier(.22, 1, .36, 1), background .2s ease, visibility 0s; }
 .fc[data-mode="recs"] .fc-sbtn { transition: top .5s cubic-bezier(.22, 1, .36, 1), left .5s cubic-bezier(.22, 1, .36, 1), width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1); }
 .fc[data-mode="recs"] .fc-sbtn-logo svg { transition: width .5s cubic-bezier(.22, 1, .36, 1), height .5s cubic-bezier(.22, 1, .36, 1); }
-.fc[data-mode="recs"] .fc-results { top: 84px !important; bottom: 0; } /* 위 84 = 오른쪽 위 동그라미 아래부터. 아래는 시트 끝까지 (2026-11-22: 둘째 줄 카드가 이어서 보여 밀어 볼 수 있게) */
+.fc:is([data-mode="recs"], .fc-closing) .fc-results { top: 84px !important; bottom: 0; } /* 위 84 = 오른쪽 위 동그라미 아래부터. 아래는 시트 끝까지 (2026-11-22: 둘째 줄 카드가 이어서 보여 밀어 볼 수 있게) */
 /* 제품 색 동그라미 줄 · '이 컬러와 비슷한 제품 n개' 문구는 2026-11-20 사용자 요청으로 화면에서 뺐다 (문구는 화면 읽기용으로만 남김) */
-.fc[data-mode="recs"] .fc-rec-dots { display: none; }
-.fc[data-mode="recs"] .fc-rec-status { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.fc[data-mode="recs"] .fc-rec-list { height: 100%; padding-bottom: 40px; } /* 얼굴을 못 찾아 아직 못 누를 때도 흐리게 하지 않는다 (2026-11-20 사용자 요청) */
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-dots { display: none; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-status { position: absolute; width: 1px; height: 1px; margin: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list { height: 100%; padding-bottom: 40px; } /* 얼굴을 못 찾아 아직 못 누를 때도 흐리게 하지 않는다 (2026-11-20 사용자 요청) */
 /* 하단 시트 바탕 = GP-홈화면 Figma 회색 네모(Rectangle 57) #7A7A7A (2026-11-20 사용자 요청: 흰 '이 컬러로 제품 찾기' 버튼이 보이게). 다크 모드는 그대로 #474747 */
 html:not([data-theme="dark"]) .fc-sheet { background: #fff; } /* 2026-11-22 사용자 시안: 흰 시트 위 연회색 카드 (흰 긴 버튼은 이미 빠짐) */
 
 /* ---------- 호수 보기 (2026-11-24, js/palette.js seeShades): 같은 흰 시트 안에서 추천 목록 ← 밀려나고 호수 화면 → 에서 들어온다 ----------
    추천 카드와 같은 연회색(#f3f3f3)·모서리 24 카드. 누른 카드 사진은 복사본(.fc-sh-fly)이 사진 자리로 날아간다. 호수 동그라미 색은 실제 색 */
 .fc-sheet { overflow: hidden; }
-.fc[data-mode="recs"] .fc-results { transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .32s ease; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-results { transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .32s ease; }
 .fc.fc-shading .fc-results { transform: translateX(-28%); opacity: 0; pointer-events: none; }
 .fc-shades { position: absolute; inset: 0; z-index: 2; visibility: hidden; opacity: 0; transform: translateX(100%);
   transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .3s ease, visibility 0s .5s; }
@@ -388,9 +406,58 @@ html[data-theme="dark"] .tui .tui-stage .fc-shades .fc-sh-back { background: #5a
 html[data-theme="dark"] .fc-sh-chip[aria-selected="true"] i { box-shadow: 0 0 0 3px #474747, 0 0 0 5px #fff; }
 @media (prefers-reduced-motion: reduce) { .fc-results, .fc-shades, .fc-sh-chip { transition: none !important; animation: none !important; } }
 
+/* ---------- 매장 재고 (2026-11-27 사용자 결정 '재고만', js/palette.js seeStock): 호수 보기와 같은 자리·같은 틀(.fc-shades, 위 제품 카드까지 같음).
+   이 매장에 재고가 있으면: 왼쪽 이 매장 재고(큰 숫자) + 오른쪽 근처 매장 줄.
+   이 매장이 품절이면: 왼쪽 가장 가까운 구매 가능 매장(바른 카드처럼 검정 그림자로 떠오름) + 오른쪽 다른 매장 줄.
+   굵은 글씨는 값(재고·매장 이름)만. 무채색. 재고는 시연용 값. 매장 안 위치(평면도)는 뺐다 ---------- */
+.fc-shades .fc-sh-top:has(.fc-st-stat) { right: 44px; }
+.fc-st-stat { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #6b6b70; }
+.fc-st-stat i { width: 8px; height: 8px; border-radius: 50%; background: #c4c4c8; }
+.fc-st-a { position: absolute; left: 44px; right: 44px; top: 230px; bottom: 36px; display: flex; gap: 16px; }
+.fc-st-here { flex: none; width: 330px; padding: 0 28px; border-radius: 24px; background: #f3f3f3; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.fc-st-here > strong { font-size: 44px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; }
+.fc-st-h { padding: 0 0 4px; font-size: 13px; font-weight: 500; color: #8a8a8e; }
+.fc-st-h + .fc-st-r { border-top: 1px solid #e2e2e5; }
+.fc-st-here + .fc-st-rows .fc-st-r { padding: 13px 0; }
+/* 추천 카드의 재고 줄 (product-view.js): 재고가 있으면 누르는 곳이 아닌 글자, 품절이면 '가까운 매장 ›' 버튼 */
+.tui .tui-stage .fc-rec-list .card div.more-shades { cursor: default; }
+.more-shades > span:first-child { display: flex; align-items: center; white-space: nowrap; }
+.stock-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #111; margin-right: 8px; }
+.stock-out .stock-dot { background: #c4c4c8; }
+.tui .tui-stage .fc-rec-list .card .stock-info .more-shades-n { color: #111; font-weight: 800; }
+.stock-out .more-shades-n { white-space: nowrap; }
+/* 품절 카드 '가까운 매장' 말풍선 (2026-11-27 'b 검정 알약', palette.js showStockTip): 누른 줄 바로 위 작은 검정 알약 + 작은 꼬리 */
+.stock-tip { position: absolute; z-index: 6; height: 40px; padding: 0 16px; border-radius: 999px; background: #111; color: #fff; display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap; pointer-events: none; animation: took-up .22s cubic-bezier(.2, .8, .2, 1) backwards; }
+.stock-tip::after { content: ""; position: absolute; right: 26px; bottom: -5px; width: 10px; height: 10px; transform: rotate(45deg); border-radius: 2px; background: inherit; }
+.stock-tip b { font-weight: 800; }
+.stock-tip-d { opacity: .45; }
+html[data-theme="dark"] .stock-tip { background: #fff; color: #111; }
+@media (prefers-reduced-motion: reduce) { .stock-tip { animation: none; } }
+html[data-theme="dark"] .fc-st-here { background: #5a5a5a; }
+html[data-theme="dark"] .stock-dot, html[data-theme="dark"] .tui .tui-stage .fc-rec-list .card .stock-info .more-shades-n { background-color: transparent; color: #fff; }
+html[data-theme="dark"] .stock-info .stock-dot { background: #fff; }
+.fc-st-rows { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 26px; border-radius: 24px; background: #f3f3f3; }
+.fc-st-r { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 0; border-top: 1px solid #e2e2e5; font-size: 15px; font-weight: 500; color: #6b6b70; white-space: nowrap; }
+.fc-st-r:first-child { border-top: 0; }
+.fc-st-r b { font-size: 19px; font-weight: 800; color: #111; letter-spacing: -0.02em; }
+.fc-st-best { flex: 1.1; min-width: 0; margin: 6px 0 14px; padding: 0 26px; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 10px 34px -6px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 0, 0, 0.35); }
+.fc-st-best.none { background: #f3f3f3; box-shadow: none; font-size: 17px; font-weight: 500; color: #6b6b70; }
+.fc-st-best + .fc-st-rows { margin: 6px 0 14px; }
+.fc-st-l { font-size: 13px; font-weight: 500; color: #8a8a8e; letter-spacing: -0.01em; }
+.fc-st-best > strong { font-size: 26px; line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fc-st-meta { font-size: 14px; font-weight: 500; color: #6b6b70; }
+.fc-st-q { margin-top: 10px; font-size: 15px; font-weight: 500; color: #6b6b70; }
+.fc-st-q b { font-size: 19px; font-weight: 800; color: #111; letter-spacing: -0.02em; }
+html[data-theme="dark"] .fc-st-r { border-top-color: rgba(255, 255, 255, 0.15); }
+html[data-theme="dark"] .fc-st-r, html[data-theme="dark"] .fc-st-stat, html[data-theme="dark"] .fc-st-meta, html[data-theme="dark"] .fc-st-q, html[data-theme="dark"] .fc-st-l { color: rgba(255, 255, 255, 0.65); }
+html[data-theme="dark"] .fc-st-r b, html[data-theme="dark"] .fc-st-q b { color: #fff; }
+html[data-theme="dark"] .fc-st-best:not(.none) { background: #474747; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 10px 34px -6px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 0, 0, 0.6); }
+
 /* ---------- 추천 카드 발라보기 버튼 (2026-11-24): 가로 = 제품 사진(200px), 글자 앞 입술 아이콘.
    지금 입술에 바른 제품이면(aria-pressed) 아이콘 속이 그 제품 색(--c, 실제 색)으로 채워진다 ---------- */
-.fc[data-mode="recs"] .fc-rec-list .card .actions:has(.shades-btn) { grid-template-columns: 200px 1fr; column-gap: 16px; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card .actions:has(.shades-btn) { grid-template-columns: 200px 1fr; column-gap: 16px; }
 .fc-rec-list .card .actions button.try-btn { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .try-lip { flex: none; width: 26px; height: 26px; overflow: visible; }
 .try-lip-fill { fill: transparent; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; transition: fill .35s ease; }
@@ -403,7 +470,7 @@ html[data-theme="dark"] .fc-sh-chip[aria-selected="true"] i { box-shadow: 0 0 0 
 /* ---------- 추천 카드 A-1 정돈형 (2026-11-24 사용자 선택, 호수 드롭다운 자리) ----------
    오른쪽 칸: 브랜드 + 제형 태그 / 제품명(두 줄) / 가격 — 맨 아래 지금 호수(색 점 + 이름, 이름은 줄이지 않고 두 줄까지) · 얇은 선 · 다른 호수 N가지 ›
    흰 상자 없이 선 하나로 나눈다. 발라보기 버튼 높이 46 고정 */
-.fc[data-mode="recs"] .fc-rec-list .card > .cur-shade { grid-column: 2; grid-row: 1; align-self: end; min-width: 0; display: flex; flex-direction: column; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card > .cur-shade { grid-column: 2; grid-row: 1; align-self: end; min-width: 0; display: flex; flex-direction: column; }
 .cur-shade-now { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .cur-shade-now[hidden] { display: none; }
 .cur-shade-now i { flex: none; width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08); }
@@ -417,21 +484,21 @@ html[data-theme="dark"] .fc-sh-chip[aria-selected="true"] i { box-shadow: 0 0 0 
 .tui .tui-stage .fc-rec-list .card .more-shades > span:first-child { color: #111; font-weight: 700; }
 .more-shades svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 /* 글씨 세 단계: 브랜드(작은 회색 + 제형 태그) · 제품명(굵게 두 줄) · 가격(가장 크게) */
-.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dl { padding-top: 4px; }
-.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(1) { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #8a8a8e; opacity: 1; }
-.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(2) { font-size: 17px; line-height: 1.32; letter-spacing: -0.02em; -webkit-line-clamp: 2; }
-.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(3) { margin-top: 4px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) dl { padding-top: 4px; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(1) { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #8a8a8e; opacity: 1; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(2) { font-size: 17px; line-height: 1.32; letter-spacing: -0.02em; -webkit-line-clamp: 2; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(3) { margin-top: 4px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .card-fin { flex: none; font-size: 11px; font-weight: 600; line-height: 16px; color: #6b6b70; border: 1px solid #d6d6da; border-radius: 6px; padding: 0 6px; }
 /* 발라보기 버튼 (2026-11-24 사용자 선택 'C4 색 + C5 모양'): 카드보다 한 단계 진한 회색 #E4E4E7 · 알약 · 높이 46 · 테두리·그림자 없음 · 검정 글자 */
-.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) .actions button { height: 46px; padding: 0 8px; border-radius: 999px; background: #e4e4e7; color: #111; box-shadow: none;
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) .actions button { height: 46px; padding: 0 8px; border-radius: 999px; background: #e4e4e7; color: #111; box-shadow: none;
   font-size: 15px; font-weight: 600; letter-spacing: -0.01em; display: flex; align-items: center; justify-content: center; }
-.fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) .actions button:active { background: #d6d6da; }
-html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) .actions button { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) .actions button:active { background: #d6d6da; }
+html[data-theme="dark"] .fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) .actions button { background: rgba(255, 255, 255, 0.14); color: #fff; }
 html[data-theme="dark"] .tui .tui-stage .fc-rec-list .card .more-shades { color: rgba(255, 255, 255, 0.7); border-top-color: rgba(255, 255, 255, 0.15); }
-html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(1), html[data-theme="dark"] .card-fin { color: rgba(255, 255, 255, 0.65); border-color: rgba(255, 255, 255, 0.25); }
+html[data-theme="dark"] .fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card:has(.cur-shade) dd:nth-of-type(1), html[data-theme="dark"] .card-fin { color: rgba(255, 255, 255, 0.65); border-color: rgba(255, 255, 255, 0.25); }
 
 /* ---------- 바른 카드 (2026-11-24 사용자 선택 'G1 빛 번짐 · 검정 그림자'): 검정 그림자로 살짝 떠오르고 버튼은 '지금 바르고 있어요' (palette.js markWorn) ---------- */
-.fc[data-mode="recs"] .fc-rec-list .card { transition: box-shadow .35s ease; }
-.fc[data-mode="recs"] .fc-rec-list .card.is-worn { z-index: 1;
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card { transition: box-shadow .35s ease; }
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card.is-worn { z-index: 1;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 10px 34px -6px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 0, 0, 0.35); }
-html[data-theme="dark"] .fc[data-mode="recs"] .fc-rec-list .card.is-worn { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 10px 34px -6px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 0, 0, 0.6); }
+html[data-theme="dark"] .fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card.is-worn { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5), 0 10px 34px -6px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 0, 0, 0.6); }
