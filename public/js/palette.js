@@ -32,6 +32,8 @@ import { mapPoint } from './lip-view.js';
 import { REDUCE_MOTION as reduce } from './motion.js';
 import { markSvg } from './brand.js';
 import { fitStage, toStage } from './ui-stage.js';
+import { setupDragScroll } from './drag-scroll.js';
+setupDragScroll(); // 시트 목록을 손가락으로 직접 밀기 (2026-11-28 갤탭 앱)
 
 const RECOMMEND_COUNT = 6; // 고른 색과 비슷한 제품을 몇 개 보여 줄지
 const stage = $('stage');
@@ -102,6 +104,8 @@ const sel = {
   exact: saved.exact || null, // NFC·추천 제품처럼 그대로 입힐 색
 };
 let mode = 'arc';
+// 로고 버튼 '눌러 주세요' 애니메이션 상태 (아래 nudge): 색을 바꿔서 보여 줄 차례인지 · 화면을 만지는 중인지 · 처음 준비가 끝났는지
+let nudgeWant = false, touching = false, nudgeReady = false;
 // 다이얼이 돌아간 각도 (시계 방향 +). 칸 s 의 가운데 = 위(손잡이) 기준 s*SEG + rot → 손잡이 아래 칸 = -rot/SEG
 let rot = -segOf(sel.fam, sel.k) * SEG;
 const dialHex = () => FAMILIES[sel.fam].stops[sel.k];
@@ -296,7 +300,7 @@ function frame(now) {
     ctx.arc(G.cx, cy, G.ri, Math.PI * 2, 0, true);
     ctx.fill('evenodd');
     // 흰 점 = 농도 바 (2026-11-20 사용자: "컬러 바는 컬러 조절, 밑에 점 바는 농도 조절"). 링과 달리 돌지 않는다.
-    // 왼쪽 끝 0% → 오른쪽 끝 100%, 지금 농도까지의 점은 흰색, 그 너머는 흐리게. 그 위를 링 안 검정 반원이 덮어 아래로 갈수록 사라진다 (Figma 와 같은 겹침 순서)
+    // 왼쪽 끝 0% → 오른쪽 끝 100%, 지금 농도까지의 점은 흰색, 그 너머는 흐리게. (예전엔 링 안 검정 반원이 덮어 아래로 갈수록 사라졌다 — 11-29 뺌)
     for (let k = -G.dot.n; k <= G.dot.n; k++) {
       const t = rad(G.ind + k * G.dot.step);
       ctx.fillStyle = (k + G.dot.n) / (2 * G.dot.n) <= lip.intensity / 100 + 1e-6 ? '#fff' : 'rgba(255,255,255,0.28)';
@@ -304,13 +308,7 @@ function frame(now) {
       ctx.arc(G.dot.cx + G.dot.r * Math.cos(t), G.dot.cy - WHEEL_TOP + G.dot.r * Math.sin(t), G.dot.d / 2, 0, Math.PI * 2);
       ctx.fill();
     }
-    const dome = ctx.createLinearGradient(0, DOME.y0 - WHEEL_TOP, 0, DOME.y1 - WHEEL_TOP);
-    dome.addColorStop(0, 'rgba(0,0,0,0)');
-    dome.addColorStop(1, '#000');
-    ctx.fillStyle = dome;
-    ctx.beginPath();
-    ctx.arc(DOME.cx, DOME.cy - WHEEL_TOP, DOME.r, 0, Math.PI * 2);
-    ctx.fill();
+    // (링 안 검정 반원 DOME 은 2026-11-29 사용자 요청으로 뺐다: 링 안쪽도 카메라가 보이게. 되살리려면 git 기록에서)
     ctx.globalAlpha = 1;
   }
   if (alphaAnim) rafId = requestAnimationFrame(frame);
@@ -371,7 +369,23 @@ const sbtn = $('fc-sbtn');
 const GRID_SVG = '<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><g fill="currentColor">'
   + [5, 24, 43].flatMap((y) => [5, 24, 43].map((x) => `<circle cx="${x}" cy="${y}" r="4.9"/>`)).join('') + '</g></svg>';
 sbtn.innerHTML = `<span class="fc-sbtn-logo">${markSvg()}</span><span class="fc-sbtn-grid">${GRID_SVG}</span>`;
-sbtn.addEventListener('click', () => setMode(mode === 'arc' ? 'recs' : 'arc'));
+sbtn.addEventListener('click', () => { nudgeWant = false; clearTimeout(nudgeTimer); nudge(false); setMode(mode === 'arc' ? 'recs' : 'arc'); });
+// ---------- 로고 버튼 '눌러 주세요' 애니메이션 (2026-11-29 사용자 요청, 시안 A: docs/로고버튼-시안/애니메이션) ----------
+// 색을 만든 뒤(다이얼·질감·농도로 색이 바뀐 뒤) 손을 떼고 NUDGE_WAIT 동안 가만히 있으면, 동그라미가 톡 눌렸다가 흰 물결이 퍼진다 (took-ui.css .fc-sbtn.nudge). 로고 버튼을 누를 때까지 계속 돈다 (2026-11-29 사용자 요청).
+// 화면을 만지는 동안은 세지 않고, 다시 색을 바꾸면 처음부터 다시 센다. 색을 바꿀 때마다 나온다(로고 버튼을 누른 뒤에도, 2026-11-29 사용자 요청). 시트가 열려 있으면 안 나온다.
+// 처음 들어올 때 정해 둔 색은 '만든 색'이 아니라서 세지 않는다 (맨 아래 nudgeReady)
+const NUDGE_WAIT = 2000;
+let nudgeTimer = 0;
+function nudge(on) { sbtn.classList.toggle('nudge', on && !reduce && mode === 'arc'); }
+function nudgeLater() {
+  clearTimeout(nudgeTimer);
+  if (nudgeWant && !touching) nudgeTimer = setTimeout(() => nudge(true), NUDGE_WAIT); // nudgeWant 는 로고 버튼을 누를 때까지 그대로 (만졌다 떼면 다시 나온다)
+}
+function nudgeArm() { if (!nudgeReady) return; nudgeWant = true; nudge(false); nudgeLater(); }
+stage.addEventListener('pointerdown', () => { touching = true; clearTimeout(nudgeTimer); nudge(false); }, true);
+const nudgeUp = () => { if (!touching) return; touching = false; nudgeLater(); };
+window.addEventListener('pointerup', nudgeUp, true);
+window.addEventListener('pointercancel', nudgeUp, true);
 // (오른쪽 위 다크/화이트 모드 동그라미는 2026-11-16 사용자 요청으로 뺐다)
 // (언어 버튼은 2026-11-17 사용자 요청으로 홈에만 — 여기서 바꾸지 않는다)
 // (왼쪽 세로 메뉴 = 스캔·NFC·9점·집 알약은 2026-11-26 사용자 요청으로 뺐다. 처음으로 = 위 로고, 추천 = 가운데 로고 버튼)
@@ -381,6 +395,7 @@ function setMode(m, { instant = false } = {}) {
   const wasOpen = mode === 'recs';
   mode = m === 'recs' || m === 'sheet' ? 'recs' : 'arc'; // 예전 주소 ?mode=sheet 도 추천 결과로
   stage.dataset.mode = mode;
+  if (mode !== 'arc') { nudgeWant = false; clearTimeout(nudgeTimer); nudge(false); } // 시트가 열리면(NFC 등 버튼 말고 열린 때도) '눌러 주세요' 끝
   // 시트를 내리는 동안에는 안의 목록(또는 호수 화면)을 그대로 둔 채 같이 내려간다 (took-ui.css .fc-closing). 다 내려가면(0.45초) 정리한다
   const sliding = wasOpen && mode === 'arc' && !instant && !reduce;
   clearTimeout(closeTimer);
@@ -673,6 +688,7 @@ let shown = null; // 지금 목록이 보여 주는 색·질감·농도
 let recTimer = 0;
 let recSeq = 0; // 늦게 온 이전 응답은 버린다
 function colorChanged() {
+  nudgeArm(); // 색이 바뀌었다 → 잠깐 뒤 로고 버튼 '눌러 주세요'
   want = recKey();
   if (mode === 'recs') queueRecs(250);
 }
@@ -844,6 +860,127 @@ function seeStock(p, from) {
   slideIn(img, from, body);
   back.focus({ preventScroll: true });
 }
+// ---------- 자세히 보기 = 검정 전체 화면 (2026-11-28 사용자 요청) ----------
+// 추천 카드를 누르거나 NFC 태그를 하면 열린다: 위 제품 정보, 호수 시트(누르면 바로 입술에), 재고 현황(고른 호수 기준, 품절이면 가까운 매장).
+// 재고·매장은 시연용 가짜 값(js/store-stock.js). 실데이터만 보기(?real=1)에서는 재고 칸을 뺀다
+const shadeCache = new Map(); // 제품 줄 → 호수 목록 (카드와 상세가 같이 쓴다)
+function loadShades(p) {
+  const key = p.line || p.id;
+  if (!shadeCache.has(key)) {
+    shadeCache.set(key, api('api/shades?id=' + encodeURIComponent(key))
+      .then((r) => (r?.ok && r.body?.shades || []).filter((s) => s.color_hex))
+      .catch(() => { shadeCache.delete(key); return []; }));
+  }
+  return shadeCache.get(key);
+}
+const wornOf = (s, p) => ({ ...s, finish: s.finish || p.finish, image_url: s.image_url || p.image_url });
+// 상세 화면: 무대(900×1440) 전체를 덮는다. 카드 자리에서 clip-path 로 퍼지고, 닫으면 다시 카드 자리로 줄어든다
+const detail = el('section', { class: 'fd', role: 'dialog', 'aria-modal': 'true', 'aria-label': tr('tg.detail'), hidden: '' });
+stage.append(detail);
+let detailOf = null;
+function cardInset(t) {
+  const c = t?.card?.isConnected && t.card.getBoundingClientRect();
+  const s = stage.getBoundingClientRect();
+  if (!c?.width || !s.width) return 'inset(40% 5% 20% 5% round 24px)';
+  const k = s.width / stage.offsetWidth; // 화면 px → 무대 px
+  return `inset(${(c.top - s.top) / k}px ${(s.right - c.right) / k}px ${(s.bottom - c.bottom) / k}px ${(c.left - s.left) / k}px round 24px)`;
+}
+function openDetail(t) {
+  const p = t.p;
+  detailOf = t;
+  const close = el('button', { type: 'button', class: 'fd-close', 'aria-label': tr('tg.close'), onclick: () => closeDetail() });
+  close.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  const nowDot = el('i');
+  const nowName = el('strong');
+  const count = el('span', { class: 'fd-count' });
+  const grid = el('div', { class: 'fd-grid', role: 'listbox', 'aria-label': tr('tg.shades') },
+    ...Array.from({ length: 12 }, () => el('span', { class: 'fd-chip wait', 'aria-hidden': 'true' }, el('i'))));
+  const stockBox = el('div', { class: 'fd-stock' });
+  const storeName = (s) => s[lang()] || s.en;
+  const renderStock = () => {
+    const sp = t.picked || p; // 고른 호수 기준 재고
+    const here = hereStock(sp);
+    const near = nearbyStock(sp.id).filter((s) => s.stock); // 살 수 있는 매장만, 가까운 순
+    const nearRow = (s) => el('div', { class: 'fd-near-r' },
+      el('span', { text: `${storeName(s)} · ${tr('st.walk', { n: s.walk })}` }), el('b', { text: tr('st.count', { n: s.stock }) }));
+    if (here.stock) { // 이 매장에 있다: 왼쪽 이 매장 재고(크게) + 오른쪽 근처 매장
+      stockBox.replaceChildren(
+        el('div', { class: 'fd-here' }, el('span', { text: tr('st.rowStock') }), el('strong', { text: tr('st.count', { n: here.stock }) }), el('em', { text: tr('st.canBuy') })),
+        near.length ? el('div', { class: 'fd-near' }, el('span', { class: 'fd-near-h', text: tr('st.nearby') }), ...near.slice(0, 3).map(nearRow)) : null);
+      return;
+    }
+    // 품절 (2026-11-28 사용자 요청 "재고가 없다면 가까운 매장 정보"): 품절 표시 + 가장 가까운 구매 가능 매장(큰 카드) + 다른 매장 줄
+    const [best, ...others] = near;
+    stockBox.replaceChildren(
+      el('div', { class: 'fd-col' },
+        el('p', { class: 'fd-out' }, el('i', { 'aria-hidden': 'true' }), tr('st.hereOut', { out: tr('st.out') })),
+        best
+          ? el('div', { class: 'fd-best' },
+            el('span', { class: 'fd-best-l', text: tr('st.nearest') }),
+            el('strong', { text: storeName(best) }),
+            el('span', { class: 'fd-best-m', text: `${tr('st.walk', { n: best.walk })} · ${distText(best.m)} · ${best.hours}` }),
+            el('span', { class: 'fd-best-q' }, tr('st.stockWord') + ' ', el('b', { text: tr('st.count', { n: best.stock }) })))
+          : el('div', { class: 'fd-best none', text: tr('st.none') }),
+        others.length ? el('div', { class: 'fd-near' }, el('span', { class: 'fd-near-h', text: tr('st.nearby') }), ...others.slice(0, 3).map(nearRow)) : null));
+  };
+  const renderNow = () => {
+    const s = t.picked;
+    nowDot.style.background = (s || p).color_hex; // 호수 색은 실제 색
+    nowName.textContent = s ? (shadeLabelOf(s) || s.shade_no || '') : tr('tg.repColor');
+    for (const c of grid.children) if (c.dataset.id) c.setAttribute('aria-selected', String(!!s && c.dataset.id === s.id));
+    if (!realOnly()) renderStock();
+    t.renderShade?.();
+  };
+  const fillGrid = (shades) => {
+    count.textContent = shades.length ? tr('nw.shadeCount', { n: shades.length }) : '';
+    if (!shades.length) { grid.replaceChildren(el('p', { class: 'fd-empty', text: tr('nw.noShades') })); return; }
+    grid.replaceChildren(...shades.map((s) => {
+      const d = el('i', { 'aria-hidden': 'true' });
+      d.style.background = s.color_hex; // 호수 색은 실제 색 (CLAUDE.md 예외)
+      return el('button', { type: 'button', class: 'fd-chip', role: 'option', 'data-id': s.id, 'aria-label': shadeLabelOf(s),
+        onclick: () => { t.picked = s; tryProduct(wornOf(s, p), { quiet: true }); renderNow(); } },
+      d, el('span', { text: shadeLabelOf(s) || s.shade_no }));
+    }));
+    renderNow();
+  };
+  const img = p.image_url ? el('img', { class: 'fd-img', src: p.image_url, alt: '', draggable: 'false', referrerpolicy: 'no-referrer' }) : el('div', { class: 'fd-img' });
+  detail.replaceChildren(
+    el('div', { class: 'fd-top' }, el('strong', { text: tr('tg.detail') }), close),
+    el('div', { class: 'fd-body' },
+      el('div', { class: 'fd-head' }, img,
+        el('div', { class: 'fd-info' },
+          el('span', { class: 'fd-brand', text: brandOf(p) }),
+          el('strong', { class: 'fd-name', text: nameOf(p) }),
+          el('span', { class: 'fd-price', text: p.price != null ? won(p.price) : '' }),
+          el('div', { class: 'fd-now' }, nowDot, el('div', {}, el('span', { text: tr('nw.wearing') }), nowName)))),
+      el('h3', { class: 'fd-h' }, el('span', { text: tr('tg.shades') }), count),
+      el('p', { class: 'fd-hint', text: tr('nw.browseShade') }),
+      grid,
+      realOnly() ? null : el('h3', { class: 'fd-h' }, el('span', { text: tr('tg.stock') })),
+      realOnly() ? null : stockBox));
+  renderNow();
+  if (t.shades) fillGrid(t.shades);
+  else loadShades(p).then((shades) => { if (detailOf === t) { t.shades = shades; fillGrid(shades); } });
+  detail.hidden = false;
+  stage.classList.add('fd-open');
+  if (!reduce) {
+    detail.animate([{ clipPath: cardInset(t) }, { clipPath: 'inset(0px 0px 0px 0px round 0px)' }], { duration: 480, easing: 'cubic-bezier(.2, .85, .25, 1)' });
+    detail.querySelector('.fd-body').animate([{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 380, delay: 160, easing: 'ease-out', fill: 'backwards' });
+  }
+  close.focus({ preventScroll: true });
+}
+function closeDetail(instant = false) {
+  if (detail.hidden) return;
+  const t = detailOf;
+  detailOf = null;
+  stage.classList.remove('fd-open');
+  const done = () => { if (!detailOf) { detail.hidden = true; detail.replaceChildren(); } };
+  if (instant || reduce) { done(); return; }
+  detail.animate([{ clipPath: 'inset(0px 0px 0px 0px round 0px)' }, { clipPath: cardInset(t) }], { duration: 340, easing: 'cubic-bezier(.4, 0, .2, 1)' }).finished.then(done, done);
+}
+window.addEventListener('took:shades-close', () => closeDetail(true));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !detail.hidden) closeDetail(); });
+
 // 전환 (호수 보기·매장 재고 공통): 목록 ← 밀려나고 새 화면이 → 에서 들어온다 (CSS .fc-shading). 사진은 누른 카드 자리에서 새 화면 사진 자리로 날아간다:
 // 화면이 움직이는 중이라 진짜 사진은 잠깐 숨기고, 시트 위에 띄운 복사본을 옮긴 뒤 바꿔 낀다. body = 아래에서 떠오를 본문(호수 격자·매장 목록)
 function slideIn(img, from, body) {
@@ -877,9 +1014,18 @@ function slideIn(img, from, body) {
   }
 }
 // 추천 카드 아래 줄: 이 매장 재고를 바로 표시, 품절이면 '가까운 매장 ›' (2026-11-27). 실데이터만 보기(?real=1)에서는 가짜 재고를 숨기므로 예전 '호수 보기'로
-const cardOpts = () => (realOnly()
-  ? { onMoreShades: (p, card, setShade) => seeShades(p, card, setShade) }
-  : { stockOf: (p) => hereStock(p).stock, onStock: (p, card) => showStockTip(p, card) });
+// 2026-11-28 사용자 요청: 카드의 재고 줄 대신 [자세히 보기] → 검정 전체 화면(호수 시트 + 재고 현황, 품절이면 가까운 매장). NFC 카드와 같은 화면(openDetail).
+// 상세에서 고른 호수는 카드에도 반영된다(setShade: 지금 호수 표시·발라보기 대상). 실데이터만 보기(?real=1)에서는 상세에 재고 칸이 없다
+const cardOpts = () => ({
+  onDetail: (p, card, setShade) => {
+    // 카드를 누르면 그 제품(지금 호수) 색을 입술에 바르고 상세를 연다 ('입술에 발라보기' 버튼은 2026-11-28 뺐다)
+    wornCard = card;
+    tryProduct(p, { quiet: true });
+    const t = { p, picked: p.shade_no ? p : null, shades: null, card };
+    t.renderShade = () => { if (t.picked) setShade(t.picked); };
+    openDetail(t);
+  },
+});
 // 품절 카드의 '가까운 매장 ›' (2026-11-27 사용자 선택 'b 검정 알약'): 새 화면 대신 누른 줄 바로 위에 작은 검정 알약 '중앙로점 · 도보 10분 · 14개'.
 // 가장 가까운 구매 가능 매장 하나만 (지점 이름 + 도보 시간 + 재고). 다시 누르거나 다른 곳을 누르면 닫히고, 4초 뒤 저절로 닫힌다
 let stockTip = null;
@@ -991,11 +1137,14 @@ const nfcWin = createNfcWindow({
   // NFC 인식 후 (2026-11-24 사용자 요청): 검정 제품 시트 대신 흰 추천 시트 안 화면으로.
   // 2026-11-27 사용자 요청: 추천 카드와 같이 '호수 보기' 대신 '매장 재고·위치' 화면. 실데이터만 보기(?real=1)에서는 가짜 재고를 숨기므로 예전 호수 보기.
   // 뒤로 가면 이 색과 비슷한 추천 립 목록. 입술에는 '인식했어요' 때 이미 발랐다
+  // 2026-11-28 사용자 요청: 매장 재고 화면 대신 제품 카드(브랜드·틴트 이름·가격·호수) + [자세히 보기] → 전체 화면(호수 시트 + 재고 현황)
+  // 2026-11-28 다시: 카드를 거치지 않고 바로 검정 상세 화면(추천 카드의 자세히 보기와 같은 화면). 닫으면 뒤에 이 색과 비슷한 추천 립 목록
   onProduct: (p) => {
+    closeDetail(true);
+    closeShades(true);
     colorChanged();
     setMode('recs');
-    if (realOnly()) seeShades(p, null);
-    else seeStock(p, null);
+    openDetail({ p, picked: p.shade_no ? p : null, shades: null, card: null });
   },
 });
 const tagToWindow = (code) => nfcWin.show(code);
@@ -1019,6 +1168,7 @@ tintHandle();
 setMode(new URLSearchParams(location.search).get('mode'), { instant: true }); // 화면 확인용 ?mode=recs
 if (bareStart) { lip.hex = null; applyLook(); } // 맨입술로 시작 (위 bareStart)
 else toLips();
+nudgeReady = true; // 여기부터 바뀌는 색 = 사람이 만든 색 (위 nudge)
 // 추천에 쓸 제품 데이터를 미리 읽어 둔다: 가운데 로고 버튼을 눌렀을 때 바로 목록이 뜨게 (api.js warmApi). 카메라가 먼저 켜지게 조금 뒤에
 setTimeout(warmApi, 600);
 // 자동 테스트·화면 확인용

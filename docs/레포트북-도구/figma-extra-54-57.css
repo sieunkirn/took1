@@ -1,0 +1,3 @@
+#p56 .shots { --h: 50mm !important; }
+#p56 .kinds { grid-template-columns: repeat(2, 24mm) !important; }
+#p56 .kinds svg { width: 24mm !important; height: 18.24mm !important; }

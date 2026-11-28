@@ -1,0 +1,78 @@
+/* ---------- 자세히 보기 = 검정 전체 화면 (2026-11-28 사용자 요청, js/palette.js openDetail) ----------
+   추천 카드를 누르거나 NFC 태그를 하면 카메라까지 덮는다. 검정 바탕에 흰 글자만: 회색·흰 칸 없이 가는 선으로만 나눈다.
+   예외(실제 색): 제품 사진, 호수 색 동그라미 */
+.fd { position: absolute; inset: 0; z-index: 20; background: #000; color: #fff; display: flex; flex-direction: column; }
+.fd[hidden] { display: none; }
+.fd-top { flex: none; height: 120px; display: flex; align-items: center; justify-content: space-between; padding: 0 44px; box-sizing: border-box; }
+.fd-top > strong { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+.tui .tui-stage .fd-close, .tui .tui-stage .fd-close:hover:not(:disabled) { width: 64px; height: 64px; border-radius: 50%; background: transparent; color: #fff;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.5); display: grid; place-items: center; }
+.tui .tui-stage .fd-close:active { box-shadow: inset 0 0 0 1.5px #fff; }
+.fd-close svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.fd-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 44px 60px; box-sizing: border-box; scrollbar-width: none; }
+.fd-body::-webkit-scrollbar { display: none; }
+.fd-head { display: flex; gap: 32px; }
+.fd-img { flex: none; width: 280px; height: 280px; box-sizing: border-box; border-radius: 20px; object-fit: contain; background: #fff; }
+.fd-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+.fd-brand { font-size: 19px; font-weight: 500; color: rgba(255, 255, 255, 0.6); }
+.fd-name { font-size: 32px; line-height: 1.28; font-weight: 800; letter-spacing: -0.02em; }
+.fd-price { font-size: 26px; font-weight: 800; }
+.fd-now { margin-top: auto; display: flex; align-items: center; gap: 14px; }
+.fd-now > i { flex: none; width: 52px; height: 52px; border-radius: 50%; }
+.fd-now > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fd-now span { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+.fd-now strong { font-size: 21px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fd-h { margin: 40px 0 6px; padding-top: 32px; border-top: 1px solid rgba(255, 255, 255, 0.18); display: flex; align-items: baseline; gap: 10px; font-size: 24px; font-weight: 800; }
+.fd-count { font-size: 17px; font-weight: 600; color: rgba(255, 255, 255, 0.5); }
+.fd-hint { margin: 0 0 18px; font-size: 16px; font-weight: 600; color: rgba(255, 255, 255, 0.55); }
+.fd-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px 8px; }
+.tui .tui-stage .fd-chip, .tui .tui-stage .fd-chip:hover:not(:disabled) { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; }
+.fd-chip i { display: block; width: 72px; height: 72px; border-radius: 50%; transition: box-shadow .2s ease, transform .2s ease; }
+.fd-chip:active i { transform: scale(.94); }
+.fd-chip span { max-width: 124px; text-align: center; font-size: 14px; line-height: 1.3; font-weight: 600; color: rgba(255, 255, 255, 0.75); word-break: keep-all; overflow-wrap: anywhere; }
+.fd-chip[aria-selected="true"] i { box-shadow: 0 0 0 3px #000, 0 0 0 5px #fff; }
+.fd-chip[aria-selected="true"] span { font-weight: 800; color: #fff; }
+.fd-chip.wait i { background: rgba(255, 255, 255, 0.15); animation: fc-sh-wait 1.1s ease-in-out infinite; }
+.fd-empty { grid-column: 1 / -1; margin: 0; font-size: 16px; color: rgba(255, 255, 255, 0.6); }
+/* 재고 현황: 왼쪽 이 매장 재고(큰 숫자) · 오른쪽 근처 매장 줄 / 품절이면 품절 + 가장 가까운 구매 가능 매장(크게) + 다른 매장 줄 */
+.fd-stock { display: flex; gap: 48px; margin-top: 18px; }
+.fd-here { flex: none; width: 260px; display: flex; flex-direction: column; gap: 4px; }
+.fd-here > span { font-size: 15px; font-weight: 500; color: rgba(255, 255, 255, 0.6); }
+.fd-here > strong { font-size: 52px; line-height: 1.1; font-weight: 800; letter-spacing: -0.03em; }
+.fd-here > em { font-style: normal; font-size: 16px; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
+.fd-near { flex: 1; min-width: 0; }
+.fd-near-h { display: block; padding-bottom: 6px; font-size: 15px; font-weight: 500; color: rgba(255, 255, 255, 0.6); }
+.fd-near-r { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 0; border-top: 1px solid rgba(255, 255, 255, 0.18); font-size: 17px; font-weight: 500; color: rgba(255, 255, 255, 0.75); white-space: nowrap; }
+.fd-near-r > span { overflow: hidden; text-overflow: ellipsis; }
+.fd-near-r b { font-size: 21px; font-weight: 800; color: #fff; }
+.fd-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.fd-out { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: rgba(255, 255, 255, 0.75); }
+.fd-out i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.45); }
+.fd-best { display: flex; flex-direction: column; gap: 6px; }
+.fd-best.none { font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.7); }
+.fd-best-l { font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+.fd-best > strong { font-size: 40px; line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; }
+.fd-best-m { font-size: 18px; font-weight: 500; color: rgba(255, 255, 255, 0.75); }
+.fd-best-q { margin-top: 6px; font-size: 18px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+.fd-best-q b { font-size: 28px; font-weight: 800; color: #fff; }
+
+/* 추천 카드 (2026-11-28): '입술에 발라보기' 버튼 없이 카드 전체가 누르는 곳 → 자세히 보기. 버튼 줄이 빠진 만큼 카드 높이를 줄인다(사진 200 + 위아래 14) */
+.fc:is([data-mode="recs"], .fc-closing) .fc-rec-list .card.card-tap { height: 228px; cursor: pointer; transition: transform .15s ease, box-shadow .35s ease; }
+.fc-rec-list .card.card-tap:active { transform: scale(.98); }
+.tui .tui-stage .fc-rec-list .card .more-detail { cursor: pointer; }
+.tui .tui-stage .fc-rec-list .card .more-detail > span { font-weight: 700; color: #111; }
+.tui .tui-stage .fc-rec-list .card .more-detail svg { margin-left: auto; color: #111; }
+html[data-theme="dark"] .tui .tui-stage .fc-rec-list .card .more-detail > span,
+html[data-theme="dark"] .tui .tui-stage .fc-rec-list .card .more-detail svg { color: #fff; }
+
+/* 드래그 (2026-11-28 "드래그가 잘 안됨"): 무대 기본값 manipulation 은 브라우저가 손가락 끌기를 '화면 밀기'로 가져가
+   pointercancel 을 보내서 다이얼·질감 줄 끌기가 중간에 끊겼다. 거울 무대는 브라우저 밀기를 끄고, 실제로 스크롤하는 목록만 밀기를 허용한다 */
+/* 추천 시트가 열린 동안(data-mode="recs")은 무대를 none 으로 두지 않는다 (2026-11-28): 무대가 none 이면 목록 안 카드 사이 빈칸·여백을
+   눌러 밀 때 none 이 그대로 이어져 목록이 안 밀렸다. 시트가 열려 있으면 다이얼은 어차피 돌지 않는다 (palette.js pointerdown: mode !== 'arc') */
+.tui-fc .tui-stage:not([data-mode="recs"]), .tui-fc .tui-stage button, .tui-fc .tui-stage a { touch-action: none; }
+/* 목록 밀기는 js/drag-scroll.js 가 손가락 움직임으로 직접 한다 (2026-11-28 갤탭 앱에서 브라우저 기본 밀기가 안 먹음).
+   브라우저 기본 밀기와 겹치지 않게 none. 마우스 휠은 그대로 된다 */
+.tui-fc .fc-rec-list, .tui-fc .fc-sh-grid, .tui-fc .fd-body, .tui-fc .nt-chips, .tui-fc .nt-recent,
+.tui-fc .fc-rec-list *, .tui-fc .fc-sh-grid *, .tui-fc .fd-body *, .tui-fc .nt-chips *, .tui-fc .nt-recent * { touch-action: none; }
+.drag-scrolling { scroll-behavior: auto !important; }
+

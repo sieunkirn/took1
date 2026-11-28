@@ -85,7 +85,8 @@ const REF_SKIN = { L: 65, a: 14, b: 18 }; // 조명 보정 기준: 고른 백색
 // 랜드마크 윤곽으로 입술을 채우고(가장자리만 살짝 블러), Lab 공간에서 원래 입술의 명암(L)은 살리고 색(a, b)만 바꾼다.
 // 입 주변 피부색으로 조명 밝기·색온도를 추정해 선택 색에 반영한다.
 // lips: 0~1 정규화 입술 좌표, look: { hex, texture, intensity(0~100) }
-export function applyLipColor(ctx, lips, w, h, mirror, look) {
+// read(x0, y0, bw, bh): 원본 픽셀을 ImageData 로 주는 함수 (없으면 ctx 에서 읽는다, 2026-11-28 lip-view.js)
+export function applyLipColor(ctx, lips, w, h, mirror, look, read = null) {
   if (!look.hex) return; // 색 없음 = 맨입술 (거울에 처음 들어왔을 때, 2026-11-24)
   const tex = TEXTURES[look.texture] || TEXTURES.matte;
   const xs = lips.outer.map((p) => (mirror ? 1 - p.x : p.x) * w), ys = lips.outer.map((p) => p.y * h);
@@ -97,7 +98,13 @@ export function applyLipColor(ctx, lips, w, h, mirror, look) {
   const bw = x1 - x0, bh = y1 - y0;
   if (bw < 2 || bh < 2) return;
 
-  maskCanvas.width = bw; maskCanvas.height = bh;
+  // 마스크 캔버스는 커질 때만 크기를 바꾼다 (2026-11-28 느려짐 수정: 예전에는 프레임마다 크기를 다시 정해 캔버스를 새로 만들었다)
+  if (maskCanvas.width < bw || maskCanvas.height < bh) {
+    maskCanvas.width = Math.max(maskCanvas.width, bw + 32);
+    maskCanvas.height = Math.max(maskCanvas.height, bh + 32);
+  } else {
+    maskCtx.clearRect(0, 0, bw, bh);
+  }
   maskCtx.save();
   if (supportsCanvasFilter) maskCtx.filter = `blur(${feather}px)`;
   maskCtx.translate(-x0, -y0);
@@ -105,7 +112,7 @@ export function applyLipColor(ctx, lips, w, h, mirror, look) {
   maskCtx.fill(lipsPath(lips, w, h, mirror), 'evenodd');
   maskCtx.restore();
   const mask = maskCtx.getImageData(0, 0, bw, bh).data;
-  const img = ctx.getImageData(x0, y0, bw, bh);
+  const img = read ? read(x0, y0, bw, bh) : ctx.getImageData(x0, y0, bw, bh);
   const d = img.data;
 
   // 입술 내부 밝기 통계와 주변 피부(마스크 바깥) 평균색
@@ -155,29 +162,6 @@ export function applyLipColor(ctx, lips, w, h, mirror, look) {
     }
   }
   ctx.putImageData(img, x0, y0);
-}
-
-// ---------- 입술만 보기 (2026-11-27, 관리자 스위치) ----------
-// 이미 그린 화면(영상 + 입힌 색)에서 입술 윤곽 안쪽만 남기고 나머지는 검정으로 덮는다. 입 안(안쪽 윤곽)도 검정.
-// 가장자리는 색 입힐 때와 같은 폭으로 흐리게 해서 누끼 선이 딱딱하지 않게 한다. lips 가 없으면(얼굴 못 찾음) 전부 검정.
-export function keepLipsOnly(ctx, lips, w, h, mirror) {
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (lips) {
-    const xs = lips.outer.map((p) => p.x * w);
-    const feather = Math.max(1, (Math.max(...xs) - Math.min(...xs)) / 60);
-    ctx.globalCompositeOperation = 'destination-in'; // 새로 칠한 곳(입술)에 있던 그림만 남는다
-    if (supportsCanvasFilter) ctx.filter = `blur(${feather}px)`;
-    ctx.fillStyle = '#000';
-    ctx.fill(lipsPath(lips, w, h, mirror), 'evenodd');
-    if (supportsCanvasFilter) ctx.filter = 'none';
-  } else {
-    ctx.clearRect(0, 0, w, h);
-  }
-  ctx.globalCompositeOperation = 'destination-over'; // 비워진 곳 뒤에 검정 레이어
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, w, h);
-  ctx.restore();
 }
 
 // 프레임 간 랜드마크 떨림을 줄이는 평활. 움직임이 크면 평활을 끄고 바로 따라가 위치가 밀리지 않게 한다.

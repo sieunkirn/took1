@@ -27,11 +27,13 @@ export const won = priceText; // 한국어 '13,000원', 영어 '₩13,000'
 // 입술 아이콘은 2026-11-24 사용자 요청으로 잠시 꺼 둠 (주석). 다시 켜려면 아래 기본값을 !!(onShades || onMoreShades) 로
 // onStock + stockOf (2026-11-27 사용자 요청): '호수 보기' 줄 대신 이 매장 재고를 카드에 바로. stockOf(제품) = 이 매장 재고 수(시연용 값),
 //   품절(0)일 때만 줄이 버튼이 되어 onStock(지금 호수, 카드) (palette.js seeStock = 가까운 구매 가능 매장)
-export function tryOnCard(product, onTry, { onShades, onMoreShades, onStock, stockOf = () => 0, lipIcon = false /* !!(onShades || onMoreShades) */ } = {}) {
+// onDetail (2026-11-28 사용자 요청 "기존 재고 부분을 자세히 보기 버튼으로"): 재고 줄 자리에 [자세히 보기 ›] 버튼. 누르면 onDetail(지금 호수, 카드, 호수 바꾸기)
+//   (palette.js openDetail = 검정 전체 화면: 호수 시트 + 재고 현황, 품절이면 가까운 매장)
+export function tryOnCard(product, onTry, { onShades, onMoreShades, onStock, onDetail, stockOf = () => 0, lipIcon = false /* !!(onShades || onMoreShades) */ } = {}) {
   let current = product;
   let card = null;
   // 거울 추천 카드(onMoreShades·onShades): 지금 바른 제품인지 palette.js markWorn 이 aria-pressed 로 표시한다 (data-hex 로 비교)
-  const mirror = !!(onShades || onMoreShades || onStock || lipIcon);
+  const mirror = !!(onShades || onMoreShades || onStock || onDetail || lipIcon);
   const tryBtn = mirror
     ? el('button', { type: 'button', class: 'try-btn', 'aria-pressed': 'false', 'data-hex': product.color_hex || '', style: `--c: ${product.color_hex || '#888'}`, onclick: () => onTry(current, card) })
     : el('button', { type: 'button', text: t('lip.tryOn'), onclick: () => onTry(current) });
@@ -56,12 +58,15 @@ export function tryOnCard(product, onTry, { onShades, onMoreShades, onStock, sto
     nowDot.style.background = current.color_hex; // 호수 색은 실제 색 (CLAUDE.md 예외)
     nowName.textContent = label;
   }
-  if (onMoreShades || onStock) {
+  if (onMoreShades || onStock || onDetail) {
     // 재고 줄 (2026-11-27 사용자 선택 '카드에 바로 표시'): 재고가 있으면 누르는 곳이 아니라 글자 '● 이 매장 재고 … 4개',
     // 품절일 때만 버튼 '● 품절 … 가까운 매장 ›' → onStock (가까운 구매 가능 매장 화면)
     const n = onStock ? stockOf(product) : 0;
     const dot = () => el('i', { class: 'stock-dot', 'aria-hidden': 'true' });
-    const more = onStock
+    // onDetail (2026-11-28): 카드 전체가 누르는 곳이라 이 줄은 버튼이 아니라 '자세히 보기 ›' 안내 글자
+    const more = onDetail
+      ? el('div', { class: 'more-shades more-detail' }, el('span', { text: t('tg.more') }))
+      : onStock
       ? (n > 0
         ? el('div', { class: 'more-shades stock-info' }, el('span', {}, dot(), t('card.stockHere')), el('span', { class: 'more-shades-n', text: t('st.count', { n }) }))
         : el('button', { type: 'button', class: 'more-shades stock-out', onclick: () => onStock(current, card) }, el('span', {}, dot(), t('st.out')), el('span', { class: 'more-shades-n', text: t('card.stockNear') })))
@@ -69,19 +74,29 @@ export function tryOnCard(product, onTry, { onShades, onMoreShades, onStock, sto
         // '호수 보기' ……… '12가지 ›' (2026-11-24 사용자 요청, 예전 '다른 호수 N가지')
         el('span', { text: t('card.moreShades') }), el('span', { class: 'more-shades-n', text: t('nw.shadeCount', { n: product.shade_count }) }))
       : null;
-    if (more && more.tagName === 'BUTTON') more.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg>');
+    if (more && (more.tagName === 'BUTTON' || onDetail)) more.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg>');
     nowBox = el('div', { class: 'cur-shade' }, el('div', { class: 'cur-shade-now' }, nowDot, nowName), more);
     renderNow();
   }
   card = productCard(product, {
-    extraActions: [tryBtn,
+    extraActions: onDetail ? [] : [tryBtn, // onDetail: '입술에 발라보기' 버튼 없음 (2026-11-28 사용자 요청)
       onShades ? el('button', { type: 'button', class: 'shades-btn', text: t('card.seeShades'), onclick: () => onShades(current, card) }) : null].filter(Boolean),
     onShade: (s) => setShade(s),
-    noPicker: !!(onShades || onMoreShades || onStock),
-    noShadeRow: !!(onMoreShades || onStock),
+    noPicker: !!(onShades || onMoreShades || onStock || onDetail),
+    noShadeRow: !!(onMoreShades || onStock || onDetail),
   });
   if (nowBox) {
     card.querySelector('.actions').before(nowBox);
+    if (onDetail) {
+      // 카드 아무 곳이나 누르면 자세히 보기 (2026-11-28 사용자 요청). 빈 버튼 칸은 뺀다
+      card.querySelector('.actions').remove();
+      card.classList.add('card-tap');
+      card.setAttribute('role', 'button');
+      card.tabIndex = 0;
+      card.setAttribute('aria-label', `${t('tg.more')} · ${product.brand || ''} ${product.name || ''}`.trim());
+      card.addEventListener('click', () => onDetail(current, card, setShade));
+      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onDetail(current, card, setShade); } });
+    }
     // 브랜드 옆 제형 태그(매트·글로시…)는 2026-11-24 사용자 요청으로 뺐다
     // if (product.finish) card.querySelector('dd')?.append(el('span', { class: 'card-fin', text: finishName(product.finish) }));
   }

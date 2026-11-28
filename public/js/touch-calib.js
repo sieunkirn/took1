@@ -202,7 +202,7 @@
     const gestures = new Map(); // pointerId → 진행 중인 터치
     let fling = 0;
     const listeners = new Set(); // 상태가 바뀌면 알린다 (미리보기의 터치 보정 버튼 상자)
-    const notify = () => listeners.forEach((f) => { try { f(); } catch { /* 닫힌 화면 */ } });
+    const notify = () => { syncTouch(); listeners.forEach((f) => { try { f(); } catch { /* 닫힌 화면 */ } }); };
 
     const isActive = () => !!(saved || sim || debug || calib || test);
 
@@ -562,6 +562,7 @@
       input[type="range"].took-press::-webkit-slider-thumb { transform: scale(1.18); }
       html.took-fs-on header.nav { padding-right: 60px; } /* 오른쪽 위 전체화면 버튼 자리 */`;
     function prepareWindow(win) {
+      syncTouch();
       if (!isActive() || win.__tookCalibReady) return;
       const doc = win.document;
       if (!doc.head) return;
@@ -1103,10 +1104,31 @@
       setTimeout(() => t.remove(), 2600);
     }
 
+    // ---------- 터치 리스너: 보정이 켜졌을 때만 막는(passive: false) 리스너 (2026-11-28 갤탭 '제품 시트 드래그가 안 먹힘') ----------
+    // 창 전체에 passive: false 인 touchstart·touchmove 가 하나라도 있으면, 브라우저는 손가락이 닿을 때마다 메인 스레드가 그 리스너를
+    // 다 돌릴 때까지 스크롤을 시작하지 못한다. 거울은 웹캠 한 장에 90ms 넘게 메인 스레드를 쓰므로 시트 목록 밀기가 아예 안 먹혔다.
+    // 보정값이 없으면(지금 매장 기기) 듣기만 하는(passive) 리스너로 걸어 스크롤이 메인 스레드를 기다리지 않게 한다.
+    // 보정·정확도 테스트를 열거나 조정값이 생기면(isActive) 그때 막는 리스너로 바꾼다 (syncTouch: notify·prepareWindow 에서 부른다)
+    let touchBlocking = false;
+    function armTouch(win, block) {
+      for (const t of BLOCK_TOUCH) {
+        win.removeEventListener(t, onRaw, true);
+        win.addEventListener(t, onRaw, { capture: true, passive: !block });
+      }
+    }
+    function syncTouch() {
+      const want = isActive();
+      if (want === touchBlocking) return;
+      touchBlocking = want;
+      wins.forEach((w) => { try { armTouch(w, want); } catch { /* 닫힌 화면 */ } });
+    }
+
     function addWindow(win) {
       if (wins.has(win)) return;
       wins.add(win);
-      for (const t of [...POINTER, ...BLOCK_TOUCH, ...BLOCK_MOUSE]) win.addEventListener(t, onRaw, { capture: true, passive: false });
+      for (const t of [...POINTER, ...BLOCK_MOUSE]) win.addEventListener(t, onRaw, { capture: true, passive: false });
+      syncTouch(); // (조정값이 이미 있으면 여기서 막는 리스너로 바뀐다)
+      armTouch(win, touchBlocking);
       win.addEventListener('dragstart', onDragStart, true);
       win.addEventListener('pagehide', () => wins.delete(win));
       if (win.document.head) prepareWindow(win);

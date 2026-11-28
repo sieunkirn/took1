@@ -268,7 +268,7 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 .idle-title { top: 170px; font-size: 35px; line-height: 46px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
 .idle-sub { top: 228px; font-size: 22px; line-height: 28px; font-weight: 400; color: rgba(255, 255, 255, 0.6); }
 .idle-label { top: 308px; font-size: 19px; line-height: 24px; font-weight: 600; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.72); }
-/* 남은 시간: 흰 원이 줄어들고 분홍 점이 그 앞머리를 따라 시계 방향으로 돈다. 지나간 자리는 회색 선 */
+/* 남은 시간: 흰 원이 줄어들고 흰 점이 그 앞머리를 따라 시계 방향으로 돈다. 지나간 자리는 회색 선 */
 .idle-ring { left: 170px; top: 369px; width: 560px; height: 560px; }
 .idle-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transform: rotate(-90deg); }
 .idle-ring circle { fill: none; }
@@ -280,7 +280,7 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 @keyframes took-idle-drain { to { stroke-dashoffset: -100; } }
 .idle-ring .dot-rot { transform-box: view-box; transform-origin: 280px 280px; animation: took-idle-dot var(--idle-s, 10s) linear forwards; }
 @keyframes took-idle-dot { to { transform: rotate(360deg); } }
-.idle-ring .dot { fill: #ff007b; }
+.idle-ring .dot { fill: #fff; }
 .idle-count { position: absolute; inset: 0; }
 .idle-num { position: absolute; left: 0; right: 0; top: 160px; text-align: center; font-size: 160px; line-height: 170px; font-weight: 200; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: #fff; }
 .idle-unit { position: absolute; left: 0; right: 0; top: 376px; text-align: center; font-size: 24px; line-height: 30px; font-weight: 400; color: rgba(255, 255, 255, 0.72); }
@@ -288,7 +288,7 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 .idle-help { top: 1041px; font-size: 22px; line-height: 41px; font-weight: 400; color: rgba(255, 255, 255, 0.6); white-space: pre-line; }
 .idle-keep { left: 220px; top: 1176px; width: 460px; height: 92px; min-height: 0; padding: 0; border-radius: 999px; cursor: pointer;
   font: inherit; font-size: 26px; font-weight: 600; color: #fff; border: 0;
-  background: #ff007b; box-shadow: none; } /* 2026-11-20 사용자 요청: 그라데이션·빛 번짐 없이 TOOK 핑크 단색 (README '색') */
+  background: #fff; color: #000; box-shadow: none; } /* 2026-11-28 사용자 요청: 핑크 없이 흰 단색 + 검정 글자 */
 /* 계속 이용하기를 누르면 (idle-reset.js dismiss, 0.76초 뒤 제거): 사라지는 동안에도 터치를 받아 아래 버튼이 눌리지 않게 덮고 있는다.
    ① 누른 버튼이 살짝 눌렸다가 분홍 빛이 번지고 ② 원은 커지며, 위 글자는 위로·아래 글자는 아래로 흩어지며 흐려지고
    ③ 마지막에 검정 막이 걷혀 원래 화면이 드러난다 */
@@ -303,7 +303,7 @@ header.nav.nav-min .nav-fullscreen { margin-left: auto; }
 .idle-closing :is(.idle-title, .idle-sub, .idle-label, .idle-ask, .idle-help) { transition-delay: .04s; }
 .idle-closing :is(.idle-back, .idle-logo) { transition-delay: .08s; }
 .idle-closing .idle-keep { transition-delay: .14s; }
-.idle-keep.idle-pressed { animation: took-idle-press .32s cubic-bezier(.3, 0, .2, 1); background: #d60067; }
+.idle-keep.idle-pressed { animation: took-idle-press .32s cubic-bezier(.3, 0, .2, 1); background: #cfcfcf; }
 .idle-back.idle-pressed { animation: took-idle-press .32s cubic-bezier(.3, 0, .2, 1); background: #2a2a2a; }
 @keyframes took-idle-press { 0% { scale: 1; } 35% { scale: .94; } 100% { scale: 1.02; } }
 @media (prefers-reduced-motion: reduce) {
@@ -414,22 +414,3 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar { display
   opacity: 0.75; white-space: nowrap; vertical-align: middle;
 }
 .card > .demo-badge { margin: 2px 0 0; }
-
-/* ---------- 자동꺼짐 화면 반투명 시안 (2026-11-24 사용자 요청: 색깔 없이 반투명 느낌) ----------
-   검정 막 대신 뒤 화면이 흐리게 비치는 유리 막. 분홍 점·분홍 버튼은 흰색 투명도로.
-   원래 검정·핑크 디자인으로 돌리려면 이 블록만 지우면 된다 */
-.idle-overlay { background: rgba(0, 0, 0, 0.42); -webkit-backdrop-filter: blur(30px) saturate(1.1); backdrop-filter: blur(30px) saturate(1.1); }
-.idle-back { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.24); }
-.idle-ring .dot { fill: #fff; }
-.idle-keep { background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.32);
-  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
-.idle-keep.idle-pressed { background: rgba(255, 255, 255, 0.28); }
-.idle-back.idle-pressed { background: rgba(255, 255, 255, 0.22); }
-
-/* 글자 배치 (2026-11-25): 'AUTO SLEEP' 줄을 지운 뒤 위(제목·안내)·원·아래(질문·버튼)를 고른 간격(72px)으로 다시 놓음 */
-.idle-title { top: 196px; }
-.idle-sub { top: 252px; }
-.idle-ring { top: 352px; }
-.idle-ask { top: 984px; }
-.idle-help { top: 1046px; }
-.idle-keep { top: 1188px; }

@@ -6,7 +6,9 @@ renderNav();
 
 export const video = $('video');
 export const view = $('view');
-export const viewCtx = view.getContext('2d', { willReadFrequently: true });
+// willReadFrequently 는 넣지 않는다 (2026-11-28): 넣으면 캔버스가 CPU 메모리로 가서, 갤탭에서 웹캠 영상 한 장을 옮겨 그리는 데만 60ms 가 걸렸다.
+// 픽셀을 꺼내 읽는 건 입술 주변 작은 부분(lip-engine.js applyLipColor)뿐이라 GPU 캔버스가 훨씬 빠르다
+export const viewCtx = view.getContext('2d');
 
 // 웹캠 멈춤 대비: 새 프레임이 이만큼 안 오면 카메라를 다시 켠다 (USB 절전·전원 부족으로 끊기지 않고 멈추는 경우)
 export const STALL_MS = 4000;

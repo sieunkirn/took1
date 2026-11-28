@@ -7,7 +7,7 @@ import { logoFull } from './brand.js';
 // ---------- 키오스크 자동 초기화 ----------
 // 손님이 떠난 뒤 다음 손님에게 앞 손님의 대화·측정한 톤·고른 색이 보이지 않게, 한동안 조작이 없으면 안내 후 지우고 홈으로 간다.
 // - 대기 시간 기본 90초. 기기마다 바꾸려면 그 기기 브라우저에서 localStorage['took.idleSeconds'] = '120' (10초 이상)
-// - 안내('See You Soon' 자동 꺼짐 화면)가 뜬 뒤 10초 안에 화면 아무 곳이나(계속 이용하기 버튼 포함) 누르면 그대로 이어서 쓴다
+// - 대기 시간이 지나면 'See You Soon' 10초 안내를 띄우고, 그동안 누르면 이어서 쓰기, 0초면 초기화 (2026-11-28 흑백으로 다시 켬)
 // - 홈에 지울 것이 없으면 아무것도 하지 않는다
 // - 직원용 화면은 <body data-idle-reset="off"> 로 끈다
 const IDLE_DEFAULT_S = 90;
@@ -61,6 +61,7 @@ export function setupIdleReset(custom = {}) {
   const onIdle = () => {
     if (custom.active && !custom.active()) return schedule(); // 지울 것이 없는 상태(예: 거울 대기 화면)
     if (document.hidden || (onHome && !hasSessionState())) return schedule();
+    // 2026-11-28 사용자 요청: 자동 꺼짐 안내 화면 부활 (Figma '자동꺼짐', 검정 바탕·흰 글자, 핑크 없음)
     showWarning();
   };
   // 계속 쓰기: 안내는 0.75초 동안 부드럽게 사라지며(누른 버튼이 눌렸다 빛나고 → 글자·원이 위아래로 흩어지며 흐려지고 → 검정 막이 걷힘)
@@ -74,7 +75,7 @@ export function setupIdleReset(custom = {}) {
     schedule();
   };
   // 안내: 'See You Soon' 자동 꺼짐 화면 (2026-11-19 사용자 디자인). 화면 전체를 검정으로 덮고
-  // 위 가운데 로고·제목·남은 초 원(분홍 점이 시계 방향으로 돌며 흰 원이 줄어듦)·'아직 이용 중이신가요?'·계속 이용하기 버튼.
+  // 위 가운데 로고·제목·AUTO SLEEP·남은 초 원(흰 점이 시계 방향으로 돌며 흰 원이 줄어듦)·'아직 이용 중이신가요?'·계속 이용하기 버튼.
   // 뒤로·계속 버튼은 물론 화면 아무 곳이나 누르거나 키를 누르면 계속 쓰고, 0초가 되면 처음 화면으로.
   // 화면 속은 900×1440 기준 좌표로 그리고 창 크기에 맞춰 통째로 줄인다(--k)
   function showWarning() {
@@ -102,6 +103,7 @@ export function setupIdleReset(custom = {}) {
       back, logo,
       el('h2', { class: 'idle-title', text: t('idle.title') }),
       el('p', { class: 'idle-sub', text: t('idle.sub') }),
+      el('p', { class: 'idle-label', 'aria-hidden': 'true', text: 'AUTO SLEEP' }), // 영어 표기 그대로 (모든 언어 같음)
       ring,
       el('p', { class: 'idle-ask', text: t('idle.ask') }),
       el('p', { class: 'idle-help', text: t('idle.help') }),

@@ -98,8 +98,18 @@ public class UvcCamera {
     final Object frameLock = new Object();
     byte[] jpeg;
     long jpegSeq;
+    long seqBase; // 이번에 연 뒤 첫 장 번호 - 1
     long jpegCount, lastFpsAt = System.currentTimeMillis(), lastFpsCount;
     volatile int fpsNow;
+    // 웹캠은 한 번 켜면 계속 켜 둔다 (2026-11-27 사용자 요청: 거울에 다시 들어올 때 바로 보이게. 화면이 바뀌면 uvc-bridge.js 의 끄기 타이머가 사라져서 원래도 안 꺼졌다).
+    // 대신 IDLE_MS 동안 /__uvc/frame 요청이 없으면(홈 화면 등) 들어온 장을 그냥 버린다: 복사·YUY2→JPEG 변환을 하지 않는다
+    static final long IDLE_MS = 5000;
+    volatile long lastAskAt = System.currentTimeMillis(); // 화면이 마지막으로 영상을 달라고 한 때
+    // 웹캠에서 마지막으로 장이 들어온 때 (화면이 안 가져가서 버린 장도 센다) (2026-11-28 멈춤 수정)
+    // 켜진 채로 장이 끊기면(USB 대역폭·전원 흔들림) 예전에는 '이미 켜져 있음'으로 보고 멈춘 연결을 계속 썼다 → 거울이 멈춘 채로 남았다
+    volatile long lastRawAt;
+    static final long STALE_MS = 2500;   // 이만큼 장이 없으면 다시 켜 달라는 요청 때 새로 연다
+    static final long WATCHDOG_MS = 4000; // 켜진 채로 이만큼 장이 없으면 앱이 스스로 다시 연다
 
     UvcCamera(Context ctx, Listener listener) {
         this.ctx = ctx;
@@ -204,7 +214,9 @@ public class UvcCamera {
         primeOnly = false; // 화면이 영상을 달라고 했다: 허용되면 바로 켠다
         if (streaming && conn != null && curW > 0) {
             // 이미 켜져 있고 해상도가 크게 다르지 않으면 그대로 쓴다
-            if (Math.abs(curW * curH - reqW * reqH) < reqW * reqH / 3) return;
+            boolean fresh = System.currentTimeMillis() - lastRawAt < STALE_MS;
+            if (fresh && Math.abs(curW * curH - reqW * reqH) < reqW * reqH / 3) return;
+            if (!fresh) note("켜져 있지만 영상이 멈춰 있어 새로 엽니다 " + (nativeOk ? nativeStats() : ""));
         }
         if (!nativeOk) note("네이티브 등시 전송 라이브러리 없음: " + nativeError + " (벌크 전송 웹캠만 가능)");
         UsbDevice d = findUvc();
@@ -390,7 +402,7 @@ public class UvcCamera {
         bulkExpect = expect;
         long until = System.currentTimeMillis() + 3000;
         while (System.currentTimeMillis() < until) {
-            synchronized (frameLock) { if (jpegSeq > 0) { state = "streaming"; note("영상 들어옴: " + chosen); return true; } }
+            synchronized (frameLock) { if (jpegSeq > seqBase) { state = "streaming"; note("영상 들어옴: " + chosen); return true; } }
             try { Thread.sleep(50); } catch (InterruptedException e) { break; }
         }
         streaming = false;
@@ -401,7 +413,10 @@ public class UvcCamera {
     int bulkExpect;
 
     void startPump(final boolean bulkMode, final UsbEndpoint ep, final int payload, final int frameCap) {
-        synchronized (frameLock) { jpeg = null; jpegSeq = 0; }
+        // 번호(jpegSeq)는 다시 열어도 0 으로 되돌리지 않는다: 켜져 있던 화면이 after=예전 번호 로 계속 묻고 있으니 번호가 이어져야 새 장을 받는다
+        synchronized (frameLock) { jpeg = null; seqBase = jpegSeq; }
+        lastAskAt = System.currentTimeMillis(); // 방금 켰다: 화면이 첫 장을 가져갈 시간을 준다
+        lastRawAt = System.currentTimeMillis();
         jpegCount = lastFpsCount = 0;
         streaming = true;
         final int w = curW, h = curH;
@@ -424,7 +439,7 @@ public class UvcCamera {
                 if (streaming) { note("영상 전송이 멈췄어요 " + nativeStats()); state = "error"; lastError = "웹캠 연결이 끊겼어요"; listener.onUsbEvent("detached"); }
                 break;
             }
-            if (s == 0) continue;
+            if (s == 0) { if (stalled()) break; continue; }
             seq = s;
             int n = nativeCopyFrame(buf);
             if (n < 0) { buf = new byte[-n + 4096]; n = nativeCopyFrame(buf); }
@@ -439,7 +454,7 @@ public class UvcCamera {
         boolean bad = false;
         while (streaming && !Thread.currentThread().isInterrupted()) {
             int n = conn.bulkTransfer(ep, pkt, pkt.length, 500);
-            if (n <= 0) continue;
+            if (n <= 0) { if (stalled()) break; continue; }
             int hlen = pkt[0] & 0xff;
             if (hlen < 2 || hlen > n) continue;
             int flags = pkt[1] & 0xff;
@@ -464,7 +479,22 @@ public class UvcCamera {
         return n > 4 && (b[0] & 0xff) == 0xFF && (b[1] & 0xff) == 0xD8;
     }
 
+    /** 켜진 채로 WATCHDOG_MS 동안 장이 없으면 새로 연다 (펌프 스레드에서 부른다. true 면 펌프는 끝낸다) */
+    boolean stalled() {
+        if (!streaming || System.currentTimeMillis() - lastRawAt < WATCHDOG_MS) return false;
+        note("영상이 " + (WATCHDOG_MS / 1000) + "초 동안 안 들어와 웹캠을 다시 엽니다 " + (nativeOk ? nativeStats() : ""));
+        lastRawAt = 0;
+        exec.execute(new Runnable() { @Override public void run() {
+            if (dev == null && conn == null) return; // 그새 꺼졌다
+            startInternal();
+        } });
+        return true;
+    }
+
     void publish(byte[] buf, int n, int w, int h, boolean isYuy2) {
+        lastRawAt = System.currentTimeMillis();
+        // 가져가는 화면이 없다 → 이 장은 버린다 (웹캠은 켜 둔다)
+        if (System.currentTimeMillis() - lastAskAt > IDLE_MS) return;
         byte[] out;
         if (isYuy2) {
             try {
@@ -488,6 +518,7 @@ public class UvcCamera {
 
     /** 웹 화면용: afterSeq 다음 장을 최대 timeoutMs 기다려 {seq, jpeg} 를 준다. 없으면 null */
     Object[] waitJpeg(long afterSeq, int timeoutMs) {
+        lastAskAt = System.currentTimeMillis();
         long until = System.currentTimeMillis() + timeoutMs;
         synchronized (frameLock) {
             while (streaming && jpegSeq <= afterSeq) {
@@ -642,7 +673,7 @@ public class UvcCamera {
         final UvcCamera cam;
         Bridge(UvcCamera cam) { this.cam = cam; }
         @JavascriptInterface public String status() { return cam.statusJson(); }
-        @JavascriptInterface public void start(int w, int h, int fps) { cam.start(w, h, fps); }
+        @JavascriptInterface public void start(int w, int h, int fps) { cam.lastAskAt = System.currentTimeMillis(); cam.start(w, h, fps); }
         @JavascriptInterface public void stop() { cam.stop(); }
     }
     final Bridge bridge = new Bridge(this);

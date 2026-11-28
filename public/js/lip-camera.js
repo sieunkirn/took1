@@ -1,21 +1,64 @@
 // 립 매핑 화면: 입술을 비추는 쪽. 카메라 켜고 끄기·멈춤 감시·입술 추적 루프, 화면 그리기.
 import { $, el } from './common.js';
 import { sleep } from './dom.js';
-import { loadTracker, detectVideo, resetTracker } from './lip-tracker.js';
-import { drawLipFrame, trackLips, stopStream, cameraErrorMessage, filmMode, lipsOnlyOn } from './lip-view.js';
+import { loadTracker, resetTracker, trackerDelegate, detectFrame, trackSize, trackerInWorker } from './lip-tracker.js';
+import { smoothLips } from './lip-engine.js';
+import { perfOn, createPerfMeter } from './perf-meter.js';
+import { drawLipFrame, stopStream, cameraErrorMessage, filmMode } from './lip-view.js';
 import { getCamSettings, videoConstraints, isExternalCamera, widestZoom } from './camera-settings.js';
 import { applyCameraLock } from './color-calib.js';
 import { t as tr } from './i18n.js';
 import { video, view, viewCtx, STALL_MS, MAX_AUTO_RESTARTS, MAX_TRACK_ERRORS, RAF_STALL_MS, TIMER_FRAME_MS, state, setGuide, showError, setPlaceholder, guideText } from './lip-state.js';
 
 // ---------- 그리기 ----------
-// 지금 보여 주는 원본: 카메라 영상
+// 지금 보여 주는 원본: 카메라 영상. 툭 앱 USB 웹캠을 바로 받는 중이면(state.cur) 그 장
 export function sourceFrame() {
   const cam = getCamSettings();
-  return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: cam.mirror, rotate: cam.rotate, lipsOnly };
+  const c = state.cur?.full;
+  if (c) return { src: c, w: c.width, h: c.height, mirror: cam.mirror, rotate: cam.rotate };
+  return { src: video, w: video.videoWidth, h: video.videoHeight, mirror: cam.mirror, rotate: cam.rotate };
 }
-// 입술만 보기(관리자 스위치): 거울 화면을 열 때 한 번 읽는다. 관리자에서 바꾸고 돌아오면 화면이 새로 열리므로 그때 반영된다
-const lipsOnly = lipsOnlyOn();
+// 툭 앱 USB 웹캠 바로 받기 (2026-11-28, uvc-bridge.js stream.tookFrames): 디코딩한 장(ImageBitmap)을 그대로 가져와
+// 입술 찾기(워커)에는 작은 장을, 화면에는 원본 장을 그린다. 예전에는 JPEG → 캔버스 → captureStream → video → 거울 캔버스로
+// 큰 그림을 몇 번씩 옮기느라 메인 스레드가 한 장에 50ms 넘게 묶였다
+const directFrames = () => state.stream?.tookFrames || null;
+/** 화면에 그린 장 바꾸기 (예전 장은 닫는다) */
+function setCur(f) {
+  if (state.cur && state.cur.full !== f?.full) state.cur.full.close?.();
+  state.cur = f;
+}
+
+// ---------- 터치 우선 (2026-11-28 갤탭 '제품 시트 드래그가 아예 안 먹힘') ----------
+// 입술 찾기를 워커에서 돌리면(lip-tracker.js) 메인 스레드가 묶이지 않아 아래는 쓰지 않는다. 워커를 못 쓰는 기기에서만:
+// 갤탭에서는 한 장 처리에 90ms 넘게 걸려 메인 스레드가 쉴 틈이 없었고, 그동안 터치·스크롤이 처리되지 못했다.
+//  - 한 장을 처리한 뒤 걸린 시간의 절반 남짓을 쉬었다가 다음 장을 처리한다 (BREATHE)
+//  - 화면을 누르고 있는 동안(+ 뗀 뒤 잠깐)은 입술 찾기를 건너뛰고 더 오래 쉰다 → 끌기·스크롤이 먼저
+const BREATHE = 0.6, BREATHE_TOUCH = 1.5, TOUCH_TAIL_MS = 400;
+let touching = 0, touchEnd = 0;
+let touchAt = 0; // 마지막 touchstart 시각: touchend 를 놓쳐도(창 밖에서 뗌 등) 8초 뒤에는 다시 입술을 찾는다
+const touchBusy = () => (touching > 0 && performance.now() - touchAt < 8000) || performance.now() - touchEnd < TOUCH_TAIL_MS;
+// 손가락은 touch 이벤트로 센다 (2026-11-28 보강): 목록을 밀기 시작하면 브라우저가 pointercancel 을 보내서, 예전(pointer 로 세기)에는
+// 미는 도중에 '뗐다'고 보고 0.4초 뒤 무거운 처리가 다시 돌았다. touchend 는 손가락을 실제로 뗄 때 온다.
+// 손을 뗀 뒤에도 관성으로 미끄러지는 동안(scroll 이벤트)은 계속 누르는 중으로 본다. 마우스·펜은 pointer 로 센다
+const OPTS = { capture: true, passive: true };
+const touchNow = (e) => {
+  touching = e.touches?.length || 0;
+  if (e.type === 'touchstart') touchAt = performance.now();
+  if (!touching) touchEnd = performance.now();
+};
+for (const t of ['touchstart', 'touchend', 'touchcancel']) addEventListener(t, touchNow, OPTS);
+addEventListener('pointerdown', (e) => { if (e.pointerType !== 'touch') { touching++; touchAt = performance.now(); } }, OPTS);
+addEventListener('pointerup', (e) => { if (e.pointerType !== 'touch') { touching = Math.max(0, touching - 1); touchEnd = performance.now(); } }, OPTS);
+addEventListener('scroll', () => { touchEnd = performance.now(); }, OPTS);
+// 시간 표시(관리자 스위치, 2026-11-28): 켜 둔 기기에서만 거울 왼쪽 위에 프레임마다 걸린 시간을 보여 준다
+const perf = perfOn() ? createPerfMeter({
+  // 크기: 툭 앱 USB 웹캠을 바로 받는 중이면 그 장(실제로 그리는 크기), 아니면 영상
+  info: () => {
+    const c = state.cur?.full;
+    const w = c ? c.width : video.videoWidth, h = c ? c.height : video.videoHeight;
+    return { delegate: trackerDelegate(), size: w ? `${w}×${h}${c ? ' (USB 바로 받기)' : ''}` : '' };
+  },
+}) : null;
 
 function render() {
   const f = sourceFrame();
@@ -32,6 +75,7 @@ function stopCamera() {
   state.loopBusy = false;
   stopStream(state.stream);
   state.stream = null;
+  setCur(null);
   video.srcObject = null;
 }
 
@@ -213,6 +257,12 @@ async function startCamera({ auto = false } = {}) {
     state.tracker = await loadTracker();
     if (gen !== state.gen) return;
   }
+  // 툭 앱 USB 웹캠: 바로 받기 켜기 (작은 장 = 입술 찾기용)
+  const tf = stream.tookFrames;
+  if (tf && stream.tookCanvas?.width) {
+    const t = trackSize(stream.tookCanvas.width, stream.tookCanvas.height);
+    tf.direct(t.w, t.h);
+  }
   state.lastVideoTime = -1;
   state.lastFrameAt = state.lastLoopAt = performance.now();
   state.videoFrames = 0;
@@ -262,7 +312,10 @@ async function reloadTracker() {
 // 새 카메라 프레임마다 입술을 찾은 뒤 같은 프레임에 색을 입힌다 (입술 위치와 영상이 항상 맞는다)
 // gen: 이 루프를 시작한 세대. 카메라를 다시 켜거나 끄면 예전 루프는 여기서 멈춘다
 function scheduleNext(gen) {
-  if (state.useTimer) state.timerId = setTimeout(() => loop(gen), TIMER_FRAME_MS);
+  const busy = trackerInWorker() ? 0 : state.lastBusy || 0; // 방금 한 장 처리에 걸린 시간 (워커면 쉬지 않는다)
+  const rest = busy > 12 ? Math.min(150, busy * (touchBusy() ? BREATHE_TOUCH : BREATHE)) : 0;
+  if (state.useTimer) state.timerId = setTimeout(() => loop(gen), Math.max(TIMER_FRAME_MS, rest));
+  else if (rest) state.timerId = setTimeout(() => { if (gen === state.gen) state.rafId = requestAnimationFrame(() => loop(gen)); }, rest);
   else state.rafId = requestAnimationFrame(() => loop(gen));
 }
 
@@ -270,18 +323,41 @@ async function loop(gen = state.gen) {
   if (gen !== state.gen) return;
   state.lastLoopAt = performance.now();
   if (!state.stream) return;
+  const loopStart = state.lastLoopAt;
+  state.lastBusy = 0;
+  let fresh = null; // 바로 받기로 가져온 새 장 { full, small }
   // 어떤 오류가 나도 다음 프레임은 반드시 예약한다 (예전에는 오류 한 번에 화면이 굳었다)
   try {
-    // 타이머로 그릴 때는 requestVideoFrameCallback 도 멈춰 있을 수 있어 currentTime 으로 새 프레임을 판단한다
-    const frame = RVFC && !state.useTimer ? state.frameNo : video.currentTime;
-    if (video.readyState >= 2 && frame !== state.lastVideoTime) {
-      state.lastVideoTime = frame;
-      if (!RVFC) state.lastFrameAt = performance.now();
-      state.autoRestarts = 0; // 프레임이 다시 들어온다
-      if (state.tracker) {
+    const tf = directFrames();
+    let isNew = false;
+    if (tf) {
+      fresh = tf.take();
+      if (fresh) { isNew = true; state.lastFrameAt = performance.now(); state.autoRestarts = 0; }
+    } else {
+      // 타이머로 그릴 때는 requestVideoFrameCallback 도 멈춰 있을 수 있어 currentTime 으로 새 프레임을 판단한다
+      const frame = RVFC && !state.useTimer ? state.frameNo : video.currentTime;
+      if (video.readyState >= 2 && frame !== state.lastVideoTime) {
+        isNew = true;
+        state.lastVideoTime = frame;
+        if (!RVFC) state.lastFrameAt = performance.now();
+        state.autoRestarts = 0; // 프레임이 다시 들어온다
+      }
+    }
+    if (!isNew && performance.now() - state.lastFrameAt > STALL_MS && !document.hidden) {
+      handleStall();
+      return;
+    }
+    let trackMs = null; // 시간 표시용: 새 장에서 입술 찾기에 걸린 시간
+    if (isNew) {
+      // 워커가 아니면(이 화면에서 찾기) 누르는 동안은 건너뛴다
+      if (state.tracker && (trackerInWorker() || !touchBusy())) {
         state.loopBusy = true;
         try {
-          state.lips = await trackLips(state.lips, video);
+          const small = fresh?.small || null;
+          if (fresh) fresh.small = null; // detectFrame 이 가져가서 닫는다
+          const r = await detectFrame(fresh ? fresh.full : video, performance.now(), small);
+          state.lips = smoothLips(state.lips, r.lips);
+          trackMs = r.ms;
           state.trackErrors = 0;
         } catch (e) {
           if (gen !== state.gen) return;
@@ -292,16 +368,24 @@ async function loop(gen = state.gen) {
         }
         if (gen !== state.gen) return;
       }
-    } else if (performance.now() - state.lastFrameAt > STALL_MS && !document.hidden) {
-      handleStall();
-      return;
+      if (fresh) { fresh.small?.close?.(); setCur({ full: fresh.full }); fresh = null; }
     }
-    if (video.readyState >= 2) {
+    // 새 장이 왔거나 입힐 색(색·질감·농도)이 바뀐 때만 그린다 (2026-11-28)
+    const look = `${state.hex}|${state.texture}|${state.intensity}`;
+    const canDraw = tf ? !!state.cur : video.readyState >= 2;
+    if (canDraw && (isNew || look !== state.drawnLook)) {
+      state.drawnLook = look;
+      const t1 = performance.now();
       render();
+      if (perf && isNew) perf.frame(trackMs ?? 0, performance.now() - t1);
+      state.lastBusy = performance.now() - loopStart;
       setGuide(guideText());
     }
   } catch (e) {
     console.warn('[took] 카메라 프레임 처리 오류:', e);
+  } finally {
+    // 세대가 바뀌어 버려진 장
+    if (fresh) { fresh.full?.close?.(); fresh.small?.close?.(); }
   }
   if (gen !== state.gen) return;
   scheduleNext(gen);
@@ -316,6 +400,10 @@ setInterval(() => {
   const now = performance.now();
   const q = video.getVideoPlaybackQuality?.().totalVideoFrames || 0;
   if (q !== state.videoFrames) { state.videoFrames = q; state.lastFrameAt = Math.max(state.lastFrameAt, now); }
+  // 툭 앱 USB 웹캠 바로 받기: 영상(video)은 멈춰 있으므로 USB 쪽이 장을 받고 있는지(tookSeq)로 본다.
+  // 루프가 입술 찾기를 기다리는 동안(첫 장은 GPU 준비로 몇 초)에도 웹캠은 살아 있다 → 멈춤으로 보고 낮은 해상도로 다시 켜던 버그 (2026-11-28)
+  const seq = state.stream?.tookCanvas?.tookSeq;
+  if (seq && seq !== state.uvcSeq) { state.uvcSeq = seq; state.lastFrameAt = Math.max(state.lastFrameAt, now); }
   if (now - state.lastLoopAt > RAF_STALL_MS && !state.loopBusy) {
     if (!state.useTimer) {
       state.useTimer = true;

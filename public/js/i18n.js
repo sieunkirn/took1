@@ -211,6 +211,7 @@ Object.assign(STRINGS.en, {
 Object.assign(STRINGS.ko, {
   'nw.close': '닫기', 'nw.recent': '방금 태그한 립', 'nw.similar': '이 색과 비슷한 립 보기',
   'nw.pickShade': '들고 계신 호수를 골라 주세요', 'nw.browseShade': '호수를 누르면 입술에 발라 드려요', 'nw.wearing': '지금 바른 호수', 'nw.shadeCount': '{n}가지',
+  'tg.title': '인식한 제품', 'tg.more': '자세히 보기', 'tg.detail': '제품 정보', 'tg.shades': '호수', 'tg.stock': '재고 현황', 'tg.close': '닫기', 'tg.repColor': '대표 색',
   'nw.noShades': '호수 정보 준비 중이에요 · 대표 색을 발랐어요',
   'nw.unknown': '등록되지 않은 태그예요', 'nw.unknownSub': '태그를 다시 한 번 리더기 가운데에 대 주세요',
   // NFC 안내·인식 모달 (2026-11-22)
@@ -238,6 +239,7 @@ Object.assign(STRINGS.ko, {
 Object.assign(STRINGS.en, {
   'nw.close': 'Close', 'nw.recent': 'Just tagged', 'nw.similar': 'Similar lips',
   'nw.pickShade': 'Pick the shade you are holding', 'nw.browseShade': 'Tap a shade to try it on', 'nw.wearing': 'On your lips', 'nw.shadeCount': '{n} shades',
+  'tg.title': 'Tagged product', 'tg.more': 'See details', 'tg.detail': 'Product details', 'tg.shades': 'Shades', 'tg.stock': 'Stock', 'tg.close': 'Close', 'tg.repColor': 'Main color',
   'nw.noShades': 'Shade info coming soon · showing the main color',
   'nw.unknown': "This tag isn't registered", 'nw.unknownSub': 'Please tap it again on the center of the reader',
   'nm.title': 'Hold the product to the reader', 'nm.sub': 'We will put its color on your lips right away',

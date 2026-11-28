@@ -1,0 +1,73 @@
+<!doctype html><meta charset="utf-8">
+<!-- 로고 버튼 '눌러 주세요' 애니메이션 후보 (2026-11-29). base.png = 실제 거울 화면 아랫부분(900×1440 중 x150~750, y880~1440). shoot.js 로 PNG -->
+<style>
+  body{margin:0;background:#fff;font-family:"Malgun Gothic",sans-serif;color:#111;width:2400px}
+  h1{font-size:44px;margin:0;padding:56px 60px 6px;letter-spacing:-0.02em}
+  .sub{font-size:24px;color:#666;padding:0 60px 10px;margin:0;line-height:1.5}
+  .when{margin:18px 60px 34px;padding:18px 26px;border:2px solid #e5e5e5;border-radius:18px;font-size:22px;line-height:1.6;color:#333}
+  .when b{color:#111}
+  .row{padding:0 60px 54px}
+  .cap{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+  .cap i{align-self:center;display:inline-block;font-style:normal;font-size:18px;font-weight:700;color:#fff;background:#111;border-radius:999px;padding:3px 14px;margin:0}
+  .cap i.rec{background:#FF007B}
+  .cap b{display:block;font-size:30px;letter-spacing:-0.01em}
+  .cap span{font-size:22px;color:#444}
+  .cap em{flex-basis:100%;font-style:normal;font-size:20px;color:#888;margin-top:-6px}
+  .strip{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  .fr{position:relative}
+  .f{width:600px;height:560px;zoom:.7387;position:relative;overflow:hidden;border-radius:30px;background:#000 url(base.png) 0 0/600px 560px}
+  .t{font-size:22px;color:#666;margin-top:8px;text-align:center}
+  .t b{color:#111}
+  .arrow{position:absolute;right:-17px;top:40%;font-size:28px;color:#bbb}
+  /* 겹쳐 그리는 것들 (좌표는 600×560 기준, 버튼 가운데 300,468 · 큰 색 동그라미 가운데 300,92) */
+  .o{position:absolute;box-sizing:border-box}
+  .erase{left:220px;top:388px;width:160px;height:160px;border-radius:50%;background:#000}
+  .btn{border-radius:50%;border:8px solid #fff;background:#000;display:grid;place-items:center;
+       box-shadow:0 0 8px rgba(255,255,255,.55)}
+  .btn img{width:59%;height:59%}
+  .ring{border-radius:50%;border:3px solid #fff}
+</style>
+<h1>로고 버튼 애니메이션 후보 — 색을 만든 뒤 잠깐 있다가</h1>
+<p class="sub">실제 거울 화면 아랫부분 위에 움직임을 장면별로 그린 그림 · 왼쪽 → 오른쪽이 시간 순서 · 모두 흰 단색 선 또는 고른 립 색만 씀 (그라데이션·빛 번짐 없음)</p>
+<div class="when"><b>공통 규칙(제안)</b> 다이얼·질감·농도로 색을 바꾸고 손을 뗀 뒤 <b>2초</b> 동안 아무것도 안 하면 → 애니메이션 <b>한 번</b>(또는 4초 간격으로 2~3번) → 다시 색을 바꾸면 처음부터 다시 셈 · 로고 버튼을 한 번 누른 사람에게는 더 안 나옴</div>
+<div id="rows"></div>
+<script>
+const C = { x: 300, y: 468, r: 67.5 }, SW = { x: 300, y: 92 }, LIP = '#D56287';
+const btn = ({ s = 1, dx = 0, dy = 0, fill = '#000', logo = 'w', w = null, h = null, label = '', lo = 1, er = true } = {}) => {
+  const W = (w ?? 135) * (w ? 1 : s), H = (h ?? 135) * (h ? 1 : s);
+  const lab = label ? `<span style="color:#fff;font-size:28px;font-weight:700;white-space:nowrap;opacity:${lo};margin-left:14px;letter-spacing:-.02em">${label}</span>` : '';
+  const inner = label
+    ? `<div style="display:flex;align-items:center;justify-content:center"><img src="logo-${logo}.svg" style="width:${H * .55}px;height:${H * .55}px">${lab}</div>`
+    : `<img src="logo-${logo}.svg">`;
+  return `${er ? '<div class="o erase"></div>' : ''}<div class="o btn" style="left:${C.x - W / 2 + dx}px;top:${C.y - H / 2 + dy}px;width:${W}px;height:${H}px;background:${fill};border-radius:${H / 2}px">${inner}</div>`;
+};
+const ring = (sc, op, w = 3) => { const d = 135 * sc; return `<div class="o ring" style="left:${C.x - d / 2}px;top:${C.y - d / 2}px;width:${d}px;height:${d}px;opacity:${op};border-width:${w}px"></div>`; };
+const hand = (x, y, rot = -20) => `<svg class="o" style="left:${x}px;top:${y}px;width:110px;height:140px;transform:rotate(${rot}deg);transform-origin:30% 5%" viewBox="0 0 66 86">
+  <g fill="#fff" stroke="#000" stroke-width="3" stroke-linejoin="round"><rect x="16" y="2" width="16" height="50" rx="8"/><path d="M12 40 h40 a12 12 0 0 1 12 12 v10 a22 22 0 0 1 -22 22 h-8 a22 22 0 0 1 -22 -22 v-12 a10 10 0 0 1 0 -10z"/>
+  <path d="M32 40 v14 M43 42 v12 M54 46 v10" fill="none"/></g></svg>`;
+const drop = (x, y, s = 1, op = 1) => `<svg class="o" style="left:${x - 18 * s}px;top:${y - 30 * s}px;width:${36 * s}px;height:${48 * s}px;opacity:${op}" viewBox="0 0 24 32"><path d="M12 0 C12 0 24 15 24 21 A12 12 0 0 1 0 21 C0 15 12 0 12 0Z" fill="${LIP}" stroke="#fff" stroke-width="1.5"/></svg>`;
+const arc = (p) => { const r = 63.5, L = 2 * Math.PI * r; return `<svg class="o" style="left:${C.x - 75}px;top:${C.y - 75}px;width:150px;height:150px" viewBox="0 0 150 150"><circle cx="75" cy="75" r="${r}" fill="none" stroke="${LIP}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${L * p} ${L}" transform="rotate(-90 75 75)"/></svg>`; };
+const shadow = (w, op) => `<div class="o" style="left:${C.x - w / 2}px;top:${C.y + 76}px;width:${w}px;height:16px;border-radius:50%;background:#fff;opacity:${op}"></div>`;
+const peek = (h) => `<div class="o" style="left:0;top:${560 - h}px;width:600px;height:${h + 40}px;background:#fff;border-radius:44px 44px 0 0"></div>`;
+const big = (op) => `<div class="o" style="left:${SW.x - 70}px;top:${SW.y - 70}px;width:140px;height:140px;border-radius:50%;border:3px solid #fff;opacity:${op}"></div>`;
+
+const ROWS = [
+  { tag: 'A · 지금 넣은 것', name: '톡 + 물결', desc: '로고가 손가락에 눌린 것처럼 톡 들어갔다 나오고, 흰 물결 두 겹이 퍼짐', note: '가장 흔한 "누르세요" 신호 · 조용함 · 1.4초',
+    fr: [['0초', btn()], ['0.15초', btn({ s: .88 })], ['0.4초', btn({ s: 1.03 }) + ring(1.2, .95, 4)], ['0.8초', btn() + ring(1.5, .6, 4) + ring(1.22, .9, 4)], ['1.4초', btn() + ring(1.75, .2, 4) + ring(1.55, .4, 4)]] },
+  { tag: 'B', name: '손가락이 직접 눌러 줌', desc: '오른쪽 아래에서 흰 손가락이 들어와 동그라미를 한 번 누르고 나감', note: '가장 직관적 · 처음 보는 사람도 바로 앎 · 화면에 그림이 하나 더 생김 · 2초',
+    fr: [['0초', btn() + hand(470, 560)], ['0.5초', btn() + hand(370, 470, -25)], ['0.8초 누름', btn({ s: .9 }) + hand(318, 452, -25)], ['1.1초', btn() + ring(1.35, .6) + hand(345, 470, -25)], ['2초', btn() + ring(1.7, .1) + hand(480, 570, -20)]] },
+  { tag: 'C · 추천', rec: true, name: '만든 색이 버튼으로 떨어짐', desc: '위 큰 색 동그라미에서 그 색 물방울이 떨어져 버튼에 닿고, 버튼이 그 색으로 찼다가 로고로 돌아옴', note: '"이 색으로 제품 찾기"가 그림만으로 읽힘 · 조제한 색과 버튼이 이어짐 · 1.8초',
+    fr: [['0초', btn() + big(.9)], ['0.3초', btn() + big(.4) + drop(SW.x, 200, .9)], ['0.7초', btn() + drop(C.x, 360, 1)], ['0.9초 닿음', btn({ fill: LIP, logo: 'w', s: 1.05 }) + ring(1.25, .6)], ['1.8초', btn({ fill: '#000' }) + ring(1.6, .1)]] },
+  { tag: 'D', name: '테두리 한 바퀴', desc: '고른 립 색 선이 동그라미 테두리를 한 바퀴 따라 그리고 사라짐', note: '로딩처럼 보일 수 있음(“기다리세요”로 읽힐 위험) · 가장 차분 · 1.6초',
+    fr: [['0초', btn()], ['0.4초', btn() + arc(.25)], ['0.8초', btn() + arc(.62)], ['1.2초', btn() + arc(1)], ['1.6초', btn()]] },
+  { tag: 'E', name: '알약으로 펼쳐져 글자', desc: '동그라미가 옆으로 늘어나며 "이 색 제품 보기"를 보여 준 뒤 다시 동그라미로', note: '뜻이 가장 확실 · 2초 동안 글자 유지 · 한/영/중/일 문구 필요 · 3초',
+    fr: [['0초', btn()], ['0.3초', btn({ w: 230, h: 135 })], ['0.6초 ~ 2.6초', btn({ w: 330, h: 120, label: '이 색 제품 보기' })], ['2.8초', btn({ w: 220, h: 130, label: '', })], ['3초', btn()]] },
+  { tag: 'F', name: '통통 튀기', desc: '버튼이 두 번 통통 뛰었다 내려앉음 (바닥에 흰 그림자)', note: '눈에 잘 띔 · 장난스러움 · 다이얼 숫자와 겹치지 않게 낮게 · 1.2초',
+    fr: [['0초', btn() + shadow(110, .0)], ['0.2초', btn({ dy: -26 }) + shadow(80, .45)], ['0.4초 착지', btn({ w: 145, h: 126, dy: 4 }) + shadow(130, .6)], ['0.6초', btn({ dy: -12 }) + shadow(95, .4)], ['1.2초', btn()]] },
+  { tag: 'G', name: '아래 시트가 살짝 들썩', desc: '화면 아래에서 흰 시트 머리가 잠깐 올라왔다 내려가며 버튼도 같이 들림', note: '"누르면 아래에서 뭔가 올라온다"를 미리 보여 줌 · 실제 여는 움직임과 같음 · 1.2초',
+    fr: [['0초', btn()], ['0.3초', '<div class=\"o erase\"></div>' + peek(40) + btn({ dy: -14, er: false })], ['0.5초', '<div class=\"o erase\"></div>' + peek(78) + btn({ dy: -28, er: false })], ['0.8초', '<div class=\"o erase\"></div>' + peek(28) + btn({ dy: -8, er: false })], ['1.2초', btn()]] },
+];
+const ONLY = location.hash.slice(1).toUpperCase(); // 예: sheet.html#AFG → A·F·G 만
+document.getElementById('rows').innerHTML = ROWS.filter((r) => !ONLY || ONLY.includes(r.tag[0])).map((r) => `<div class="row"><div class="cap"><i class="${r.rec ? 'rec' : ''}">${r.tag}</i><b>${r.name}</b><span>${r.desc}</span><em>${r.note}</em></div>
+  <div class="strip">${r.fr.map(([t, h], i) => `<div class="fr"><div class="f">${h}</div><div class="t"><b>${t}</b></div>${i < 4 ? '<span class="arrow">›</span>' : ''}</div>`).join('')}</div></div>`).join('');
+</script>

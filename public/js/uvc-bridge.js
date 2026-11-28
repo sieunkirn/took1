@@ -55,6 +55,14 @@ async function openUvc(v) {
   let active = true, seq = 0, frames = 0, fpsNow = 0, fpsT = performance.now(), fpsN = 0;
   let firstOk;
   const first = new Promise((ok) => { firstOk = ok; });
+  // 바로 받기 (2026-11-28): 거울(lip-camera.js)이 stream.tookFrames.take() 로 디코딩한 장을 그대로 가져간다.
+  // 켜지면(direct) 캔버스에 그리기·captureStream 을 거치지 않는다 → 메인 스레드에서 큰 그림 복사가 없어진다.
+  // 한 장 = { full: 원본 크기 ImageBitmap, small: 입술 찾기용 작은 ImageBitmap, seq }. 가져간 쪽이 둘 다 닫는다.
+  // 가져가기 전에는 다음 장을 받지 않는다(최대 0.5초): 거울이 처리하는 속도만큼만 디코딩한다
+  let direct = null; // { w, h } 거울이 켬 (작은 장 크기)
+  let ready = null;  // 아직 안 가져간 장
+  let wake = null;
+  const dropReady = () => { if (ready) { ready.full.close?.(); ready.small?.close?.(); ready = null; } };
 
   (async function pumpLoop() {
     let misses = 0;
@@ -65,12 +73,32 @@ async function openUvc(v) {
         if (r.status !== 200) { misses++; if (misses > 5) await sleep(200); continue; }
         misses = 0;
         seq = Number(r.headers.get('X-Seq')) || seq + 1;
-        const bmp = await createImageBitmap(await r.blob());
+        const blob = await r.blob();
+        if (direct && frames > 0) {
+          const [full, small] = await Promise.all([
+            createImageBitmap(blob),
+            createImageBitmap(blob, { resizeWidth: direct.w, resizeHeight: direct.h, resizeQuality: 'low' }).catch(() => null),
+          ]);
+          if (!active) { full.close?.(); small?.close?.(); break; }
+          if (canvas.width !== full.width || canvas.height !== full.height) { canvas.width = full.width; canvas.height = full.height; } // 크기만 맞춰 둔다
+          dropReady(); // 거울이 못 가져간 예전 장은 버린다
+          frames++;
+          ready = { full, small, seq: frames };
+          canvas.tookSeq = frames;
+          fpsN++;
+          const now = performance.now();
+          if (now - fpsT >= 1000) { fpsNow = Math.round(fpsN * 1000 / (now - fpsT)); fpsN = 0; fpsT = now; }
+          await new Promise((ok) => { wake = ok; setTimeout(ok, 500); });
+          wake = null;
+          continue;
+        }
+        const bmp = await createImageBitmap(blob);
         if (!active) { bmp.close?.(); break; }
         if (canvas.width !== bmp.width || canvas.height !== bmp.height) { canvas.width = bmp.width; canvas.height = bmp.height; }
         ctx.drawImage(bmp, 0, 0);
         bmp.close?.();
         frames++;
+        canvas.tookSeq = frames; // 거울(lip-camera.js)이 새 장이 왔는지 보는 번호
         fpsN++;
         const now = performance.now();
         if (now - fpsT >= 1000) { fpsNow = Math.round(fpsN * 1000 / (now - fpsT)); fpsN = 0; fpsT = now; }
@@ -86,6 +114,20 @@ async function openUvc(v) {
   if (!ok) { active = false; release(); throw err('NotReadableError', 'USB 웹캠이 영상을 보내지 않아요'); }
 
   const stream = canvas.captureStream();
+  // 거울은 이 캔버스에서 바로 그리고 입술을 찾는다 (2026-11-28): captureStream → video 를 거쳐 그리면 갤탭에서 한 장에 50ms 넘게 걸렸다.
+  // video 는 그대로 재생해서 멈춤 감시·다른 화면(색 보정·웹캠 설정)은 예전처럼 쓴다
+  stream.tookCanvas = canvas;
+  stream.tookFrames = {
+    /** 바로 받기 켜기. w×h = 입술 찾기용 작은 장 크기 */
+    direct(w, h) { direct = { w, h }; },
+    /** 새 장이 있으면 가져간다 (없으면 null). 가져간 장의 full·small 은 가져간 쪽이 닫는다 */
+    take() {
+      const f = ready;
+      ready = null;
+      if (f && wake) wake();
+      return f;
+    },
+  };
   const track = stream.getVideoTracks()[0];
   const origStop = track.stop.bind(track);
   const origSettings = track.getSettings?.bind(track);
@@ -93,7 +135,7 @@ async function openUvc(v) {
   track.getSettings = () => ({ ...(origSettings ? origSettings() : {}), deviceId: UVC_ID, groupId: UVC_ID, width: canvas.width, height: canvas.height, frameRate: fpsNow || st.fps || 30 });
   track.getCapabilities = () => ({ deviceId: UVC_ID, width: { max: canvas.width }, height: { max: canvas.height } });
   track.applyConstraints = async () => {}; // 자동 노출·색 고정(카메라 색 보정)은 USB 직접 연결에서는 지원 안 함
-  const entry = { track, stop: () => { if (!active) return; active = false; origStop(); release(); } };
+  const entry = { track, stop: () => { if (!active) return; active = false; dropReady(); wake?.(); origStop(); release(); } };
   track.stop = entry.stop;
   live.add(entry);
   users++;

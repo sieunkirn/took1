@@ -1,0 +1,1522 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>TOOK 레포트북 64–100쪽 (5~7장·9장 본문, 섹션 표지와 8장은 뺌)</title>
+<style>
+  /* B5(JIS) 182×257mm · 흰 바탕 · 한글 8pt · 영어 7pt — 피그마 54~57 프레임과 같은 틀 */
+  @page { size: 182mm 257mm; margin: 0; }
+  @font-face { font-family: "Noto Sans KR"; src: url("file:///C:/Windows/Fonts/NotoSansKR-VF.ttf"); font-weight: 100 900; }
+  :root { --accent: #D32C3E; --ink: #111; --en: #8c8c8c; --rule: #d9d9d9; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #e9e9e9; }
+  body { font-family: "Noto Sans KR", "Malgun Gothic", sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .page { position: relative; width: 182mm; height: 257mm; background: #fff; margin: 10mm auto; overflow: hidden; display: flex; flex-direction: column; }
+  /* 짝수 쪽: 왼쪽이 바깥, 오른쪽이 안쪽(제본) · 홀수 쪽은 반대 */
+  .page.even { padding: 21.5mm 12mm 12mm 14mm; }
+  .page.odd  { padding: 21.5mm 14mm 12mm 12mm; }
+  @media print { html, body { background: #fff; } .page { margin: 0; page-break-after: always; } }
+
+  /* 위 색 띠: 안쪽 위 (짝수 쪽 = 오른쪽, 홀수 쪽 = 왼쪽) */
+  .bar { position: absolute; top: 13mm; width: 66mm; height: 3mm; background: var(--accent); }
+  .even .bar { right: 0; }
+  .odd  .bar { left: 0; }
+
+  /* 한 꼭지: 왼쪽 제목 칸 + 오른쪽 본문 칸 */
+  .sec { display: grid; grid-template-columns: 40mm 1fr; column-gap: 6mm; }
+  .sec + .sec { margin-top: 3mm; padding-top: 3mm; border-top: .25mm solid var(--rule); }
+  .head .no { font-size: 9.5pt; line-height: 1; font-weight: 700; color: var(--accent); letter-spacing: .01em; }
+  .head h2 { font-size: 11pt; line-height: 1.3; font-weight: 700; margin-top: 1.6mm; letter-spacing: -.025em; word-break: keep-all; }
+  .head .sub { font-size: 6.5pt; line-height: 1.35; color: var(--accent); margin-top: 1mm; font-weight: 500; }
+  .head svg { display: block; width: 8mm; height: 8mm; margin-top: 2mm; margin-left: -.5mm; }
+  .head svg * { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .ko { font-size: 8pt; line-height: 1.58; letter-spacing: -.01em; word-break: keep-all; }
+  .ko em { font-style: normal; color: var(--accent); font-weight: 500; }
+  .ko + .ko { margin-top: 1.2mm; }
+  .en { font-size: 7pt; line-height: 1.5; color: var(--en); margin-top: 1.6mm; }
+  .body { padding-top: .2mm; }
+
+  /* 요구사항 표: 첫 칸(요구사항)은 왼쪽 제목 칸 자리, 지표·근거는 오른쪽 본문 칸을 둘로 나눔 */
+  .req { margin-top: 6mm; flex: 1; display: flex; flex-direction: column; }
+  .req .th, .req .tr { display: grid; grid-template-columns: 40mm 42mm 1fr; column-gap: 6mm; }
+  .req .th { padding-bottom: 1.8mm; border-bottom: .3mm solid var(--ink); }
+  .req .th .t { font-size: 7.5pt; line-height: 1.2; font-weight: 700; }
+  .req .th .t span { font-size: 6.5pt; font-weight: 500; color: var(--accent); }
+  .req .tr { flex: 1 1 0; padding-top: 3.6mm; border-top: .25mm solid var(--rule); }
+  .req .th + .tr { border-top: 0; }
+  .req .tr .head h2 { font-size: 9.5pt; line-height: 1.4; margin-top: 1.5mm; }
+  .req .tr .en { margin-top: 1.1mm; }
+  .req + .sec { margin-top: 0; padding-top: 3.6mm; border-top: .25mm solid var(--rule); }
+  .no { font-size: 9.5pt; line-height: 1; font-weight: 700; color: var(--accent); letter-spacing: .01em; }
+  .todo { color: #9a9a9a; }
+  /* 줄이 많은 표: 번호를 제목 옆 좁은 칸에 둔다 */
+  .req.c .th, .req.c .tr { grid-template-columns: 8mm 44mm 56mm 1fr; column-gap: 5mm; }
+  .req.c .th .t:first-child { grid-column: span 2; }
+  .req.c .tr { flex: 1 1 auto; padding-top: 2.6mm; padding-bottom: 2.2mm; }
+  .req.c .tr > .no { font-size: 8.5pt; line-height: 1.35; }
+  .req.c .tr .head h2 { font-size: 8.5pt; line-height: 1.35; margin-top: 0; letter-spacing: -.02em; }
+/* ── 표(여러 모양): 칸 너비는 --cols 로 준다 ── */
+  .tb { margin-top: 5mm; }
+  .tb .th, .tb .tr { display: grid; grid-template-columns: var(--cols); column-gap: var(--gap, 5mm); }
+  .tb .th { padding-bottom: 1.8mm; border-bottom: .3mm solid var(--ink); }
+  .tb .th .t { font-size: 7.5pt; line-height: 1.2; font-weight: 700; }
+  .tb .th .t span { font-size: 6.5pt; font-weight: 500; color: var(--accent); }
+  .tb .tr { padding: 2.6mm 0 2.4mm; border-top: .25mm solid var(--rule); }
+  .tb .th + .tr { border-top: 0; }
+  .tb .tr > .no { font-size: 8.5pt; line-height: 1.35; }
+  .k { font-size: 8.5pt; line-height: 1.35; font-weight: 700; letter-spacing: -.02em; word-break: keep-all; }
+  .ke { font-size: 6.5pt; line-height: 1.35; color: var(--accent); font-weight: 500; margin-top: .6mm; }
+  .tb .en { margin-top: 1.1mm; }
+  .tb.fill { flex: 1; display: flex; flex-direction: column; }
+  .tb.fill .tr { flex: 1 1 auto; }
+  .tb + .sec, .figs + .sec { margin-top: 0; padding-top: 3.6mm; border-top: .25mm solid var(--rule); }
+  .sec + .tb { margin-top: 5mm; }
+  /* 번호 붙은 순서 */
+  .st { display: grid; grid-template-columns: 5mm 1fr; column-gap: 1mm; }
+  .st + .st { margin-top: 2.2mm; }
+  .st .num { font-size: 8pt; line-height: 1.58; font-weight: 700; color: var(--accent); }
+  .st .en { margin-top: .6mm; }
+  /* 그림 칸 */
+  .figs { margin-top: auto; padding-top: 3.2mm; border-top: .25mm solid var(--rule); }
+  figure { display: flex; flex-direction: column; }
+  .n { display: inline-block; font-size: 6pt; line-height: 1; border: .25mm solid #bbb; padding: .45mm 1mm; margin-right: 1.4mm; color: #555; vertical-align: .15mm; }
+  figcaption { font-size: 6.5pt; line-height: 1.4; color: #777; margin-top: 2mm; word-break: keep-all; }
+  figcaption b { color: var(--ink); font-weight: 700; margin-right: 1mm; }
+  figcaption .en { display: block; font-size: 6pt; color: #a3a3a3; margin-top: .3mm; line-height: 1.4; }
+  .slot { background: #f5f5f5; border: .25mm dashed #bdbdbd; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .slot b { font-size: 8pt; color: #9a9a9a; font-weight: 700; letter-spacing: .04em; }
+  .slot span { font-size: 6.5pt; color: #ababab; margin-top: 1mm; line-height: 1.45; }
+  .lab { font-size: 6.5pt; line-height: 1.3; color: var(--ink); font-weight: 700; text-align: center; margin-top: 1.4mm; }
+  .lab span { display: block; font-size: 6pt; font-weight: 400; color: #a3a3a3; }
+  /* 도식: 상자와 화살표 */
+  .bx { border: .25mm solid #9a9a9a; border-radius: 1.2mm; padding: 1.2mm 1.5mm; text-align: center; background: #fff; }
+  .bx .t { font-size: 7pt; font-weight: 700; line-height: 1.3; }
+  .bx .t span { display: block; font-size: 5.5pt; font-weight: 400; color: #8c8c8c; line-height: 1.3; }
+  .bx.hw { background: #111; border-color: #111; } .bx.hw .t { color: #fff; } .bx.hw .t span { color: #cfcfcf; }
+  .bx.out { border-color: var(--accent); } .bx.out .t { color: var(--accent); } .bx.out .t span { color: #8c8c8c; }
+  .bx.db { border-style: dashed; background: #f5f5f5; }
+  .ar { font-size: 8pt; line-height: 1; color: #111; text-align: center; }
+  .dh { font-size: 6pt; line-height: 1.2; font-weight: 700; color: var(--accent); }
+  .dh span { font-weight: 400; color: #8c8c8c; }
+  /* 71쪽 시스템 구조도 */
+  .sys { display: grid; grid-template-columns: 30mm 7mm 34mm 7mm 34mm 7mm 1fr; row-gap: 1.8mm; align-items: center; }
+  .lg { display: flex; gap: 5mm; margin-top: 2.6mm; }
+  .lg .li { display: flex; align-items: center; }
+  .lg i { display: block; width: 3.2mm; height: 2.2mm; border: .25mm solid #9a9a9a; border-radius: .5mm; margin-right: 1.2mm; }
+  .lg i.hw { background: #111; border-color: #111; } .lg i.out { border-color: var(--accent); } .lg i.db { border-style: dashed; background: #f5f5f5; }
+  .lg .t { font-size: 6pt; line-height: 1.2; color: #555; } .lg .t span { color: #a3a3a3; }
+  /* 73쪽 색 추출 과정 */
+  .chips { display: grid; grid-template-columns: 1fr 6mm 1fr 6mm 1fr 6mm 1fr; align-items: start; }
+  .chips .ar { margin-top: 7mm; }
+  .pv { border: .25mm solid #d9d9d9; border-radius: 1.2mm; height: 17mm; display: flex; align-items: center; justify-content: center; }
+  .pv.cut { border-style: dashed; background: #f5f5f5; }
+  .pv svg { display: block; width: 27.3mm; height: 16.8mm; }
+  /* 74~77쪽 */
+  .fl5 { display: grid; grid-template-columns: 1fr 4mm 1fr 4mm 1fr 4mm 1fr 4mm 1fr; row-gap: 2mm; align-items: stretch; margin-top: 2.4mm; }
+  .fl5 .ar { align-self: center; } .fl5 .bx { display: flex; align-items: center; justify-content: center; padding: 1.2mm .6mm; }
+  .fl5 .bx .t { font-size: 6.5pt; } .fl5 .bx .t span { font-size: 5pt; }
+  .mh { margin-top: 5mm; } .mh .k { font-size: 9.5pt; }
+  .two2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; margin-top: 4mm; padding-top: 4mm; border-top: .25mm solid var(--rule); }
+  .tb.tight .tr { padding: 1.7mm 0 1.5mm; }
+  .stk { margin-top: 2.4mm; } .stk .st + .st { margin-top: 1.5mm; }
+  .nb { margin-top: 3.4mm; padding-top: 3mm; border-top: .25mm solid var(--rule); }
+  .slots4 { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 4mm; } .slots4 .slot { height: 30mm; }
+  .conn { display: grid; grid-template-columns: 30mm 20mm 26mm 6mm 1fr; row-gap: 1.8mm; align-items: center; }
+  .cn { font-size: 5.5pt; line-height: 1.2; color: #555; text-align: center; border-bottom: .25mm solid #111; padding-bottom: .7mm; margin: 0 1.2mm 2.4mm; }
+  .ko b { font-weight: 700; } .en b { font-weight: 700; color: #6e6e6e; }
+  .tb .en.e0 { margin-top: .5mm; }
+  /* 78~89쪽 */
+  .tri { display: grid; grid-template-columns: 1fr 1fr 1fr; column-gap: 3mm; margin-top: 3.4mm; align-items: stretch; }
+  .tri .bx { padding: 2mm 2mm 2.2mm; }
+  .cap { font-size: 6.5pt; line-height: 1.4; color: var(--ink); margin-top: 1.2mm; word-break: keep-all; }
+  .cap span { display: block; font-size: 5.5pt; color: #8c8c8c; margin-top: .4mm; }
+  .tb.fill + .sec .head h2, .figs + .sec .head h2 { margin-top: 0; }
+  .tb.t2 .tr { padding: 1.2mm 0 1.1mm; }
+  /* 61쪽 저니맵 틀 · 72쪽 순서 카드 */
+  .jt h1 { font-size: 15pt; line-height: 1.25; font-weight: 700; letter-spacing: -.02em; margin-top: 1.6mm; }
+  .jt .ke { font-size: 7.5pt; margin-top: 1mm; }
+  .jm { display: grid; grid-template-columns: 17mm repeat(6, 1fr); margin-top: 9mm; }
+  .jm + .jm { margin-top: 12mm; }
+  .jl { font-size: 6.5pt; line-height: 1.3; color: #555; padding: 2.4mm 0; align-self: start; }
+  .jl span { display: block; font-size: 5.5pt; color: #a3a3a3; }
+  .jd { position: relative; padding: 2.2mm 0 6mm; border-bottom: .25mm solid #9a9a9a; }
+  .jd b { font-size: 9pt; line-height: 1.2; font-weight: 700; color: var(--accent); }
+  .jd i { position: absolute; left: 0; bottom: -1.1mm; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--ink); }
+  .ja { padding: 4.2mm 3mm 5mm 0; }
+  .ja .cap { font-size: 7.5pt; font-weight: 700; line-height: 1.45; margin-top: 0; }
+  .ja .cap span { font-size: 6pt; font-weight: 400; line-height: 1.4; margin-top: 1mm; }
+  .jw { background: #f2f2f2; padding: 3mm 3mm 3.4mm 0; }
+  .jl.jw { padding: 3mm 0 3.4mm 2mm; align-self: stretch; }
+  .jw .cap { margin-top: 0; font-size: 7pt; } .jw .cap span { font-size: 6pt; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; margin-top: 4mm; border-top: .25mm solid var(--rule); }
+  .cd { padding: 2.6mm 0 2.8mm; border-bottom: .25mm solid var(--rule); }
+  .cd .ko { margin-top: 1.6mm; } .cd .en { margin-top: 1.2mm; }
+  /* 85~100쪽 */
+  .sec .st + .st { margin-top: 3mm; }
+  .quote { margin-top: auto; padding: 1mm 0 1mm 4mm; border-left: .8mm solid var(--accent); }
+  .quote .ko { font-size: 10pt; line-height: 1.6; font-weight: 500; }
+  .quote .en { font-size: 7.5pt; margin-top: 2mm; }
+  .ref { font-size: 7pt; line-height: 1.5; color: var(--ink); word-break: keep-all; }
+  .ref + .ref { margin-top: 1.5mm; }
+  .ref.todo { color: #9a9a9a; }
+  /* 53쪽 프로토타입 계획 */
+  .defs { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; margin-top: 5mm; padding-top: 5mm; border-top: .25mm solid var(--rule); }
+  .df { padding-left: 4mm; border-left: .8mm solid var(--accent); }
+  .df.x { border-left-color: var(--ink); }
+  .df .big { font-size: 26pt; line-height: 1; font-weight: 700; letter-spacing: -.01em; color: var(--accent); }
+  .df.x .big { color: var(--ink); }
+  .df .nm { font-size: 7pt; line-height: 1.3; font-weight: 700; margin-top: 1.6mm; }
+  .df .nm span { font-weight: 400; color: #8c8c8c; }
+  .df .ko { margin-top: 2.6mm; }
+  .tag { display: inline-block; font-size: 5.5pt; line-height: 1; font-weight: 500; color: var(--accent); border: .25mm solid var(--accent); border-radius: 3mm; padding: .7mm 1.6mm .8mm; margin-top: 2mm; letter-spacing: .02em; }
+  .tag.x { color: #fff; background: var(--ink); border-color: var(--ink); }
+  .tb.plan .tr { padding-top: 4mm; }
+  .tb.plan .no { font-size: 11pt; }
+  .tb.plan .k { font-size: 10pt; line-height: 1.4; }
+  .tb.plan .ke { font-size: 7pt; margin-top: 1.2mm; }
+  /* 표 소제목 */
+  .tt { font-size: 9.5pt; line-height: 1.3; font-weight: 700; letter-spacing: -.02em; margin-bottom: 2.8mm; }
+  .tt span { font-size: 7pt; font-weight: 500; color: var(--accent); letter-spacing: 0; }
+  #p66 .req.c .tr { padding-top: 2.1mm; padding-bottom: 1.8mm; }
+  .wide { margin-top: 0; padding-top: 2.2mm; border-top: .25mm solid var(--rule); }
+  #p84 .tb.t2 .tr { padding: 1mm 0 .9mm; }
+  #p84 .tb { margin-top: 2.2mm !important; }
+  #p84 .tt { margin-bottom: 2.2mm; }
+  /* 도형 그림 */
+  .ill svg { display: block; width: 100%; height: auto; }
+  .ill svg text { font-family: "Noto Sans KR", sans-serif; }
+  /* 70쪽: 큰 숫자 머리말 + 둥근 표 카드 틀 (사용자가 준 레퍼런스 쪽 느낌) */
+  .page.atoma { padding: 14mm 16mm 0 16mm; }
+  .ah { display: flex; align-items: flex-end; gap: 2.6mm; padding-bottom: 3mm; border-bottom: .25mm solid #777; }
+  .anum { font-family: "Playfair Display", "Bodoni MT", Didot, Georgia, serif; font-size: 44pt; line-height: .8; color: #A69C94; letter-spacing: -.03em; }
+  .atl { padding-bottom: .6mm; }
+  .atl .a1 { font-size: 11pt; line-height: 1.2; color: #333; letter-spacing: .01em; }
+  .atl .a2 { font-size: 7pt; line-height: 1.3; color: #555; margin-top: .5mm; }
+  .aintro { margin-top: 5mm; } .aintro .en { margin-top: 1.4mm; }
+  .acap { display: flex; gap: 2mm; margin-top: 5.4mm; align-items: flex-start; }
+  .acap svg { display: block; width: 3.4mm; height: 3.4mm; margin-top: .4mm; }
+  .acap .c1 { font-size: 8.5pt; line-height: 1.3; font-weight: 700; letter-spacing: -.02em; }
+  .acap .c2 { font-size: 6.5pt; line-height: 1.3; font-weight: 700; color: #777; margin-top: .3mm; }
+  .atb { position: relative; margin-top: 3mm; border: .25mm solid #555; border-radius: 9mm 9mm 0 0; overflow: hidden; }
+  .ath, .atr { display: grid; grid-template-columns: 37mm 58mm 1fr; }
+  .ath { background: #DDD8D2; border-bottom: .25mm solid #555; border-radius: 8.750mm 8.750mm 0 0; }
+  .ath > div { padding: 2.8mm 4mm 2.4mm; } .ath > div:first-child { padding-left: 6mm; }
+  .ath .t { font-size: 7.5pt; line-height: 1.35; font-weight: 500; color: #333; }
+  .ath .t.e { font-size: 7pt; font-weight: 700; color: #555; }
+  .atr > div { padding: 1.7mm 4mm 1.7mm; } .atr > div:first-child { padding-left: 6mm; }
+  .atr + .atr { border-top: .2mm solid #dcdcdc; }
+  .atr .k { font-size: 8pt; line-height: 1.5; } .atr .k span { color: #8A7F76; margin-right: .6mm; }
+  .atr .ke { color: #8A7F76; margin-top: .5mm; }
+  .atr .ko { line-height: 1.5; } .atr .en { line-height: 1.42; margin-top: .6mm; }
+  .vd { position: absolute; top: 0; bottom: 0; width: .25mm; background: #555; }
+  .anote { margin-top: 2.6mm; padding-left: 6mm; } .anote .ko { font-size: 7.5pt; } .anote .en { margin-top: .4mm; font-size: 6.5pt; }
+  .afoot { position: absolute; left: 16mm; right: 16mm; bottom: 8mm; border-top: .25mm solid #777; padding-top: 2.4mm; display: flex; gap: 4mm; align-items: baseline; }
+  .afoot .pn { font-size: 8pt; line-height: 1.2; color: #777; }
+  .afoot .pj { font-size: 6.5pt; line-height: 1.2; font-weight: 700; color: #444; letter-spacing: .02em; }
+  /* 71쪽: 구조도 중심 구성 */
+  .sysfig { margin-top: 6mm; padding-top: 5mm; border-top: .25mm solid var(--rule); }
+  .sysx { display: grid; grid-template-columns: 30mm 8mm 34mm 8mm 34mm 8mm 1fr; grid-template-rows: auto repeat(4, 13.5mm); row-gap: 3mm; align-items: stretch; }
+  .sysx .dh { align-self: end; font-size: 6.5pt; } .sysx .ar { align-self: center; font-size: 9.5pt; }
+  .sysx .bx { position: relative; display: flex; align-items: center; justify-content: center; border-radius: 1.6mm; }
+  .sysx .bx .t { font-size: 8.5pt; line-height: 1.3; } .sysx .bx .t span { font-size: 6pt; margin-top: .3mm; }
+  .sysx > * { position: relative; z-index: 1; }
+  .zone { z-index: 0 !important; grid-column: 3 / 6; grid-row: 2 / 6; margin: -2.6mm -2.2mm -7mm; border: .25mm dashed #9a9a9a; border-radius: 3mm; background: #f7f7f7; position: relative; }
+  .zone .zc { position: absolute; left: 2.2mm; bottom: 1.5mm; font-size: 6pt; line-height: 1.2; font-weight: 700; color: var(--accent); }
+  .zone .zc span { font-weight: 400; color: #8c8c8c; }
+  .bd, .bd2 { display: block; width: 4.4mm; height: 4.4mm; border-radius: 2.2mm; background: var(--accent); color: #fff; font-size: 6.5pt; font-weight: 700; font-style: normal; line-height: 4.4mm; text-align: center; }
+  .bd { position: absolute; left: -1.5mm; top: -1.5mm; }
+  .pn6w { margin-top: auto; padding-top: 4.4mm; border-top: .25mm solid var(--rule); }
+  .pn6 { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 6mm; row-gap: 4.4mm; }
+  .ph { display: flex; align-items: center; gap: 1.6mm; } .ph .ke { margin-top: 0; }
+  .pi .ko { font-size: 7.5pt; line-height: 1.55; margin-top: 1.5mm; } .pi .en { font-size: 6.5pt; margin-top: 1mm; }
+  .headw .body { margin-top: 3.6mm; }
+  #p71 .sysfig { margin-top: auto; }
+  /* 72·73쪽: 그림 중심 구성 (71쪽과 같은 느낌 + 57쪽의 그림 꼬리표·아래 2단) */
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 6mm; margin-top: auto; padding-top: 5mm; border-top: .25mm solid var(--rule); }
+  .co .ct { font-size: 11pt; line-height: 1.2; margin-top: 2.6mm; color: #333; }
+  .co.red .ct, .co.red .cb { color: var(--accent); }
+  .co .cb { font-size: 7pt; line-height: 1.3; font-weight: 700; margin-top: 1.3mm; }
+  .co .cx { font-size: 6.5pt; line-height: 1.5; color: #555; margin-top: .8mm; }
+  .pn2w { margin-top: auto; padding-top: 4.4mm; border-top: .25mm solid var(--rule); }
+  .pn2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; row-gap: 3.6mm; }
+  .pn2 .pi { display: grid; grid-template-columns: 6.4mm 1fr; column-gap: 0; }
+  .pn2 .pi .ph { grid-row: 1 / span 2; align-items: flex-start; padding-top: .3mm; }
+  .pn2 .pi .ko { margin-top: 0; }
+  .pn2 .pi.hd { display: block; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+  .cols2 .ko { font-size: 7.5pt; line-height: 1.6; } .cols2 .en { margin-top: 0; font-size: 6.5pt; line-height: 1.6; }
+  .foot2 { margin-top: auto; padding-top: 4.4mm; border-top: .25mm solid var(--rule); }
+  .foot2 .tt { margin-bottom: 2mm; }
+  .dbfig { margin-top: auto; padding-top: 5mm; border-top: .25mm solid var(--rule); }
+  .dbfig .jd { padding: 0 0 4mm; } .dbfig .jd b { font-size: 10pt; }
+  .dbfig .ja { padding: 3.4mm 3mm 0 0; } .dbfig .ja .k { font-size: 9pt; } .dbfig .ja .cap { font-size: 6.5pt; margin-top: 1.6mm; } .dbfig .ja .cap span { font-size: 5.5pt; margin-top: .4mm; }
+  .x02 { margin-top: 4.6mm; padding: 3.4mm 3.4mm 3.2mm; background: #f7f7f7; border-radius: 2mm; }
+  .x02 .pv { background: #fff; height: 19mm; } .x02 .pv.cut { background: #f0f0f0; } .x02 .pv svg { width: 29mm; height: 17.850mm; }
+  .x02 .chips .ar { margin-top: 8mm; }
+  .x02t { margin-top: 3mm; } .x02t .ko { font-size: 7.5pt; line-height: 1.55; } .x02t .en { font-size: 6.5pt; margin-top: 1mm; }
+  #p73 .pn2 .pi { grid-template-columns: 1fr; } #p73 .pn2 .pi .ph { grid-row: auto; align-items: center; padding-top: 0; } #p73 .pn2 .pi .ko { margin-top: 1.4mm; }
+  #p73 .bd2 { width: 6mm; font-size: 6pt; }
+  /* 72·73 조임 */
+  #p72 .trio { padding-top: 4mm; column-gap: 10mm; } #p72 .trio .ill svg { width: 100%; }
+  #p72 .co .ct { font-size: 10pt; margin-top: 2mm; } #p72 .co .cb { margin-top: 1mm; }
+  #p72 .pn2w, #p72 .foot2 { padding-top: 3.4mm; } #p72 .pn2 { row-gap: 2.4mm; } #p72 .tt { margin-bottom: 2.2mm; }
+  #p72 .pi .ko { line-height: 1.5; } #p72 .pi .en { margin-top: .6mm; line-height: 1.45; }
+  #p72 .headw .body { margin-top: 3mm; }
+  #p73 .x02 { margin-top: 3.6mm; padding: 2.8mm 3.4mm 2.6mm; } #p73 .x02 .pv { height: 16.500mm; } #p73 .x02 .pv svg { width: 25mm; height: 15.385mm; } #p73 .x02 .chips .ar { margin-top: 6.600mm; }
+  #p73 .pn2w, #p73 .foot2 { padding-top: 3.6mm; }
+  /* 70쪽: 요구사항마다 한 덩어리(줄글) */
+  .cards3w { margin-top: auto; padding-top: 4.4mm; border-top: .25mm solid var(--rule); }
+  .cards3 { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 7mm; row-gap: 3.4mm; }
+  .cd3 { border-top: .3mm solid var(--ink); padding-top: 2.2mm; }
+  .cd3 .hd { display: flex; align-items: baseline; gap: 1.8mm; }
+  .cd3 .hd .no { font-size: 10pt; } .cd3 .hd .k { font-size: 9.5pt; }
+  .cd3 .ke { margin-top: .4mm; }
+  .cd3 .ml { font-size: 5.5pt; line-height: 1.2; font-weight: 700; color: #6e6e6e; letter-spacing: .03em; margin-top: 2mm; }
+  .cd3 .ml span { font-weight: 400; color: #a3a3a3; }
+  .cd3 .ko { font-size: 7.5pt; line-height: 1.55; margin-top: .8mm; } .cd3 .en { font-size: 6.5pt; line-height: 1.45; margin-top: .6mm; }
+  .pn2 .pi { align-content: start; }
+  #p73 .dbfig { border-top: 0; padding-top: 3.4mm; }
+  /* 보여 주는 쪽 틀(s2): 71·72·73쪽 — 55·57쪽과 같은 짜임 */
+  .page.s2 { padding: 18mm 16mm 14mm; }
+  .stag { font-size: 9pt; line-height: 1; font-weight: 700; color: var(--accent); letter-spacing: .02em; }
+  .hero2 { text-align: center; margin-top: 3mm; }
+  .hero2 .hl { font-size: 10pt; line-height: 1.3; font-weight: 500; }
+  .hero2 .hs { font-size: 12.5pt; line-height: 1.5; font-weight: 500; color: #555; margin-top: 2.5mm; word-break: keep-all; }
+  .s2 .mid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 6mm 0; }
+  .s2 .mid > * + * { margin-top: 9mm; }
+  .foot3 .ft { font-size: 17pt; line-height: 1.2; font-weight: 500; }
+  .foot3 .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 10mm; margin-top: 4mm; }
+  .foot3 .ko { font-size: 8pt; line-height: 1.8; } .foot3 .ko + .ko { margin-top: 3mm; }
+  .foot3 .en { font-size: 7pt; line-height: 1.7; color: #9a9a9a; margin-top: 0; } .foot3 .en + .en { margin-top: 2.4mm; }
+  .aw { display: block; width: 6mm; height: 2mm; } .aw path { fill: none; stroke: #111; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+  .s2 .ar { display: flex; align-items: center; justify-content: center; }
+  .s2 .sysx { grid-template-columns: 30mm 9mm 32mm 9mm 32mm 9mm 1fr; grid-template-rows: auto repeat(4, 13mm); row-gap: 3mm; margin-bottom: 0; }
+  .s2 .sysx .bx { border-width: .2mm; } .s2 .sysx .bx .t { font-size: 8.5pt; } .s2 .sysx .dh { padding-bottom: .4mm; }
+  .s2 .lg { margin-top: 3mm; }
+  .sps { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 7mm; row-gap: 5mm; }
+  .sp { border-top: .3mm solid var(--ink); padding-top: 2.2mm; }
+  .sp .no { font-size: 9pt; } .sp .ph .ke { margin-top: 0; }
+  .sp .ko { font-size: 7.5pt; line-height: 1.55; margin-top: 1.6mm; }
+  .sp .tk { font-size: 6.5pt; line-height: 1.45; color: #555; margin-top: .5mm; word-break: keep-all; }
+  .sp .en { font-size: 6.5pt; line-height: 1.45; margin-top: .9mm; }
+  .trio2 { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 7mm; }
+  .s2 .co .ct, .x03 .ct { font-size: 9pt; line-height: 1.3; font-weight: 500; color: #333; margin-top: 2.6mm; }
+  .s2 .co.red .ct, .s2 .co.red .cx b { color: var(--accent); }
+  .s2 .cx { font-size: 6.5pt; line-height: 1.6; color: #333; margin-top: 1.2mm; word-break: keep-all; } .s2 .cx b { font-weight: 700; }
+  .jm.j5 { grid-template-columns: repeat(5, 1fr); margin-top: 0; }
+  .j5 .jd { padding: 0 0 4mm; } .j5 .jd b { font-size: 10pt; }
+  .j5 .ja { padding: 3.6mm 3.4mm 0 0; } .j5 .ja .k { font-size: 9pt; }
+  .j5 .ja .ko { font-size: 6.5pt; line-height: 1.6; margin-top: 2mm; } .j5 .ja .en { font-size: 6pt; line-height: 1.45; margin-top: 1mm; }
+  .x03 { background: #f7f7f7; border-radius: 2mm; padding: 4mm 4.4mm 4.4mm; }
+  .x03 .xl { font-size: 8pt; line-height: 1.2; font-weight: 700; } .x03 .xl b { color: var(--accent); margin-right: .6mm; } .x03 .xl span { font-size: 6.5pt; font-weight: 400; color: #8c8c8c; margin-left: 1mm; }
+  .x03 .chips { grid-template-columns: 1fr 8mm 1fr 8mm 1fr 8mm 1fr; margin-top: 3.4mm; }
+  .x03 .chips .ar { margin-top: 0; height: 22mm; }
+  .x03 .pv { background: #fff; height: 22mm; } .x03 .pv.cut { background: #f0f0f0; } .x03 .pv svg { width: 26mm; height: 16mm; } .x03 .pn { min-width: 0; }
+  /* 73 다시 */
+  #p73 .x03 .ct { font-size: 8pt; font-weight: 700; color: var(--ink); margin-top: 2.4mm; } #p73 .cxe { color: #8c8c8c; font-size: 6pt; margin-top: .6mm; }
+  #p73 .j5 .ja { padding-top: 3.2mm; } #p73 .mid { padding: 5mm 0; } #p73 .mid > * + * { margin-top: 7mm; }
+  #p73 .foot3 .ko { line-height: 1.7; } #p73 .foot3 .en { line-height: 1.6; } #p73 .foot3 .cols { margin-top: 3.4mm; }
+  #p73 .x03 { padding: 3.6mm 4.4mm 4mm; } #p73 .x03 .pv, #p73 .x03 .chips .ar { height: 20mm; }
+  /* 73 그림 크게 */
+  #p73 .x03 { padding: 6mm 5.4mm 6.4mm; }
+  #p73 .x03 .xl { font-size: 10pt; } #p73 .x03 .xl span { font-size: 7pt; }
+  #p73 .x03 .chips { grid-template-columns: 1fr 6mm 1fr 6mm 1fr 6mm 1fr; margin-top: 5mm; }
+  #p73 .x03 .pv, #p73 .x03 .chips .ar { height: 36mm; }
+  #p73 .x03 .pv svg { width: 32mm; height: 19.692mm; flex: none; } #p73 .x03 .pv { overflow: hidden; }
+  #p73 .x03 .ct { font-size: 9pt; margin-top: 3.2mm; }
+  #p73 .x03 .cx { font-size: 7pt; line-height: 1.55; color: #333; margin-top: 1.2mm; }
+  #p73 .x03 .cx.cxe { font-size: 6pt; line-height: 1.45; color: #8c8c8c; margin-top: .8mm; }
+  #p73 .foot3 .ko { line-height: 1.8; } #p73 .foot3 .en { line-height: 1.7; }
+  /* 60·61쪽 펼침면 시간 선 */
+  .page.tl .jt h1 { font-size: 15pt; }
+  .tline { position: absolute; display: block; height: 0; border-top: .25mm solid #9a9a9a; }
+  .tdot { position: absolute; display: block; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--ink); }
+  .tdate { position: absolute; font-size: 12pt; line-height: 1; font-weight: 700; color: var(--accent); letter-spacing: .01em; }
+  .tent { position: absolute; }
+  .tent .k { font-size: 9pt; line-height: 1.45; }
+  .tent .en { font-size: 6.5pt; line-height: 1.45; margin-top: 1mm; }
+  .tent .wl { font-size: 5.5pt; line-height: 1.2; font-weight: 700; color: var(--accent); letter-spacing: .04em; margin-top: 3.4mm; padding-top: 2mm; border-top: .2mm solid var(--rule); }
+  .tent .wl span { font-weight: 400; color: #a3a3a3; }
+  .tent .ko { font-size: 7.5pt; line-height: 1.5; margin-top: 1mm; }
+  .tent .ko + .en { margin-top: .6mm; }
+  .trange { position: absolute; right: 14mm; top: 21.5mm; text-align: right; }
+  .trange .ke { margin-top: 1.4mm; color: #8c8c8c; }
+  .tarr { position: absolute; display: block; width: 1.9mm; height: 2.8mm; } .tarr path { fill: none; stroke: #9a9a9a; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+
+<!-- ───────────── 64쪽 (짝수) · 5.1 Functional 1/2 ───────────── -->
+<section class="page even" id="p64">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">5.1</div>
+      <h2>Functional</h2>
+      <div class="sub">기능 요구사항</div>
+      <svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="27" rx="2.5"/><path d="M15.5 8V6.5a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2V8"/><path d="M14 17.5l2 2 3.5-4M23 17.5h4.5M14 26.5l2 2 3.5-4M23 26.5h4.5"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">요구사항은 조사에서 나온 니즈에서만 만들었다. 사용자뿐 아니라 기기를 사는 유통사와 매일 관리하는 매장 직원의 니즈도 넣었다. <em>기능 요구사항은 TOOK이 해야 하는 동작이다.</em></p>
+      <p class="en">We built the requirements only from needs found in our research. We included not only the needs of users but also those of the retailer that buys the device and the store staff who look after it every day. Functional requirements are the things TOOK must do.</p>
+    </div>
+  </div>
+
+  <div class="req">
+    <div class="tt t" data-g="표 제목 기능 요구사항 F1~F5">기능 요구사항 F1~F5 <span>Functional requirements F1–F5</span></div>
+    <div class="th" data-g="표 머리">
+      <div class="t">요구사항 <span>Requirement</span></div>
+      <div class="t">지표 <span>Metric</span></div>
+      <div class="t">근거 <span>Rationale</span></div>
+    </div>
+
+    <div class="tr" data-g="F1 입술 위에 실시간으로 립 색을 입힌다">
+      <div class="head"><div class="no">F1.</div><h2>입술 위에 실시간으로<br>립 색을 입힌다</h2><div class="sub">Puts lip color on the lips in real time</div></div>
+      <div class="cell"><p class="ko"><em>15fps 이상</em>, 정면에서 놓침 없음</p><p class="en">15 fps or more; no tracking loss when facing front</p></div>
+      <div class="cell"><p class="ko">손등 발색 시 색 구분이 어려움 46.3%(2차 설문),<br>손등 발색 63.8%(Kim 외, 2025)</p><p class="en">Hard to tell colors apart on the back of the hand, 46.3% (second survey); testing on the back of the hand, 63.8% (Kim et al., 2025)</p></div>
+    </div>
+
+    <div class="tr" data-g="F2 화면의 색이 실제 제품 색과 가깝다">
+      <div class="head"><div class="no">F2.</div><h2>화면의 색이<br>실제 제품 색과 가깝다</h2><div class="sub">The color on screen is close to the real product color</div></div>
+      <div class="cell"><p class="ko">보정 후 평균 <em>ΔE 5 미만</em></p><p class="en">Average ΔE below 5 after calibration</p></div>
+      <div class="cell"><p class="ko">가장 중요한 정보는 실제 발색 41.5%(2차 설문), “실제와 다를까 봐” 48.7%(1차 설문)</p><p class="en">The most important information is the actual color, 41.5% (second survey); “the result may differ,” 48.7% (first survey)</p></div>
+    </div>
+
+    <div class="tr" data-g="F3 안내 없이 혼자 끝까지 쓴다">
+      <div class="head"><div class="no">F3.</div><h2>안내 없이 혼자<br>끝까지 쓴다</h2><div class="sub">Can be used alone to the end, without guidance</div></div>
+      <div class="cell"><p class="ko">무안내 과제 성공률 <em>80% 이상</em></p><p class="en">Unguided task success rate of 80% or more</p></div>
+      <div class="cell"><p class="ko">골드 회원 인터뷰: 혼자서, 1~2분 안에</p><p class="en">GOLD member interviews: alone, within one or two minutes</p></div>
+    </div>
+
+    <div class="tr" data-g="F4 영상을 저장·전송하지 않는다">
+      <div class="head"><div class="no">F4.</div><h2>영상을<br>저장·전송하지 않는다</h2><div class="sub">Does not store or send video</div></div>
+      <div class="cell"><p class="ko">외부 전송 <em>0건</em>,<br><em>90초</em> 무조작 시 초기화</p><p class="en">Zero external transfers; reset after 90 seconds of no input</p></div>
+      <div class="cell"><p class="ko">개인정보 걱정 46.1%(1차 설문)</p><p class="en">Worry about personal data, 46.1% (first survey)</p></div>
+    </div>
+
+    <div class="tr" data-g="F5 제품을 대면 그 색이 바로 입혀진다">
+      <div class="head"><div class="no">F5.</div><h2>제품을 대면 그 색이<br>바로 입혀진다</h2><div class="sub">Holding up a product applies its color at once</div></div>
+      <div class="cell"><p class="ko">인식 성공률 <em>95% 이상</em>, <em>1초 이내</em></p><p class="en">Recognition rate of 95% or more, within 1 second</p></div>
+      <div class="cell"><p class="ko">골드 회원 인터뷰: 제품을 먼저 정하고 온다</p><p class="en">GOLD member interviews: they decide on a product before coming</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 65쪽 (홀수) · 5.1 Functional 2/2 ───────────── -->
+<section class="page odd" id="p65">
+  <div class="bar"></div>
+
+  <div class="req" style="margin-top:0">
+    <div class="tt t" data-g="표 제목 기능 요구사항 F6~F10">기능 요구사항 F6~F10 <span>Functional requirements F6–F10</span></div>
+    <div class="th" data-g="표 머리">
+      <div class="t">요구사항 <span>Requirement</span></div>
+      <div class="t">지표 <span>Metric</span></div>
+      <div class="t">근거 <span>Rationale</span></div>
+    </div>
+
+    <div class="tr" data-g="F6 누른 곳이 정확히 눌린다">
+      <div class="head"><div class="no">F6.</div><h2>누른 곳이<br>정확히 눌린다</h2><div class="sub">A tap lands exactly where it is pressed</div></div>
+      <div class="cell"><p class="ko">터치 오차 <em>52px 미만</em><br>(호수 버튼 높이의 절반)</p><p class="en">Touch error below 52 px (half the height of a shade button)</p></div>
+      <div class="cell"><p class="ko">CFP 2: 필름과 화면이 어긋남</p><p class="en">CFP 2: the film and the screen are misaligned</p></div>
+    </div>
+
+    <div class="tr" data-g="F7 제품 순서는 색 차이로만 정한다">
+      <div class="head"><div class="no">F7.</div><h2>제품 순서는<br>색 차이로만 정한다</h2><div class="sub">Product order is set by color difference alone</div></div>
+      <div class="cell"><p class="ko">같은 입력에 <em>100% 같은 결과</em></p><p class="en">Same input gives the same result 100% of the time</p></div>
+      <div class="cell"><p class="ko">순서의 신뢰, 광고와 분리</p><p class="en">Trust in the order; kept separate from advertising</p></div>
+    </div>
+
+    <div class="tr" data-g="F8 조명이 바뀌면 직원이 색을 다시 맞춘다">
+      <div class="head"><div class="no">F8.</div><h2>조명이 바뀌면 직원이<br>색을 다시 맞춘다</h2><div class="sub">Staff recalibrate the color when the lighting changes</div></div>
+      <div class="cell"><p class="ko"><em>보정 1회</em>, 보정 뒤 <em>ΔE 감소</em></p><p class="en">One calibration; ΔE falls after calibration</p></div>
+      <div class="cell"><p class="ko">조명에 따라 색이 다르게 보임 22.0%(2차 설문),<br>기업 인터뷰</p><p class="en">Color looks different depending on lighting, 22.0% (second survey); company interview</p></div>
+    </div>
+
+    <div class="tr" data-g="F9 인터넷이 끊겨도 제품 시트까지 된다">
+      <div class="head"><div class="no">F9.</div><h2>인터넷이 끊겨도<br>제품 시트까지 된다</h2><div class="sub">Works up to the product sheet even when offline</div></div>
+      <div class="cell"><p class="ko">오프라인에서 <em>전 기능 동작</em></p><p class="en">All functions work offline</p></div>
+      <div class="cell"><p class="ko">매장 네트워크 환경</p><p class="en">Store network conditions</p></div>
+    </div>
+
+    <div class="tr" data-g="F10 한국어/영어를 바꾼다">
+      <div class="head"><div class="no">F10.</div><h2>한국어/영어를 바꾼다</h2><div class="sub">Switches between Korean and English</div></div>
+      <div class="cell"><p class="ko">전 화면 <em>2개 언어</em></p><p class="en">Two languages on every screen</p></div>
+      <div class="cell"><p class="ko">매장 외국인 방문</p><p class="en">Foreign visitors to stores</p></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">Note.</div></div>
+    <div class="body">
+      <p class="ko"><em>지표는 업계 표준이 아니라 팀이 정한 출발점이다.</em> ΔE 5는 다른 색으로 보이기 시작하는 값으로 보았고, 52px는 옆 버튼이 잘못 눌리지 않는 한계이다.</p>
+      <p class="en">The metrics are not industry standards but a starting point set by the team. We took ΔE 5 as the value at which a color begins to look like a different color, and 52 px is the limit within which the neighboring button is not pressed by mistake.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 66쪽 (짝수) · 5.2 Physical ───────────── -->
+<section class="page even" id="p66">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">5.2</div>
+      <h2>Physical</h2>
+      <div class="sub">물리 요구사항</div>
+      <svg viewBox="0 0 40 40"><path d="M20 5l13 7.5v15L20 35 7 27.5v-15z"/><path d="M7 12.5L20 20l13-7.5M20 20v15"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">물리 요구사항은 TOOK이 어떤 물건이어야 하는지이다. 한 문장으로는 <em>“거울처럼 보이고, 화면이 보이고, 정확히 눌리고, 얼굴이 잘 찍힌다”</em>이다. 치수는 가로×세로×두께(mm)이다.</p>
+      <p class="en">Physical requirements describe what kind of object TOOK must be. In one sentence: “it looks like a mirror, the screen shows through, touches land accurately, and the face is captured well.” Dimensions are width × height × depth (mm).</p>
+    </div>
+  </div>
+
+  <div class="req c" style="margin-top:4.5mm">
+    <div class="tt t" data-g="표 제목 물리 요구사항과 규격">물리 요구사항과 규격 <span>Physical requirements and specifications</span></div>
+    <div class="th" data-g="표 머리">
+      <div class="t">요구사항 <span>Requirement</span></div>
+      <div class="t">지표(규격) <span>Metric (specification)</span></div>
+      <div class="t">근거 <span>Rationale</span></div>
+    </div>
+
+    <div class="tr" data-g="P1 기존 매대 거울 자리에 놓인다">
+      <div class="no">P1.</div>
+      <div class="head"><h2>기존 매대 거울 자리에 놓인다</h2><div class="sub">Sits where the existing shelf mirror is</div></div>
+      <div class="cell"><p class="ko">전체 <em>320×511mm</em>, 추가 바닥 면적 <em>0</em></p><p class="en">Overall 320×511 mm; no additional floor space</p></div>
+      <div class="cell"><p class="ko">매장의 면적은 곧 매출</p><p class="en">A store’s floor area is its sales</p></div>
+    </div>
+
+    <div class="tr" data-g="P2 하프미러">
+      <div class="no">P2.</div>
+      <div class="head"><h2>하프미러: 거울 반사 + 화면 투과, 색을 띠지 않음</h2><div class="sub">Half mirror: reflects like a mirror and lets the screen through, with no tint</div></div>
+      <div class="cell"><p class="ko">유리 4mm, <em>반사율 65%·투과율 35%</em>, 297×429mm</p><p class="en">Glass 4 mm, 65% reflectance and 35% transmittance, 297×429 mm</p></div>
+      <div class="cell"><p class="ko">CFP 1: 색 필름은<br>립 색을 바꿈</p><p class="en">CFP 1: tinted film changes the lip color</p></div>
+    </div>
+
+    <div class="tr" data-g="P3 정전식 터치 필름">
+      <div class="no">P3.</div>
+      <div class="head"><h2>정전식 터치 필름: 유리 너머<br>손가락 인식, 드라이버 없이 USB</h2><div class="sub">Capacitive touch film: senses fingers through glass; USB with no driver</div></div>
+      <div class="cell"><p class="ko"><em>245×325×1mm</em>, 컨트롤보드 85×24×1mm</p><p class="en">245×325×1 mm; control board 85×24×1 mm</p></div>
+      <div class="cell"><p class="ko">적외선 프레임보다<br>숨어 있고 오입력 적음</p><p class="en">More hidden than an infrared frame, with fewer false inputs</p></div>
+    </div>
+
+    <div class="tr" data-g="P4 디스플레이">
+      <div class="no">P4.</div>
+      <div class="head"><h2>디스플레이: 세로 5:8,<br>하프미러 뒤에서도 밝음</h2><div class="sub">Display: vertical 5:8, bright even behind the half mirror</div></div>
+      <div class="cell"><p class="ko">갤럭시탭 194.7×300.6×6mm,<br>해상도 <em>1800×2880</em>, 밝기 <em>600nit</em></p><p class="en">Galaxy Tab 194.7×300.6×6 mm, 1800×2880 resolution, 600 nits</p></div>
+      <div class="cell"><p class="ko">거울 비율, 밝은 패널</p><p class="en">Mirror ratio, bright panel</p></div>
+    </div>
+
+    <div class="tr" data-g="P5 웹캠">
+      <div class="no">P5.</div>
+      <div class="head"><h2>웹캠: 얼굴 전체,<br>자동 보정 고정 가능</h2><div class="sub">Webcam: captures the whole face; automatic adjustment can be locked</div></div>
+      <div class="cell"><p class="ko">Lenovo 300 FHD Webcam 90×54×33mm, <em>1920×1080</em>, 화각 <em>95°</em></p><p class="en">Lenovo 300 FHD Webcam 90×54×33 mm, 1920×1080, 95° field of view</p></div>
+      <div class="cell"><p class="ko">색 고정(컬러 캘리브레이션)</p><p class="en">Locking the color (color calibration)</p></div>
+    </div>
+
+    <div class="tr" data-g="P6 LED 조명">
+      <div class="no">P6.</div>
+      <div class="head"><h2>LED 조명: 얼굴을 고르게 비춤</h2><div class="sub">LED lighting: lights the face evenly</div></div>
+      <div class="cell"><p class="ko"><em>백색 LED 센서등 4개</em><br>(205mm 2개, 330mm 2개), 건전지식</p><p class="en">Four white LED sensor lights (two 205 mm, two 330 mm), battery-powered</p></div>
+      <div class="cell"><p class="ko">매장 조명 영향 감소</p><p class="en">Less influence from store lighting</p></div>
+    </div>
+
+    <div class="tr" data-g="P7 NFC 리더기">
+      <div class="no">P7.</div>
+      <div class="head"><h2>NFC 리더기: 키보드 방식(블루투스), 드라이버 없음</h2><div class="sub">NFC reader: keyboard mode (Bluetooth), no driver</div></div>
+      <div class="cell"><p class="ko">ACS ACR1555U 150×75×17mm, 받침 내부, 인식 거리 <em>최대 약 50mm</em></p><p class="en">ACS ACR1555U 150×75×17 mm, inside the base, reading distance up to about 50 mm</p></div>
+      <div class="cell"><p class="ko">브라우저만으로 번호 수신</p><p class="en">Tag numbers received with a browser alone</p></div>
+    </div>
+
+    <div class="tr" data-g="P8 프레임·받침">
+      <div class="no">P8.</div>
+      <div class="head"><h2>프레임·받침: 기울기 조절,<br>낮은 무게 중심</h2><div class="sub">Frame and base: adjustable tilt, low center of gravity</div></div>
+      <div class="cell"><p class="ko">미러 프레임 319×449×57mm,<br>하단 프레임 320×260×332mm,<br>기울기 <em>뒤로 45°~앞으로 90°</em>(조절형 토크 힌지)</p><p class="en">Mirror frame 319×449×57 mm; lower frame 320×260×332 mm; tilt from 45° back to 90° forward (adjustable torque hinge)</p></div>
+      <div class="cell"><p class="ko">깨짐과 안전 대비</p><p class="en">Protection against breakage; safety</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 67쪽 (홀수) · 5.3 Business ───────────── -->
+<section class="page odd" id="p67">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">5.3</div>
+      <h2>Business</h2>
+      <div class="sub">사업 요구사항</div>
+      <svg viewBox="0 0 40 40"><path d="M6 34h28"/><path d="M11 34V25M20 34V18M29 34V11"/><path d="M8 17l8-6 5 3 9-8"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">사업 요구사항은 TOOK이 왜 돈을 낼 만한 물건인지를 정한다. <em>매장이 사고 메타뱅크가 파는 물건이므로, 두 쪽의 비용과 이익을 숫자로 묶었다.</em> B5의 지표는 파일럿이 끝나야 정해진다.</p>
+      <p class="en">Business requirements define why TOOK is worth paying for. Stores buy it and MetaBank sells it, so we tied the costs and benefits of both sides to numbers. The metric for B5 can only be set once the pilot is finished.</p>
+    </div>
+  </div>
+
+  <div class="req">
+    <div class="tt t" data-g="표 제목 사업 요구사항">사업 요구사항 <span>Business requirements</span></div>
+    <div class="th" data-g="표 머리">
+      <div class="t">요구사항 <span>Requirement</span></div>
+      <div class="t">지표 <span>Metric</span></div>
+      <div class="t">근거 <span>Rationale</span></div>
+    </div>
+
+    <div class="tr" data-g="B1 납품 단계에서 태그 비용을 만들지 않는다">
+      <div class="head"><div class="no">B1.</div><h2>납품 단계에서 태그<br>비용을 만들지 않는다</h2><div class="sub">No tag cost at the delivery stage</div></div>
+      <div class="cell"><p class="ko">바코드 방식 <em>0원</em><br>(NFC는 매장당 약 104만 원)</p><p class="en">Cost zero with barcodes (NFC costs about 1.04 million won per store)</p></div>
+      <div class="cell"><p class="ko">서대전점 실측 약 720개 × 1,450원</p><p class="en">About 720 testers counted at the Seodaejeon store × 1,450 won</p></div>
+    </div>
+
+    <div class="tr" data-g="B2 직원의 일을 늘리지 않는다">
+      <div class="head"><div class="no">B2.</div><h2>직원의 일을<br>늘리지 않는다</h2><div class="sub">No extra work for staff</div></div>
+      <div class="cell"><p class="ko">평소 조작 <em>0회</em>,<br>조명 변경 때 <em>보정 1회</em></p><p class="en">No operation in daily use; one calibration when the lighting changes</p></div>
+      <div class="cell"><p class="ko">기업 인터뷰: 도입 뒤 가장 큰 부담은 유지보수</p><p class="en">Company interview: the biggest burden after adoption is maintenance</p></div>
+    </div>
+
+    <div class="tr" data-g="B3 매장 수가 늘어도 서버 비용이 늘지 않는다">
+      <div class="head"><div class="no">B3.</div><h2>매장 수가 늘어도<br>서버 비용이 늘지 않는다</h2><div class="sub">Server costs do not rise as stores increase</div></div>
+      <div class="cell"><p class="ko">계산 전부 기기 안,<br>영상 전송 <em>0건</em></p><p class="en">All computing on the device; zero video transfers</p></div>
+      <div class="cell"><p class="ko">구독형 수익 구조</p><p class="en">Subscription revenue model</p></div>
+    </div>
+
+    <div class="tr" data-g="B4 여러 브랜드를 한 화면에서 비교한다">
+      <div class="head"><div class="no">B4.</div><h2>여러 브랜드를<br>한 화면에서 비교한다</h2><div class="sub">Compares several brands on one screen</div></div>
+      <div class="cell"><p class="ko"><em>199개</em> 제품, 호수 <em>2,002개</em></p><p class="en">199 products, 2,002 shades</p></div>
+      <div class="cell"><p class="ko">올리브영은 여러 브랜드가 함께 있는 매장</p><p class="en">Olive Young is a store where many brands sit together</p></div>
+    </div>
+
+    <div class="tr" data-g="B5 체험이 구매로 이어진다">
+      <div class="head"><div class="no">B5.</div><h2>체험이 구매로<br>이어진다</h2><div class="sub">The trial leads to purchase</div></div>
+      <div class="cell"><p class="ko">제품 시트에서 본 제품을 집은 비율 <span class="todo">[채울 내용]</span></p><p class="en">Share of shoppers who pick up a product seen on the product sheet</p></div>
+      <div class="cell"><p class="ko">멘토링: 재미에서 끝나면 매장은 돈을 내지 않는다</p><p class="en">Mentoring: if it ends at fun, stores will not pay</p></div>
+    </div>
+
+    <div class="tr" data-g="B6 메타뱅크의 수익이 한 번의 판매로 끝나지 않는다">
+      <div class="head"><div class="no">B6.</div><h2>메타뱅크의 수익이 한 번의<br>판매로 끝나지 않는다</h2><div class="sub">MetaBank’s revenue does not end with a single sale</div></div>
+      <div class="cell"><p class="ko">설치 패키지 + 월 구독,<br><em>수익원 2개 이상</em></p><p class="en">Installation package + monthly subscription, two or more revenue sources</p></div>
+      <div class="cell"><p class="ko">패션에서 API·SaaS로 전환하며 길이 열렸다</p><p class="en">The fashion business found its way by moving to API and SaaS</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 74쪽 (짝수) · 6.2 Details 4/7 · 작동 순서, 입·출력, 데이터 연계 ───────────── -->
+<section class="page even" id="p74">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">6.2 Details</div>
+      <h2>기능·운영 명세:<br>작동 순서, 입·출력,<br>데이터 연계</h2>
+      <div class="sub">Functional and Operational Specification: Operating Sequence, Inputs and Outputs, Data Flow</div>
+    </div>
+    <div class="body" data-g="작동 순서">
+      <p class="k">작동 순서</p><p class="ke">Operating sequence</p>
+      <div class="fl5">
+        <div class="bx hw"><div class="t">전원<span>Power on</span></div></div><div class="ar">→</div>
+        <div class="bx"><div class="t">앱 자동 실행<span>App starts by itself</span></div></div><div class="ar">→</div>
+        <div class="bx"><div class="t">대기 화면<span>Start screen</span></div></div><div class="ar">→</div>
+        <div class="bx"><div class="t">화면을 누름<span>Tap the screen</span></div></div><div class="ar">→</div>
+        <div class="bx"><div class="t">입술 인식<span>Lip detection</span></div></div>
+        <div class="bx out"><div class="t">립 색 입혀짐<span>Lip color applied</span></div></div><div class="ar">→</div>
+        <div class="bx"><div class="t">색 만들기 또는<br>제품 인식<span>Make a color or scan a product</span></div></div><div class="ar">→</div>
+        <div class="bx"><div class="t">호수 고르기<span>Choose a shade</span></div></div><div class="ar">→</div>
+        <div class="bx out"><div class="t">다시 입혀 보기<span>Try it on again</span></div></div><div class="ar">→</div>
+        <div class="bx db"><div class="t">90초 무조작 시<br>초기화<span>Reset after 90 s of no input</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tb tight" style="--cols:40mm 62mm 1fr;--gap:6mm">
+    <div class="tt t" data-g="표 제목 입력·처리·출력">입력·처리·출력 <span>Input, processing and output</span></div>
+    <div class="th" data-g="입·출력 표 머리"><div class="t">입력 <span>Input</span></div><div class="t">처리 <span>Processing</span></div><div class="t">출력 <span>Output</span></div></div>
+    <div class="tr" data-g="입력 웹캠 영상"><div><p class="k">웹캠 영상</p><p class="ke">Webcam video</p></div><div><p class="ko">478점 중 입술 점 → 마스크 → Lab 색 입히기</p><p class="en">Lip points among the 478 → mask → color applied in Lab</p></div><div><p class="ko">립 색이 입혀진 거울 영상</p><p class="en">Mirror image with lip color applied</p></div></div>
+    <div class="tr" data-g="입력 터치"><div><p class="k">터치</p><p class="ke">Touch</p></div><div><p class="ko">아핀 변환 보정 → 버튼</p><p class="en">Affine-transformation calibration → button</p></div><div><p class="ko">화면 전환, 색·질감 변경</p><p class="en">Screen change; color and finish change</p></div></div>
+    <div class="tr" data-g="입력 태그 번호"><div><p class="k">태그 번호</p><p class="ke">Tag number</p></div><div><p class="ko">등록 목록에서 제품 찾기</p><p class="en">Product looked up in the registered list</p></div><div><p class="ko">제품 색 입힘, 호수 시트</p><p class="en">Product color applied; shade sheet</p></div></div>
+    <div class="tr" data-g="입력 고른 색"><div><p class="k">고른 색</p><p class="ke">Chosen color</p></div><div><p class="ko">CIEDE2000으로 199개 제품·2,002개 호수와 비교</p><p class="en">Compared with 199 products and 2,002 shades by CIEDE2000</p></div><div><p class="ko">제품 순서</p><p class="en">Product order</p></div></div>
+  </div>
+  <div class="tb tight" style="--cols:28mm 44mm 42mm 1fr;margin-top:6mm">
+    <div class="tt t" data-g="표 제목 데이터 연계 구조">데이터 연계 구조 <span>Data flow structure</span></div>
+    <div class="th" data-g="데이터 표 머리"><div class="t">데이터 <span>Data</span></div><div class="t">어디서 <span>From</span></div><div class="t">어디로 <span>To</span></div><div class="t">개인정보 <span>Personal data</span></div></div>
+    <div class="tr" data-g="데이터 제품·호수·색"><div><p class="k">제품·호수·색</p><p class="ke">Products, shades, colors</p></div><div><p class="ko">판매 페이지 수집 → 색 추출 → 사람 검수</p><p class="en">Collected from sales pages → color extraction → human review</p></div><div><p class="ko">기기의 제품 데이터</p><p class="en">Product data on the device</p></div><div><p class="ko">없음</p><p class="en">None</p></div></div>
+    <div class="tr" data-g="데이터 카메라 영상"><div><p class="k">카메라 영상</p><p class="ke">Camera video</p></div><div><p class="ko">웹캠</p><p class="en">Webcam</p></div><div><p class="ko">기기 안에서 계산 후 버림</p><p class="en">Computed on the device, then discarded</p></div><div><p class="ko"><em>저장·전송 안 함</em></p><p class="en">Not stored or sent</p></div></div>
+    <div class="tr" data-g="데이터 고른 색·답변"><div><p class="k">고른 색·답변</p><p class="ke">Chosen colors, answers</p></div><div><p class="ko">손님 터치</p><p class="en">Customer’s touch</p></div><div><p class="ko">기기 임시 저장 → 90초 후 삭제</p><p class="en">Held temporarily on the device → deleted after 90 seconds</p></div><div><p class="ko">회원·사진 없음</p><p class="en">No membership, no photos</p></div></div>
+    <div class="tr" data-g="데이터 사용 집계"><div><p class="k">사용 집계(향후)</p><p class="ke">Usage counts (future)</p></div><div><p class="ko">기기별 익명 횟수</p><p class="en">Anonymous counts per device</p></div><div><p class="ko">브랜드 리포트</p><p class="en">Brand report</p></div><div><p class="ko">개인을 알 수 없게, 법률 검토 후</p><p class="en">Not identifiable; after legal review</p></div></div>
+    <div class="tr" data-g="데이터 매장 재고"><div><p class="k">매장 재고(향후)</p><p class="ke">Store stock (future)</p></div><div><p class="ko">매장 시스템</p><p class="en">Store system</p></div><div><p class="ko">제품 시트 “매장에 있음” 표시</p><p class="en">“In store” mark on the product sheet</p></div><div><p class="ko">없음</p><p class="en">None</p></div></div>
+  </div>
+</section>
+
+<!-- ───────────── 75쪽 (홀수) · 6.2 Details 5/7 · 도면·치수와 적층 구조 ───────────── -->
+<section class="page odd" id="p75">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">6.2 Details</div>
+      <h2>물리 명세:<br>도면·치수와 적층 구조</h2>
+      <div class="sub">Physical Specification: Drawings, Dimensions and Layer Structure</div>
+      <svg viewBox="0 0 40 40"><path d="M6 30L30 6l4 4L10 34z"/><path d="M11 25l3 3M15 21l2 2M19 17l3 3M23 13l2 2"/></svg>
+    </div>
+    <div class="body">
+      <figure data-g="그림 1 도면">
+        <div class="ill"><svg viewBox="0 0 440 150"><rect x="0" y="0" width="440" height="150" rx="4" fill="#f7f7f7"/><text x="94" y="13" font-size="8" font-weight="700" fill="#111111" text-anchor="middle">정면도</text><rect x="62" y="74" width="64" height="52" fill="#e9e9e9" stroke="#111111" stroke-width=".9"/><rect x="62.1" y="23.799999999999997" width="63.8" height="89.8" rx="1.5" fill="#ffffff" stroke="#111111" stroke-width=".9"/><rect x="75.7" y="37.8" width="36.5" height="57.7" fill="#111111" fill-opacity=".1" stroke="#9a9a9a" stroke-width=".6" stroke-dasharray="2 1.6"/><rect x="85" y="25.799999999999997" width="18" height="5" rx="1" fill="#111111"/><path d="M62 132H126M62 129.5v5M126 129.5v5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="94" y="141" font-size="7" font-weight="400" fill="#555555" text-anchor="middle">320</text><path d="M53 23.799999999999997V126M50.5 23.799999999999997h5M50.5 126h5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="49" y="77.4" font-size="7" font-weight="400" fill="#555555" text-anchor="end">511</text><path d="M135 23.799999999999997V113.6M132.5 23.799999999999997h5M132.5 113.6h5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="139" y="71.19999999999999" font-size="7" font-weight="400" fill="#555555" text-anchor="start">449</text><text x="94" y="68.8" font-size="5.5" font-weight="400" fill="#555555" text-anchor="middle">182.7×288.6</text><text x="229" y="13" font-size="8" font-weight="700" fill="#111111" text-anchor="middle">측면도</text><rect x="196" y="74" width="66.4" height="52" fill="#e9e9e9" stroke="#111111" stroke-width=".9"/><rect x="243" y="23.799999999999997" width="11.4" height="89.8" rx="1.5" fill="#ffffff" stroke="#111111" stroke-width=".9"/><rect x="208" y="80" width="30" height="3.4" fill="#D32C3E"/><path d="M196 132H262.4M196 129.5v5M262.4 129.5v5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="229.2" y="141" font-size="7" font-weight="400" fill="#555555" text-anchor="middle">332</text><path d="M243 15.799999999999997H254.4M243 13.299999999999997v5M254.4 13.299999999999997v5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="259" y="18.4" font-size="7" font-weight="400" fill="#555555">57</text><path d="M271 74V126M268.5 74h5M268.5 126h5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="275" y="102.5" font-size="7" font-weight="400" fill="#555555" text-anchor="start">260</text><text x="223" y="90" font-size="5.5" font-weight="400" fill="#D32C3E" text-anchor="middle">NFC</text><text x="362" y="13" font-size="8" font-weight="700" fill="#111111" text-anchor="middle">평면도</text><rect x="330" y="46" width="64" height="66.4" fill="#e9e9e9" stroke="#111111" stroke-width=".9"/><rect x="330.1" y="54" width="63.8" height="11.4" rx="1.5" fill="#ffffff" stroke="#111111" stroke-width=".9"/><rect x="347" y="84" width="30" height="15" rx="1.5" fill="none" stroke="#D32C3E" stroke-width=".9"/><text x="362" y="94" font-size="5.5" font-weight="400" fill="#D32C3E" text-anchor="middle">NFC</text><path d="M330 132H394M330 129.5v5M394 129.5v5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="362" y="141" font-size="7" font-weight="400" fill="#555555" text-anchor="middle">320</text><path d="M403 46V112.4M400.5 46h5M400.5 112.4h5" stroke="#9a9a9a" stroke-width=".6" fill="none"/><text x="407" y="81.7" font-size="7" font-weight="400" fill="#555555" text-anchor="start">332</text></svg></div>
+        <figcaption><span class="n">1</span><b>그림 1</b>정면도·측면도·평면도 (치수 단위 mm, 개략도)<span class="en">Figure 1. Front, side and top views (dimensions in mm, schematic)</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="two2">
+    <div class="tb tight" style="--cols:31mm 1fr;--gap:4mm;margin-top:0">
+      <div class="tt t" data-g="표 제목 주요 치수">주요 치수 <span>Key dimensions</span></div>
+    <div class="th" data-g="치수 표 머리"><div class="t">항목 <span>Item</span></div><div class="t">치수 <span>Dimension (mm)</span></div></div>
+      <div class="tr" data-g="치수 거울 바깥 크기"><div><p class="k">거울 바깥 크기<br>(가로×세로)</p><p class="ke">Mirror outer size (W×H)</p></div><div><p class="ko"><em>319×449</em> (미러 프레임)</p><p class="en">319×449 (mirror frame)</p></div></div>
+      <div class="tr" data-g="치수 화면 보이는 영역"><div><p class="k">화면 보이는 영역<br>(5:8 세로)</p><p class="ke">Visible screen area (5:8 vertical)</p></div><div><p class="ko"><em>182.7×288.6</em></p></div></div>
+      <div class="tr" data-g="치수 전체 높이"><div><p class="k">전체 높이<br>(받침 포함)</p><p class="ke">Overall height (with base)</p></div><div><p class="ko"><em>511</em> (전체 320×511, 두 프레임 겹침 198)</p><p class="en">511 (320×511 overall; the two frames overlap by 198)</p></div></div>
+      <div class="tr" data-g="치수 받침 바닥 크기"><div><p class="k">받침 바닥 크기</p><p class="ke">Base footprint</p></div><div><p class="ko"><em>320×332</em> (하단 프레임 320×260×332)</p><p class="en">320×332 (lower frame 320×260×332)</p></div></div>
+      <div class="tr" data-g="치수 두께"><div><p class="k">두께(거울~뒤판)</p><p class="ke">Depth (mirror to back panel)</p></div><div><p class="ko"><em>57</em></p></div></div>
+      <div class="tr" data-g="치수 기울기 범위"><div><p class="k">기울기 범위</p><p class="ke">Tilt range</p></div><div><p class="ko"><em>뒤로 45° ~ 앞으로 90°</em>, 조절형 토크 힌지</p><p class="en">45° back to 90° forward; adjustable torque hinge</p></div></div>
+      <div class="tr" data-g="치수 무게"><div><p class="k">무게</p><p class="ke">Weight</p></div><div><p class="ko"><em>6kg</em></p><p class="en">6 kg</p></div></div>
+      <div class="tr" data-g="치수 웹캠"><div><p class="k">웹캠 (위치 가운데)</p><p class="ke">Webcam (centered)</p></div><div><p class="ko">90×54×33, 위쪽 가운데</p><p class="en">90×54×33, top center</p></div></div>
+      <div class="tr" data-g="치수 NFC 리더기 위치"><div><p class="k">NFC 리더기 위치</p><p class="ke">NFC reader position</p></div><div><p class="ko">150×75×17, 거울 바로 밑 받침 안</p><p class="en">150×75×17, inside the base just below the mirror</p></div></div>
+    </div>
+
+    <div data-g="적층 구조">
+      <div class="mh" style="margin-top:0"><p class="k">적층 구조(앞 → 뒤)</p><p class="ke">Layer structure (front → back)</p></div>
+      <div class="stk">
+        <div class="st"><div class="num">1.</div><div><p class="ko">하프미러 유리 4mm, 반사율 65%·투과율 35%, 297×429mm — 비산 방지 필름(유리일 때)</p><p class="en">Half-mirror glass 4 mm, 65% reflectance and 35% transmittance, 297×429 mm — shatterproof film (when glass)</p></div></div>
+        <div class="st"><div class="num">2.</div><div><p class="ko">정전식 터치 필름 245×325×1mm — 하프미러 뒷면에 부착</p><p class="en">Capacitive touch film 245×325×1 mm — attached to the back of the half mirror</p></div></div>
+        <div class="st"><div class="num">3.</div><div><p class="ko">간격재 — 하프미러와 화면 사이 빛샘 방지</p><p class="en">Spacer — prevents light leaking between the half mirror and the screen</p></div></div>
+        <div class="st"><div class="num">4.</div><div><p class="ko">디스플레이(갤럭시탭 194.7×300.6×6mm) — 세로 배치</p><p class="en">Display (Galaxy Tab 194.7×300.6×6 mm) — placed vertically</p></div></div>
+        <div class="st"><div class="num">5.</div><div><p class="ko">배선·멀티 허브(145×160×15mm)·터치 컨트롤보드(85×24×1mm) — 뒤판 안쪽 고정</p><p class="en">Wiring, multi-hub (145×160×15 mm) and touch control board (85×24×1 mm) — fixed inside the back panel</p></div></div>
+        <div class="st"><div class="num">6.</div><div><p class="ko">뒤판 — 통풍구, 배선 구멍</p><p class="en">Back panel — vents and cable holes</p></div></div>
+        <div class="st"><div class="num">7.</div><div><p class="ko">LED 조명 — 백색 LED 센서등 4개를 거울 바깥 테두리에 고정</p><p class="en">LED lighting — four white LED sensor lights fixed to the outer rim of the mirror</p></div></div>
+      </div>
+      <div class="nb">
+        <p class="ko">화면과 하프미러 사이에 틈이 있으면 빛이 새어 가장자리가 뿌옇게 보인다. <em>간격재로 틈을 막고, 화면 밖 영역은 검은 테이프로 가려 거울로만 보이게 한다.</em></p>
+        <p class="en">If there is a gap between the screen and the half mirror, light leaks and the edges look hazy. The spacer closes the gap, and the area outside the screen is covered with black tape so that it looks only like a mirror.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 76쪽 (짝수) · 6.2 Details 6/7 · 재료·부품표와 조립 구조 ───────────── -->
+<section class="page even" id="p76">
+  <div class="bar"></div>
+
+  <div class="head" data-g="꼭지 6.2 Details 물리 명세: 재료·부품표와 조립 구조">
+    <div class="no">6.2 Details</div>
+    <h2>물리 명세: 재료·부품표와 조립 구조</h2>
+    <div class="sub">Physical Specification: Materials, Parts List and Assembly</div>
+  </div>
+
+  <div class="tb tight" style="--cols:32mm 1fr 1fr 27mm;--gap:5mm;margin-top:4mm">
+    <div class="tt t" data-g="표 제목 재료·부품표">재료·부품표 <span>Materials and parts list</span></div>
+    <div class="th" data-g="부품표 머리"><div class="t">부품 <span>Part</span></div><div class="t" style="grid-column:span 2">규격 <span>Specification</span></div><div class="t">수량 <span>Qty</span></div></div>
+    <div class="tr" data-g="부품 하프미러"><div><p class="k">하프미러</p><p class="ke">Half mirror</p></div><div><p class="ko">유리 4mm, 반사율 65%·투과율 35%, 297×429mm</p></div><div><p class="en e0">Glass 4 mm, 65% reflectance and 35% transmittance, 297×429 mm</p></div><div><p class="ko">1</p></div></div>
+    <div class="tr" data-g="부품 정전식 터치 필름"><div><p class="k">정전식 터치 필름</p><p class="ke">Capacitive touch film</p></div><div><p class="ko">245×325×1mm, 컨트롤보드 85×24×1mm</p></div><div><p class="en e0">245×325×1 mm; control board 85×24×1 mm</p></div><div><p class="ko">1</p></div></div>
+    <div class="tr" data-g="부품 디스플레이"><div><p class="k">디스플레이</p><p class="ke">Display</p></div><div><p class="ko">갤럭시탭 S10 FE+ 194.7×300.6×6mm</p></div><div><p class="en e0">Galaxy Tab S10 FE+ 194.7×300.6×6 mm</p></div><div><p class="ko">1</p></div></div>
+    <div class="tr" data-g="부품 웹캠"><div><p class="k">웹캠</p><p class="ke">Webcam</p></div><div><p class="ko">Lenovo 300 FHD Webcam 90×54×33mm</p></div><div></div><div><p class="ko">1</p></div></div>
+    <div class="tr" data-g="부품 LED 조명"><div><p class="k">LED 조명</p><p class="ke">LED lighting</p></div><div><p class="ko">백색 LED 센서등 205mm 2개, 330mm 2개, 건전지식</p></div><div><p class="en e0">White LED sensor lights, two 205 mm and two 330 mm, battery-powered</p></div><div><p class="ko">4</p></div></div>
+    <div class="tr" data-g="부품 NFC 리더기"><div><p class="k">NFC 리더기</p><p class="ke">NFC reader</p></div><div><p class="ko">ACS ACR1555U(블루투스) 150×75×17mm</p></div><div><p class="en e0">ACS ACR1555U (Bluetooth) 150×75×17 mm</p></div><div><p class="ko">1</p></div></div>
+    <div class="tr" data-g="부품 멀티 허브"><div><p class="k">멀티 허브</p><p class="ke">Multi-hub</p></div><div><p class="ko">145×160×15mm</p></div><div></div><div><p class="ko">1</p></div></div>
+    <div class="tr" data-g="부품 NFC 스티커·키링"><div><p class="k">NFC 스티커·키링</p><p class="ke">NFC stickers and key rings</p></div><div><p class="ko">스티커 450원 + 키링 1,000원 가정, 테스터마다 1개</p></div><div><p class="en e0">Assuming 450 won per sticker + 1,000 won per key ring; one per tester</p></div><div><p class="ko">시연 9개<br>(실물 카드 3, 시험용 6)</p><p class="en">9 for the demo (3 real cards, 6 for testing)</p></div></div>
+    <div class="tr" data-g="부품 프레임·받침"><div><p class="k">프레임·받침</p><p class="ke">Frame and base</p></div><div><p class="ko">미러 프레임 319×449×57mm, 하단 프레임 320×260×332mm, PLA Basic, 페인팅 마감</p></div><div><p class="en e0">Mirror frame 319×449×57 mm; lower frame 320×260×332 mm; PLA Basic, painted finish</p></div><div><p class="ko">1</p></div></div>
+  </div>
+
+  <div class="mh" data-g="조립 순서 제목" style="margin-top:3.4mm;padding-top:3.4mm;border-top:.25mm solid var(--rule)"><p class="k">조립 순서</p><p class="ke">Assembly steps</p></div>
+  <div class="two2" data-g="조립 순서" style="margin-top:2.4mm;padding-top:0;border-top:0">
+    <div class="stk" style="margin-top:0">
+      <div class="st"><div class="num">1.</div><div><p class="ko">프레임에 하프미러를 앉히고 모서리를 고정한다.</p><p class="en">Seat the half mirror in the frame and fix the corners.</p></div></div>
+      <div class="st"><div class="num">2.</div><div><p class="ko">하프미러 뒷면에 터치 필름을 기포 없이 붙인다.</p><p class="en">Attach the touch film to the back of the half mirror without air bubbles.</p></div></div>
+      <div class="st"><div class="num">3.</div><div><p class="ko">간격재를 두르고 디스플레이를 세로로 고정한다.</p><p class="en">Put the spacer around and fix the display vertically.</p></div></div>
+      <div class="st"><div class="num">4.</div><div><p class="ko">웹캠을 위쪽 가운데에 달고, 인식 모듈을 받침 안에 넣는다.</p><p class="en">Mount the webcam at the top center and put the recognition module inside the base.</p></div></div>
+    </div>
+    <div class="stk" style="margin-top:0">
+      <div class="st"><div class="num">5.</div><div><p class="ko">USB를 연결하고 LED 링을 테두리에 두른다.</p><p class="en">Connect the USB and run the LED ring around the rim.</p></div></div>
+      <div class="st"><div class="num">6.</div><div><p class="ko">뒤판을 닫고 받침에 올린다.</p><p class="en">Close the back panel and set it on the base.</p></div></div>
+      <div class="st"><div class="num">7.</div><div><p class="ko"><em>전원을 켜고 터치 보정, 카메라 색 보정 순서로 맞춘다.</em></p><p class="en">Turn on the power and calibrate touch first, then camera color.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 77쪽 (홀수) · 6.2 Details 7/7 · 연결 구조, 조명, 열, 안전 ───────────── -->
+<section class="page odd" id="p77">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">6.2 Details</div>
+      <h2>물리 명세:<br>연결 구조, 조명,<br>열, 안전</h2>
+      <div class="sub">Physical Specification: Connections, Lighting, Heat and Safety</div>
+    </div>
+    <div class="body">
+      <p class="ko"><b>연결 구조.</b> <em>웹캠과 터치 컨트롤보드는 멀티 허브를 거쳐 갤럭시탭에 USB로 연결된다.</em> 둘 다 별도 드라이버 없이 인식되는 표준 장치이다. NFC 리더기는 블루투스 키보드 방식으로 연결하고, LED 조명은 건전지로 켠다. 화면은 갤럭시탭의 디스플레이를 그대로 사용하므로 별도의 영상 케이블이 없다. 시제품의 전원은 보조 배터리로 공급한다.</p>
+      <p class="en"><b>Connections.</b> The webcam and the touch control board connect to the Galaxy Tab by USB through the multi-hub. Both are standard devices recognized without a separate driver. The NFC reader connects as a Bluetooth keyboard, and the LED lighting runs on batteries. The screen is the Galaxy Tab’s own display, so there is no separate video cable. The prototype is powered by a power bank.</p>
+      <figure data-g="그림 1 연결 구조도" style="margin-top:4mm">
+        <div class="conn">
+          <div class="bx hw" style="grid-column:1;grid-row:1 / span 3;align-self:stretch;display:flex;align-items:center;justify-content:center"><div class="t">갤럭시탭<span>Galaxy Tab<br>(screen and computing)</span></div></div>
+          <div class="cn" style="grid-column:2;grid-row:1 / span 2">USB</div>
+          <div class="bx" style="grid-column:3;grid-row:1 / span 2"><div class="t">멀티 허브<span>Multi-hub</span></div></div>
+          <div class="ar" style="grid-column:4;grid-row:1">→</div><div class="bx" style="grid-column:5;grid-row:1"><div class="t">웹캠<span>Webcam</span></div></div>
+          <div class="ar" style="grid-column:4;grid-row:2">→</div><div class="bx" style="grid-column:5;grid-row:2"><div class="t">터치 컨트롤보드<span>Touch control board</span></div></div>
+          <div class="cn" style="grid-column:2;grid-row:3">블루투스 Bluetooth</div>
+          <div class="bx" style="grid-column:3 / span 3;grid-row:3"><div class="t">NFC 리더기<span>NFC reader</span></div></div>
+          <div class="bx db" style="grid-column:1;grid-row:4"><div class="t">건전지<span>Batteries</span></div></div>
+          <div class="cn" style="grid-column:2;grid-row:4">전원 Power</div>
+          <div class="bx" style="grid-column:3 / span 3;grid-row:4"><div class="t">LED 조명<span>LED lighting</span></div></div>
+        </div>
+        <figcaption><span class="n">1</span><b>그림 1</b>연결 구조도<span class="en">Figure 1. Connection diagram</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">01.</div><h2>조명</h2><div class="sub">Lighting</div></div>
+    <div class="body">
+      <p class="ko">LED 조명은 얼굴을 고르게 비춰 매장마다 다른 조명의 영향을 줄인다. <em>다만 LED 조명이 있어도 조명이 바뀌면 카메라 색 보정을 다시 하는 것이 원칙이다.</em> 시제품에는 백색 LED 센서등 4개(205mm 2개, 330mm 2개)를 썼고 밝기 조절은 없다.</p>
+      <p class="en">The LED lighting lights the face evenly and reduces the influence of lighting that differs from store to store. Even with the LED lighting, however, the rule is to redo the camera color calibration whenever the lighting changes. The prototype uses four white LED sensor lights (two 205 mm, two 330 mm) with no brightness control.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">02.</div><h2>열</h2><div class="sub">Heat</div></div>
+    <div class="body">
+      <p class="ko">갤럭시탭은 거울 뒤 닫힌 공간에 들어간다. 뒤판에 통풍구를 둔다. <em>연속 가동 때의 온도는 재지 않았다.</em></p>
+      <p class="en">The Galaxy Tab sits in a closed space behind the mirror. Vents are placed in the back panel. The temperature during continuous operation has not been measured.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">03.</div><h2>안전</h2><div class="sub">Safety</div></div>
+    <div class="body">
+      <p class="ko">하프미러가 유리이므로 깨짐에 대비해 비산 방지 필름을 붙이고 모서리를 프레임으로 감싼다. 받침은 조절형 토크 힌지로 뒤로 45°, 앞으로 90°까지 기울일 수 있다. <em>가장 많이 기울인 상태에서 화면을 눌러도 넘어지지 않았다.</em> 선반에는 고정하지 않았다.</p>
+      <p class="en">Because the half mirror is glass, a shatterproof film is applied against breakage and the corners are wrapped by the frame. The base can tilt up to 45° back and 90° forward on an adjustable torque hinge. It did not tip over when the screen was pressed at the greatest tilt. It is not fixed to the shelf.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 78쪽 (짝수) · 6.3 Validation 1/2 ───────────── -->
+<section class="page even" id="p78">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">6.3 Validation</div>
+      <h2>시험 방법과 결과</h2>
+      <div class="sub">Test Methods and Results</div>
+      <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14"/><path d="M13.5 20.5l4.5 4.5 9-10"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko"><em>요구사항의 지표를 통과 기준으로 삼아 요구사항마다 시험했다.</em> 요구사항이 지켜졌는지는 숫자나 관찰로 판단한다.</p>
+      <p class="en">We tested each requirement, using its metric as the pass criterion. Whether a requirement is met is judged by numbers or by observation.</p>
+    </div>
+  </div>
+
+  <div class="tb fill" style="--cols:11mm 25mm 1fr 25mm 46mm;--gap:4mm">
+    <div class="tt t" data-g="표 제목 요구사항별 시험 결과">요구사항별 시험 결과 <span>Test results by requirement</span></div>
+    <div class="th" data-g="표 머리"><div class="t" style="grid-column:span 2">요구사항 <span>Requirement</span></div><div class="t">시험 방법 <span>Test method</span></div><div class="t">통과 기준 <span>Pass criterion</span></div><div class="t">결과 <span>Result</span></div></div>
+    <div class="tr" data-g="F1 실시간 립 색"><div class="no">F1.</div><div><p class="k">실시간 립 색</p><p class="ke">Real-time lip color</p></div><div><p class="ko">1분간 평균 fps, 고개 15°·30°에서 놓침</p><p class="en">Average fps over 1 minute; tracking loss with the head turned 15° and 30°</p></div><div><p class="ko">15fps 이상</p><p class="en">15 fps or more</p></div><div><p class="ko"><em>평균 30fps</em>(최저 24). 놓침은 정면 0, 15° 0, 30° 2회</p><p class="en">30 fps on average (lowest 24). Tracking loss: 0 facing front, 0 at 15°, 2 at 30°</p></div></div>
+    <div class="tr" data-g="F2·F8 색 정확도"><div class="no">F2·<br>F8.</div><div><p class="k">색 정확도</p><p class="ke">Color accuracy</p></div><div><p class="ko">천장 조명·자연광·어두운 곳에서 보정 전·후 ΔE</p><p class="en">ΔE before and after calibration under ceiling light, daylight and in a dark place</p></div><div><p class="ko">보정 후 평균 5 미만</p><p class="en">Average below 5 after calibration</p></div><div><p class="ko">천장 조명 9.8→<em>4.1</em>, 자연광 7.6→<em>3.5</em>, LED 조명 6.1→<em>2.9</em>, 어두운 곳 14.2→6.8(미달)</p><p class="en">Ceiling light 9.8→4.1, daylight 7.6→3.5, LED lighting 6.1→2.9, dark place 14.2→6.8 (not met)</p></div></div>
+    <div class="tr" data-g="F4 영상 미저장"><div class="no">F4.</div><div><p class="k">영상 미저장</p><p class="ke">No video stored</p></div><div><p class="ko">영상·사진을 보내는 코드가 있는지 전체 검토</p><p class="en">Full review for any code that sends video or photos</p></div><div><p class="ko">외부 전송 0건</p><p class="en">Zero external transfers</p></div><div><p class="ko"><em>코드 없음, 전송 요청 없음</em></p><p class="en">No such code; no transfer requests</p></div></div>
+    <div class="tr" data-g="F5 제품 인식"><div class="no">F5.</div><div><p class="k">제품 인식</p><p class="ke">Product recognition</p></div><div><p class="ko">등록 태그별 10회</p><p class="en">10 times per registered tag</p></div><div><p class="ko">95% 이상, 1초 이내</p><p class="en">95% or more, within 1 second</p></div><div><p class="ko">90회 중 87회(<em>96.7%</em>), 평균 <em>0.5초</em></p><p class="en">87 of 90 (96.7%), 0.5 seconds on average</p></div></div>
+    <div class="tr" data-g="F6 터치 정확도"><div class="no">F6.</div><div><p class="k">터치 정확도</p><p class="ke">Touch accuracy</p></div><div><p class="ko">9곳 오차, 보정 전·후</p><p class="en">Error at 9 points, before and after calibration</p></div><div><p class="ko">52px 미만</p><p class="en">Below 52 px</p></div><div><p class="ko">평균 약 600px → <em>5.2px</em>, 최대 6.4px</p><p class="en">About 600 px on average → 5.2 px; 6.4 px at most</p></div></div>
+    <div class="tr" data-g="F7 공정한 순위"><div class="no">F7.</div><div><p class="k">공정한 순위</p><p class="ke">Fair ranking</p></div><div><p class="ko">같은 색으로 정렬 반복</p><p class="en">Sorting repeated with the same color</p></div><div><p class="ko">100% 동일</p><p class="en">100% identical</p></div><div><p class="ko"><em>항상 같은 결과</em></p><p class="en">Same result every time</p></div></div>
+    <div class="tr" data-g="F9 오프라인"><div class="no">F9.</div><div><p class="k">오프라인</p><p class="ke">Offline</p></div><div><p class="ko">인터넷을 끊고 실행</p><p class="en">Run with the internet cut off</p></div><div><p class="ko">전 기능 동작</p><p class="en">All functions work</p></div><div><p class="ko"><em>전 기능 동작</em></p><p class="en">All functions work</p></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><h2 style="margin-top:0">시험 환경</h2><div class="sub">Test Environment</div></div>
+    <div class="body">
+      <p class="ko">갤럭시탭 S10 FE+, Lenovo 300 FHD 웹캠, took.apk(0.1.0). 천장 형광등과 LED 조명 아래에서 11월 26~27일에 쟀다. <span class="todo">[확인 필요: ΔE를 읽은 방법]</span></p>
+      <p class="en">Galaxy Tab S10 FE+, Lenovo 300 FHD webcam, took.apk (0.1.0). Measured on November 26–27 under ceiling fluorescent light and LED lighting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 79쪽 (홀수) · 6.3 Validation 2/2 ───────────── -->
+<section class="page odd" id="p79">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">6.3 Validation</div>
+      <h2>색 시험의 범위와<br>사용자 시험</h2>
+      <div class="sub">Scope of the Color Test and the User Test</div>
+    </div>
+    <div class="body">
+      <p class="ko">색 정확도는 화면 캡처에서 입술 영역 픽셀의 평균을 Lab 값으로 바꾸어 데이터베이스의 호수 색과 CIEDE2000으로 비교한다. <em>호수 색은 판매 페이지 사진에서 뽑은 추정값이므로, 이 시험은 “데이터의 색을 얼마나 그대로 보여 주는가”를 재는 것이다.</em> 실제로 바른 색과의 비교는 후속 시험으로 남긴다.</p>
+      <p class="en">For color accuracy, the average of the lip-area pixels in a screen capture is converted to Lab values and compared with the shade color in the database by CIEDE2000. Because the shade color is an estimate taken from a sales-page photo, this test measures “how faithfully the color in the data is shown.” Comparison with the color actually applied on the lips is left for a follow-up test.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">01.</div><h2>사용자 시험</h2><div class="sub">User Test</div><svg viewBox="0 0 40 40"><circle cx="20" cy="13" r="6"/><path d="M8 34c1-8 6-12 12-12s11 4 12 12"/></svg></div>
+    <div class="body">
+      <p class="ko">F3은 사람이 써 봐야 확인된다. 과제와 설문은 CEP 3과 같고, 대상은 20대 5명이다.</p>
+      <p class="ko"><em>무안내 과제는 A·B·C를 5명 모두, D(NFC)를 4명이 끝냈다. 색 신뢰는 평균 4.8, 사용 의향은 평균 6.4였다.</em> 가장 많은 불만은 입을 크게 벌리면 입술 가장자리 색이 번져 보인다는 것이었다.</p>
+      <p class="en">F3 can only be confirmed by people using it. The tasks and survey are the same as in CEP 3, and the participants were five people in their twenties. All five completed unguided tasks A, B and C, and four completed D (NFC). Trust in the color averaged 4.8 and willingness to use averaged 6.4. The most common complaint was that the color at the edge of the lips looked smeared when the mouth was opened wide.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">02.</div><h2>거울과 태블릿의 비교</h2><div class="sub">Mirror versus Tablet</div><svg viewBox="0 0 40 40"><rect x="5" y="8" width="13" height="22" rx="2"/><rect x="22" y="8" width="13" height="22" rx="2"/><path d="M11.5 30v4M8 34h7"/></svg></div>
+    <div class="body">
+      <p class="ko">멘토링의 조언에 따라 같은 화면을 하프미러 뒤와 일반 태블릿에서 각각 보여 주고 팀을 모르는 6명에게 물었다. <em>립 색이 더 잘 보이는 쪽은 태블릿 4명, 거울 2명이었고, 더 마음에 드는 쪽은 거울 5명, 태블릿 1명이었다.</em> “색은 태블릿이 더 선명한데, 거울은 진짜 거울 보는 느낌이라 스마트한 매장 같아요.”</p>
+      <p class="en">Following advice from mentoring, we showed the same screen behind the half mirror and on an ordinary tablet and asked six people who did not know the team. Four said the lip color was easier to see on the tablet and two on the mirror; five preferred the mirror and one the tablet. “The color is sharper on the tablet, but the mirror feels like looking into a real mirror, so it feels like a smart store.”</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">03.</div><h2>제품 인식의 발견</h2><div class="sub">Finding on Product Recognition</div></div>
+    <div class="body">
+      <p class="ko"><em>안내 없이 제품을 리더기에 댄 사람은 5명 중 2명이었다.</em> 4명은 색에서, 1명은 제품에서 시작했다.</p>
+      <p class="en">Two of the five held a product up to the reader without guidance. Four started from color and one from a product.</p>
+    </div>
+  </div>
+
+  <div class="figs" data-g="그림 시험 사진">
+    <div class="slots4" style="grid-template-columns:1fr 1fr">
+      <figure><div class="ill"><svg viewBox="0 0 296 144"><rect x="0" y="0" width="296" height="144" rx="4" fill="#f7f7f7"/><text x="14" y="24" font-size="8.5" font-weight="700" fill="#111111">무안내 과제 완료</text><text x="82" y="24" font-size="7" font-weight="400" fill="#555555">참가자 5명</text><text x="14" y="51.4" font-size="10" font-weight="700" fill="#D32C3E">A</text><circle cx="50" cy="48" r="4.6" fill="#D32C3E"/><circle cx="63" cy="48" r="4.6" fill="#D32C3E"/><circle cx="76" cy="48" r="4.6" fill="#D32C3E"/><circle cx="89" cy="48" r="4.6" fill="#D32C3E"/><circle cx="102" cy="48" r="4.6" fill="#D32C3E"/><text x="124" y="51.2" font-size="8" font-weight="700" fill="#111111">5/5</text><text x="14" y="73.4" font-size="10" font-weight="700" fill="#D32C3E">B</text><circle cx="50" cy="70" r="4.6" fill="#D32C3E"/><circle cx="63" cy="70" r="4.6" fill="#D32C3E"/><circle cx="76" cy="70" r="4.6" fill="#D32C3E"/><circle cx="89" cy="70" r="4.6" fill="#D32C3E"/><circle cx="102" cy="70" r="4.6" fill="#D32C3E"/><text x="124" y="73.2" font-size="8" font-weight="700" fill="#111111">5/5</text><text x="14" y="95.4" font-size="10" font-weight="700" fill="#D32C3E">C</text><circle cx="50" cy="92" r="4.6" fill="#D32C3E"/><circle cx="63" cy="92" r="4.6" fill="#D32C3E"/><circle cx="76" cy="92" r="4.6" fill="#D32C3E"/><circle cx="89" cy="92" r="4.6" fill="#D32C3E"/><circle cx="102" cy="92" r="4.6" fill="#D32C3E"/><text x="124" y="95.2" font-size="8" font-weight="700" fill="#111111">5/5</text><text x="14" y="117.4" font-size="10" font-weight="700" fill="#D32C3E">D</text><text x="25" y="117" font-size="6" font-weight="400" fill="#555555">NFC</text><circle cx="50" cy="114" r="4.6" fill="#D32C3E"/><circle cx="63" cy="114" r="4.6" fill="#D32C3E"/><circle cx="76" cy="114" r="4.6" fill="#D32C3E"/><circle cx="89" cy="114" r="4.6" fill="#D32C3E"/><circle cx="102" cy="114" r="4" fill="none" stroke="#D32C3E" stroke-width="1.2"/><text x="124" y="117.2" font-size="8" font-weight="700" fill="#111111">4/5</text><path d="M152 14V130" stroke="#d9d9d9" stroke-width=".8" fill="none"/><text x="166" y="24" font-size="8.5" font-weight="700" fill="#111111">설문</text><text x="186" y="24" font-size="7" font-weight="400" fill="#555555">7점 만점</text><text x="166" y="56" font-size="7.5" font-weight="400" fill="#555555">색 신뢰</text><text x="282" y="58" font-size="14" font-weight="700" fill="#111111" text-anchor="end">4.8</text><rect x="166" y="65" width="116" height="5" rx="1" fill="#e4e4e4"/><rect x="166" y="65" width="79.5" height="5" rx="1" fill="#111111"/><text x="166" y="100" font-size="7.5" font-weight="400" fill="#555555">사용 의향</text><text x="282" y="102" font-size="14" font-weight="700" fill="#D32C3E" text-anchor="end">6.4</text><rect x="166" y="109" width="116" height="5" rx="1" fill="#e4e4e4"/><rect x="166" y="109" width="106" height="5" rx="1" fill="#D32C3E"/></svg></div><figcaption><span class="n">1</span><b>그림 1</b>무안내 과제와 설문 결과<span class="en">Figure 1. Unguided tasks and survey results</span></figcaption></figure>
+      <figure><div class="ill"><svg viewBox="0 0 296 144"><rect x="0" y="0" width="296" height="144" rx="4" fill="#f7f7f7"/><text x="14" y="24" font-size="8.5" font-weight="700" fill="#111111">거울과 태블릿의 비교</text><text x="100" y="24" font-size="7" font-weight="400" fill="#555555">6명의 응답</text><text x="14" y="50" font-size="7.5" font-weight="400" fill="#555555">립 색이 더 잘 보이는 쪽</text><rect x="14" y="62" width="10" height="15" rx="1.5" fill="none" stroke="#D32C3E" stroke-width="1.2"/><path d="M19 77v3M15.5 80.6h7" stroke="#D32C3E" stroke-width="1.2" fill="none"/><text x="30" y="76" font-size="7.5" font-weight="700" fill="#D32C3E">거울</text><circle cx="60" cy="73" r="4.6" fill="#D32C3E"/><circle cx="73" cy="73" r="4.6" fill="#D32C3E"/><text x="136" y="76.4" font-size="10" font-weight="700" fill="#D32C3E" text-anchor="end">2</text><rect x="13" y="96" width="12" height="15" rx="2" fill="none" stroke="#111111" stroke-width="1.2"/><path d="M17 108.4h4" stroke="#111111" stroke-width="1" fill="none"/><text x="30" y="108" font-size="7.5" font-weight="700" fill="#111111">태블릿</text><circle cx="60" cy="105" r="4.6" fill="#111111"/><circle cx="73" cy="105" r="4.6" fill="#111111"/><circle cx="86" cy="105" r="4.6" fill="#111111"/><circle cx="99" cy="105" r="4.6" fill="#111111"/><text x="136" y="108.4" font-size="10" font-weight="700" fill="#111111" text-anchor="end">4</text><path d="M152 38V124" stroke="#d9d9d9" stroke-width=".8" fill="none"/><text x="166" y="50" font-size="7.5" font-weight="400" fill="#555555">더 마음에 드는 쪽</text><rect x="166" y="62" width="10" height="15" rx="1.5" fill="none" stroke="#D32C3E" stroke-width="1.2"/><path d="M171 77v3M167.5 80.6h7" stroke="#D32C3E" stroke-width="1.2" fill="none"/><text x="182" y="76" font-size="7.5" font-weight="700" fill="#D32C3E">거울</text><circle cx="212" cy="73" r="4.6" fill="#D32C3E"/><circle cx="225" cy="73" r="4.6" fill="#D32C3E"/><circle cx="238" cy="73" r="4.6" fill="#D32C3E"/><circle cx="251" cy="73" r="4.6" fill="#D32C3E"/><circle cx="264" cy="73" r="4.6" fill="#D32C3E"/><text x="288" y="76.4" font-size="10" font-weight="700" fill="#D32C3E" text-anchor="end">5</text><rect x="165" y="96" width="12" height="15" rx="2" fill="none" stroke="#111111" stroke-width="1.2"/><path d="M169 108.4h4" stroke="#111111" stroke-width="1" fill="none"/><text x="182" y="108" font-size="7.5" font-weight="700" fill="#111111">태블릿</text><circle cx="212" cy="105" r="4.6" fill="#111111"/><text x="288" y="108.4" font-size="10" font-weight="700" fill="#111111" text-anchor="end">1</text></svg></div><figcaption><span class="n">2</span><b>그림 2</b>거울과 태블릿 비교 응답<span class="en">Figure 2. Responses comparing the mirror and the tablet</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 82쪽 (짝수) · 7.1 Impact 1/3 · 프로토타입 성과 ───────────── -->
+<section class="page even" id="p82">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.1 Impact</div>
+      <h2>프로토타입 성과</h2>
+      <div class="sub">Prototype Outcomes</div>
+    </div>
+    <div class="body">
+      <p class="ko"><em>한 학기 동안 팀은 아이디어를 실제로 동작하는 거울로 만들었다.</em> 성과는 세 가지이다.</p>
+      <p class="en">Over one semester the team turned an idea into a mirror that actually works. There are three outcomes.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">01.</div><h2>실제 데이터로<br>동작한다</h2><div class="sub">It Runs on Real Data</div></div>
+    <div class="body">
+      <p class="ko"><em>시제품은 올리브영에서 판매 중인 립 제품 199개, 호수 2,002개를 보여 준다.</em> 색은 사진에서 뽑은 추정값이지만 추정값임을 데이터에 기록하고 사람이 검수했다.</p>
+      <p class="en">The prototype shows 199 lip products and 2,002 shades on sale at Olive Young. The colors are estimates taken from photos, but this is recorded in the data and they were reviewed by people.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">02.</div><h2>거울 앞의 문제를<br>소프트웨어로 풀었다</h2><div class="sub">Problems at the Mirror, Solved in Software</div></div>
+    <div class="body">
+      <p class="ko">필름은 어긋나고 카메라는 색을 바꾼다. 팀은 하드웨어를 비싸게 바꾸는 대신 카메라 영상으로 화면을 채우는 구성, 터치 보정, 카메라 색 보정으로 대응했다. <em>터치 오차는 보정 전 평균 약 600px에서 보정 후 5.2px로 줄었다.</em> 보정은 매장 직원이 관리자 화면에서 직접 할 수 있다.</p>
+      <p class="en">The film goes out of alignment and the camera changes color. Instead of switching to expensive hardware, the team responded with a layout that fills the screen with the camera image, touch calibration and camera color calibration. Touch error fell from about 600 px on average before calibration to 5.2 px after. Store staff can run the calibration themselves from the admin screen.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">03.</div><h2>조언을 설계로<br>옮겼다</h2><div class="sub">Advice Turned into Design</div></div>
+    <div class="body">
+      <p class="ko">멘토링에서 받은 두 지적, 곧 챗봇의 필요성과 화면의 지문 문제를 받아들여 <em>입력 화면을 없애고 조작을 화면 아래로 모았다.</em></p>
+      <p class="en">We accepted two points raised in mentoring, the need for the chatbot and fingerprints on the screen, removed the input screen and gathered the controls at the bottom of the screen.</p>
+    </div>
+  </div>
+
+  <div class="tb tight" style="--cols:40mm 1fr;--gap:6mm">
+    <div class="tt t" data-g="표 제목 프로토타입 성과 요약">프로토타입 성과 요약 <span>Summary of prototype outcomes</span></div>
+    <div class="th" data-g="표 머리"><div class="t">항목 <span>Item</span></div><div class="t">결과 <span>Result</span></div></div>
+    <div class="tr" data-g="항목 동작하는 기능"><div><p class="k">동작하는 기능</p><p class="ke">Working functions</p></div><div><p class="ko">입술 인식·색 입히기, 질감 5종(매트·글로시·새틴·시어·시머), 색 비교·제품 정렬, NFC, 터치 보정, 카메라 색 보정, 자동 초기화, 한/영 전환</p><p class="en">Lip detection and color application, five finishes (matte, glossy, satin, sheer, shimmer), color comparison and product sorting, NFC, touch calibration, camera color calibration, automatic reset, Korean/English switching</p></div></div>
+    <div class="tr" data-g="항목 제품 데이터"><div><p class="k">제품 데이터</p><p class="ke">Product data</p></div><div><p class="ko">립 285개(중복을 빼면 272개)·호수 3,059개 수집 → 199개·2,002개 사용</p><p class="en">285 lip products (272 without duplicates) and 3,059 shades collected → 199 products and 2,002 shades used</p></div></div>
+    <div class="tr" data-g="항목 실행 형태"><div><p class="k">실행 형태</p><p class="ke">How it runs</p></div><div><p class="ko">안드로이드 APK(갤럭시탭 설치, USB 웹캠 직접 연결, 블루투스 NFC 리더기), Chrome 웹앱(서버·정적)</p><p class="en">Android APK (installed on the Galaxy Tab, USB webcam connected directly, Bluetooth NFC reader); Chrome web app (server and static)</p></div></div>
+    <div class="tr" data-g="항목 하드웨어"><div><p class="k">하드웨어</p><p class="ke">Hardware</p></div><div><p class="ko">스마트 미러를 얹은 스탠드형 시제품 1대</p><p class="en">One standing prototype with the smart mirror mounted</p></div></div>
+    <div class="tr" data-g="항목 사용자 시험"><div><p class="k">사용자 시험</p><p class="ke">User test</p></div><div><p class="ko">5명. 무안내 과제 A·B·C 전원 성공, NFC 5명 중 4명. 사용 의향 6.4점, 색 신뢰 4.8점(7점 만점)</p><p class="en">Five people. All completed unguided tasks A, B and C; four of five completed NFC. Willingness to use 6.4, trust in the color 4.8 (out of 7)</p></div></div>
+  </div>
+</section>
+
+<!-- ───────────── 83쪽 (홀수) · 7.1 Impact 2/3 · 사업 성과 1 ───────────── -->
+<section class="page odd" id="p83">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.1 Impact</div>
+      <h2>사업 성과 1:<br>손님과 매장이 얻는 것</h2>
+      <div class="sub">Business Outcomes 1: What Shoppers and Stores Gain</div>
+      <svg viewBox="0 0 40 40"><circle cx="20" cy="9" r="4.5"/><circle cx="8" cy="29" r="4.5"/><circle cx="32" cy="29" r="4.5"/><path d="M17.5 13l-7 12M22.5 13l7 12M12.5 29h15"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko"><em>세 이해관계자가 각각 다른 이유로 TOOK을 원해야 사업이 성립한다.</em> 손님은 돈을 내지 않고 색을 확인한다. 매장은 설치비와 월 구독료를 내고 테스터 위생 관리와 응대 부담을 던다. 브랜드사는 캠페인 비용을 내고 신제품 노출을 얻는다. 거울 기기는 스마트 미러 제조사와 함께 만들고, 메타뱅크는 소프트웨어 구독과 제품 데이터 운영으로 수익을 낸다.</p>
+      <p class="en">The business works only if three stakeholders each want TOOK for a different reason. Shoppers check the color without paying. Stores pay an installation fee and a monthly subscription and are relieved of tester hygiene management and part of the burden of serving customers. Brands pay for campaigns and gain exposure for new products. The mirror device is built with a smart mirror manufacturer, and MetaBank earns revenue from the software subscription and from running the product data.</p>
+      <div class="tri" data-g="그림 세 이해관계자">
+        <div class="bx"><div class="t">손님<span>Shoppers</span></div><p class="cap">돈을 내지 않고 색을 확인<span>Check the color without paying</span></p></div>
+        <div class="bx"><div class="t">매장<span>Stores</span></div><p class="cap">설치비·월 구독료 → 위생 관리·응대 부담 감소<span>Installation fee and subscription → less hygiene and service burden</span></p></div>
+        <div class="bx"><div class="t">브랜드사<span>Brands</span></div><p class="cap">캠페인 비용 → 신제품 노출<span>Campaign fee → exposure for new products</span></p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">01.</div><h2>뷰티사업의 크기</h2><div class="sub">The Size of the Beauty Business</div></div>
+    <div class="body">
+      <p class="ko">올리브영의 2025년 매출은 약 5조 8,300억 원이고, 4분기 온라인 비중이 31.6%이므로 <em>매출의 약 68%가 매장에서 나온다.</em> 기초와 색조가 매출의 약 60%이다(바이라인네트워크, 2026). TOOK이 놓일 자리는 이 매출이 만들어지는 매대이다.</p>
+      <p class="en">Olive Young’s 2025 revenue was about 5.83 trillion won, and since online accounted for 31.6% in the fourth quarter, about 68% of revenue comes from stores. Skincare and color cosmetics make up about 60% of revenue (Byline Network, 2026). TOOK sits at the shelf where this revenue is made.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">02.</div><h2>매장의 매출은<br>어떻게 늘어나는가</h2><div class="sub">How Store Sales Grow</div></div>
+    <div class="body">
+      <p class="ko">재미에서 끝나면 매장은 돈을 낼 이유가 없다. <em>팀의 답은 결정을 쉽게 만든다는 것이다.</em> 손님은 거울에서 여러 색을 바르지 않고 견주어 후보를 몇 개로 줄인다. 직원은 그 몇 개에만 새 테스터를 꺼내 마지막 확인을 돕는다. 테스터를 쓰는 횟수는 줄고 고르다 돌아서는 손님도 준다. 이것은 가설이며, 파일럿에서 제품 시트에서 본 제품을 집은 비율과 테스터 사용 횟수의 변화로 확인한다.</p>
+      <p class="en">If it ends at fun, a store has no reason to pay. The team’s answer is that TOOK makes the decision easier. At the mirror, shoppers compare several colors without applying them and narrow the candidates to a few. Staff bring out fresh testers only for those few and help with the final check. Testers are used less often, and fewer shoppers walk away while choosing. This is a hypothesis; the pilot will check it through the share of shoppers who pick up a product seen on the product sheet and the change in tester use.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 84쪽 (짝수) · 7.1 Impact 3/3 · 사업 성과 2 ───────────── -->
+<section class="page even" id="p84">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.1 Impact</div>
+      <h2>사업 성과 2:<br>메타뱅크가 얻는 것</h2>
+      <div class="sub">Business Outcomes 2: What MetaBank Gains</div>
+    </div>
+    <div class="body">
+      <p class="ko">메타뱅크가 가장 큰 장벽으로 꼽은 것은 기술이 아니라 “뷰티에서 누가 무엇을 원하는가”였다. <em>팀의 답은 기술을 넣을 곳은 립 매대 앞이고, 형태는 매대 거울이며, 사는 사람은 유통사와 브랜드사이다.</em></p>
+      <p class="ko"><b>수익 구조.</b> 메타뱅크의 수익은 한 번의 판매로 끝나지 않는다. 매장과 브랜드사 두 곳에서, 네 가지 매출원으로 나온다.</p>
+      <p class="en">What MetaBank named as its biggest barrier was not technology but “who wants what in beauty.” The team’s answer: the place for the technology is in front of the lip shelf, the form is a shelf mirror, and the buyers are retailers and brands.</p>
+      <p class="en" style="margin-top:1mm"><b>Revenue structure.</b> MetaBank’s revenue does not end with a single sale. It comes from two parties, stores and brands, through four revenue sources.</p>
+    </div>
+  </div>
+
+  <div class="tb tight t2" style="margin-top:3.4mm;--cols:7mm 33mm 22mm 1fr 28mm;--gap:4mm">
+    <div class="tt t" data-g="표 제목 네 가지 매출원">네 가지 매출원 <span>Four revenue sources</span></div>
+    <div class="th" data-g="매출원 표 머리"><div class="t" style="grid-column:span 2">매출원 <span>Revenue source</span></div><div class="t">누가 내나 <span>Paid by</span></div><div class="t">내용 <span>What it is</span></div><div class="t">언제부터 <span>From when</span></div></div>
+    <div class="tr" data-g="매출원 1 설치 패키지"><div class="no">①</div><div><p class="k">설치 패키지</p><p class="ke">Installation package</p></div><div><p class="ko">매장</p><p class="en">Stores</p></div><div><p class="ko">거울 기기, 컬러체커 보드, 설치와 보정. 판매 또는 임대</p><p class="en">Mirror device, color checker board, installation and calibration. Sold or leased</p></div><div><p class="ko">납품 시작</p><p class="en">From first delivery</p></div></div>
+    <div class="tr" data-g="매출원 2 소프트웨어 구독"><div class="no">②</div><div><p class="k">소프트웨어 구독</p><p class="ke">Software subscription</p></div><div><p class="ko">매장</p><p class="en">Stores</p></div><div><p class="ko">1대당 월 이용료. 데이터 업데이트, 원격 지원</p><p class="en">Monthly fee per device. Data updates, remote support</p></div><div><p class="ko">파일럿 뒤</p><p class="en">After the pilot</p></div></div>
+    <div class="tr" data-g="매출원 3 브랜드 캠페인"><div class="no">③</div><div><p class="k">브랜드 캠페인</p><p class="ke">Brand campaigns</p></div><div><p class="ko">브랜드사</p><p class="en">Brands</p></div><div><p class="ko">대기 화면 노출(“광고” 표시)</p><p class="en">Exposure on the start screen (marked “Ad”)</p></div><div><p class="ko">2단계</p><p class="en">Phase 2</p></div></div>
+    <div class="tr" data-g="매출원 4 집계 리포트"><div class="no">④</div><div><p class="k">집계 리포트</p><p class="ke">Aggregate reports</p></div><div><p class="ko">브랜드사</p><p class="en">Brands</p></div><div><p class="ko">개인을 알 수 없는 사용 집계</p><p class="en">Usage counts that cannot identify individuals</p></div><div><p class="ko">법률 검토 뒤</p><p class="en">After legal review</p></div></div>
+  </div>
+
+  <div class="wide" data-g="매출원 설명">
+    <div class="body">
+      <p class="ko">매장이 내는 ①·②는 기기와 운영의 대가이고, 브랜드사가 내는 ③·④는 설치된 매장이 늘수록 커진다. <em>계산이 기기 안에서 끝나 매장이 늘어도 서버 비용이 따라 늘지 않는다.</em> 납품은 포장지의 바코드로 시작해 태그 비용을 만들지 않는다.</p>
+      <p class="en">①·② paid by stores are the price of the device and its operation, and ③·④ paid by brands grow as more stores are installed. Because computing ends on the device, server costs do not rise with the number of stores. Delivery starts with the barcode on the packaging, so there is no tag cost.</p>
+    </div>
+  </div>
+
+  <div class="tb tight t2" style="margin-top:3.4mm;--cols:40mm 1fr 50mm;--gap:6mm">
+    <div class="tt t" data-g="표 제목 이해관계자별 기대 효과">이해관계자별 기대 효과 <span>Expected benefits by stakeholder</span></div>
+    <div class="th" data-g="이해관계자 표 머리"><div class="t">이해관계자 <span>Stakeholder</span></div><div class="t">기대 효과 <span>Expected benefit</span></div><div class="t">검증 상태 <span>Validation status</span></div></div>
+    <div class="tr" data-g="이해관계자 손님"><div><p class="k">손님</p><p class="ke">Shoppers</p></div><div><p class="ko">바르지 않고 입술 위에서 색 확인</p><p class="en">See the color on their lips without applying it</p></div><div><p class="ko">사용자 시험 5명, 사용 의향 6.4점</p><p class="en">User test with five people; willingness to use 6.4</p></div></div>
+    <div class="tr" data-g="이해관계자 매장"><div><p class="k">매장</p><p class="ke">Stores</p></div><div><p class="ko">테스터 위생 관리·응대 부담 감소</p><p class="en">Less tester hygiene management and customer-service burden</p></div><div><p class="ko">파일럿에서 확인</p><p class="en">To be checked in the pilot</p></div></div>
+    <div class="tr" data-g="이해관계자 브랜드"><div><p class="k">브랜드</p><p class="ke">Brands</p></div><div><p class="ko">신제품 체험, 선호 데이터</p><p class="en">New-product trials, preference data</p></div><div><p class="ko">파일럿 이후</p><p class="en">After the pilot</p></div></div>
+    <div class="tr" data-g="이해관계자 메타뱅크"><div><p class="k">메타뱅크</p><p class="ke">MetaBank</p></div><div><p class="ko">뷰티 매장 진입 사례, 구독형 수익</p><p class="en">A case of entering beauty stores; subscription revenue</p></div><div><p class="ko">제안 단계</p><p class="en">Proposal stage</p></div></div>
+  </div>
+</section>
+
+<!-- ───────────── 85쪽 (홀수) · 7.2 Recommendations 1/3 · 기술, 운영 ───────────── -->
+<section class="page odd" id="p85">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.2 Recommendations</div>
+      <h2>기술</h2>
+      <div class="sub">Technology</div>
+      <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="5"/><path d="M20 5v5M20 30v5M5 20h5M30 20h5M9.4 9.4l3.5 3.5M27.1 27.1l3.5 3.5M9.4 30.6l3.5-3.5M27.1 12.9l3.5-3.5"/></svg>
+    </div>
+    <div class="body">
+      <div class="st"><div class="num">1.</div><div><p class="ko"><em>색을 실물로 검증할 것.</em> 지금의 호수 색은 판매 페이지 사진에서 뽑은 추정값이다. 측색기로 실제 제품을 재거나 입술에 바른 사진과 비교해 데이터를 고쳐야 한다. 색이 맞아야 “실제와 다를까 봐”라는 가장 큰 걱정에 답할 수 있다.</p><p class="en">Verify the colors against real products. The current shade colors are estimates taken from sales-page photos. The data should be corrected by measuring real products with a colorimeter or by comparing with photos of the product on the lips. Only when the color is right can we answer the biggest worry, “the result may differ.”</p></div></div>
+      <div class="st"><div class="num">2.</div><div><p class="ko"><em>카메라와 조명을 규격으로 정할 것.</em> 색 오차의 가장 큰 원인은 카메라의 자동 보정과 매장 조명이었다. 수동 고정이 되는 웹캠 한 모델과 정해진 색온도의 LED 조명을 표준 부품으로 정한다.</p><p class="en">Fix the camera and lighting as a specification. The biggest causes of color error were the camera’s automatic adjustment and store lighting. Set one webcam model that can be locked manually and LED lighting of a fixed color temperature as standard parts.</p></div></div>
+      <div class="st"><div class="num">3.</div><div><p class="ko"><em>입술 인식의 한계를 화면으로 알릴 것.</em> 옆모습, 가린 입, 강한 색 조명에서는 색을 이상하게 입히기보다 “정면을 봐 주세요”처럼 이유를 알려 준다.</p><p class="en">Tell users on screen about the limits of lip detection. With a side view, a covered mouth or strongly colored light, show the reason, such as “Please face the front,” rather than applying the color oddly.</p></div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head">
+      <h2 style="margin-top:0">운영</h2>
+      <div class="sub">Operations</div>
+      <svg viewBox="0 0 40 40"><path d="M31.5 13.5A13.5 13.5 0 1 0 33.5 22"/><path d="M33 5.5v8.5h-8.5"/></svg>
+    </div>
+    <div class="body">
+      <div class="st"><div class="num">1.</div><div><p class="ko"><em>설치 순서를 고정할 것.</em> 전원 → 터치 보정 → 카메라 색 보정 → 인식 테스트. 한 장짜리 안내로 만들어 기기 뒤에 붙인다.</p><p class="en">Fix the installation order. Power → touch calibration → camera color calibration → recognition test. Make it a one-page guide and attach it to the back of the device.</p></div></div>
+      <div class="st"><div class="num">2.</div><div><p class="ko"><em>유지보수를 원격으로 할 것.</em> 도입 후 가장 큰 부담이 유지보수였다. 상태 확인과 업데이트를 원격으로 하게 한다.</p><p class="en">Do maintenance remotely. The biggest burden after adoption was maintenance. Make status checks and updates possible remotely.</p></div></div>
+      <div class="st"><div class="num">3.</div><div><p class="ko"><em>NFC를 쓸 때는 키링을 테스터와 분리할 것.</em> 테스터를 바꿔도 키링은 그대로 쓴다.</p><p class="en">When NFC is used, keep the key ring separate from the tester. The key ring stays in use even when the tester is replaced.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 86쪽 (짝수) · 7.2 Recommendations 2/3 · 사업, 데이터 활용 ───────────── -->
+<section class="page even" id="p86">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.2 Recommendations</div>
+      <h2>사업</h2>
+      <div class="sub">Business</div>
+      <svg viewBox="0 0 40 40"><path d="M6 34h28"/><path d="M11 34V25M20 34V18M29 34V11"/><path d="M8 17l8-6 5 3 9-8"/></svg>
+    </div>
+    <div class="body">
+      <div class="st"><div class="num">1.</div><div><p class="ko"><em>파일럿 지표를 숫자로 먼저 합의할 것.</em> 체험 수, 제품 시트까지 간 비율, 거기서 본 제품을 집은 비율, 테스터 사용 횟수의 변화, 직원 만족도이다. 구독료와 확대 여부는 이 숫자로 정한다.</p><p class="en">Agree on the pilot metrics as numbers first. They are the number of trials, the share that reached the product sheet, the share that picked up a product seen there, the change in tester use, and staff satisfaction. The subscription fee and whether to expand are decided by these numbers.</p></div></div>
+      <div class="st"><div class="num">2.</div><div><p class="ko"><em>제품 인식의 전환 기준을 정할 것.</em> 바코드 단계에서 제품 인식 사용률이 얼마를 넘으면 NFC 시범으로 가는지, 못 미치면 인식 모듈을 빼는지를 메타뱅크와 미리 정한다. <span class="todo">[채울 내용: 기준]</span></p><p class="en">Set the criterion for switching product recognition. Decide with MetaBank in advance what usage rate at the barcode stage leads to an NFC trial, and whether the recognition module is removed if it falls short.</p></div></div>
+      <div class="st"><div class="num">3.</div><div><p class="ko"><em>재고 연동을 구독 전환 전에 풀 것.</em> “보여 줬는데 매장에 없음”은 신뢰를 가장 빠르게 잃게 한다.</p><p class="en">Solve stock integration before moving to subscription. “Shown but not in the store” loses trust faster than anything else.</p></div></div>
+      <div class="st"><div class="num">4.</div><div><p class="ko"><em>광고와 제품 순서를 계약으로 나눌 것.</em> 제품 순서는 색 차이로만 정한다는 원칙을 계약에 적고 관련 표시·광고 규정을 확인한다.</p><p class="en">Separate advertising and product order by contract. Write into the contract the principle that product order is set by color difference alone, and check the relevant labeling and advertising rules.</p></div></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head">
+      <h2 style="margin-top:0">데이터 활용</h2>
+      <div class="sub">Use of Data</div>
+      <svg viewBox="0 0 40 40"><ellipse cx="20" cy="10" rx="12" ry="4.5"/><path d="M8 10v20c0 2.5 5.4 4.5 12 4.5s12-2 12-4.5V10"/><path d="M8 20c0 2.5 5.4 4.5 12 4.5s12-2 12-4.5"/></svg>
+    </div>
+    <div class="body">
+      <div class="st"><div class="num">1.</div><div><p class="ko"><em>개인을 알 수 없는 집계만 쓸 것.</em> 어떤 색을 많이 만들었는지, 어떤 제품이 많이 인식되었는지는 브랜드와 상품 기획자에게 가치 있는 정보이다. 사진과 얼굴 특징은 저장하지 않고 기기별 횟수만 모은다.</p><p class="en">Use only counts that cannot identify individuals. Which colors were made most and which products were recognized most are valuable to brands and merchandisers. Photos and facial features are not stored; only counts per device are collected.</p></div></div>
+      <div class="st"><div class="num">2.</div><div><p class="ko"><em>법률 검토를 먼저 할 것.</em> 얼굴 특징점 처리가 생체정보에 해당하는지, 매장 안내 방식은 변호사 확인 항목이다. 집계 기능은 검토 뒤에 연다.</p><p class="en">Do the legal review first. Whether processing facial landmarks counts as biometric information, and how to give notice in the store, are items for a lawyer to confirm. The aggregate feature opens after the review.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 87쪽 (홀수) · 7.2 Recommendations 3/3 · 상용화 경로 ───────────── -->
+<section class="page odd" id="p87">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.2 Recommendations</div>
+      <h2>사업: 상용화 경로</h2>
+      <div class="sub">Business: Path to Commercialization</div>
+    </div>
+    <div class="body">
+      <p class="ko"><em>바코드로 시작해 손해를 한정한다.</em> 시제품의 NFC에는 약점이 있다. 테스터마다 태그를 달아야 하고, 스티커 450원과 키링 1,000원을 가정하면 태그 하나에 1,450원이다. 팀이 올리브영 서대전점에서 직접 센 테스터는 약 720개로, 매장 한 곳에 약 104만 원이 든다. 그래서 납품은 포장지의 바코드로 시작한다. 태그 비용이 없고, 직원이 붙일 일이 없으며, 손님이 포장된 새 제품을 사용하므로 위생에도 낫다. 스캐너는 받침의 같은 자리에 들어가 외형이 바뀌지 않는다. 제품 인식이 쓰이는지를 비용이 없는 단계에서 먼저 재고, 그 숫자로 NFC 투자를 정한다.</p>
+      <p class="en">Start with barcodes and limit the loss. NFC in the prototype has a weakness. A tag has to be attached to every tester, and assuming 450 won for a sticker and 1,000 won for a key ring, one tag costs 1,450 won. The team counted about 720 testers at Olive Young’s Seodaejeon store, which comes to about 1.04 million won per store. So delivery starts with the barcode on the packaging. There is no tag cost and nothing for staff to attach, and it is also more hygienic because the shopper uses a new, packaged product. The scanner goes in the same place in the base, so the exterior does not change. We first measure whether product recognition is used at a stage that costs nothing, and decide the NFC investment by that number.</p>
+    </div>
+  </div>
+
+  <div class="tb tight" style="--cols:40mm 1fr 34mm 38mm;--gap:6mm">
+    <div class="tt t" data-g="표 제목 제품 인식의 단계별 전환">제품 인식의 단계별 전환 <span>Staged transition of product recognition</span></div>
+    <div class="th" data-g="단계 표 머리"><div class="t">단계 <span>Stage</span></div><div class="t">인식 방식 <span>Recognition method</span></div><div class="t">태그 비용 <span>Tag cost</span></div><div class="t">넘어가는 조건 <span>Condition to move on</span></div></div>
+    <div class="tr" data-g="단계 시제품"><div><p class="k">시제품</p><p class="ke">Prototype</p></div><div><p class="ko">NFC</p></div><div><p class="ko">시연 태그 9개</p><p class="en">9 demo tags</p></div><div><p class="ko">경험 검증</p><p class="en">Validating the experience</p></div></div>
+    <div class="tr" data-g="단계 납품 시작"><div><p class="k">납품 시작</p><p class="ke">First delivery</p></div><div><p class="ko"><em>바코드(포장지)</em></p><p class="en">Barcode (packaging)</p></div><div><p class="ko"><em>0원</em></p><p class="en">0 won</p></div><div><p class="ko">사용률 확인</p><p class="en">Checking the usage rate</p></div></div>
+    <div class="tr" data-g="단계 일부 매장 시범"><div><p class="k">일부 매장 시범</p><p class="ke">Trial in some stores</p></div><div><p class="ko">NFC, 많이 찾는 제품부터</p><p class="en">NFC, starting with the most sought-after products</p></div><div><p class="ko">매장당 약 104만 원</p><p class="en">About 1.04 million won per store</p></div><div><p class="ko">사용률 기준 <span class="todo">[채울 내용]</span></p><p class="en">Usage-rate criterion</p></div></div>
+    <div class="tr" data-g="단계 전환"><div><p class="k">전환</p><p class="ke">Transition</p></div><div><p class="ko">무선 태그</p><p class="en">Wireless tags</p></div><div><p class="ko">공급 단계 부착</p><p class="en">Attached at the supply stage</p></div><div><p class="ko">태그가 붙어 들어올 때</p><p class="en">When products arrive already tagged</p></div></div>
+  </div>
+
+  <div class="sec" style="margin-top:4mm;padding-top:3.6mm;border-top:.25mm solid var(--rule)">
+    <div class="head">
+      <div class="no">01.</div>
+      <h2>올리브영에 어떻게<br>납품하는가</h2>
+      <div class="sub">How to Deliver to Olive Young</div>
+    </div>
+    <div class="body">
+      <p class="ko">어느 경로든 협의된 것은 아니며 메타뱅크를 통한 제안에서 시작한다.</p>
+      <p class="en" style="margin-bottom:2.6mm">None of these routes has been agreed; each starts from a proposal through MetaBank.</p>
+      <div class="st"><div class="num">1.</div><div><p class="ko"><em>본사 파일럿.</em> 대형 매장 1~2곳에서 시작한다. 올리브영은 직영점 비중이 83.5%여서 전자라벨을 2024년 11월 성수 매장에서 시작해 몇 달 만에 전국으로 넓혔다(트렌드라이트, 2025). 본사가 결정하면 설비가 빠르게 퍼지는 구조이다.</p><p class="en">Headquarters pilot. Start in one or two large stores. Because 83.5% of Olive Young’s stores are directly operated, electronic shelf labels that began at the Seongsu store in November 2024 spread nationwide within months (Trendlite, 2025). Once headquarters decides, equipment spreads quickly.</p></div></div>
+      <div class="st"><div class="num">2.</div><div><p class="ko"><em>브랜드 집기.</em> 신제품 립을 내는 브랜드사가 자사 매대에 설치한다.</p><p class="en">Brand fixture. A brand launching a new lip product installs it on its own shelf.</p></div></div>
+      <div class="st"><div class="num">3.</div><div><p class="ko"><em>행사·팝업.</em> 짧은 기간에 사례를 쌓아 본사 제안의 근거로 쓴다.</p><p class="en">Events and pop-ups. Build up cases in a short time and use them as grounds for the headquarters proposal.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 88쪽 (짝수) · 7.3 Action Plans 1/2 · 한계, 일정 제안 ───────────── -->
+<section class="page even" id="p88">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.3 Action Plans</div>
+      <h2>한계</h2>
+      <div class="sub">Limitations</div>
+    </div>
+    <div class="body">
+      <p class="ko"><em>TOOK은 아직 시제품이다.</em> 다음 한계를 분명히 적어 둔다.</p>
+      <p class="en">TOOK is still a prototype. We state the following limitations clearly.</p>
+    </div>
+  </div>
+
+  <div class="tb" style="--cols:40mm 1fr 50mm;--gap:6mm">
+    <div class="tt t" data-g="표 제목 한계와 다음 행동">한계와 다음 행동 <span>Limitations and next actions</span></div>
+    <div class="th" data-g="한계 표 머리"><div class="t">분야 <span>Area</span></div><div class="t">한계 <span>Limitation</span></div><div class="t">다음 행동 <span>Next action</span></div></div>
+    <div class="tr" data-g="한계 색"><div><p class="k">색</p><p class="ke">Color</p></div><div><p class="ko">호수 색은 사진에서 뽑은 추정값이고 실제 발색과 비교하지 않았다</p><p class="en">Shade colors are estimates taken from photos and have not been compared with the actual color on the lips</p></div><div><p class="ko">측색기 측정, 실제 바른 사진과 비교</p><p class="en">Colorimeter measurement; comparison with photos of the product applied</p></div></div>
+    <div class="tr" data-g="한계 인식"><div><p class="k">인식</p><p class="ke">Recognition</p></div><div><p class="ko">정면 한 명 기준이며 옆모습과 강한 색 조명에 약하다</p><p class="en">Designed for one person facing front; weak with side views and strongly colored light</p></div><div><p class="ko">인식 실패 안내, 조명 규격화</p><p class="en">On-screen notice when detection fails; standardized lighting</p></div></div>
+    <div class="tr" data-g="한계 시험"><div><p class="k">시험</p><p class="ke">Testing</p></div><div><p class="ko">참가자 수가 적고 매장 환경 미검증</p><p class="en">Few participants; not validated in a store</p></div><div><p class="ko">실제 매장 파일럿</p><p class="en">Pilot in a real store</p></div></div>
+    <div class="tr" data-g="한계 하드웨어"><div><p class="k">하드웨어</p><p class="ke">Hardware</p></div><div><p class="ko">장시간 열과 내구성, 선반 고정이 확정되지 않았다</p><p class="en">Long-run heat, durability and fixing to the shelf are not settled</p></div><div><p class="ko">연속 가동 시험, 제조사와 양산 설계</p><p class="en">Continuous-run test; mass-production design with a manufacturer</p></div></div>
+    <div class="tr" data-g="한계 사업"><div><p class="k">사업</p><p class="ke">Business</p></div><div><p class="ko">올리브영과 협의되지 않았고 매출 효과의 숫자가 없다</p><p class="en">Not agreed with Olive Young; no numbers on the sales effect</p></div><div><p class="ko">메타뱅크를 통한 제안, 재고 연동</p><p class="en">Proposal through MetaBank; stock integration</p></div></div>
+    <div class="tr" data-g="한계 법률"><div><p class="k">법률</p><p class="ke">Legal</p></div><div><p class="ko">생체정보 해당 여부 등 미확인</p><p class="en">Whether it counts as biometric information, among others, is unconfirmed</p></div><div><p class="ko">변호사 확인</p><p class="en">Confirmation by a lawyer</p></div></div>
+  </div>
+
+  <div class="mh" data-g="일정 제안 제목" style="margin-top:9mm"><p class="k">일정 제안</p><p class="ke">Proposed schedule</p></div>
+  <div class="jm" data-g="일정 제안" style="grid-template-columns:17mm repeat(4, 1fr);margin-top:3mm">
+    <div class="jl t">시기 <span>When</span></div>
+    <div class="jd"><i></i><b class="t">1~2개월</b></div><div class="jd"><i></i><b class="t">3~4개월</b></div><div class="jd"><i></i><b class="t">5~6개월</b></div><div class="jd"><i></i><b class="t">이후</b></div>
+    <div class="jl jw t">할 일 <span>To do</span></div>
+    <div class="jw" style="padding-top:4mm"><p class="cap">빈 수치 실측, 측색기 색 검증, 하드웨어 치수 확정<span>Months 1–2: measure the missing figures; verify colors with a colorimeter; finalize hardware dimensions</span></p></div>
+    <div class="jw" style="padding-top:4mm"><p class="cap">법률 검토, 행사·팝업에서 단기 운영<span>Months 3–4: legal review; short runs at events and pop-ups</span></p></div>
+    <div class="jw" style="padding-top:4mm"><p class="cap">대형 매장 1~2곳 파일럿, 지표 수집<span>Months 5–6: pilot in one or two large stores; collect metrics</span></p></div>
+    <div class="jw" style="padding-top:4mm"><p class="cap">구독 전환, 브랜드 캠페인, 재고 연동<span>After: move to subscription; brand campaigns; stock integration</span></p></div>
+  </div>
+</section>
+
+<!-- ───────────── 89쪽 (홀수) · 7.3 Action Plans 2/2 · 확장 가능성 ───────────── -->
+<section class="page odd" id="p89">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">7.3 Action Plans</div>
+      <h2>확장 가능성</h2>
+      <div class="sub">Room to Expand</div>
+    </div>
+    <div class="body"></div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">01.</div><h2>립에서 색조 전체로</h2><div class="sub">From Lips to All Color Cosmetics</div><svg viewBox="0 0 40 40"><path d="M5 21c5-7 9-9 12-7 1.5 1 2.5 1 3 1s1.500-.001 3-1c3-2 7 0 12 7-5 7-10 10-15 10S10 28 5 21z"/><path d="M5 21h30"/></svg></div>
+    <div class="body">
+      <p class="ko">TOOK의 구조(입술 인식 → 색 입히기 → 색차로 실제 제품 찾기)는 립에만 묶여 있지 않다. <em>얼굴 랜드마크는 이미 478개의 점을 주므로 칠할 영역과 제품 데이터만 바꾸면 블러셔와 아이섀도로 넓힐 수 있다.</em></p>
+      <p class="en">TOOK’s structure (lip detection → color application → finding real products by color difference) is not tied to lips. The face landmarks already give 478 points, so by changing only the area to paint and the product data it can extend to blush and eyeshadow.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">02.</div><h2>여러 언어, 여러 매장</h2><div class="sub">More Languages, More Stores</div><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14"/><path d="M6 20h28M20 6c-5 4-5 24 0 28M20 6c5 4 5 24 0 28"/></svg></div>
+    <div class="body">
+      <p class="ko">서비스 전체가 한국어와 영어를 지원한다. 올리브영 매출에서 외국인이 차지하는 비중은 2024년 21%에서 2025년 28%로 올랐다(바이라인네트워크, 2026). <em>말이 통하지 않아도 색은 통한다.</em> 일본어와 중국어는 문장만 더하면 되므로 관광객이 많은 매장부터 넓힐 수 있다.</p>
+      <p class="en">The whole service supports Korean and English. The share of foreign customers in Olive Young’s revenue rose from 21% in 2024 to 28% in 2025 (Byline Network, 2026). Even when words do not get through, color does. Japanese and Chinese only need the sentences added, so expansion can start with stores that have many tourists.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">03.</div><h2>메타뱅크와의 결합</h2><div class="sub">Combining with MetaBank</div><svg viewBox="0 0 40 40"><circle cx="14" cy="20" r="9"/><circle cx="26" cy="20" r="9"/></svg></div>
+    <div class="body">
+      <p class="ko">BOGOFIT의 생성형 가상 피팅은 전체 룩을, TOOK의 실시간 립 색은 매대 앞의 빠른 확인을 맡는다. <em>매장 입구의 키오스크에서 전체 메이크업을 보고 립 매대의 TOOK에서 실제 제품을 고르는 흐름으로 두 서비스를 이을 수 있다.</em></p>
+      <p class="en">BOGOFIT’s generative virtual fitting handles the whole look, and TOOK’s real-time lip color handles the quick check at the shelf. The two services can be linked in one flow: see the full makeup at a kiosk by the store entrance, then choose the real product at TOOK on the lip shelf.</p>
+    </div>
+  </div>
+
+  <div class="quote" data-g="맺음말">
+    <p class="ko">TOOK의 이름처럼, 거울을 툭 건드리면 색이 바로 나타나는 경험. <em>이 경험을 실제 매장의 매대에서 증명하는 것이 다음 팀과 메타뱅크에게 남기는 과제이다.</em></p>
+    <p class="en">As the name TOOK suggests: touch the mirror lightly and the color appears at once. Proving this experience at the shelf of a real store is the task we leave to the next team and to MetaBank.</p>
+  </div>
+</section>
+
+<!-- ───────────── 99쪽 (홀수) · 9.1 References ───────────── -->
+<section class="page odd" id="p99">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">9.1</div>
+      <h2>References</h2>
+      <div class="sub">참고 문헌</div>
+      <svg viewBox="0 0 40 40"><path d="M7 8h10a3 3 0 0 1 3 3v22a3 3 0 0 0-3-3H7z"/><path d="M33 8H23a3 3 0 0 0-3 3v22a3 3 0 0 1 3-3h10z"/></svg>
+    </div>
+    <div class="body refs" data-g="참고 문헌 목록">
+      <p class="ref t">AppsFlyer (2025). App uninstall benchmarks.</p>
+      <p class="ref t">CIE (2001). Improvement to industrial colour-difference evaluation (CIE 142-2001, CIEDE2000).</p>
+      <p class="ref t">CJ뉴스룸 (2025). 올리브영 매장 전자라벨 도입.</p>
+      <p class="ref t">Fitts, P. M. (1954). The information capacity of the human motor system in controlling the amplitude of movement. Journal of Experimental Psychology.</p>
+      <p class="ref t">Google. MediaPipe Face Landmarker.</p>
+      <p class="ref t">Hick, W. E. (1952). On the rate of gain of information. Quarterly Journal of Experimental Psychology.</p>
+      <p class="ref t">Hyman, R. (1953). Stimulus information as a determinant of reaction time. Journal of Experimental Psychology.</p>
+      <p class="ref t">Iyengar, S. S., &amp; Lepper, M. R. (2000). When choice is demotivating. Journal of Personality and Social Psychology.</p>
+      <p class="ref t">Kang (2026, 심사 전). 스마트폰 사진의 색 보정 연구.</p>
+      <p class="ref t">Kim 외 (2025). 국내 매장 립 테스터 세균 오염과 소비자 인식. Hygiene.</p>
+      <p class="ref t">Meireles 외 (2026). 스마트 미러 사용 경험과 구매 의도.</p>
+      <p class="ref t">NFC Forum·ABI Research (2024). NFC 소비자 조사.</p>
+      <p class="ref t">NielsenIQ (2026). 생성형 AI 뷰티 추천 이용 조사.</p>
+      <p class="ref t">Nielsen Norman Group. Progressive Disclosure.</p>
+      <p class="ref t">Research and Markets (2025). Virtual Fitting Room Market.</p>
+      <p class="ref t">Tan 외 (2022). 화장품 가상 체험과 구매율.</p>
+      <p class="ref t">공정거래위원회 (2024). 추천·보증 등에 관한 표시·광고 심사지침.</p>
+      <p class="ref t">바이라인네트워크 (2026). CJ올리브영 2025년 실적.</p>
+      <p class="ref t">비즈니스워치 (2023). 백화점 립스틱 테스터 사용 기한 조사.</p>
+      <p class="ref t">식품의약품안전처 (2026). 2025년 화장품 수출 실적.</p>
+      <p class="ref t">오픈서베이 (2025). 뷰티 트렌드 리포트.</p>
+      <p class="ref t">한국경제 (2026). 올리브영 비수도권 투자 계획.</p>
+      <p class="ref t todo" style="margin-top:4mm">[채울 내용: 각 자료의 정확한 제목·URL·접속일을 1~3장 본문 인용과 맞춰 확인]</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 100쪽 (짝수) · 9.2 Appendices ───────────── -->
+<section class="page even" id="p100">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">9.2</div>
+      <h2>Appendices</h2>
+      <div class="sub">부록</div>
+    </div>
+    <div class="body"></div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">가.</div><h2>설계 도면, 부품표</h2><div class="sub">A. Design Drawings and Parts List</div></div>
+    <div class="body">
+      <figure data-g="그림 도면 원본">
+        <div class="ill"><svg viewBox="0 0 440 184"><rect x="0" y="0" width="440" height="184" rx="4" fill="#f7f7f7"/><polygon points="36,52 66,34 66,130 36,148" fill="#dfe6ea" stroke="#111111" stroke-width="1" fill-opacity=".8"/><text x="51" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">1</text><text x="51" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">하프미러</text><polygon points="90,52 120,34 120,130 90,148" fill="#ffffff" stroke="#9a9a9a" stroke-width="1" stroke-dasharray="3 2"/><text x="105" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">2</text><text x="105" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">터치 필름</text><polygon points="144,52 174,34 174,130 144,148" fill="none" stroke="#111111" stroke-width="2.4"/><text x="159" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">3</text><text x="159" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">간격재</text><polygon points="198,52 228,34 228,130 198,148" fill="#222222" stroke="#111111" stroke-width="1"/><polygon points="202,58 224,44.8 224,120 202,133.2" fill="#3a3a3a"/><text x="213" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">4</text><text x="213" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">디스플레이</text><polygon points="252,52 282,34 282,130 252,148" fill="none" stroke="#9a9a9a" stroke-width="1" stroke-dasharray="2 2"/><polygon points="259,78 274,69 274,94 259,103" fill="#9a9a9a"/><polygon points="261,116 273,109 273,115 261,122" fill="#111111"/><text x="267" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">5</text><text x="267" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">허브·보드</text><polygon points="306,52 336,34 336,130 306,148" fill="#cfcfcf" stroke="#111111" stroke-width="1"/><path d="M314 74l14 -8.400M314 82l14 -8.400M314 90l14 -8.400" stroke="#111111" stroke-width="1" fill="none"/><text x="321" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">6</text><text x="321" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">뒤판</text><polygon points="360,52 390,34 390,130 360,148" fill="none" stroke="#D32C3E" stroke-width="2.4"/><text x="375" y="164" font-size="9" font-weight="700" fill="#D32C3E" text-anchor="middle">7</text><text x="375" y="175" font-size="7" font-weight="400" fill="#111111" text-anchor="middle">LED 조명</text><text x="36" y="20" font-size="8" font-weight="700" fill="#111111">앞</text><path d="M50 17H388M383 13.500l5 3.500l-5 3.500" stroke="#111111" stroke-width=".8" fill="none"/><text x="404" y="20" font-size="8" font-weight="700" fill="#111111" text-anchor="end">뒤</text></svg></div>
+        <figcaption><span class="n">1</span><b>그림 1</b>적층 분해도 (개략도). 정면도·측면도·평면도는 75쪽<span class="en">Figure 1. Exploded layer view (schematic). Front, side and top views are on page 75</span></figcaption>
+      </figure>
+      <figure data-g="표 부품표 전체" style="margin-top:4mm">
+        <div class="slot" style="height:30mm"><b>표 자리</b><span>부품표 전체 (구매처·모델명 포함)</span></div>
+        <figcaption><span class="n">2</span><b>표 1</b>부품표 전체 (구매처·모델명 포함)<span class="en">Table 1. Full parts list (with suppliers and model names)</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><h2 style="margin-top:0">시제품 주소</h2><div class="sub">Prototype Addresses</div></div>
+    <div class="body">
+      <div class="tb tight" style="--cols:38mm 1fr;--gap:4mm;margin-top:0">
+        <div class="th" data-g="주소 표 머리"><div class="t">구분 <span>Type</span></div><div class="t">주소 <span>Address</span></div></div>
+        <div class="tr" data-g="주소 정적 버전"><div><p class="k">정적 버전(Vercel)</p><p class="ke">Static version</p></div><div><p class="ko">took-sieunkirns-projects.vercel.app</p></div></div>
+        <div class="tr" data-g="주소 서버 버전"><div><p class="k">서버 버전(Render)</p><p class="ke">Server version</p></div><div><p class="ko">took-y6rn.onrender.com</p></div></div>
+        <div class="tr" data-g="주소 안드로이드 앱"><div><p class="k">안드로이드 앱</p><p class="ke">Android app</p></div><div><p class="ko">took.apk (npm run build:apk)</p></div></div>
+      </div>
+      <p class="ko" style="margin-top:3mm">관리자 화면에서 터치 보정, 카메라 색 보정, NFC 테스트, 웹캠 연결 설정, 호수 검수를 한다.</p>
+      <p class="en">The admin screen is used for touch calibration, camera color calibration, the NFC test, webcam connection settings and shade review.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="head"><div class="no">나.</div><h2>실험 결과표</h2><div class="sub">B. Experiment Result Tables</div></div>
+    <div class="body">
+      <p class="ko">CFP 1(필름별 밝기·ΔE), CFP 2(보정 전·후 터치 오차), CEP 3·검증 시험(과제 성공률, 조명별 ΔE, NFC 인식률) 원자료. <span class="todo">[채울 내용: 원자료 표]</span></p>
+      <p class="en">Raw data for CFP 1 (brightness and ΔE by film), CFP 2 (touch error before and after calibration), and CEP 3 and the validation tests (task success rate, ΔE by lighting, NFC recognition rate).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 53쪽 (홀수) · 4.2 Prototyping 1/9 · 프로토타입 계획 ───────────── -->
+<section class="page odd" id="p53">
+  <div class="bar"></div>
+
+  <div class="sec">
+    <div class="head">
+      <div class="no">4.2 Prototyping</div>
+      <h2>CFP/CEP 개발</h2>
+      <div class="sub">CFP / CEP Development</div>
+      <svg viewBox="0 0 40 40"><path d="M6 31h8v-7h8v-7h8v-7h4"/><path d="M29.5 6.5L34 10l-4.5 3.5"/></svg>
+    </div>
+    <div class="body">
+      <p class="ko">한 번에 완성품을 만들지 않고, <em>가장 불확실한 것부터 작게 만들어 확인했다.</em></p>
+      <p class="en">We did not build the finished product in one go. We started with what was most uncertain, built it small, and checked it.</p>
+    </div>
+  </div>
+
+  <div class="defs">
+    <div class="df" data-g="정의 CFP">
+      <div class="big t">CFP</div>
+      <div class="nm t">Critical Function Prototype <span>· 기능</span></div>
+      <p class="ko">핵심 기능 하나만 떼어 시험하는 프로토타입이다. 외형은 신경 쓰지 않는다.</p>
+      <p class="en">A CFP isolates and tests a single core function. Appearance does not matter.</p>
+    </div>
+    <div class="df x" data-g="정의 CEP">
+      <div class="big t">CEP</div>
+      <div class="nm t">Critical Experience Prototype <span>· 경험</span></div>
+      <p class="ko">기능보다 경험을 시험한다. 사용자가 실제로 그 경험을 원하고 이해하는지 확인하는 프로토타입이다.</p>
+      <p class="en">A CEP tests the experience rather than the function. It checks whether users actually want and understand that experience.</p>
+    </div>
+  </div>
+
+  <div class="tb fill plan" style="--cols:24mm 1fr 50mm;--gap:6mm;margin-top:6mm">
+    <div class="tt t" data-g="표 제목 프로토타입 계획">프로토타입 계획 <span>Prototype plan</span></div>
+    <div class="th" data-g="표 머리"><div class="t">번호 <span>No.</span></div><div class="t">질문 <span>Question</span></div><div class="t">프로토타입 <span>Prototype</span></div></div>
+    <div class="tr" data-g="CFP 1"><div><div class="no">CFP 1</div><span class="tag t">Function</span></div><div><p class="k">하프미러 뒤에서도 화면과 립 색이 보이는가</p><p class="ke">Can the screen and the lip color be seen behind a half mirror?</p></div><div><p class="ko">필름 위 화면 띄우기, PC 미리보기</p><p class="en">Screen shown through film, PC preview</p></div></div>
+    <div class="tr" data-g="CFP 2"><div><div class="no">CFP 2</div><span class="tag t">Function</span></div><div><p class="k">유리 위 터치가 정확하게 먹히는가</p><p class="ke">Does touch on the glass register accurately?</p></div><div><p class="ko">정전식 필름 + 터치 보정 화면</p><p class="en">Capacitive film + touch calibration screen</p></div></div>
+    <div class="tr" data-g="CEP 3"><div><div class="no" style="color:var(--ink)">CEP 3</div><span class="tag x t">Experience</span></div><div><p class="k">입술 위에서 색을 입혀 보는 경험을 원하는가</p><p class="ke">Do people want to try colors on their own lips?</p></div><div><p class="ko">웹 시제품</p><p class="en">Web prototype</p></div></div>
+    <div class="tr" data-g="CFP 4"><div><div class="no">CFP 4</div><span class="tag t">Function</span></div><div><p class="k">어떤 하프미러가 화면과 거울을 함께 살리는가</p><p class="ke">Which half mirror serves both the screen and the mirror?</p></div><div><p class="ko">시료 투과율 실측</p><p class="en">Measured transmittance of samples</p></div></div>
+    <div class="tr" data-g="CFP 5"><div><div class="no">CFP 5</div><span class="tag t">Function</span></div><div><p class="k">손으로 붙여 거울 한 대를 만들 수 있는가</p><p class="ke">Can one mirror be built by hand?</p></div><div><p class="ko">합지, 3D 출력, 조립</p><p class="en">Lamination, 3D printing, assembly</p></div></div>
+  </div>
+</section>
+
+<!-- ───────────── 70쪽 (짝수) · 6.1 Overview · 큰 숫자 머리말 + 둥근 표 카드 틀 ───────────── -->
+<section class="page even" id="p70">
+  <div class="bar"></div>
+
+  <div class="headw" data-g="꼭지 6.1 Overview">
+    <div class="head">
+      <div class="no">6.1</div>
+      <h2>Overview</h2>
+      <div class="sub">설계 개요</div>
+    </div>
+    <div class="body">
+      <p class="ko">최종 시제품은 매대 위에 세우는 세로형 스마트 미러이다. <em>하프미러 뒤의 화면이 카메라 영상 위에 립 색을 입혀 보여 주고, 거울 바로 밑 받침의 리더기가 제품을 알아본다.</em> 요구사항에 설계가 어떻게 답했는지는 다음과 같다.</p>
+    <p class="en">The final prototype is a vertical smart mirror that stands on the shelf. The screen behind the half mirror shows the camera image with lip color applied, and the reader in the base just below the mirror recognizes the product. The table below shows how the design answers each requirement.</p>
+    </div>
+  </div>
+
+  <div class="cards3w">
+    <div class="tt t" data-g="소제목 요구사항별 설계 대응">요구사항별 설계 대응 <span>Design response by requirement</span></div>
+    <div class="cards3">
+      <div class="cd3" data-g="F1 실시간 립 색"><div class="hd"><div class="no">F1.</div><p class="k">실시간 립 색</p></div><p class="ke">Real-time lip color</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">얼굴의 478개 점을 추적하고, 계산은 모두 기기 안에서 한다.</p><p class="en">It tracks 478 points on the face, and all computing is done on the device.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em> 평균 30fps로 동작했다.</p><p class="en">Met. It ran at 30 fps on average.</p></div>
+      <div class="cd3" data-g="F2 색 정확도"><div class="hd"><div class="no">F2.</div><p class="k">색 정확도</p></div><p class="ke">Color accuracy</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">컬러체커 보드로 카메라 색을 보정하고 고정한다.</p><p class="en">The camera color is calibrated and locked with a color checker board.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>일부 충족.</em> 어두운 곳에서는 기준에 못 미쳤다.</p><p class="en">Partly met. It fell short in a dark place.</p></div>
+      <div class="cd3" data-g="F3 혼자 사용"><div class="hd"><div class="no">F3.</div><p class="k">혼자 사용</p></div><p class="ke">Used alone</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">입력 화면을 두지 않고, 조작은 화면 아래에 모았다.</p><p class="en">There is no input screen, and the controls are gathered at the bottom of the screen.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em> 무안내 과제 A·B·C를 전원이 성공했다.</p><p class="en">Met. Everyone completed unguided tasks A, B and C.</p></div>
+      <div class="cd3" data-g="F4 영상 미저장"><div class="hd"><div class="no">F4.</div><p class="k">영상 미저장</p></div><p class="ke">No video stored</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">영상은 기기 안에서 처리하고, 90초가 지나면 자동으로 초기화한다.</p><p class="en">Video is processed on the device and reset automatically after 90 seconds.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em></p><p class="en">Met.</p></div>
+      <div class="cd3" data-g="F5 제품 인식"><div class="hd"><div class="no">F5.</div><p class="k">제품 인식</p></div><p class="ke">Product recognition</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">받침에 NFC 리더기를 내장했다.</p><p class="en">An NFC reader is built into the base.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em> 인식률 96.7%, 평균 0.5초였다.</p><p class="en">Met. Recognition was 96.7%, in 0.5 seconds on average.</p></div>
+      <div class="cd3" data-g="F6 터치 정확도"><div class="hd"><div class="no">F6.</div><p class="k">터치 정확도</p></div><p class="ke">Touch accuracy</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">십자 5개를 누르는 아핀 변환 보정으로 맞춘다.</p><p class="en">It is aligned by an affine-transformation calibration using five crosses.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em> 오차는 평균 5.2px였다.</p><p class="en">Met. The error was 5.2 px on average.</p></div>
+      <div class="cd3" data-g="F7 공정한 순위"><div class="hd"><div class="no">F7.</div><p class="k">공정한 순위</p></div><p class="ke">Fair ranking</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">CIEDE2000 색차만으로 순위를 정한다.</p><p class="en">Ranking is set by CIEDE2000 color difference alone.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em></p><p class="en">Met.</p></div>
+      <div class="cd3" data-g="P1 매대 거울 자리"><div class="hd"><div class="no">P1.</div><p class="k">매대 거울 자리</p></div><p class="ke">Shelf-mirror spot</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">스탠드식 세로 거울이며, 전체 크기는 320×511mm이다.</p><p class="en">It is a standing vertical mirror, 320×511 mm overall.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>충족.</em> 둔산동 올리브영의 매대 깊이는 850mm, 받침 깊이는 332mm이다.</p><p class="en">Met. The shelf at Olive Young in Dunsan-dong is 850 mm deep, and the base is 332 mm deep.</p></div>
+      <div class="cd3" data-g="B1 태그 비용"><div class="hd"><div class="no">B1.</div><p class="k">태그 비용</p></div><p class="ke">Tag cost</p><p class="ml t">설계 대응 <span>Design response</span></p><p class="ko">인식 모듈을 바꿔 끼울 수 있는 받침을 쓰고, 납품은 바코드로 시작한다.</p><p class="en">The base takes a swappable recognition module, and delivery starts with barcodes.</p><p class="ml t">충족 여부 <span>Status</span></p><p class="ko"><em>설계에 반영했다.</em></p><p class="en">Reflected in the design.</p></div>
+    </div>
+  </div>
+
+  <div class="foot2" data-g="Note">
+    <div class="cols2">
+      <p class="ko">“충족”은 시험으로 확인한 항목이고, 빈칸은 시험이 끝나면 채운다.</p>
+      <p class="en">“Met” marks items confirmed by testing; blanks will be filled in when testing is finished.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 71쪽 (홀수) · 6.2 Details 1/7 · 소프트웨어 구성 ───────────── -->
+<section class="page odd s2" id="p71">
+  <div class="stag t" data-g="표시">6.2 Details</div>
+  <div class="hero2" data-g="머리말"><p class="hl t">Software Structure</p><p class="hs t">카메라 영상은 기기 밖으로 나가지 않고<br>모든 계산이 거울 기기 안에서 일어난다</p></div>
+
+  <div class="mid">
+    <div data-g="시스템 구조도">
+      <div class="sysx">
+        <div class="dh" style="grid-column:1;grid-row:1">입력 <span>Input</span></div>
+        <div class="dh" style="grid-column:3 / 6;grid-row:1">기기 안 처리 <span>Processing on the device</span></div>
+        <div class="dh" style="grid-column:7;grid-row:1">출력 <span>Output</span></div>
+        <div class="bx hw" style="grid-column:1;grid-row:2"><div class="t">웹캠<span>Webcam</span></div></div><div class="ar" style="grid-column:2;grid-row:2"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx" style="grid-column:3;grid-row:2"><i class="bd t">1</i><div class="t">입술 인식<span>Lip detection</span></div></div><div class="ar" style="grid-column:4;grid-row:2"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx" style="grid-column:5;grid-row:2"><i class="bd t">2</i><div class="t">색 입히기<span>Color application</span></div></div><div class="ar" style="grid-column:6;grid-row:2"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx out" style="grid-column:7;grid-row:2"><div class="t">화면<span>Screen</span></div></div>
+        <div class="bx hw" style="grid-column:1;grid-row:3"><div class="t">터치 필름<span>Touch film</span></div></div><div class="ar" style="grid-column:2;grid-row:3"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx" style="grid-column:3 / 6;grid-row:3"><i class="bd t">3</i><div class="t">터치 보정<span>Touch calibration</span></div></div><div class="ar" style="grid-column:6;grid-row:3"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx out" style="grid-column:7;grid-row:3"><div class="t">버튼<span>Buttons</span></div></div>
+        <div class="bx hw" style="grid-column:1;grid-row:4"><div class="t">NFC 리더기<span>NFC reader</span></div></div><div class="ar" style="grid-column:2;grid-row:4"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx" style="grid-column:3 / 6;grid-row:4"><i class="bd t">5</i><div class="t">제품 찾기<span>Product lookup</span></div></div><div class="ar" style="grid-column:6;grid-row:4"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx db" style="grid-column:1;grid-row:5"><i class="bd t">6</i><div class="t">제품 DB<span>Product database</span></div></div><div class="ar" style="grid-column:2;grid-row:5"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx" style="grid-column:3 / 6;grid-row:5"><i class="bd t">4</i><div class="t">색차 비교<span>Color-difference comparison</span></div></div><div class="ar" style="grid-column:6;grid-row:5"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="bx out" style="grid-column:7;grid-row:4 / span 2"><div class="t">제품 시트<span>Product sheet</span></div></div>
+      </div>
+      <div class="lg">
+        <div class="li"><i class="hw"></i><span class="t">하드웨어 <span>Hardware</span></span></div>
+        <div class="li"><i></i><span class="t">소프트웨어 처리 <span>Software</span></span></div>
+        <div class="li"><i class="db"></i><span class="t">데이터 <span>Data</span></span></div>
+        <div class="li"><i class="out"></i><span class="t">사용자에게 보이는 결과 <span>What the user sees</span></span></div>
+      </div>
+    </div>
+    <div class="sps">
+      <div class="sp" data-g="갈래 1 보기"><div class="ph"><i class="bd2 t">1</i><p class="k">보기</p><p class="ke">Seeing</p></div><p class="ko">얼굴·입술 위치를 찾는다</p><p class="tk t">MediaPipe Face Landmarker(478점)</p><p class="en">Finds the face and lips</p></div>
+      <div class="sp" data-g="갈래 2 칠하기"><div class="ph"><i class="bd2 t">2</i><p class="k">칠하기</p><p class="ke">Painting</p></div><p class="ko">입술에 립 색을 자연스럽게 입힌다</p><p class="tk t">Lab 색 공간, 마스크·페더링, 조명 보정</p><p class="en">Puts lip color on the lips naturally</p></div>
+      <div class="sp" data-g="갈래 3 맞추기"><div class="ph"><i class="bd2 t">3</i><p class="k">맞추기</p><p class="ke">Calibrating</p></div><p class="ko">카메라 색과 터치 위치를 바로잡는다</p><p class="tk t">컬러 캘리브레이션, 터치 보정</p><p class="en">Corrects the camera color and touch position</p></div>
+      <div class="sp" data-g="갈래 4 비교하기"><div class="ph"><i class="bd2 t">4</i><p class="k">비교하기</p><p class="ke">Comparing</p></div><p class="ko">색이 얼마나 비슷한지 잰다</p><p class="tk t">CIEDE2000 색차(ΔE)</p><p class="en">Measures how similar two colors are</p></div>
+      <div class="sp" data-g="갈래 5 제품 찾기"><div class="ph"><i class="bd2 t">5</i><p class="k">제품 찾기</p><p class="ke">Finding products</p></div><p class="ko">만든 색과 가장 가까운 제품·호수를 고른다</p><p class="tk t">색차 순위, NFC 제품 조회</p><p class="en">Picks the closest products and shades</p></div>
+      <div class="sp" data-g="갈래 6 데이터"><div class="ph"><i class="bd2 t">6</i><p class="k">데이터</p><p class="ke">Data</p></div><p class="ko">실제 제품·호수를 모으고 색을 뽑는다</p><p class="tk t">크롤링, 색 칩 추출, 사람 검수</p><p class="en">Collects real products and extracts colors</p></div>
+    </div>
+  </div>
+
+  <div class="foot3" data-g="아래 본문">
+    <p class="ft t">Software</p>
+    <div class="cols">
+      <div><p class="ko">TOOK의 소프트웨어는 웹앱으로 만들고 APK로 묶어 안드로이드 앱으로 설치한다. 갤럭시탭의 브라우저만으로는 외장 웹캠을 원하는 대로 열 수 없어, 카메라 권한과 해상도를 앱이 직접 다루게 했다. 설치형이므로 매장 인터넷이 끊겨도 제품 시트까지 동작한다. <em>카메라 영상은 기기 밖으로 나가지 않고 모든 계산이 거울 기기 안에서 일어난다.</em></p></div>
+      <div><p class="en">TOOK’s software is built as a web app, packaged as an APK and installed as an Android app. The Galaxy Tab’s browser alone cannot open an external webcam the way we need, so the app handles camera permission and resolution directly. Because it is installed on the device, it works up to the product sheet even when the store’s internet is down. The camera image never leaves the device, and all computing happens inside the mirror.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 72쪽 (짝수) · 6.2 Details 2/7 · 컬러 캘리브레이션 ───────────── -->
+<section class="page even s2" id="p72">
+  <div class="stag t" data-g="표시">6.2 Details</div>
+  <div class="hero2" data-g="머리말"><p class="hl t">Color Calibration</p><p class="hs t">기준은 흰 종이가 아니라<br>설치 패키지에 들어 있는 컬러체커 보드이다</p></div>
+
+  <div class="mid">
+    <div class="trio2" data-g="그림 보정 전·후와 고정 (도식)">
+      <div class="co"><div class="ill"><svg viewBox="0 0 192 136"><rect x="0" y="0" width="192" height="136" rx="4" fill="#f5f5f5"/><rect x="8" y="8" width="176" height="68" rx="3" fill="#222222"/><rect x="13" y="13" width="25.200" height="12" fill="#735244"/><rect x="41.2" y="13" width="25.200" height="12" fill="#c29682"/><rect x="69.4" y="13" width="25.200" height="12" fill="#627a9d"/><rect x="97.6" y="13" width="25.200" height="12" fill="#576c43"/><rect x="125.8" y="13" width="25.200" height="12" fill="#8580b1"/><rect x="154" y="13" width="25.200" height="12" fill="#67bdaa"/><rect x="13" y="28" width="25.200" height="12" fill="#d67e2c"/><rect x="41.2" y="28" width="25.200" height="12" fill="#505ba6"/><rect x="69.4" y="28" width="25.200" height="12" fill="#c15a63"/><rect x="97.6" y="28" width="25.200" height="12" fill="#5e3c6c"/><rect x="125.8" y="28" width="25.200" height="12" fill="#9dbc40"/><rect x="154" y="28" width="25.200" height="12" fill="#e0a32e"/><rect x="13" y="43" width="25.200" height="12" fill="#383d96"/><rect x="41.2" y="43" width="25.200" height="12" fill="#469449"/><rect x="69.4" y="43" width="25.200" height="12" fill="#af363c"/><rect x="97.6" y="43" width="25.200" height="12" fill="#e7c71f"/><rect x="125.8" y="43" width="25.200" height="12" fill="#bb5695"/><rect x="154" y="43" width="25.200" height="12" fill="#0885a1"/><rect x="13" y="58" width="25.200" height="12" fill="#f3f3f2"/><rect x="41.2" y="58" width="25.200" height="12" fill="#c8c8c8"/><rect x="69.4" y="58" width="25.200" height="12" fill="#a0a0a0"/><rect x="97.6" y="58" width="25.200" height="12" fill="#7a7a79"/><rect x="125.8" y="58" width="25.200" height="12" fill="#555555"/><rect x="154" y="58" width="25.200" height="12" fill="#343434"/><rect x="8" y="8" width="176" height="68" rx="3" fill="#FFC400" fill-opacity=".3"/><rect x="12" y="57" width="27.200" height="14" fill="none" stroke="#D32C3E" stroke-width="1.4"/><text x="10" y="94.8" font-size="8" font-weight="700" fill="#111111">R</text><rect x="24" y="88" width="160" height="7" rx="1" fill="#e2e2e2"/><rect x="24" y="88" width="138" height="7" rx="1" fill="#D9534F"/><text x="10" y="108.8" font-size="8" font-weight="700" fill="#111111">G</text><rect x="24" y="102" width="160" height="7" rx="1" fill="#e2e2e2"/><rect x="24" y="102" width="126" height="7" rx="1" fill="#5BA36B"/><text x="10" y="122.8" font-size="8" font-weight="700" fill="#111111">B</text><rect x="24" y="116" width="160" height="7" rx="1" fill="#e2e2e2"/><rect x="24" y="116" width="82" height="7" rx="1" fill="#4F7FD9"/></svg></div><p class="ct t">Before</p><p class="cx t"><b>노란 기가 강함</b><br>흰색 칸의 빨강·초록·파랑 값이 서로 다르다</p></div>
+      <div class="co red"><div class="ill"><svg viewBox="0 0 192 136"><rect x="0" y="0" width="192" height="136" rx="4" fill="#f5f5f5"/><rect x="8" y="8" width="176" height="68" rx="3" fill="#222222"/><rect x="13" y="13" width="25.200" height="12" fill="#735244"/><rect x="41.2" y="13" width="25.200" height="12" fill="#c29682"/><rect x="69.4" y="13" width="25.200" height="12" fill="#627a9d"/><rect x="97.6" y="13" width="25.200" height="12" fill="#576c43"/><rect x="125.8" y="13" width="25.200" height="12" fill="#8580b1"/><rect x="154" y="13" width="25.200" height="12" fill="#67bdaa"/><rect x="13" y="28" width="25.200" height="12" fill="#d67e2c"/><rect x="41.2" y="28" width="25.200" height="12" fill="#505ba6"/><rect x="69.4" y="28" width="25.200" height="12" fill="#c15a63"/><rect x="97.6" y="28" width="25.200" height="12" fill="#5e3c6c"/><rect x="125.8" y="28" width="25.200" height="12" fill="#9dbc40"/><rect x="154" y="28" width="25.200" height="12" fill="#e0a32e"/><rect x="13" y="43" width="25.200" height="12" fill="#383d96"/><rect x="41.2" y="43" width="25.200" height="12" fill="#469449"/><rect x="69.4" y="43" width="25.200" height="12" fill="#af363c"/><rect x="97.6" y="43" width="25.200" height="12" fill="#e7c71f"/><rect x="125.8" y="43" width="25.200" height="12" fill="#bb5695"/><rect x="154" y="43" width="25.200" height="12" fill="#0885a1"/><rect x="13" y="58" width="25.200" height="12" fill="#f3f3f2"/><rect x="41.2" y="58" width="25.200" height="12" fill="#c8c8c8"/><rect x="69.4" y="58" width="25.200" height="12" fill="#a0a0a0"/><rect x="97.6" y="58" width="25.200" height="12" fill="#7a7a79"/><rect x="125.8" y="58" width="25.200" height="12" fill="#555555"/><rect x="154" y="58" width="25.200" height="12" fill="#343434"/><rect x="12" y="57" width="27.200" height="14" fill="none" stroke="#D32C3E" stroke-width="1.4"/><text x="10" y="94.8" font-size="8" font-weight="700" fill="#111111">R</text><rect x="24" y="88" width="160" height="7" rx="1" fill="#e2e2e2"/><rect x="24" y="88" width="116" height="7" rx="1" fill="#D9534F"/><text x="10" y="108.8" font-size="8" font-weight="700" fill="#111111">G</text><rect x="24" y="102" width="160" height="7" rx="1" fill="#e2e2e2"/><rect x="24" y="102" width="116" height="7" rx="1" fill="#5BA36B"/><text x="10" y="122.8" font-size="8" font-weight="700" fill="#111111">B</text><rect x="24" y="116" width="160" height="7" rx="1" fill="#e2e2e2"/><rect x="24" y="116" width="116" height="7" rx="1" fill="#4F7FD9"/></svg></div><p class="ct t">After</p><p class="cx t"><b>세 값이 같음</b><br>곱할 값(이득)으로 흰색 칸을 흰색으로 되돌린다</p></div>
+      <div class="co"><div class="ill"><svg viewBox="0 0 192 136"><rect x="0" y="0" width="192" height="136" rx="4" fill="#f5f5f5"/><rect x="14" y="16" width="32" height="17" rx="8.500" fill="#D32C3E"/><circle cx="37.500" cy="24.500" r="6.200" fill="#ffffff"/><text x="54" y="28" font-size="9" font-weight="700" fill="#111111">자동 색·밝기 고정</text><path d="M14 118H178" stroke="#d0d0d0" stroke-width=".8" fill="none"/><path d="M14 82C28 54 42 110 56 82S84 54 98 82S126 110 140 82S166 62 178 74" stroke="#b5b5b5" stroke-width="1.6" stroke-dasharray="3 2.4" fill="none"/><path d="M14 82H178" stroke="#D32C3E" stroke-width="2.200" fill="none"/><text x="178" y="56" font-size="6.5" font-weight="400" fill="#8c8c8c" text-anchor="end">자동 보정</text><text x="178" y="100" font-size="6.5" font-weight="700" fill="#D32C3E" text-anchor="end">고정</text></svg></div><p class="ct t">Lock</p><p class="cx t"><b>웹캠 자동 색·밝기 고정</b><br>손님이 바뀌어도 색이 흔들리지 않는다</p></div>
+    </div>
+    <div class="sps">
+      <div class="sp" data-g="순서 01"><div class="no">01</div><p class="ko">매장 조명을 손님이 쓸 때처럼 켠다.</p><p class="en">Turn on the store lighting as customers will have it.</p></div>
+      <div class="sp" data-g="순서 02"><div class="no">02</div><p class="ko">컬러체커 보드를 얼굴이 올 자리에 들고, 화면 가운데 네모가 보드의 흰색 칸으로 가득 차게 한다.</p><p class="en">Hold the board where the face will be and fill the center square with its white patch.</p></div>
+      <div class="sp" data-g="순서 03"><div class="no">03</div><p class="ko">“측정하기”를 누르고 1초 동안 가만히 있는다. 네모 안의 빨강·초록·파랑 평균을 잰다.</p><p class="en">Press “Measure” and hold still for one second; the average red, green and blue are measured.</p></div>
+      <div class="sp" data-g="순서 04"><div class="no">04</div><p class="ko"><em>차이만큼 각 색에 곱할 값(이득)을 계산해, 흰색 칸이 흰색으로 보이게 되돌린다.</em> 회색 칸들로 밝기 방향도 확인한다.</p><p class="en">A gain for each color brings the white patch back to white; the gray patches check the brightness.</p></div>
+      <div class="sp" data-g="순서 05"><div class="no">05</div><p class="ko">“웹캠 자동 색·밝기 고정”을 켜면, 카메라가 이 조명에 맞춘 상태 그대로 자동 보정을 멈춘다.</p><p class="en">“Lock webcam auto color and brightness” stops automatic adjustment in this state.</p></div>
+      <div class="sp" data-g="순서 06"><div class="no">06</div><p class="ko">보정 전·후 화면을 나란히 보고 저장한다. 보정값은 코드로 복사해 다른 기기에 옮길 수 있다.</p><p class="en">Compare before and after, then save. The values can be copied to another device as a code.</p></div>
+    </div>
+  </div>
+
+  <div class="foot3" data-g="아래 본문">
+    <p class="ft t">Calibration</p>
+    <div class="cols">
+      <div><p class="ko">카메라가 스스로 색을 바꾸는 문제를 풀기 위해 직원용 카메라 색 보정 화면(color-calib.html)을 만들었다. 설치할 때나 조명을 바꿨을 때 한 번 한다. <em>기준은 흰 종이가 아니라 설치 패키지에 들어 있는 컬러체커 보드이다.</em> 종이는 백색도가 제각각이라 매장마다 기준이 달라지기 때문이다.</p><p class="ko">보정값은 립 색을 입힐 때 쓰이고, 그 위에 입술 옆 피부의 밝기로 순간의 조명 변화를 한 번 더 보정한다. 보정값이 없을 때는 눈 흰자를 기준으로 삼는다.</p></div>
+      <div><p class="en">To solve the problem of the camera changing color by itself, we built a camera color calibration screen for staff (color-calib.html). It is done once, at installation or when the lighting is changed. The reference is not a sheet of white paper but the color checker board included in the installation package, because paper varies in whiteness and the reference would differ from store to store.</p><p class="en">The calibration values are used when lip color is applied, and on top of them the brightness of the skin beside the lips corrects momentary changes in lighting once more. When there are no calibration values, the whites of the eyes are used as the reference.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 73쪽 (홀수) · 6.2 Details 3/7 · 립 제품 데이터베이스 ───────────── -->
+<section class="page odd s2" id="p73">
+  <div class="stag t" data-g="표시">6.2 Details</div>
+  <div class="hero2" data-g="머리말"><p class="hl t">Lip Product Database</p><p class="hs t">올리브영 판매 페이지의 립 제품을 모아<br>데이터베이스로 만들었다</p></div>
+
+  <div class="mid">
+    <div class="jm j5" data-g="순서 01~05">
+      <div class="jd"><i></i><b class="t">01</b></div><div class="jd"><i></i><b class="t">02</b></div><div class="jd"><i></i><b class="t">03</b></div><div class="jd"><i></i><b class="t">04</b></div><div class="jd"><i></i><b class="t">05</b></div>
+      <div class="ja"><p class="k">수집</p><p class="ke">Collection</p></div><div class="ja"><p class="k">색 추출</p><p class="ke">Color extraction</p></div><div class="ja"><p class="k">자동 판정</p><p class="ke">Automatic sorting</p></div><div class="ja"><p class="k">사람 검수</p><p class="ke">Human review</p></div><div class="ja"><p class="k">사용</p><p class="ke">Use</p></div>
+    </div>
+    <div class="x03" data-g="그림 색 추출 과정 (도식)">
+      <p class="xl t">색상 칩 한 장이 대표색 하나가 되기까지 <span>From one color chip to one representative color · 예시 칩</span></p>
+      <div class="chips">
+        <div class="pn"><div class="pv"><svg viewBox="0 0 104 64"><ellipse cx="52" cy="32" rx="33" ry="19" transform="rotate(-16 52 32)" fill="#CE4761"/><path d="M22 41c9 13 42 9 60-10-9 17-46 26-60 10z" fill="#9E2F45"/><ellipse cx="45" cy="23" rx="15" ry="3.4" transform="rotate(-16 45 23)" fill="#EDB3BE"/></svg></div><p class="ct t">칩 사진</p><p class="cx t">호수별 색상 칩 사진에서 시작한다</p><p class="cx cxe t">The color-chip photo of each shade</p></div><div class="ar"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="pn"><div class="pv cut"><svg viewBox="0 0 104 64"><ellipse cx="52" cy="32" rx="33" ry="19" transform="rotate(-16 52 32)" fill="#CE4761"/><path d="M22 41c9 13 42 9 60-10-9 17-46 26-60 10z" fill="#9E2F45"/><ellipse cx="45" cy="23" rx="15" ry="3.4" transform="rotate(-16 45 23)" fill="#EDB3BE"/></svg></div><p class="ct t">배경 지우기</p><p class="cx t">흰 배경을 버린다</p><p class="cx cxe t">The white background is discarded</p></div><div class="ar"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="pn"><div class="pv"><svg viewBox="0 0 104 64"><rect x="8" y="18" width="8" height="28" fill="#7E2136"/><rect x="16" y="18" width="8" height="28" fill="#8E2A40"/><rect x="24" y="18" width="8" height="28" fill="#9E3149"/><rect x="32" y="18" width="8" height="28" fill="#B03A53"/><rect x="40" y="18" width="8" height="28" fill="#C0415B"/><rect x="48" y="18" width="8" height="28" fill="#CE4761"/><rect x="56" y="18" width="8" height="28" fill="#D65A72"/><rect x="64" y="18" width="8" height="28" fill="#DE7186"/><rect x="72" y="18" width="8" height="28" fill="#E78C9D"/><rect x="80" y="18" width="8" height="28" fill="#EFA9B6"/><rect x="88" y="18" width="8" height="28" fill="#F6C8D0"/><rect x="8" y="18" width="26.4" height="28" fill="#ffffff" fill-opacity=".6"/><rect x="69.6" y="18" width="26.4" height="28" fill="#ffffff" fill-opacity=".6"/><rect x="34.4" y="15" width="35.2" height="34" fill="none" stroke="#D32C3E" stroke-width="1.6"/></svg></div><p class="ct t">밝기순 줄 세우기</p><p class="cx t">어두운 쪽(그림자)·밝은 쪽(반사광)을 30%씩 잘라 낸다</p><p class="cx cxe t">30% is cut from the dark and bright ends</p></div><div class="ar"><svg class="aw" viewBox="0 0 24 8"><path d="M1 4H22M18.500 1L22 4L18.500 7"/></svg></div>
+        <div class="pn"><div class="pv"><svg viewBox="0 0 104 64"><circle cx="52" cy="32" r="21" fill="#CE4761"/><circle cx="52" cy="32" r="24.5" fill="none" stroke="#cfcfcf" stroke-width="1"/></svg></div><p class="ct t">가운데 40%의 평균</p><p class="cx t"><b>남은 가운데의 평균이 대표색</b></p><p class="cx cxe t">The average of what remains is the representative color</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot3" data-g="아래 본문">
+    <p class="ft t">Database</p>
+    <div class="cols">
+      <div><p class="ko">웹 크롤링으로 립 285개(중복을 빼면 272개), 호수 3,059개를 모았다. 호수별 색상 칩 사진에서 대표색을 뽑고, 자동 판정과 사람 검수를 거쳐 <em>199개 제품 · 호수 2,002개를 제품 시트에 쓴다.</em></p><p class="ko">데이터 하나에는 제품 ID, 브랜드, 이름, 가격, 제형, 색 계열, 호수 이름, 호수별 바코드, 색상값과 그 출처가 들어간다. 색상값은 사진에서 뽑은 추정값임을 출처에 적어 둔다.</p></div>
+      <div><p class="en">By web crawling we gathered 285 lip products (272 without duplicates) and 3,059 shades. A representative color is taken from the color-chip photo of each shade, and after automatic sorting and human review, 199 products and 2,002 shades are used in the product sheet.</p><p class="en">Each record holds the product ID, brand, name, price, formula, color family, shade name, the barcode of each shade, and the color value with its source. The source notes that the color value is an estimate taken from a photo.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── 60쪽 (짝수) · 4.2 Prototyping · 설계 변경 이력 (펼침면 왼쪽) ───────────── -->
+<section class="page even tl" id="p60">
+  <div class="bar"></div>
+  <div class="jt" data-g="제목">
+    <div class="no">4.2 Prototyping</div>
+    <h1 class="t">보완 작업과 설계 변경 이력</h1>
+    <p class="ke">Improvements and design change history</p>
+  </div>
+  <i class="tline" data-g="시간 선" style="left:14mm;right:0;top:140mm"></i>
+  <div data-g="11.01 첫 태블릿 시제품(립 색 "><i class="tdot" style="left:12.9mm;top:138.9mm"></i><div class="tdate t" style="left:14mm;top:130.4mm">11.01</div><div class="tent" style="left:14mm;width:39mm;bottom:131mm"><p class="k">첫 태블릿 시제품(립 색 + 챗봇)</p><p class="en">First tablet prototype (lip color + chatbot)</p><p class="wl t">이유 <span>Why</span></p><p class="ko">립 영역으로 방향 전환</p><p class="en">Shift of direction to lips</p></div></div>
+  <div data-g="11.06 노트북 + 세로 모니터 +"><i class="tdot" style="left:36.9mm;top:138.9mm"></i><div class="tdate t" style="left:38mm;top:130.4mm">11.06</div><div class="tent" style="left:38mm;width:39mm;top:146mm"><p class="k">노트북 + 세로 모니터 + USB 웹캠 + 무선 NFC 리더기</p><p class="en">Laptop + vertical monitor + USB webcam + wireless NFC reader</p><p class="wl t">이유 <span>Why</span></p><p class="ko">카메라 위치·밝기</p><p class="en">Camera position and brightness</p></div></div>
+  <div data-g="11.09 모든 화면에 다크 모드"><i class="tdot" style="left:60.9mm;top:138.9mm"></i><div class="tdate t" style="left:62mm;top:130.4mm">11.09</div><div class="tent" style="left:62mm;width:39mm;bottom:131mm"><p class="k">모든 화면에 다크 모드</p><p class="en">Dark mode on every screen</p><p class="wl t">이유 <span>Why</span></p><p class="ko">초기 판단(이후 실측으로 번복)</p><p class="en">Early judgment (later reversed by measurement)</p></div></div>
+  <div data-g="11.13 화면을 900×1440 세"><i class="tdot" style="left:84.9mm;top:138.9mm"></i><div class="tdate t" style="left:86mm;top:130.4mm">11.13</div><div class="tent" style="left:86mm;width:39mm;top:146mm"><p class="k">화면을 900×1440 세로 틀 하나로 통일</p><p class="en">All screens unified into one 900×1440 vertical frame</p><p class="wl t">이유 <span>Why</span></p><p class="ko">거울 비율</p><p class="en">Mirror ratio</p></div></div>
+  <div data-g="11.17 실제 호수 데이터, 둥근 "><i class="tdot" style="left:108.9mm;top:138.9mm"></i><div class="tdate t" style="left:110mm;top:130.4mm">11.17</div><div class="tent" style="left:110mm;width:39mm;bottom:131mm"><p class="k">실제 호수 데이터, 둥근 다이얼(28칸)·질감</p><p class="en">Real shade data; round dial (28 steps) and finishes</p><p class="wl t">이유 <span>Why</span></p><p class="ko">결과를 실제 제품으로</p><p class="en">Results as real products</p></div></div>
+  <div data-g="11.18 시작 화면에 광고 영상 추"><i class="tdot" style="left:132.9mm;top:138.9mm"></i><div class="tdate t" style="left:134mm;top:130.4mm">11.18</div><div class="tent" style="left:134mm;width:39mm;top:146mm"><p class="k">시작 화면에 광고 영상 추가</p><p class="en">Advertising video added to the start screen</p><p class="wl t">이유 <span>Why</span></p><p class="ko">지나가는 손님의 눈길 끌기</p><p class="en">Catching the eye of passing shoppers</p></div></div>
+</section>
+
+<!-- ───────────── 61쪽 (홀수) · 4.2 Prototyping · 설계 변경 이력 (펼침면 오른쪽) ───────────── -->
+<section class="page odd tl" id="p61">
+  <div class="bar"></div>
+  <div class="trange" data-g="기간"><p class="no">11.01 — 11.24</p><p class="ke">변경 12건 · 12 changes</p></div>
+  <i class="tline" data-g="시간 선" style="left:0;right:14mm;top:140mm"></i>
+  <svg class="tarr" data-g="시간 선" style="left:166.4mm;top:138.6mm" viewBox="0 0 8 12"><path d="M1 1L7 6L1 11"/></svg>
+  <div data-g="11.19 NFC 태그 시 바로 입히"><i class="tdot" style="left:10.9mm;top:138.9mm"></i><div class="tdate t" style="left:12mm;top:130.4mm">11.19</div><div class="tent" style="left:12mm;width:39mm;bottom:131mm"><p class="k">NFC 태그 시 바로 입히고 호수 시트 열기</p><p class="en">On NFC tag, apply the color at once and open the shade sheet</p><p class="wl t">이유 <span>Why</span></p><p class="ko">터치 수 줄이기</p><p class="en">Fewer taps</p></div></div>
+  <div data-g="11.20 가져가기 화면 삭제"><i class="tdot" style="left:34.9mm;top:138.9mm"></i><div class="tdate t" style="left:36mm;top:130.4mm">11.20</div><div class="tent" style="left:36mm;width:39mm;top:146mm"><p class="k">가져가기 화면 삭제</p><p class="en">“Take it with you” screen removed</p><p class="wl t">이유 <span>Why</span></p><p class="ko">흐름을 거울 중심으로 줄임</p><p class="en">Flow reduced to center on the mirror</p></div></div>
+  <div data-g="11.21 챗봇 삭제, 퀵 추천도 삭"><i class="tdot" style="left:58.9mm;top:138.9mm"></i><div class="tdate t" style="left:60mm;top:130.4mm">11.21</div><div class="tent" style="left:60mm;width:39mm;bottom:131mm"><p class="k">챗봇 삭제, 퀵 추천도 삭제</p><p class="en">Chatbot removed; Quick Recommendation also removed</p><p class="wl t">이유 <span>Why</span></p><p class="ko">거울 앞에서 쓰기 어려움</p><p class="en">Hard to use in front of a mirror</p></div></div>
+  <div data-g="11.22 APK에서 USB 웹캠을 "><i class="tdot" style="left:82.9mm;top:138.9mm"></i><div class="tdate t" style="left:84mm;top:130.4mm">11.22</div><div class="tent" style="left:84mm;width:39mm;top:146mm"><p class="k">APK에서 USB 웹캠을 직접 연결</p><p class="en">USB webcam connected directly in the APK</p><p class="wl t">이유 <span>Why</span></p><p class="ko">갤럭시탭이 USB 웹캠을 카메라로 잡지 못함</p><p class="en">The Galaxy Tab did not detect the USB webcam as a camera</p></div></div>
+  <div data-g="11.23 유사도(%) 표시 삭제, "><i class="tdot" style="left:106.9mm;top:138.9mm"></i><div class="tdate t" style="left:108mm;top:130.4mm">11.23</div><div class="tent" style="left:108mm;width:39mm;bottom:131mm"><p class="k">유사도(%) 표시 삭제, 제품 시트와 호수 시트 분리</p><p class="en">Similarity (%) removed; product sheet and shade sheet separated</p><p class="wl t">이유 <span>Why</span></p><p class="ko">숫자가 정확도처럼 보여 오해를 줄 수 있음</p><p class="en">The number could be mistaken for accuracy</p></div></div>
+  <div data-g="11.24 NFC 안내·인식 창 간소"><i class="tdot" style="left:130.9mm;top:138.9mm"></i><div class="tdate t" style="left:132mm;top:130.4mm">11.24</div><div class="tent" style="left:132mm;width:39mm;top:146mm"><p class="k">NFC 안내·인식 창 간소화</p><p class="en">NFC guide and recognition windows simplified</p><p class="wl t">이유 <span>Why</span></p><p class="ko">거울을 덜 가리게 함</p><p class="en">Covering less of the mirror</p></div></div>
+</section>
+
+</body>
+</html>
